@@ -6,7 +6,6 @@ import { log } from "../_shared/logger.ts";
 import { verifyWebhookHmac } from "../_shared/webhookSignature.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
 
-
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -17,17 +16,17 @@ const corsHeaders = {
 function mapRodonavesStatus(code: string): string | null {
   const codeNum = parseInt(code, 10);
   // Delivered
-  if ([1, 80, 81, 82, 83, 84, 85].includes(codeNum)) return "entregue";
+  if (codeNum === 1) return "entregue";
   // In transit
   if ([2, 3, 4, 5, 6, 20, 21, 22, 23, 24, 25, 26, 27].includes(codeNum))
     return "em_transito";
   // Out for delivery
   if ([7, 8, 9, 10].includes(codeNum)) return "saiu_entrega";
-  // Issues / occurrences
+  // Issues / occurrences (80-85 = extravio, nunca entregue)
   if (
     [
       40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 60, 61, 62, 63, 64,
-      65, 70, 71, 72, 73,
+      65, 70, 71, 72, 73, 80, 81, 82, 83, 84, 85,
     ].includes(codeNum)
   )
     return "ocorrencia";
@@ -41,12 +40,17 @@ serve(async (req: Request) => {
 
   try {
     // P13: rate limit
-    const rl = await checkRateLimit(req, "rodonaves-webhook", { maxRequests: 100 });
+    const rl = await checkRateLimit(req, "rodonaves-webhook", {
+      maxRequests: 100,
+    });
     if (!rl.allowed) {
-      return new Response(JSON.stringify({ error: rl.message ?? "rate limited" }), {
-        status: 429,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return new Response(
+        JSON.stringify({ error: rl.message ?? "rate limited" }),
+        {
+          status: 429,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
     }
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -57,12 +61,12 @@ serve(async (req: Request) => {
 
     const raw = await req.text();
 
-
     // HMAC signature verification (fail-closed).
     // Test-mode bypass ONLY when ALLOW_TEST_MODE=true is set server-side —
     // clients cannot bypass by sending a header alone.
     const testModeAllowed = Deno.env.get("ALLOW_TEST_MODE") === "true";
-    const isTestMode = testModeAllowed && req.headers.get("x-test-mode") === "true";
+    const isTestMode =
+      testModeAllowed && req.headers.get("x-test-mode") === "true";
     if (!isTestMode) {
       const signature = req.headers.get("x-rodonaves-signature") || "";
       if (

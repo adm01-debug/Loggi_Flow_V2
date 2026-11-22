@@ -15,10 +15,13 @@ import { log } from "../_shared/logger.ts";
 // Rodonaves API Gateways
 const TRACKING_GATEWAY = "https://tracking-apigateway.rte.com.br";
 const QUOTATION_GATEWAY = "https://quotation-apigateway.rte.com.br";
+// NÃO VERIFICADO: URL correta do gateway de prazo é desconhecida. Todos os
+// candidatos (deadlinesla-/deadline-/sla-/delivery-apigateway.rte.com.br)
+// retornam Cloudflare 530/1016 e o path legado /v1/DeadlineSLA retorna 404.
 const DEADLINE_GATEWAY = "https://01wapi.rte.com.br";
 const PICKUP_GATEWAY = "https://pickup-apigateway.rte.com.br";
 const CUSTOMER_GATEWAY = "https://customer-apigateway.rte.com.br";
-const SELFATTENDANCE_GATEWAY = "https://01wapi.rte.com.br";
+const SELFATTENDANCE_GATEWAY = "https://selfattendance-apigateway.rte.com.br";
 const UNITTOCITY_GATEWAY = "https://unittocity-apigateway.rte.com.br";
 const PAYMENTS_GATEWAY = "https://payments-apigateway.rte.com.br";
 const DNE_GATEWAY = "https://dne-apigateway.rte.com.br";
@@ -136,63 +139,25 @@ async function getToken(gateway: string): Promise<string> {
   // Cache por gateway: cada gateway emite seu próprio token OAuth.
   tokenCache[gateway] = {
     token: data.access_token,
-    expiresAt: Date.now() + 25 * 60_000,
+    // O token OAuth da RTE vive 300 min; renova com 10 min de folga.
+    expiresAt: Date.now() + 290 * 60_000,
   };
   return data.access_token;
 }
 
+/**
+ * Mapeia ProcedaCode (API v3 de rastreio) para o status interno.
+ * Mesma tabela usada em rodonaves-webhook: 1 = entregue, 2-6 e 20-27 em
+ * trânsito, 7-10 saiu para entrega, 40-73 e 80-85 (extravio) = ocorrência.
+ */
 function mapTrackingCodeToStatus(code: number): string {
-  switch (code) {
-    case 0:
-      return "em_transito";
-    case 1:
-    case 2:
-    case 24:
-    case 29:
-    case 31:
-      return "entregue";
-    case 37:
-    case 43:
-      return "saiu_entrega";
-    case 44:
-    case 45:
-    case 46:
-      return "despachado";
-    case 38:
-    case 39:
-    case 47:
-    case 58:
-      return "em_transito";
-    case 25:
-    case 3:
-    case 4:
-    case 5:
-    case 6:
-    case 7:
-    case 8:
-    case 9:
-    case 10:
-    case 11:
-    case 12:
-    case 13:
-    case 14:
-    case 15:
-    case 16:
-    case 17:
-    case 18:
-    case 19:
-    case 20:
-    case 21:
-    case 22:
-    case 23:
-    case 26:
-    case 27:
-    case 28:
-    case 30:
-      return "ocorrencia";
-    default:
-      return "em_transito";
-  }
+  if (code === 1) return "entregue";
+  if (code >= 7 && code <= 10) return "saiu_entrega";
+  if ((code >= 2 && code <= 6) || (code >= 20 && code <= 27))
+    return "em_transito";
+  if ((code >= 40 && code <= 73) || (code >= 80 && code <= 85))
+    return "ocorrencia";
+  return "em_transito";
 }
 
 // Helper: build query string from params object
@@ -1119,6 +1084,26 @@ Deno.serve(async (req) => {
           protocolNumber: params.protocolNumber,
           isCustomerPortal: params.isCustomerPortal,
         });
+        // A v3 devolve Events[]; o RTETrackingPanel lê o shape legado
+        // Tracking[]. Normaliza aqui para manter a UI funcionando.
+        if (
+          result != null &&
+          typeof result === "object" &&
+          Array.isArray((result as Record<string, unknown>).Events)
+        ) {
+          const payload = result as Record<string, unknown>;
+          payload.Tracking = (payload.Events as Record<string, unknown>[]).map(
+            (ev) => ({
+              DataOcorrencia: ev.EventDate,
+              HoraOcorrencia: ev.EventTime,
+              DescricaoOcorrencia: ev.Description,
+              Cidade: ev.City,
+              UF: ev.State,
+              Filial: ev.Branch,
+              CodigoOcorrencia: ev.ProcedaCode ?? ev.EventCode,
+            }),
+          );
+        }
         break;
       }
 
@@ -1622,10 +1607,10 @@ Deno.serve(async (req) => {
               invoiceNumber: entrega.nf_remessa || "",
             });
 
-            if (trackingData?.Tracking?.length > 0) {
-              const latestEvent = trackingData.Tracking[0];
+            if (trackingData?.Events?.length > 0) {
+              const latestEvent = trackingData.Events[0];
               const newStatus = mapTrackingCodeToStatus(
-                latestEvent.CodigoOcorrencia,
+                latestEvent.ProcedaCode ?? latestEvent.EventCode,
               );
               if (newStatus !== "ocorrencia" && newStatus !== entrega.status) {
                 await supabase
@@ -1640,14 +1625,14 @@ Deno.serve(async (req) => {
                 updates.push({
                   id: entrega.id,
                   status: newStatus,
-                  lastEvent: latestEvent.DescricaoOcorrencia,
+                  lastEvent: latestEvent.Description,
                 });
               }
               if (newStatus === "ocorrencia") {
                 await supabase.from("ocorrencias").insert({
                   entrega_id: entrega.id,
-                  tipo_ocorrencia: `RTE-${latestEvent.CodigoOcorrencia}`,
-                  descricao: latestEvent.DescricaoOcorrencia,
+                  tipo_ocorrencia: `RTE-${latestEvent.ProcedaCode ?? latestEvent.EventCode}`,
+                  descricao: latestEvent.Description,
                 });
               }
             }
