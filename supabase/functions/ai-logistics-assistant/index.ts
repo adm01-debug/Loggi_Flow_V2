@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
+import { requireUser } from "../_shared/auth.ts";
 import { log } from "../_shared/logger.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
 import { getWeatherForRoutes } from "../_shared/weather.ts";
@@ -19,7 +20,8 @@ interface Entrega {
   status: string;
   previsao_entrega: string | null;
   endereco_entrega: string;
-  transportadoras: { nome_fantasia: string } | null;
+  transportadoras:
+    { nome_fantasia: string } | { nome_fantasia: string }[] | null;
   valor_frete?: number;
   created_at?: string;
   latitude?: number | null;
@@ -30,9 +32,6 @@ interface Ocorrencia {
   tipo_ocorrencia: string;
   resolvida: boolean | null;
 }
-
-const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 export const handler = async (req: Request) => {
   if (req.method === "OPTIONS") {
@@ -56,6 +55,19 @@ export const handler = async (req: Request) => {
       );
     }
 
+    const auth = await requireUser(req);
+    if (!auth.ok) {
+      return new Response(
+        JSON.stringify({ success: false, message: "Não autorizado." }),
+        {
+          status: auth.status,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
+    }
+    // O usuário é identificado pelas claims do JWT, nunca por um campo do body.
+    const userId = auth.claims.sub;
+
     const body = await req.json();
     const message = body.message || body.prompt;
     const conversationHistory = body.conversationHistory || [];
@@ -77,7 +89,10 @@ export const handler = async (req: Request) => {
     const googleApiKey = Deno.env.get("GOOGLE_API_KEY");
     if (!googleApiKey) throw new Error("GOOGLE_API_KEY not configured");
 
-    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    );
 
     // Fetch rich contextual data for Elite analysis
     const [
@@ -121,8 +136,9 @@ export const handler = async (req: Request) => {
       (resOcorrenciasAbertas.data as Ocorrencia[]) || [];
     const slaError = resSlaStats.error;
 
-    if (slaError)
+    if (slaError) {
       log.warn("Aviso: Falha ao carregar estatísticas de performance via RPC.");
+    }
 
     // Manual SLA calc fallback
     const totalFrete = custosRecentes.reduce(
@@ -170,7 +186,9 @@ export const handler = async (req: Request) => {
     - Entregas em Trânsito: ${entregasAtivas.length}
     - Entregas com Risco de Atraso (Previsão Vencida): ${emAtraso}
     - Ocorrências Abertas: ${ocorrenciasAbertas.length}
-    - Custo Logístico (30 dias): R$ ${totalFrete.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+    - Custo Logístico (30 dias): R$ ${totalFrete.toLocaleString("pt-BR", {
+      minimumFractionDigits: 2,
+    })}
     - Top Transportadoras (Performance): ${transportadoras
       .slice(0, 3)
       .map((t: Transportadora) => t.nome_fantasia)
@@ -210,12 +228,14 @@ export const handler = async (req: Request) => {
       },
     );
 
-    if (!response.ok)
+    if (!response.ok) {
       throw new Error(`Erro no gateway de IA: ${response.status}`);
-    if (stream)
+    }
+    if (stream) {
       return new Response(response.body, {
         headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
       });
+    }
 
     const data = await response.json();
     const assistantMessage =
@@ -229,7 +249,7 @@ export const handler = async (req: Request) => {
       },
     );
   } catch (error) {
-    log.error("Erro no Assistente IA:", error);
+    log.error("Erro no Assistente IA:", { error: String(error) });
     return new Response(
       JSON.stringify({
         success: false,
