@@ -1,4 +1,4 @@
-# Auditoria: funcionalidades planejadas × implementadas — Loggi Flow V2 — 2026-11-20
+﻿# Auditoria: funcionalidades planejadas × implementadas — Loggi Flow V2 — 2026-11-20
 
 > **Escopo:** tudo que a documentação do repositório (`docs/`, `docs/adr/`, `docs/agentes/`, `README.md`,
 > `DOCUMENTATION.md`, `TEMPLATE_STRUCTURE.md`, `CHANGELOG.md`, `ESTADO_ATUAL*.md`, `AGENTS.md`,
@@ -144,11 +144,11 @@
 
 **Telas/abas inteiramente estáticas**
 
-| Onde                                                   | O que                                                                                                                           |
-| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
-| `src/pages/Configuracoes.tsx:343-378` (aba "security") | API Key/Webhook Secret mascarados fixos, "Regenerar" sem `onClick`, switches não controlados, "Salvar" não persiste (`:54-60`). |
-| `src/pages/Profile.tsx:240-256` (aba "security")       | Input de senha sem estado; "Alterar" e "Configurar" (2FA) sem `onClick`.                                                        |
-| `src/pages/APIDocumentation.tsx`                       | Página inteira estática (ver 1.7).                                                                                              |
+| Onde                                                       | O que                                                                                                                                                                                                                                                                                                                                          |
+| ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ~~`src/pages/Configuracoes.tsx:343-378` (aba "security")~~ | ~~API Key/Webhook Secret mascarados fixos, "Regenerar" sem `onClick`, switches não controlados, "Salvar" não persiste~~. — CONCLUÍDO via PR #264: 2FA real via `TwoFactorSetup` (MFA TOTP), "Sessão atual" com `useSessionTimeout` (expiração real + botão Estender via `refreshSession`), chaves de API/Webhooks apontando para `/seguranca`. |
+| `src/pages/Profile.tsx:240-256` (aba "security")           | Input de senha sem estado; "Alterar" e "Configurar" (2FA) sem `onClick`.                                                                                                                                                                                                                                                                       |
+| `src/pages/APIDocumentation.tsx`                           | Página inteira estática (ver 1.7).                                                                                                                                                                                                                                                                                                             |
 
 ~~**Abas estáticas de Configurações de Frete (malha/integracoes/automacao) em `src/pages/ConfiguracoesFrete.tsx`**~~ — CONCLUÍDO via PR #262 (`e6c13742`): aba malha → "Nova Região" abre Dialog e persiste em `transportadoras.regioes_atendidas`; Select de cobertura controlado por `coverage_details.coverage_type`; switches de zona com `onCheckedChange` (toggle real em `regioes_atendidas`); busca de transportadora filtra a lista. Aba integracoes → "Novo Gateway de Resposta" faz `insert` real em `freight_integration_mappings` (`mapping_config.endpoint_url`, fonte webhook), switch `is_active` faz `update` real, ícone Settings copia a URL, e o card Parser hardcoded foi substituído pelo componente real `NormalizationMapping` (persiste em `non_api_config.normalization`, consumido por `normalize-freight-response`). Aba automacao → switches agora controlados (`autoRetries`/`autoOcr`), log "Nexus RPA Status" rotulado como simulação e parâmetros 3/15m/60m marcados como valores de referência.
 
