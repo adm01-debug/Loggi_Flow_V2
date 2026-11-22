@@ -7,6 +7,51 @@ import { checkRateLimit } from "../_shared/rateLimiter.ts";
 import { claimIdempotencyKey } from "../_shared/idempotency.ts";
 import { log } from "../_shared/logger.ts";
 
+/**
+ * Mapeia status/evento livre de um webhook genérico para o enum entrega_status.
+ * Retorna null quando não reconhece — nesse caso a entrega não é tocada.
+ */
+export function mapCarrierStatus(raw: string): string | null {
+  const s = raw.toLowerCase();
+  if (s.includes("entreg") || s.includes("delivered") || s === "delivered") {
+    return "entregue";
+  }
+  if (
+    s.includes("ocorrenc") ||
+    s.includes("problema") ||
+    s.includes("incidente")
+  ) {
+    return "ocorrencia";
+  }
+  if (
+    s.includes("em_transito") ||
+    s.includes("transito") ||
+    s.includes("in_transit")
+  ) {
+    return "em_transito";
+  }
+  if (s.includes("saiu_entrega") || s.includes("out_for_delivery")) {
+    return "saiu_entrega";
+  }
+  if (
+    s.includes("despach") ||
+    s.includes("despatched") ||
+    s.includes("shipped")
+  ) {
+    return "despachado";
+  }
+  if (s.includes("finaliz") || s.includes("finished")) {
+    return "finalizado";
+  }
+  if (s.includes("aguardando_producao") || s.includes("pending")) {
+    return "aguardando_producao";
+  }
+  if (s.includes("nf_emitida") || s.includes("invoice")) {
+    return "nf_emitida";
+  }
+  return null;
+}
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -24,11 +69,18 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
     );
 
-    const rl = await checkRateLimit(req, "carrier-webhook-receiver", { maxRequests: 100, windowMs: 60_000 });
+    const rl = await checkRateLimit(req, "carrier-webhook-receiver", {
+      maxRequests: 100,
+      windowMs: 60_000,
+    });
     if (!rl.allowed) {
       return new Response(JSON.stringify({ error: "rate_limited" }), {
         status: 429,
-        headers: { ...corsHeaders, "Content-Type": "application/json", "Retry-After": String(rl.retryAfter ?? 60) },
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json",
+          "Retry-After": "60",
+        },
       });
     }
 
@@ -72,11 +124,24 @@ serve(async (req) => {
     }
 
     // Idempotency guard: dedupe by (carrier_id + event_id|timestamp)
-    const eventId = String(payload.event_id ?? payload.id ?? `${payload.carrier_id}:${payload.event_type}:${payload.timestamp ?? ""}`);
-    const idem = await claimIdempotencyKey(`carrier:${payload.carrier_id}`, eventId);
+    const eventId = String(
+      payload.event_id ??
+        payload.id ??
+        `${payload.carrier_id}:${payload.event_type}:${
+          payload.timestamp ?? ""
+        }`,
+    );
+    const idem = await claimIdempotencyKey(
+      `carrier:${payload.carrier_id}`,
+      eventId,
+    );
     if (idem.duplicate) {
       return new Response(
-        JSON.stringify({ success: true, duplicate: true, message: "already processed" }),
+        JSON.stringify({
+          success: true,
+          duplicate: true,
+          message: "already processed",
+        }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
@@ -88,10 +153,68 @@ serve(async (req) => {
       status: "success",
     });
 
+    // 2. Atualiza a entrega correspondente quando o payload traz identificador de rota
+    const applyStatus = mapCarrierStatus(
+      payload.status ?? payload.event_type ?? "",
+    );
+    const trackingCode = payload.codigo_rastreamento || payload.tracking_code;
+    const numeroEntrega = payload.numero_entrega || payload.delivery_code;
+
+    if (trackingCode || numeroEntrega) {
+      const entregaQuery = supabaseClient
+        .from("entregas")
+        .select("id, status")
+        .limit(1);
+
+      if (trackingCode) {
+        entregaQuery.eq("codigo_rastreamento", trackingCode);
+      } else {
+        entregaQuery.eq("numero_entrega", numeroEntrega);
+      }
+
+      const { data: entregas, error: findError } = await entregaQuery;
+      if (findError) throw findError;
+
+      const entrega = entregas && entregas.length > 0 ? entregas[0] : undefined;
+      if (entrega) {
+        const updateData: Record<string, unknown> = {};
+        if (applyStatus && applyStatus !== entrega.status) {
+          updateData.status = applyStatus;
+          if (applyStatus === "entregue") {
+            updateData.data_entrega_efetiva =
+              payload.entregue_em ??
+              payload.timestamp ??
+              new Date().toISOString();
+            if (payload.recebedor) updateData.recebedor = payload.recebedor;
+          }
+        }
+
+        if (Object.keys(updateData).length > 0) {
+          const { error: updateError } = await supabaseClient
+            .from("entregas")
+            .update(updateData)
+            .eq("id", entrega.id);
+          if (updateError) throw updateError;
+        }
+
+        if (applyStatus === "ocorrencia") {
+          await supabaseClient.from("ocorrencias").insert({
+            entrega_id: entrega.id,
+            tipo_ocorrencia: `carrier-${payload.carrier_id}`,
+            descricao:
+              payload.descricao ||
+              payload.ocorrencia_descricao ||
+              `Ocorrência reportada pela transportadora ${payload.carrier_id}`,
+          });
+        }
+      }
+    }
+
     return new Response(
       JSON.stringify({
         success: true,
         message: "Carrier Webhook processed via Nexus Shield",
+        entrega_atualizada: Boolean(trackingCode || numeroEntrega),
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
