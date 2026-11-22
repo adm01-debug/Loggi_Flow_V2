@@ -35,7 +35,7 @@ interface Message {
 const CHAT_URL = `${sanitizarUrlSupabase(import.meta.env.VITE_SUPABASE_URL) ?? ""}/functions/v1/ai-logistics-assistant`;
 
 export function AIAssistant() {
-  const { user, session } = useAuth();
+  const { session } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
