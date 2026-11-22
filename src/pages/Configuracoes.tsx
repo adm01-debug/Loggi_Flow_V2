@@ -10,8 +10,6 @@ import { type NotificationPreferences } from "@/hooks";
 import { format } from "date-fns";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -38,7 +36,9 @@ import { BusinessRulesManager } from "@/components/automation/BusinessRulesManag
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { TwoFactorSetup } from "@/components/security/TwoFactorSetup";
+import { useSessionTimeout } from "@/hooks/auth/useSessionTimeout";
 
 export default function Configuracoes() {
   const [searchParams] = useSearchParams();
@@ -46,6 +46,8 @@ export default function Configuracoes() {
   const notificationPrefs = useNotificationPreferences();
   const [saving, setSaving] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
+  const navigate = useNavigate();
+  const { sessionInfo, refreshSession } = useSessionTimeout();
 
   const integrations = integrationValidation?.integrations || [];
   const isValidating = integrationValidation?.isValidating || false;
@@ -410,46 +412,45 @@ export default function Configuracoes() {
                   </div>
                 </TabsContent>
                 <TabsContent value="security" className="space-y-4">
+                  <TwoFactorSetup />
                   <div className="card-base p-4 space-y-4">
-                    <div>
-                      <Label>API Key</Label>
-                      <div className="flex gap-2 mt-1">
-                        <Input
-                          type="password"
-                          value="••••••••••••••••"
-                          readOnly
-                        />
-                        <Button variant="outline">Regenerar</Button>
+                    <div className="flex items-center justify-between py-2">
+                      <div>
+                        <p className="font-medium">Sessão atual</p>
+                        <p className="text-sm text-muted-foreground">
+                          {sessionInfo.expiresAt
+                            ? `Expira em ${format(
+                                sessionInfo.expiresAt,
+                                "dd/MM/yyyy HH:mm",
+                              )}`
+                            : "Sessão de duração padrão"}
+                        </p>
                       </div>
-                    </div>
-                    <div>
-                      <Label>Webhook Secret</Label>
-                      <div className="flex gap-2 mt-1">
-                        <Input
-                          type="password"
-                          value="••••••••••••••••"
-                          readOnly
-                        />
-                        <Button variant="outline">Regenerar</Button>
-                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => void refreshSession()}
+                      >
+                        <RefreshCw className="h-4 w-4 mr-2" />
+                        Estender
+                      </Button>
                     </div>
                     <div className="flex items-center justify-between py-2">
                       <div>
-                        <p className="font-medium">Two-Factor Authentication</p>
+                        <p className="font-medium">Chaves de API e Webhooks</p>
                         <p className="text-sm text-muted-foreground">
-                          Adicionar camada extra de segurança
+                          Gerencie credenciais de integração no centro de
+                          segurança
                         </p>
                       </div>
-                      <Switch />
-                    </div>
-                    <div className="flex items-center justify-between py-2">
-                      <div>
-                        <p className="font-medium">Session Timeout</p>
-                        <p className="text-sm text-muted-foreground">
-                          Logout automático após inatividade
-                        </p>
-                      </div>
-                      <Switch defaultChecked />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => navigate("/seguranca")}
+                      >
+                        <Shield className="h-4 w-4 mr-2" />
+                        Abrir Segurança
+                      </Button>
                     </div>
                   </div>
                 </TabsContent>
