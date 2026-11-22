@@ -1,63 +1,215 @@
 import { useState } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Code, Copy, CheckCircle2, ExternalLink, Book, Zap, Shield, Globe } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Code,
+  Copy,
+  CheckCircle2,
+  Book,
+  Shield,
+  Server,
+  Info,
+} from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { FilterBar } from "@/components/common/FilterBar";
 import { useFilters } from "@/hooks/common/useFilters";
+import { sanitizarUrlSupabase } from "@/lib/supabaseEnv";
 
-interface Endpoint { 
-  id: string; 
-  method: string; 
-  path: string; 
-  description: string; 
-  category: string; 
+interface Endpoint {
+  id: string;
+  method: string;
+  path: string; // caminho relativo ex. /functions/v1/predict-delays
+  auth: boolean;
+  description: string;
+  category: string;
 }
 
+// Edge functions reais do Supabase (supabase/functions/<nome>/index.ts).
+// A base real é resolvida do ambiente em runtime; ver APIDocumentation para uso.
 const endpoints: Endpoint[] = [
-  { id: "1", method: "GET", path: "/api/entregas", description: "Listar todas entregas", category: "entregas" },
-  { id: "2", method: "GET", path: "/api/entregas/:id", description: "Buscar entrega por ID", category: "entregas" },
-  { id: "3", method: "POST", path: "/api/entregas", description: "Criar nova entrega", category: "entregas" },
-  { id: "4", method: "PUT", path: "/api/entregas/:id", description: "Atualizar entrega", category: "entregas" },
-  { id: "5", method: "GET", path: "/api/coletas", description: "Listar todas coletas", category: "coletas" },
-  { id: "6", method: "POST", path: "/api/coletas", description: "Criar nova coleta", category: "coletas" },
-  { id: "7", method: "GET", path: "/api/clientes", description: "Listar clientes", category: "clientes" },
-  { id: "8", method: "GET", path: "/api/transportadoras", description: "Listar transportadoras", category: "transportadoras" },
-  { id: "9", method: "POST", path: "/api/predict-delays", description: "Prever atrasos (IA)", category: "ia" },
-  { id: "10", method: "POST", path: "/api/smart-carrier", description: "Seleção inteligente de transportadora", category: "ia" },
+  {
+    id: "latency",
+    method: "POST",
+    path: "/functions/v1/predict-delays",
+    auth: true,
+    description: "Prever atrasos (IA) com base no histórico",
+    category: "ia",
+  },
+  {
+    id: "carrier",
+    method: "POST",
+    path: "/functions/v1/smart-carrier-selection",
+    auth: true,
+    description: "Seleção inteligente de transportadora",
+    category: "ia",
+  },
+  {
+    id: "assistant",
+    method: "POST",
+    path: "/functions/v1/ai-logistics-assistant",
+    auth: true,
+    description: "Assistente de IA da plataforma",
+    category: "ia",
+  },
+  {
+    id: "mapbox",
+    method: "POST",
+    path: "/functions/v1/get-mapbox-token",
+    auth: false,
+    description: "Obter token público do Mapbox",
+    category: "integracao",
+  },
+  {
+    id: "geocode",
+    method: "POST",
+    path: "/functions/v1/geocode-address",
+    auth: true,
+    description: "Geocodificar endereço (Nominatim)",
+    category: "integracao",
+  },
+  {
+    id: "weather",
+    method: "POST",
+    path: "/functions/v1/get-weather-data",
+    auth: false,
+    description: "Clima atual para previsões",
+    category: "integracao",
+  },
+  {
+    id: "webhook-status",
+    method: "POST",
+    path: "/functions/v1/webhook-status",
+    auth: true,
+    description: "Status de webhooks de transportadoras",
+    category: "integracao",
+  },
+  {
+    id: "normalize",
+    method: "POST",
+    path: "/functions/v1/normalize-freight-response",
+    auth: true,
+    description: "Normalizar resposta de frete",
+    category: "integracao",
+  },
+  {
+    id: "resend",
+    method: "POST",
+    path: "/functions/v1/resend-email",
+    auth: true,
+    description: "Envio de e-mail transacional",
+    category: "comunicacao",
+  },
+  {
+    id: "send-password-reset",
+    method: "POST",
+    path: "/functions/v1/send-password-reset",
+    auth: false,
+    description: "Enviar link de redefinição de senha",
+    category: "auth",
+  },
+  {
+    id: "secure-store",
+    method: "POST",
+    path: "/functions/v1/secure-store",
+    auth: true,
+    description: "Armazenar credenciais de integrações",
+    category: "seguranca",
+  },
+  {
+    id: "lgpd",
+    method: "POST",
+    path: "/functions/v1/lgpd-erase-user",
+    auth: true,
+    description: "Apagamento de dados do usuário (LGPD)",
+    category: "seguranca",
+  },
+  {
+    id: "check-password-breach",
+    method: "POST",
+    path: "/functions/v1/check-password-breach",
+    auth: true,
+    description: "Verificar senha em vazamentos",
+    category: "seguranca",
+  },
+  {
+    id: "rodonaves",
+    method: "POST",
+    path: "/functions/v1/rodonaves-api",
+    auth: true,
+    description: "Integração com Rodonaves",
+    category: "transportadora",
+  },
+  {
+    id: "lalamove",
+    method: "POST",
+    path: "/functions/v1/lalamove-api",
+    auth: true,
+    description: "Integração com Lalamove",
+    category: "transportadora",
+  },
+  {
+    id: "melhor-envio",
+    method: "POST",
+    path: "/functions/v1/melhor-envio-api",
+    auth: true,
+    description: "Integração com Melhor Envio",
+    category: "transportadora",
+  },
+  {
+    id: "carrier-webhook",
+    method: "POST",
+    path: "/functions/v1/carrier-webhook-receiver",
+    auth: false,
+    description: "Receber webhooks de transportadoras",
+    category: "transportadora",
+  },
 ];
 
-const methodColors: Record<string, string> = { 
-  GET: "bg-success/15 text-success", 
-  POST: "bg-info/15 text-info", 
-  PUT: "bg-warning/15 text-warning", 
-  DELETE: "bg-destructive/15 text-destructive" 
+const methodColors: Record<string, string> = {
+  GET: "bg-success/15 text-success",
+  POST: "bg-info/15 text-info",
+  PUT: "bg-warning/15 text-warning",
+  DELETE: "bg-destructive/15 text-destructive",
+};
+
+const categoryLabels: Record<string, string> = {
+  ia: "IA",
+  integracao: "Integração",
+  comunicacao: "Comunicação",
+  auth: "Auth",
+  seguranca: "Segurança",
+  transportadora: "Transportadora",
 };
 
 export default function APIDocumentation() {
   const [copied, setCopied] = useState<string | null>(null);
   const [methodFilter, setMethodFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
-  
-  const { filteredData, filters, setSearch, clearFilters, hasActiveFilters } = useFilters(endpoints, {
-    search: { fields: ["path", "description"] as (keyof Endpoint)[] }
-  });
 
-  // Apply additional filters
-  const fullyFilteredData = filteredData.filter(endpoint => {
-    if (methodFilter !== "all" && endpoint.method !== methodFilter) return false;
-    if (categoryFilter !== "all" && endpoint.category !== categoryFilter) return false;
+  const baseUrl = sanitizarUrlSupabase(import.meta.env.VITE_SUPABASE_URL) ?? "";
+  const fullBase = baseUrl ? `${baseUrl}/functions/v1` : null;
+
+  const { filteredData, filters, setSearch, clearFilters, hasActiveFilters } =
+    useFilters(endpoints, {
+      search: { fields: ["path", "description"] as (keyof Endpoint)[] },
+    });
+
+  const fullyFilteredData = filteredData.filter((endpoint) => {
+    if (methodFilter !== "all" && endpoint.method !== methodFilter)
+      return false;
+    if (categoryFilter !== "all" && endpoint.category !== categoryFilter)
+      return false;
     return true;
   });
 
-  const copyToClipboard = (text: string, id: string) => { 
-    navigator.clipboard.writeText(text); 
-    setCopied(id); 
-    toast.success("Copiado!"); 
-    setTimeout(() => setCopied(null), 2000); 
+  const copyToClipboard = (text: string, id: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(id);
+    toast.success("Copiado!");
+    setTimeout(() => setCopied(null), 2000);
   };
 
   return (
@@ -71,28 +223,29 @@ export default function APIDocumentation() {
               </div>
               API Documentation
             </h1>
-            <p className="text-muted-foreground mt-1">Documentação da API REST</p>
+            <p className="text-muted-foreground mt-1">
+              Edge functions do Supabase (Supabase Functions)
+            </p>
           </div>
-          <Button variant="outline">
-            <ExternalLink className="w-4 h-4 mr-2" />Swagger UI
-          </Button>
         </div>
 
         <div className="grid grid-cols-4 gap-4">
           <div className="stat-card text-center">
-            <Globe className="w-5 h-5 text-info mx-auto mb-2" />
+            <Code className="w-5 h-5 text-info mx-auto mb-2" />
             <p className="text-2xl font-bold">{endpoints.length}</p>
             <p className="text-xs text-muted-foreground">Endpoints</p>
           </div>
           <div className="stat-card text-center">
-            <Zap className="w-5 h-5 text-warning mx-auto mb-2" />
-            <p className="text-2xl font-bold">REST</p>
-            <p className="text-xs text-muted-foreground">Protocolo</p>
+            <Server className="w-5 h-5 text-warning mx-auto mb-2" />
+            <p className="text-2xl font-bold">Functions</p>
+            <p className="text-xs text-muted-foreground">Runtime</p>
           </div>
           <div className="stat-card text-center">
             <Shield className="w-5 h-5 text-success mx-auto mb-2" />
-            <p className="text-2xl font-bold">JWT</p>
-            <p className="text-xs text-muted-foreground">Auth</p>
+            <p className="text-2xl font-bold">
+              {endpoints.filter((e) => e.auth).length}
+            </p>
+            <p className="text-xs text-muted-foreground">Com auth JWT</p>
           </div>
           <div className="stat-card text-center">
             <Book className="w-5 h-5 text-accent-foreground mx-auto mb-2" />
@@ -100,6 +253,25 @@ export default function APIDocumentation() {
             <p className="text-xs text-muted-foreground">Versão</p>
           </div>
         </div>
+
+        {fullBase === null && (
+          <div className="flex items-start gap-2 rounded-lg border border-warning/40 bg-warning/10 p-3 text-sm">
+            <Info className="w-4 h-4 mt-0.5 text-warning" />
+            <span>
+              Base URL do Supabase não configurada no ambiente. Os endpoints
+              abaixo usam o caminho relativo{" "}
+              <code className="font-mono">/functions/v1/…</code>.
+            </span>
+          </div>
+        )}
+        {fullBase !== null && (
+          <div className="rounded-lg border border-border bg-muted/40 p-3 text-sm">
+            <span className="font-mono text-xs text-muted-foreground">
+              Base URL real
+            </span>
+            <div className="font-mono text-xs break-all mt-1">{fullBase}</div>
+          </div>
+        )}
 
         <Tabs defaultValue="endpoints">
           <TabsList>
@@ -109,46 +281,87 @@ export default function APIDocumentation() {
           </TabsList>
 
           <TabsContent value="endpoints" className="space-y-4">
-            <FilterBar 
-              search={filters.search} 
-              onSearchChange={setSearch} 
+            <FilterBar
+              search={filters.search}
+              onSearchChange={setSearch}
               searchPlaceholder="Buscar endpoint..."
               status={methodFilter}
               onStatusChange={setMethodFilter}
-              statusOptions={[
-                { value: "GET", label: "GET" }, 
-                { value: "POST", label: "POST" }, 
-                { value: "PUT", label: "PUT" }
-              ]}
+              statusOptions={[{ value: "POST", label: "POST" }]}
               statusLabel="Método"
-              extraFilters={[{
-                key: "category",
-                value: categoryFilter,
-                onChange: setCategoryFilter,
-                options: [
-                  { value: "entregas", label: "Entregas" }, 
-                  { value: "coletas", label: "Coletas" }, 
-                  { value: "ia", label: "IA" }
-                ],
-                label: "Categoria"
-              }]}
-              hasActiveFilters={hasActiveFilters || methodFilter !== "all" || categoryFilter !== "all"}
-              onClearFilters={() => { clearFilters(); setMethodFilter("all"); setCategoryFilter("all"); }}
+              extraFilters={[
+                {
+                  key: "category",
+                  value: categoryFilter,
+                  onChange: setCategoryFilter,
+                  options: Object.keys(categoryLabels).map((k) => ({
+                    value: k,
+                    label: categoryLabels[k],
+                  })),
+                  label: "Categoria",
+                },
+              ]}
+              hasActiveFilters={
+                hasActiveFilters ||
+                methodFilter !== "all" ||
+                categoryFilter !== "all"
+              }
+              onClearFilters={() => {
+                clearFilters();
+                setMethodFilter("all");
+                setCategoryFilter("all");
+              }}
               totalFiltered={fullyFilteredData.length}
               totalOriginal={endpoints.length}
             />
-            
+
             <div className="space-y-2">
               {fullyFilteredData.map((e) => (
-                <div key={e.id} className="card-interactive flex items-center gap-4">
-                  <Badge className={cn("font-mono w-16 justify-center", methodColors[e.method])}>
+                <div
+                  key={e.id}
+                  className="card-interactive flex items-center gap-4"
+                >
+                  <Badge
+                    className={cn(
+                      "font-mono w-16 justify-center",
+                      methodColors[e.method],
+                    )}
+                  >
                     {e.method}
                   </Badge>
-                  <code className="flex-1 font-mono text-sm">{e.path}</code>
-                  <span className="text-sm text-muted-foreground">{e.description}</span>
-                  <Badge variant="outline">{e.category}</Badge>
-                  <Button variant="ghost" size="icon" onClick={() => copyToClipboard(e.path, e.id)}>
-                    {copied === e.id ? <CheckCircle2 className="w-4 h-4 text-success" /> : <Copy className="w-4 h-4" />}
+                  <code className="flex-1 font-mono text-sm break-all">
+                    {e.path}
+                  </code>
+                  <span className="text-sm text-muted-foreground">
+                    {e.description}
+                  </span>
+                  <div className="flex items-center gap-1">
+                    <Badge variant="outline">
+                      {categoryLabels[e.category]}
+                    </Badge>
+                    {e.auth ? (
+                      <Badge className="bg-success/15 text-success">JWT</Badge>
+                    ) : (
+                      <Badge variant="secondary">Público</Badge>
+                    )}
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() =>
+                      copyToClipboard(
+                        e.auth && fullBase
+                          ? `${fullBase}/${e.path.split("/functions/v1/")[1]}`
+                          : e.path,
+                        e.id,
+                      )
+                    }
+                  >
+                    {copied === e.id ? (
+                      <CheckCircle2 className="w-4 h-4 text-success" />
+                    ) : (
+                      <Copy className="w-4 h-4" />
+                    )}
                   </Button>
                 </div>
               ))}
@@ -158,17 +371,27 @@ export default function APIDocumentation() {
           <TabsContent value="auth" className="card-base p-6">
             <h3 className="font-semibold mb-4">Autenticação</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Todas as requisições devem incluir o header Authorization com um token JWT válido.
+              Funções marcadas como{" "}
+              <Badge className="bg-success/15 text-success">JWT</Badge> exigem o
+              header Authorization com o token da sessão do usuário logado.
+              Funções <Badge variant="secondary">Público</Badge> não exigem, mas
+              só devem ser chamadas pelo front-of-front (nunca exponha
+              segredos).
             </p>
             <div className="bg-muted p-4 rounded-lg font-mono text-sm">
-              <p>Authorization: Bearer {'<seu_token>'}</p>
+              <p>Authorization: Bearer {"<seu_token>"}</p>
             </div>
+            <p className="text-xs text-muted-foreground mt-3">
+              Componentes reutilizáveis no front:{" "}
+              <code className="font-mono">callFunction</code> (padrão)
+            </p>
           </TabsContent>
 
           <TabsContent value="examples" className="card-base p-6">
             <h3 className="font-semibold mb-4">Exemplo de Requisição</h3>
-            <pre className="bg-muted p-4 rounded-lg overflow-x-auto text-sm">{`curl -X GET https://api.loggi-flow.com/api/entregas \\
+            <pre className="bg-muted p-4 rounded-lg overflow-x-auto text-sm">{`curl -X POST ${fullBase ?? "https://<ref>.supabase.co"}/predict-delays \\
   -H "Authorization: Bearer <token>" \\
+  -H "apikey: <anon_key>" \\
   -H "Content-Type: application/json"`}</pre>
           </TabsContent>
         </Tabs>
