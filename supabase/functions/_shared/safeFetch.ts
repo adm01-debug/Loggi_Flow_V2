@@ -11,6 +11,7 @@
  */
 
 import { fetchWithTimeout } from "./fetch-with-timeout.ts";
+import { withCircuitBreaker } from "./circuitBreaker.ts";
 
 const BLOCKED_HOSTNAMES = new Set([
   "localhost",
@@ -58,6 +59,7 @@ export class SSRFBlockedError extends Error {
 export interface SafeFetchOptions extends RequestInit {
   timeout?: number;
   allowedHosts?: string[]; // exact hostnames or suffix matches (".mapbox.com")
+  circuitBreakerName?: string | null; // default: hostname; null desativa breaker
 }
 
 export async function safeFetch(
@@ -90,14 +92,22 @@ export async function safeFetch(
   if (options.allowedHosts && options.allowedHosts.length > 0) {
     const ok = options.allowedHosts.some((allowed) => {
       const a = allowed.toLowerCase();
-      return host === a || (a.startsWith(".") && host.endsWith(a)) ||
-        host.endsWith(`.${a}`);
+      return (
+        host === a ||
+        (a.startsWith(".") && host.endsWith(a)) ||
+        host.endsWith(`.${a}`)
+      );
     });
     if (!ok) {
       throw new SSRFBlockedError(`host ${host} not in allow-list`, url);
     }
   }
 
-  const { timeout, allowedHosts: _al, ...rest } = options;
-  return fetchWithTimeout(url, { ...rest, timeout: timeout ?? 10_000 });
+  const { timeout, allowedHosts: _al, circuitBreakerName, ...rest } = options;
+  const breakerKey = circuitBreakerName ?? host;
+
+  const doFetch = () =>
+    fetchWithTimeout(url, { ...rest, timeout: timeout ?? 10_000 });
+
+  return withCircuitBreaker(breakerKey, doFetch);
 }

@@ -4,6 +4,7 @@ import { validateContract } from "../_shared/contract-validator.ts";
 import { requireString } from "../_shared/validate.ts";
 import { log } from "../_shared/logger.ts";
 import { parseLocaleNumber } from "../_shared/number.ts";
+import { safeFetch } from "../_shared/safeFetch.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -107,7 +108,7 @@ serve(async (req) => {
         config.fallback_strategy === "hybrid")
     ) {
       log.info("Using AI to extract data...");
-      const aiResponse = await fetch(
+      const aiResponse = await safeFetch(
         "https://api.openai.com/v1/chat/completions",
         {
           method: "POST",

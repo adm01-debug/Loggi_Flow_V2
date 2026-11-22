@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import { log } from "../_shared/logger.ts";
+import { safeFetch } from "../_shared/safeFetch.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -104,7 +105,7 @@ serve(async (req) => {
               .join("");
 
             // Send notification to external endpoint
-            const response = await fetch(webhook.url, {
+            const response = await safeFetch(webhook.url, {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
