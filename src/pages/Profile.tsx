@@ -4,6 +4,7 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { TwoFactorSetup } from "@/components/security/TwoFactorSetup";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -27,6 +28,8 @@ export default function Profile() {
   const { userLevel, achievements } = useGamification();
   const { uploadImage, uploading } = useImageUpload("avatars");
   const [saving, setSaving] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [changingPassword, setChangingPassword] = useState(false);
 
   // Inicializa o form com o nome vindo do profile na primeira vez que
   // o profile chega. Mantemos em refs para não re-inicializar o state
@@ -34,7 +37,8 @@ export default function Profile() {
   const [form, setForm] = useState(() => ({
     full_name:
       profile?.full_name ||
-      (typeof window !== "undefined" && (user?.user_metadata?.full_name as string)) ||
+      (typeof window !== "undefined" &&
+        (user?.user_metadata?.full_name as string)) ||
       "",
     phone: (user?.user_metadata?.phone as string) || "",
   }));
@@ -87,12 +91,36 @@ export default function Profile() {
     setSaving(false);
   };
 
+  const handleChangePassword = async () => {
+    if (!user) return;
+    if (newPassword.length < 8) {
+      toast.error("A nova senha precisa ter pelo menos 8 caracteres");
+      return;
+    }
+    setChangingPassword(true);
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
+      if (error) throw error;
+      setNewPassword("");
+      toast.success("Senha alterada com sucesso!");
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Erro desconhecido";
+      toast.error("Erro: " + message);
+    }
+    setChangingPassword(false);
+  };
+
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && user) {
       // Bucket é privado: envia para pasta do próprio usuário (exigido pelo RLS)
       // e armazena URL assinada (1 ano) para servir sem expor o bucket.
-      const result = await uploadImage(file, { pathPrefix: user.id, signed: true });
+      const result = await uploadImage(file, {
+        pathPrefix: user.id,
+        signed: true,
+      });
       if (result) {
         await supabase
           .from("profiles")
@@ -237,23 +265,36 @@ export default function Profile() {
                   <span className="text-sm">moedas</span>
                 </div>
               </TabsContent>
-              <TabsContent value="security" className="card-base p-6 space-y-4">
-                <div>
-                  <Label>Alterar Senha</Label>
-                  <div className="flex gap-2 mt-1">
-                    <Input type="password" placeholder="Nova senha" />
-                    <Button variant="outline">Alterar</Button>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between py-3 border-t">
+              <TabsContent value="security" className="space-y-4">
+                <div className="card-base p-6 space-y-4">
                   <div>
-                    <p className="font-medium">Two-Factor Authentication</p>
-                    <p className="text-sm text-muted-foreground">
-                      Segurança extra para sua conta
-                    </p>
+                    <Label>Alterar Senha</Label>
+                    <div className="flex gap-2 mt-1">
+                      <Input
+                        type="password"
+                        placeholder="Nova senha (mínimo 8 caracteres)"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            void handleChangePassword();
+                          }
+                        }}
+                      />
+                      <Button
+                        variant="outline"
+                        onClick={() => void handleChangePassword()}
+                        disabled={changingPassword || !newPassword}
+                      >
+                        {changingPassword ? (
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        ) : null}
+                        Alterar
+                      </Button>
+                    </div>
                   </div>
-                  <Button variant="outline">Configurar</Button>
                 </div>
+                <TwoFactorSetup />
               </TabsContent>
             </Tabs>
           </div>
