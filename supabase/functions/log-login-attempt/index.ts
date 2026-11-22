@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { log } from "../_shared/logger.ts";
+import { log, redact } from "../_shared/logger.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -49,7 +49,7 @@ serve(async (req: Request) => {
       });
     }
 
-    log.info(`Logging login attempt for: ${email}, success: ${success}`);
+    log.info(`Logging login attempt for: ${redact(email)}, success: ${success}`);
 
     const { error } = await supabaseAdmin.from("login_attempts").insert({
       email,

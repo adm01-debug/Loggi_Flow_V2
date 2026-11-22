@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { log } from "../_shared/logger.ts";
+import { log, redact } from "../_shared/logger.ts";
 import { safeFetch } from "../_shared/safeFetch.ts";
 
 const corsHeaders = {
@@ -92,7 +92,7 @@ serve(async (req: Request) => {
       });
     }
 
-    log.info(`Validating login for: ${email} from IP: ${ip_address}`);
+    log.info(`Validating login for: ${redact(email)} from IP: ${ip_address}`);
 
     // Check if IP is in blacklist
     if (ip_address) {
@@ -301,7 +301,7 @@ serve(async (req: Request) => {
       }
     }
 
-    log.info(`Login validation passed for: ${email}`);
+    log.info(`Login validation passed for: ${redact(email)}`);
     return new Response(JSON.stringify({ allowed: true }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

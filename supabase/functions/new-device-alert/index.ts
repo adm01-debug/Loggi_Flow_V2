@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { log } from "../_shared/logger.ts";
+import { log, redact } from "../_shared/logger.ts";
 import { safeFetch } from "../_shared/safeFetch.ts";
 import { requireUser } from "../_shared/auth.ts";
 
@@ -45,7 +45,7 @@ const handler = async (req: Request): Promise<Response> => {
       login_time,
     }: NewDeviceAlertRequest = await req.json();
 
-    log.info(`Sending new device alert to ${userEmail}`);
+    log.info(`Sending new device alert to ${redact(userEmail)}`);
 
     const formattedDate = new Date(login_time).toLocaleString("pt-BR", {
       dateStyle: "full",
