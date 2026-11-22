@@ -170,7 +170,7 @@ Tudo aqui é bug ou exposição em produção hoje. Uma PR por etapa.
 | 009 | Assinatura antes do contrato no `lalamove-webhook` | Mover a verificação HMAC (`:120-130`) para antes de `validateContract` (`:99-118`); usar `_shared/webhookSignature.ts` (comparação constante) no lugar do `===` da linha 44 | POST sem assinatura recebe 401, não 400 |
 | 010 | Remover bypass `ALLOW_TEST_MODE` `[AVALIAR]` | `lalamove-webhook/index.ts:89-90` e `rodonaves-webhook/index.ts:64-77`; `useRodonavesWebhook.tsx:22` passa a chamar uma ação autenticada de `rodonaves-api` (ou é removido) em vez do webhook público | Nenhum header `x-test-mode` no código; front sem chamada ao webhook |
 | 011 | `scheduled-reports` sem IDOR | `index.ts:17-28`: `requireUser`, `userId` vem das claims; ação desconhecida → 400 | Request de outro usuário recebe 403; ação inválida recebe 400 |
-| 012 | `new-device-alert` só interno | Exigir `requireInternalSecret` ou `service_role` (padrão de `resend-email`); destinatário vem do `auth.users` pelo `user_id`, nunca do body | Chamada com anon key recebe 401 |
+| 012 | `new-device-alert` autenticado | Hoje é disparado pelo navegador (`useNewDeviceDetection.tsx:133-145`) com `user_email` no body: passar a `requireUser`, `user_id`/e‑mail vêm das claims, nunca do body; `ip_address` deixa de vir do cliente (ver 146) | Chamada com anon key recebe 401; body com `user_email` de outro usuário é ignorado |
 | 013 | `external-db-bridge` com allowlist | `index.ts:107-160`: `table` e `rpcName` só de um enum; `filters` com schema; erro do banco externo não volta ao cliente | Tabela fora da lista recebe 422 |
 | 014 | Filtro PostgREST sem interpolação | `nexus-webhook-receiver/index.ts:102`: `phone` validado (E.164) e usado em `.eq`/`.in`, não dentro de string `.or(...)` | Payload com `,` ou `)` no telefone não altera a query |
 | 015 | `contract_test_logs` sem payload | `_shared/contract-validator.ts:34-42`: gravar só função, campos com erro e hash do payload; aguardar o insert | Tabela não recebe mais corpo de webhook |
@@ -211,7 +211,7 @@ Ordem por exposição: quem recebe tráfego anônimo da internet primeiro.
 | --- | --- | --- | --- |
 | 037 | Schema `carrier-webhook-receiver` v1 | `supabase/functions/carrier-webhook-receiver/contract.ts`: `carrier_id`, `event_type` (enum), `event_id`, `tracking_code`, `occurred_at`, `payload` (passthrough limitado) | `contract.ts` exporta `v1` e `Input` |
 | 038 | Migrar `carrier-webhook-receiver` | `withContract` + `webhookGuard`; 422 unificado; remover `validateContract`/`requireString` | Testes da etapa 089 verdes |
-| 039 | Schema `lalamove-webhook` v1 | `eventType`, `eventId`, `timestamp`, `data.order{ orderId, status, ... }` conforme documentação Lalamove; `eventId` obrigatório (sem `randomUUID` de fallback, `:133`) | Evento sem id recebe 422 |
+| 039 | Schema `lalamove-webhook` v1 | v1 congela o shape aceito hoje (`:132`): `eventType`, `data{ orderId, status, ... }`, `eventId` opcional; sem id, a chave de idempotência vira hash do corpo (fim do `crypto.randomUUID()`, `:133`). `eventId` obrigatório só em v2 (etapa 118) | Fixtures atuais continuam 200; dois corpos iguais sem id → 1 processado |
 | 040 | Migrar `lalamove-webhook` | HMAC primeiro, `claimIdempotencyKey` no lugar do SELECT→INSERT (`:138-143`, `:225`) | Dois POSTs iguais: 200 e 200 `duplicate:true`, um só processado |
 | 041 | Schema `rodonaves-webhook` v1 | `event_id`, `status_code`, `nf`, `tracking`, `occurred_at` conforme `docs/rodonaves_tracking_openapi_v1.27.3.json` | Schema cruzado com o OpenAPI da Rodonaves |
 | 042 | Migrar `rodonaves-webhook` | Idem 040 (`:125-130`, `~210`) | Testes da etapa 091 verdes |
@@ -219,10 +219,10 @@ Ordem por exposição: quem recebe tráfego anônimo da internet primeiro.
 | 044 | Migrar `nexus-webhook-receiver` | Falhas de negócio (`:93,107,122`) → 404/409 com `ContractError`, não 200 `success:false` | Nenhum 200 com `success:false` |
 | 045 | `bitrix24-integration` action `webhook` `[SEGREDO]` | Schema do evento Bitrix + validação de `application_token` (ou `BITRIX_WEBHOOK_SECRET`) antes de gravar (`:310-333`) | POST sem token recebe 401 |
 | 046 | `ingest-biosync` `[SEGREDO]` | Schema de telemetria (`device_id`, `metrics[]`, `captured_at`) + `x-device-token`/`requireInternalSecret` (`:21`) | Body livre recebe 422; sem token 401 |
-| 047 | Contrato de saída de `webhook-status` | Schema do payload que o Loggi envia aos parceiros (`event`, `version`, `occurred_at`, `data`) + assinatura HMAC com timestamp; documentado em `docs/api/CONTRATOS.md` | Parceiro consegue validar a assinatura com o exemplo da doc |
+| 047 | Contratos de `webhook-status` (entrada e saída) | Entrada: `discriminatedUnion('action')` do que `useClientWebhooks.tsx` envia (`notify_status_change` com `entrega_id`, `old_status`, `new_status`, …; `index.ts:47-57`). Saída: schema do payload enviado aos parceiros (`event`, `version`, `occurred_at`, `data`) + HMAC com timestamp; ambos em `docs/api/CONTRATOS.md` | Parceiro valida a assinatura com o exemplo da doc; ação inválida recebe 422 |
 | 048 | `evolution-whatsapp` e `whatsapp-notification` | `discriminatedUnion('action', ...)` por ação; números E.164; tamanho de mensagem | Ação desconhecida recebe 422 com `fields:[{path:'action'}]` |
 | 049 | Tabela de violações `[DDL]` | `supabase/migrations/<ts>_webhook_contract_violations.sql`: `function`, `version`, `code`, `fields jsonb`, `payload_hash`, `created_at`, RLS admin; `contract_test_logs` para de receber corpo | Migration na PR, dono aplica |
-| 050 | Apagar `contract-validator.ts` | Depois de 038–048 nenhuma função o importa | `grep -rn contract-validator supabase` vazio |
+| 050 | Apagar `contract-validator.ts` | Só depois de 038–048 **e** 059–060 (`normalize-freight-response` e `ocr-receipt-processor` também o importam) | `grep -rn contract-validator supabase` vazio |
 | 051 | `index_test.ts` dos 4 webhooks | Usar `handler` em vez de HTTP real; `lalamove-webhook/index_test.ts:15-24` passa a receber 401 de verdade | `deno test` desses 4 verde sem `|| true` |
 | 052 | OpenAPI dos webhooks | `requestBody`, `401`, `413`, `422`, `429` e `x-contract-version` para carrier, lalamove, rodonaves, nexus, bitrix, biosync | Lint do OpenAPI verde |
 
@@ -231,7 +231,7 @@ Ordem por exposição: quem recebe tráfego anônimo da internet primeiro.
 | # | Etapa | O que fazer | Pronto quando |
 | --- | --- | --- | --- |
 | 053 | `rodonaves-api` parte 1 | Schemas Zod por `action` de cotação substituindo `requireString`/`requireNumber` (`index.ts:1127-1569`); único 422 já existente vira `ContractError` | Ações de cotação sem `validate.ts` |
-| 054 | `rodonaves-api` parte 2 | Rastreio, coleta, ocorrências; `validate.ts` removido do repo | `grep -rn "_shared/validate" supabase` vazio |
+| 054 | `rodonaves-api` parte 2 | Rastreio, coleta, ocorrências. `validate.ts` ainda é importado por 7 funções (4 webhooks, normalize, ocr, rodonaves-api): só é removido depois de 038–044, 059 e 060 | `grep -rn "_shared/validate" supabase` vazio ao fim da fase |
 | 055 | `melhor-envio-api` | Schema por `action`; `useSandbox` (`:60`) decidido por env no servidor, nunca pelo cliente | Cliente não consegue mudar sandbox/produção |
 | 056 | `lalamove-api` | Schema por `method` (`:80`); rota desconhecida → 400 `METHOD_NOT_ALLOWED`/422 | Sem 404 para ação inválida |
 | 057 | `lalamove-tracking` | Schema (`orderId`, filtros) | — |
@@ -248,7 +248,7 @@ Ordem por exposição: quem recebe tráfego anônimo da internet primeiro.
 | 068 | `secure-store` | Códigos `invalid_value` etc. migrados para o catálogo (`VALIDATION_FAILED` + `fields`) | — |
 | 069 | `check-password-breach` | `prefix` de 5 hex (depende de 007) | — |
 | 070 | `geocode-address` e `get-weather-data` | `lat`/`lon` com faixas, `address` com tamanho; query params validados por schema | — |
-| 071 | `get-mapbox-token`, `health`, `health-check` | Só `GET`/`OPTIONS`; body ignorado explicitamente; 405 para o resto | — |
+| 071 | `get-mapbox-token`, `health`, `health-check` | Sem contrato de corpo: `GET` e `POST` sem body aceitos em v1 (o front chama por POST: `useNexusHealth.ts:68`, `systemTester.ts:29`); migrar os dois chamadores para `GET` e só então restringir em v2 | Chamadores atuais continuam 200 |
 | 072 | `execute-protocol` e `lgpd-erase-user` | `protocol_id`/`user_id` uuid, `confirm: z.literal(true)`; erro de banco não vai ao cliente | — |
 | 073 | `external-db-bridge` | Enum de `table`/`rpcName` e schema de `filters` (depende de 013) | — |
 | 074 | `nexus-auto-healing`, `accuracy-meta-monitor`, `accuracy-weekly-digest` | Body opcional validado; `preview` boolean; auth interna (depende de 018) | — |
@@ -272,7 +272,7 @@ Caso mínimo por função: válido → 2xx; campo ausente → 422; tipo errado �
 | 085 | Harness de invocação | `tests/contracts/_harness/invoke.ts`: `invoke(handler, { method, body, headers, query })` → `{ status, headers, json }`; sem rede | Usado por 089+ |
 | 086 | Asserção de erro | `expectContractError(res, { status, code, fields? })` valida contra `ContractErrorSchema` e compara `fields.path` | — |
 | 087 | Gerador de casos negativos | `tests/contracts/_harness/negativeCases.ts`: a partir de um payload válido e do schema gera: cada obrigatório ausente; cada campo com tipo trocado; `""`/`[]`/`{}`/`null`; campo extra (strict) | Função pura com teste próprio |
-| 088 | Casos comuns parametrizados | `tests/contracts/common.spec.ts` sobre o registro de handlers: JSON inválido 400, 1 MB 413, `PUT` 405, `OPTIONS` 204 com CORS | 43 handlers × 4 casos verdes |
+| 088 | Casos comuns parametrizados | `tests/contracts/common.spec.ts` sobre o registro de handlers, parametrizado por método e por existência de contrato de corpo: JSON inválido 400 e 1 MB 413 só para quem tem body (não para 071), método fora da lista 405, `OPTIONS` 204 com CORS | 43 handlers × casos aplicáveis verdes |
 | 089 | `carrier-webhook-receiver` | Válido 200; assinatura errada 401; timestamp antigo 401; duplicado 200 `duplicate`; negativos gerados 422 | Arquivo `supabase/functions/carrier-webhook-receiver/index.contract.test.ts` |
 | 090 | `lalamove-webhook` | Idem 089 + `eventId` ausente 422 | — |
 | 091 | `rodonaves-webhook` | Idem 089 | — |
@@ -391,7 +391,7 @@ Caso mínimo por função: válido → 2xx; campo ausente → 422; tipo errado �
 | 180 | Um lockfile `[AVALIAR]` | Apagar `bun.lock`/`bun.lockb` (vite 5.4.19 e zod 3.25.76, divergentes do npm) — confirmar que o Lovable não os usa | Só `package-lock.json` |
 | 181 | Gates de segurança atualizados `[CI → dono]` | `audit-gate.mjs:9-19`: allowlist por `pacote@versão` com justificativa atual (comentário cita vite 5.4 e SheetJS 0.18.5; o lock tem vite 6.4.6 e `xlsx-js-style`); `codeql.yml` roda em PR; `dependency-review` mantido | CodeQL em toda PR |
 | 182 | CI sem repetição `[CI → dono]` | `ci-nexus.yml`: suíte vitest roda 2× (`:62` e `:68`) + `test:fuzz` já contido nela (`:65`) e repete lint/tsc do `ci.yml`; deixar uma execução; `timeout-minutes`, `concurrency`; `security.yml` consolidado no `ci.yml` | Tempo de CI cai; um audit por PR |
-| 183 | Deploy de edge com gate `[CI → dono]` | `deploy-functions.yml`: `needs: [contract-tests, deno-check]`, `environment: producao-edge` com aprovação, CLI com versão fixa, input `only` via `env:` (sem `${{ }}` em `run:`, `:42-43`) | Deploy só após testes verdes e aprovação |
+| 183 | Deploy de edge com gate `[CI → dono]` | `deploy-functions.yml`: jobs `contract-tests` e `deno-check` declarados no próprio workflow via `workflow_call` reutilizável (`needs` não enxerga jobs de `ci.yml`/`ci-nexus.yml`), `environment: producao-edge` com aprovação, CLI com versão fixa, input `only` via `env:` (sem `${{ }}` em `run:`, `:42-43`) | Deploy só após testes verdes e aprovação |
 | 184 | Pin de SHA e baseline `[CI → dono]` | Actions por SHA (hoje tag exata `@v7.0.1`/`@v3`) em `ci.yml`, `security.yml`, `ci-nexus.yml`, `deploy-functions.yml`, `contexto-ia.yml`; `sha_pinning_required:true`; AGENTS.md "9 checks" → 10 (ou baseline ajustado) | `settings-guard` verde |
 | 185 | Proteção da `main` `[AVALIAR]` `[DONO]` | `strict:true` e revisão obrigatória (ou CODEOWNERS) em `github-settings-baseline.json:16-21` — custo: PRs precisam atualizar antes de mergear | Dono decide; baseline atualizado |
 | 186 | ESLint mais forte | `no-console` no front (exceto `utils/logger`), `import/order`, `react-hooks/exhaustive-deps` como `error` revisando os 24 `eslint-disable`; os 38 arquivos > 500 linhas viram épico separado (não cabem aqui) | Budget de warnings não sobe |
