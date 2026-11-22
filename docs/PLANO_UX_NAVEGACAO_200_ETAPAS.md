@@ -6,9 +6,10 @@ fluxos de várias etapas, feedback, teclado, celular, endereço compartilhável,
 
 - **Criado em:** 2026-11-22
 - **Base de código lida:** `main` em `87fd515`
-- **Método:** auditoria por dimensão (navegação do shell e botão Voltar) e verificação adversarial de cada
-  achado, relendo o arquivo citado: **16 confirmados, 12 parciais (linha ou contagem corrigida neste texto),
-  0 refutados**. As demais dimensões foram levantadas por leitura direta dos arquivos citados.
+- **Método:** auditoria em nove dimensões (shell, botão Voltar, modais, fluxos, feedback, teclado, celular,
+  endereço, métricas) e verificação adversarial de cada achado, relendo o arquivo citado: **89 confirmados,
+  37 parciais (linha ou contagem corrigida neste texto), 0 refutados**. O apêndice A lista os achados que
+  mudam a prioridade das etapas.
 - **Estado:** plano. Nenhuma etapa executada.
 - **Não verificado:** comportamento em aparelho real (iOS, Android, tablet), medições de contraste com
   ferramenta, teste com usuário. Contagens vêm de `grep` no commit base.
@@ -242,8 +243,8 @@ Hoje há quatro controles de voltar simultâneos, dois atalhos Alt+← somados e
 | 049 | Um só lugar para "visitados recentemente" | Consolidar o dropdown do header, o do breadcrumb e `RecentlyVisited.tsx` numa fonte do provider, com limite e deduplicação | Uma lista, coerente em qualquer tela |
 | 050 | Histórico que sobrevive a recarga | `recentPages` persistido por usuário, limpo no `signOut` (hoje fica no `localStorage` após sair) | Trocar de usuário não herda histórico alheio |
 | 051 | Breadcrumb no mobile | Trilha compacta (último pai + atual) em vez de esconder; sem quebra de linha em 360px | Em celular o usuário sabe em que ramo está |
-| 052 | Voltar ao topo coerente | `ScrollToTop` e `ScrollRestoration` convivem: definir que o botão não aparece quando a restauração acabou de posicionar o scroll | Nenhum salto duplo ao entrar na tela |
-| 053 | Posição de scroll por rota | `ScrollRestoration.tsx` guarda posição num `Map` em memória, perdida ao recarregar: persistir por sessão e limitar o tamanho | Voltar para uma lista longa retoma a posição |
+| 052 | "Voltar ao topo" que aparece | `ScrollToTop.tsx:11,23` escuta `window.scrollY` e rola `window`, mas o contêiner rolável é `<main id="main-content">` (`MainLayout.tsx:85-86`): o botão **nunca aparece** hoje. Passar a observar o elemento certo | Botão surge após rolar a listagem e leva ao topo |
+| 053 | Posição de scroll por rota | `ScrollRestoration` guarda a posição num `Map` em memória e compara com um `useRef` que o remount por rota (`App.tsx:116`) já recria com a rota nova: a posição **nunca é salva**. Corrigir junto com a etapa 012 e persistir por sessão | Voltar para uma lista longa retoma a posição |
 | 054 | Foco anunciado na troca de rota | A restauração foca o primeiro `h1` (`ScrollRestoration.tsx`), mas muitas páginas não têm `h1` visível: garantir `h1` por página via `PageHeader` (hoje em 3 páginas) | Leitor de tela anuncia a tela nova em todas as rotas |
 | 055 | `PageHeader` em todas as páginas | Componente único com título, descrição, ações e slot de breadcrumb; adotado em lote (20 páginas) | Cabeçalho igual em toda a aplicação |
 | 056 | `PageHeader` — lote 2 | 20 páginas seguintes | — |
@@ -267,12 +268,12 @@ Hoje o app tem 53 arquivos com `Dialog`, nenhum estado de modal na URL, 1 única
 | 068 | Detalhe de entrega com rota | Entrega passa a ter `/entregas/:id` (hoje só existe `/rastreamento/:id`): compartilhável, indexável no histórico, com Voltar para a listagem | Operador manda o link da entrega para o cliente |
 | 069 | Detalhe de coleta com rota | `/coletas/:id` nos mesmos termos | — |
 | 070 | Detalhe de ocorrência com rota | `/ocorrencias/:id` nos mesmos termos | — |
-| 071 | Confirmação única | Adotar `ConfirmProvider`/`useConfirm` (existe em `src/components/common/ConfirmProvider.tsx` e hoje tem zero uso fora dele) como único caminho de confirmação | `AlertDialog` solto sai dos 18 arquivos |
-| 072 | Toda exclusão confirma | Os 12 pontos de exclusão em páginas passam pelo `useConfirm`, com o nome do registro no texto ("Excluir o cliente Promobrindes?") | Nenhuma exclusão em um clique |
-| 073 | Exclusão com desfazer | Como a exclusão é lógica (`deleted_at`), o toast de sucesso oferece "Desfazer" por 10 segundos | Erro de clique deixa de ser perda de dado |
+| 071 | Confirmação única | `ConfirmProvider` existe completo (inclui exigir digitação e contagem regressiva) mas **não está montado** em `App.tsx:186-205`, e `useConfirm` lança exceção sem ele (`ConfirmProvider.tsx:188`): montar o provedor e adotá-lo como único caminho | Primeiro uso de `useConfirm` funciona; `AlertDialog` solto sai dos 16 arquivos |
+| 072 | Toda exclusão confirma | Hoje excluem em um clique, sem nenhum diálogo: `AlertasCusto.tsx:549`, `Notificacoes.tsx:353`, `ConfiguracoesFrete.tsx:967`, `WebhookManager.tsx:92`, `ScheduledReportsManager.tsx:339`, `AdminADR.tsx:283` (exclusão física) e a ação em lote de `Notificacoes.tsx:282` (`.delete().in(...)`, `:170-178`). Todas passam pelo `useConfirm`, com o nome do registro no texto | Nenhuma exclusão em um clique |
+| 073 | Exclusão com desfazer `[AVALIAR]` | Onde a exclusão é lógica (`deleted_at`), o aviso de sucesso oferece "Desfazer" por 10 segundos. Levantar e decidir caso a caso as exclusões físicas: notificações (`Notificacoes.tsx:143-179`), decisões de arquitetura (`AdminADR.tsx:99-105`), alertas de custo (`useCostAlerts.tsx:273`), regras de frete (`ConfiguracoesFrete.tsx:139-145`), webhooks de cliente (`useClientWebhooks.tsx:92-95`) e relatórios agendados (`scheduled-reports/index.ts:55`) — cada uma vira exclusão lógica (pede coluna nova, decisão do dono) ou fica só com a confirmação da 072, registrado na tabela do plano | Cada exclusão tem destino escrito: desfazer ou confirmação, nada implícito |
 | 074 | Ações em lote conferem | `BulkActions` mostra quantos e quais registros serão afetados antes de executar | "Excluir 37 selecionados" diz o que são |
-| 075 | Saída protegida | `useConfirmExit` só é usado em `Profile` e `Configuracoes`; passar a proteger todo formulário sujo, inclusive modais fechados por Esc ou clique fora | Fechar com dados preenchidos pergunta antes |
-| 076 | Esc e clique fora conscientes | Formulário sujo: `onEscapeKeyDown`/`onPointerDownOutside` disparam confirmação; leitura: fecham direto | Ninguém perde 10 campos por um clique no fundo |
+| 075 | Saída protegida | `useConfirmExit` só registra `beforeunload` (F5 e fechar aba); o trecho de navegação interna é um comentário vazio (`useConfirmExit.ts:21-26`), então clicar no menu descarta o formulário em silêncio. Implementar o bloqueio de navegação interna — e `useBlocker` **não serve** enquanto o app usa `BrowserRouter` (`App.tsx:193`), que não é roteador de dados: ou migrar para `createBrowserRouter` (decisão de arquitetura, `[AVALIAR]`) ou interceptar na saída, cobrindo também os `NavLink` do menu (`AppSidebar.tsx:371,418`) e da barra inferior, não só as chamadas a `navigate` | Clicar no menu ou na barra inferior com formulário sujo pergunta antes |
+| 076 | Esc e clique fora conscientes | Não existe **nenhum** `onEscapeKeyDown`/`onInteractOutside`/`onPointerDownOutside` no `src` inteiro: todo modal de formulário descarta o preenchido em silêncio (ex.: `Clientes.tsx:916-941`, `PickupDialog.tsx:201,456`). Formulário sujo passa a pedir confirmação; leitura fecha direto | Ninguém perde um formulário por um clique no fundo |
 | 077 | Modal com nome acessível | 5 `DialogContent` sem `DialogTitle` (entre eles `OnboardingWizard`, `WelcomeModal`, `LevelUpModal`, `ImageUploader`): título visível ou `VisuallyHidden` | Radix para de avisar e o leitor de tela anuncia o diálogo |
 | 078 | Sem modal sobre modal | Mapear os casos de diálogo aninhado e trocar por etapa dentro do mesmo painel | Nenhuma pilha de dois modais |
 | 079 | Painel de detalhe no lugar de modal grande | `DetailSheet` (existe, sem uso) para visualizações longas, com largura confortável e scroll interno | Detalhe deixa de caber mal num modal central |
@@ -326,10 +327,10 @@ O app já tem `GlobalLoadingBar`, `ScrollRestoration`, `PageTransition` e `Empty
 | 115 | Carregamento de ação | Botão que dispara requisição mostra pendência e bloqueia duplo clique em todos os formulários | Nenhum envio duplicado por clique ansioso |
 | 116 | Atualização otimista nas ações rápidas | Hoje não há nenhuma (`onMutate` não aparece no código): aplicar em marcar como lido, favoritar, mudar status no kanban, com reversão em caso de falha | Ação rápida responde na hora |
 | 117 | Confirmação visível do que mudou | Após salvar, destacar a linha alterada na lista por alguns segundos, em vez de só um aviso que passa | Usuário vê o efeito, não só a mensagem |
-| 118 | Transição coerente | `PageTransition` em todas as páginas ou em nenhuma (hoje em 4), com duração curta e única | Navegação tem o mesmo ritmo em todo o app |
-| 119 | Movimento respeita a preferência | Transições, animações de botão e o brilho da barra de carregamento desligam com "reduzir movimento" do sistema | Quem sente desconforto com movimento usa o app |
-| 120 | Barra de navegação honesta | `GlobalLoadingBar` hoje roda 500 ms fixos a cada rota, mesmo quando a tela já está pronta: ligar ao carregamento real da rota e dos dados | Barra aparece quando há espera de verdade |
-| 121 | Anúncio da troca de tela | A região de anúncio informa o nome da tela nova para leitores de tela, apoiada no `h1` de `PageHeader` | Usuário de leitor de tela sabe que mudou de página |
+| 118 | Transição coerente | `PageTransition` está em 4 páginas e não produz animação nenhuma: o `AnimatePresence mode="wait"` (`PageTransition.tsx:63`) nunca vê a saída porque a árvore é descartada pelo `key` de `App.tsx:116`. Decidir: animar no lugar certo (após a etapa 012) ou remover o componente | Navegação tem o mesmo ritmo, ou nenhuma animação fingida |
+| 119 | Movimento respeita a preferência | `ReducedMotion.tsx:59-62` grava `data-reduce-motion` no documento e **nada lê**: não há `@media (prefers-reduced-motion)` em `src/index.css` nem consumidor do dado. Criar a regra de CSS e ligar as animações a ela | Transições e brilhos param com a preferência do sistema |
+| 120 | Uma barra de navegação, honesta | São **duas** ao mesmo tempo: `NavigationProgressBar` (`App.tsx:194`) e `GlobalLoadingBar` (`MainLayout.tsx:68`), ambas com progresso falso por temporizador (150 ms e 500 ms). Manter uma e ligá-la ao carregamento real da rota e dos dados | Uma barra, aparecendo quando há espera de verdade |
+| 121 | Anúncio da troca de tela | `useRouteAnnouncer` (`LiveRegion.tsx:72`) existe e não tem consumidor; e o foco que `ScrollRestoration` manda para o `h1` é buscado antes do conteúdo lazy resolver. Ligar o anunciador ao provedor de navegação e focar após a resolução | Leitor de tela anuncia a tela nova em todas as rotas |
 | 122 | Volta ao topo previsível | Entrar numa tela nova começa no topo; voltar retoma a posição anterior (regra única, sem salto duplo) | Nenhuma tela abre no meio sem motivo |
 | 123 | Aviso de offline útil | `OfflineBanner` informa o que ainda funciona e o que está em fila (apoiado na fila de operações pendentes) | Usuário em área sem sinal sabe o que esperar |
 | 124 | Fila de pendências visível | Tela ou painel que mostra operações aguardando conexão, com reenviar e descartar | Nada fica "salvo" sem o usuário saber |
@@ -345,14 +346,14 @@ Hoje existem dois diálogos de busca montados ao mesmo tempo, ambos escutando Ct
 
 | # | Etapa | O que fazer | Pronto quando |
 | --- | --- | --- | --- |
-| 131 | Uma busca só | `GlobalSearch` (carregado no `Header.tsx:30,172`) e `SearchCommand` (montado em `MainLayout`) são dois diálogos distintos sobre o mesmo `useGlobalSearch`, cada um registrando Ctrl+K no documento (`GlobalSearch.tsx:41-47`, `SearchCommand.tsx:34-42`): manter um, remover o outro | Ctrl+K abre uma busca, não duas |
+| 131 | Uma busca só | `GlobalSearch` (`Header.tsx:172`) e `SearchCommand` (`MainLayout.tsx:125`) são dois diálogos sobre o mesmo `useGlobalSearch`, ambos registrando Ctrl+K (`GlobalSearch.tsx:43`, `SearchCommand.tsx:36`); pior, `SearchCommand` também renderiza um **botão de busca em fluxo** (`:64-73`) no fim do shell, solto na tela. Manter um, remover o outro | Ctrl+K abre uma busca e não há botão órfão na página |
 | 132 | Atalho não dispara ao digitar | `useKeyboardShortcut` (`useKeyboardShortcuts.ts:30-60`) não checa o elemento em foco: Alt+N dentro de um campo de texto navega e perde o que foi escrito; ignorar quando o foco está em campo editável | Digitar nunca leva o usuário para outra tela |
 | 133 | Atalhos documentados e visíveis | `KeyboardShortcutsHelp` abre por atalho descoberto (hoje a lista vive em `shortcutsList`, `useKeyboardShortcuts.ts:12-19`), com os atalhos reais, incluindo Voltar e busca | Usuário descobre os atalhos sem ler código |
 | 134 | Alt+→ coerente | Hoje `navigate(1)` avança no histórico sem checar se há para onde; usar a pilha do provider e desabilitar quando não houver | Avançar nunca é um atalho morto |
-| 135 | Busca que encontra registros | A busca indexa o que o `useGlobalSearch` traz; garantir entrega, coleta, cliente, transportadora e nota, com tipo e destino certos | Operador acha uma entrega pelo número em um atalho |
+| 135 | Busca que abre o registro | A busca encontra a entrega certa e navega para a **lista inteira**: `useGlobalSearch.tsx:283-334` devolve `url: "/envios"` sem id, e o `?highlight=` que `GlobalSearch.tsx:88` monta não é lido em lugar nenhum. Resultado passa a abrir o registro (depende das rotas das etapas 068–070) | Achar pelo número leva ao registro, não à lista |
 | 136 | Busca que encontra telas | Além de registros, a busca lista rotas do registro (Fase 1), com seção e permissão respeitadas | "Onde configuro frete?" resolve na busca |
-| 137 | Busca no celular | Entrada de busca acessível na barra inferior ou no cabeçalho em telas pequenas | Busca deixa de ser recurso só de desktop |
-| 138 | Ações rápidas na busca | Comandos como "nova coleta", "novo despacho" aparecem na busca, aproveitando o que `GlobalSearch` já tenta fazer com tema e sair | Um lugar para ir a qualquer tela ou ação |
+| 137 | Busca no celular e no tablet | O gatilho do cabeçalho é `hidden lg:block` (`Header.tsx:170`), então abaixo de 1024px o único acesso é o botão solto que `SearchCommand` monta no fim do shell (`MainLayout.tsx:120-126`, `SearchCommand.tsx:64-73`) — existe, mas fora de lugar. Ao consolidar a busca (131), substituir esse acesso por um gatilho na barra inferior ou no cabeçalho | Busca alcançável no celular, em lugar previsível |
+| 138 | Ações rápidas na busca | Comandos como "nova coleta" e "novo despacho" aparecem na busca, aproveitando o que `GlobalSearch` já faz com tema e sair; e corrigir o filtro do `cmdk`, que refaz a busca pelo título (`SearchCommand.tsx:109`) e esconde o que foi achado por endereço ou código de rastreio | Um lugar para ir a qualquer tela ou ação, sem perder resultado |
 | 139 | Navegação por teclado no menu | Setas percorrem itens, Enter abre, Esc fecha seção; foco não escapa para o conteúdo no meio da lista | Menu operável sem mouse |
 | 140 | Ordem de tabulação do shell | Sequência: atalhos, menu, busca, cabeçalho, conteúdo; sem armadilha de foco na sidebar colapsada | Tab percorre a tela na ordem visual |
 | 141 | Foco visível no escuro | Contorno de foco com contraste suficiente nos dois temas, em menu, trilha, barra inferior e botões de ação | Foco nunca desaparece no fundo escuro |
@@ -370,11 +371,11 @@ A barra inferior já trata a área segura do aparelho, mas `ResponsiveTable` (o 
 | # | Etapa | O que fazer | Pronto quando |
 | --- | --- | --- | --- |
 | 149 | Um só `useIsMobile` | Existem dois: `hooks/ui/use-mobile.tsx` (limite 767px) e `hooks/common/useMediaQuery.ts` (limite 768px), usados por arquivos diferentes; manter um e ajustar o limite ao Tailwind | Nenhuma tela se comporta como celular e desktop ao mesmo tempo |
-| 150 | Tabela vira cartão no celular | `ResponsiveTable` existe e não é importado por ninguém; adotar nas listagens principais (lote 1: Central de Rastreamento, Dashboard de Cotações, Painel OTIF) | Tabela deixa de exigir rolagem lateral no celular |
+| 150 | Tabela vira cartão no celular | `ResponsiveTable` existe, já trata o celular (`:47`) e só é citado pelo próprio barril; 38 arquivos montam tabela crua. Adotar nas listagens principais (lote 1: Central de Rastreamento, Dashboard de Cotações, Painel OTIF) | Tabela deixa de exigir rolagem lateral no celular |
 | 151 | Tabela vira cartão — lote 2 | Conciliação, Logística Reversa, Exportação, Gerenciamento de Usuários | — |
-| 152 | Tabela vira cartão — lote 3 | Demais páginas com tabela crua (13 no total) | Nenhuma tabela crua em tela pequena |
+| 152 | Tabela vira cartão — lote 3 | Demais telas com tabela crua (38 arquivos no total, 13 deles em `src/pages`), a começar por `GerenciamentoUsuarios.tsx:338-346`, com 6 colunas | Nenhuma tabela crua em tela pequena |
 | 153 | Coluna essencial primeiro | Em cartão, mostrar o que decide a ação (código, cliente, status, prazo) e esconder o resto atrás de "ver detalhes" | Operador decide sem abrir o registro |
-| 154 | Teclado numérico certo | Só 2 campos usam `inputMode`; CEP, CNPJ, telefone, peso e valor passam a abrir o teclado correto no celular | Digitar endereço no celular deixa de ser penoso |
+| 154 | Teclado numérico certo | `inputMode` aparece em 2 lugares no `src` inteiro; CNPJ, CEP e telefone são texto livre em `Clientes.tsx:439-441,482-484,513-516` e `Fornecedores.tsx:388-390,431-433,462-465`, abrindo teclado alfabético no celular | Cadastro no celular abre o teclado certo |
 | 155 | Alvos de toque adequados | Revisar botões de ícone e linhas clicáveis para o mínimo de 44px em telas de toque | Nenhum alvo pequeno nas telas de campo |
 | 156 | Rotação liberada | O manifesto fixa `portrait-primary`; um sistema com tabelas e mapas precisa de paisagem no tablet | Tablet em paisagem usa a tela inteira |
 | 157 | Barra inferior com destino coerente | Itens vindos do registro (Fase 1), com rótulo curto, ícone consistente e indicação da tela atual | Usuário sabe onde está na barra |
@@ -382,7 +383,7 @@ A barra inferior já trata a área segura do aparelho, mas `ResponsiveTable` (o 
 | 159 | Ações rápidas revistas | O botão flutuante não cobre ação da tela nem a barra; some ao rolar para baixo e volta ao subir | Botão flutuante deixa de atrapalhar |
 | 160 | Formulário longo no celular | Rodapé de ação fixo, rolagem para o campo com erro e teclado que não cobre o campo ativo | Cadastro no celular é concluído sem zoom |
 | 161 | Mapa utilizável no celular | Altura adequada, gesto de arrastar que não conflita com a rolagem da página, controles ao alcance do polegar | Mapa deixa de prender a rolagem |
-| 162 | Gesto nativo respeitado | Onde o sistema já tem gesto de voltar (iOS e aplicativo instalado), não registrar o gesto próprio (ver etapa 028) | Um gesto, um voltar |
+| 162 | Gesto nativo respeitado e mapa livre | Onde o sistema já tem gesto de voltar, não registrar o próprio (etapa 028); e aplicar o `data-no-swipe` que o hook já verifica (`useTouchGestures.ts:13`) e **nenhum elemento usa**, no mapa de `RastreamentoMotorista.tsx:190` e nos mapas de telas internas — na raiz o gesto não navega, por causa da guarda `pathname !== "/"` (`useTouchGestures.ts:34`), então o mapa do painel inicial não é afetado | Um gesto, um voltar; arrastar o mapa de uma tela interna não navega |
 | 163 | Gesto para abrir o menu | Deslizar da borda esquerda abre o menu no celular, com a mesma animação do botão | Menu alcançável com uma mão |
 | 164 | Rolagem com puxar para atualizar | Nas listagens em celular, puxar para baixo recarrega a consulta e mostra o estado de atualização | Operador atualiza a fila sem procurar botão |
 | 165 | Tablet com layout próprio | Entre 769px e 1024px, sidebar em modo ícone e tabela com menos colunas, em vez de herdar o desktop | Tablet deixa de ser um desktop apertado |
@@ -404,7 +405,7 @@ Quase nada do estado da tela está no endereço: 6 usos de parâmetros de URL em
 | 175 | Abas no endereço | Das 286 instâncias de abas, apenas 7 são controladas; migrar as abas das telas principais para `?tab=` | Link abre direto na aba certa |
 | 176 | Período no endereço | Seletor de datas dos painéis grava o período na URL | Relatório pode ser compartilhado com o mesmo período |
 | 177 | Login devolve ao destino | `ProtectedRoute` não guarda a rota pretendida e `Auth` sempre manda para `/`: gravar o destino e voltar a ele após entrar | Link recebido por e-mail abre a tela certa depois do login |
-| 178 | Sessão expirada retoma | `SessionTimeoutWarning` guarda a rota e os parâmetros; ao reautenticar, o usuário volta para onde estava | Expirar não custa o trabalho em andamento |
+| 178 | Sessão expirada retoma | `useSessionTimeout.ts:74-76` chama `signOut()` direto quando expira, e o diálogo só existe para o aviso prévio (`SessionTimeoutWarning.tsx:17`): guardar rota e parâmetros, avisar e, ao reautenticar, voltar para onde estava | Expirar não custa o trabalho em andamento |
 | 179 | Sessão sincronizada entre abas | Sair em uma aba reflete nas outras (hoje não há `BroadcastChannel` nem escuta de armazenamento) | Sair em uma aba não deixa outra "logada" |
 | 180 | Dados frescos ao voltar para a aba | Ao reativar a aba, revalidar o que é sensível a tempo (fila, rastreio, alertas), sem recarregar tudo | Aba esquecida aberta não mostra dado velho |
 | 181 | Uma tarefa por aba sem conflito | Duas abas no mesmo registro: avisar quando o dado mudou por outra sessão antes de sobrescrever | Operador não sobrescreve o colega sem saber |
@@ -433,9 +434,9 @@ Há um canal de telemetria pronto (`useTelemetry` gravando em `telemetry_logs`, 
 
 | # | Etapa | O que fazer | Pronto quando |
 | --- | --- | --- | --- |
-| 194 | Eventos de navegação | Registrar, pelo provider: troca de tela, uso do Voltar (e por qual caminho: cabeçalho, barra inferior, gesto, atalho), uso da busca, abertura de menu e item escolhido | Painel mostra por onde as pessoas navegam |
+| 194 | Eventos de navegação | Registrar, pelo provedor: troca de tela, uso do Voltar (e por qual caminho: cabeçalho, barra inferior, gesto, atalho), busca (termo, nº de resultados, escolha), menu e item escolhido — hoje `trackEvent` não existe no `src` e nada disso é medido | Painel mostra por onde as pessoas navegam |
 | 195 | Indicadores definidos | Definir e calcular: uso do Voltar por tela, abandono por etapa nos 8 fluxos, tempo até a primeira ação, repetição de clique no mesmo elemento, erro de formulário por campo, conclusão por fluxo | Seis indicadores com consulta pronta |
-| 196 | Painel de navegação | Painel administrativo com esses indicadores por semana, separando celular e desktop | Dono vê onde o usuário trava sem pedir relatório |
+| 196 | Navegação sai de `security_events` | A navegação é gravada na tabela de eventos de segurança (`useNavigationHistory.tsx:106-120`, severidade baixa), e o painel lê os 200 últimos registros da mesma tabela (`SecurityEventsPanel.tsx:36`; 100 é só o padrão do hook, `useSecurityEvents.ts:57`): o `page_view` empurra os eventos reais para fora da tela. Navegação passa para `telemetry_logs`, e o painel administrativo mostra os indicadores por semana, separando celular e computador | Painel de segurança volta a mostrar segurança; navegação tem painel próprio |
 | 197 | Medida antes de mudar | A linha de base exige a etapa 194 primeiro: hoje só existe `page_view` (`useNavigationHistory.tsx:106-121`), que não conta uso do Voltar nem abandono por etapa. Sequência: instrumentar (194), deixar rodar uma semana, registrar os números das telas mais usadas e só então aplicar as fases 1 a 9 | Linha de base registrada com data, já com os eventos novos |
 | 198 | Comparação por versão | Como o deploy é contínuo, marcar cada etapa entregue no painel e comparar a semana anterior com a seguinte | Cada fase tem efeito medido, não suposto |
 | 199 | Escuta do usuário | Canal curto dentro do app ("algo confuso nesta tela?") que grava a tela, a rota e o comentário no mesmo canal de telemetria | Operação reclama na hora, com contexto |
@@ -461,3 +462,46 @@ Há um canal de telemetria pronto (`useTelemetry` gravando em `telemetry_logs`, 
 - Decidir os `[AVALIAR]`: 001 (formato do registro), 156 (rotação no tablet), 184 (renomear endereços), 193 (língua da navegação).
 - Aprovar a telemetria de navegação (194) e o painel (196).
 - Autorizar a conta de teste usada em 167 e 168 (a criação é execução minha) e convocar os cinco operadores (200).
+
+---
+
+## Apêndice A — achados verificados que mudam a prioridade
+
+Auditoria em nove dimensões, cada achado relido no arquivo citado por um verificador independente instruído a
+refutá-lo: **89 confirmados, 37 parciais, 0 refutados**. Abaixo os que não são "melhoria de experiência", e sim
+função que não funciona — a razão de várias etapas acima terem subido de prioridade.
+
+### A.1 Recursos que existem e nunca funcionaram
+
+| Achado | Evidência | Efeito hoje | Etapa |
+| --- | --- | --- | --- |
+| "Voltar ao topo" nunca aparece | `ScrollToTop.tsx:11,23` lê `window.scrollY` e rola `window`; quem rola é `<main id="main-content">` (`MainLayout.tsx:85-86`) | Botão invisível em toda listagem longa | 052 |
+| Posição de rolagem nunca é salva | `ScrollRestoration` compara com um `useRef` que o remount por rota (`App.tsx:116`) já recria com a rota nova | Voltar sempre abre no topo | 053, 012 |
+| Transição de página não anima | `AnimatePresence mode="wait"` (`PageTransition.tsx:63`) nunca vê a saída, descartada pelo mesmo `key` | Quatro páginas carregam um componente sem efeito | 118 |
+| "Reduzir movimento" é lido e descartado | `ReducedMotion.tsx:59-62` grava `data-reduce-motion`; não há `@media (prefers-reduced-motion)` em `src/index.css` nem consumidor | A preferência de acessibilidade não faz nada | 119 |
+| Anúncio de rota sem consumidor | `useRouteAnnouncer` (`LiveRegion.tsx:72`) não é chamado em lugar nenhum | Leitor de tela não sabe que a tela mudou | 121 |
+| Confirmação central nunca montada | `ConfirmProvider.tsx:188` lança exceção sem o provedor, ausente de `App.tsx:186-205` | 190 linhas prontas, inutilizáveis | 071 |
+| Tabela responsiva sem uso | `ResponsiveTable.tsx:47` trata o celular; só o próprio barril a cita, e 38 arquivos montam tabela crua | Operação no celular rola tabela de lado | 150–152 |
+| Escape do gesto sem uso | `useTouchGestures.ts:13` verifica `data-no-swipe`; nenhum elemento tem o atributo | Arrastar o mapa de uma tela interna dispara o voltar (na raiz, não, pela guarda de `:34`) | 162 |
+| Destaque de resultado sem leitor | `GlobalSearch.tsx:88` monta `?highlight=<id>`; nada lê esse parâmetro | Busca acha o registro e abre a lista inteira | 135 |
+| Etapa de despacho da cotação nunca é desenhada | `CotacaoFrete.tsx:195,246` chama `selectAndAdvance`, que guarda a escolha e muda o passo para "despachar" (`useQuotationFlow.tsx:226-229`), mas a tela não renderiza esse passo (`grep despachar src/pages/CotacaoFrete.tsx` vazio) | "Selecionar" guarda a escolha e a tela não avança | 085–089, 098 |
+| Guarda de saída só no F5 | `useConfirmExit.ts:21-26` tem comentário vazio no lugar do bloqueio de rota | Clicar no menu descarta o formulário | 075 |
+
+### A.2 Caminhos que enganam o usuário
+
+| Achado | Evidência | Efeito hoje | Etapa |
+| --- | --- | --- | --- |
+| Onboarding abre em "concluído" para quem nunca começou | `useOnboarding.tsx:222` faz `progress?.completed_at !== null`, que é verdadeiro quando não há progresso | Usuário novo vê o tour como terminado | 101 |
+| Botões do onboarding não abrem o assistente | `useOnboarding.tsx:83` guarda `showWizard` em `useState` de hook comum; progresso e diálogo são instâncias diferentes | "Configurar módulo seguinte" não faz nada | 101, 013 |
+| Disparo multicanal diz "concluído" mesmo falhando tudo | `CotacaoMultiCanal.tsx:321` engole o erro no laço, `:327` conta como feito e `:332` avisa sucesso | Operador acredita em cotação que não saiu | 095, 096 |
+| Cotações automáticas falham caladas e o carregamento acaba antes | `CotacaoMultiCanal.tsx:172,215,242` descartam o erro; `:256` desliga o indicador sem esperar as promessas | Tela parece pronta com dados faltando | 095 |
+| Nova busca apaga as cotações já obtidas | `CotacaoMultiCanal.tsx:106-107` limpa os resultados dentro de `handleSearch`, sem aviso nem volta | Trabalho de coleta de preços perdido num clique | 089, 094 |
+| Sessão expira e derruba sem diálogo | `useSessionTimeout.ts:74-76` chama `signOut()`; o aviso prévio é a única tela (`SessionTimeoutWarning.tsx:17`) | Formulário aberto vira tela de login | 178 |
+| Exclusão física em um clique | `Notificacoes.tsx:282` dispara `.delete().in(...)` em lote (`:170-178`); `AdminADR.tsx:283` idem para um registro | Dado apagado sem pergunta nem desfazer | 072, 073 |
+| Botão de busca solto no fim da página | `SearchCommand.tsx:64-73` renderiza um botão em fluxo, montado em `MainLayout.tsx:125` | Campo de busca órfão abaixo do conteúdo | 131 |
+| Duas barras de progresso, ambas fingidas | `NavigationProgressBar` (`App.tsx:194`) e `GlobalLoadingBar` (`MainLayout.tsx:68`), com temporizadores de 150 ms e 500 ms | Progresso que não representa carregamento | 120 |
+| Dois avisos no mesmo canto | `App.tsx:191-192` monta os dois sistemas; o painel do Radix usa a mesma posição do outro (`ui/toast.tsx:17`) | Mensagens empilhadas e inconsistentes | 107 |
+| Primeira abertura de cada tela pisca tela cheia | O único limite de suspensão é `App.tsx:195`, com reserva de altura total, e o layout está dentro de cada página: enquanto o pedaço da rota não chega, menu e cabeçalho desaparecem (voltar a uma rota já carregada não suspende) | Primeira visita a cada tela perde o shell | 008–012, 114 |
+| Navegação polui a tabela de segurança | `useNavigationHistory.tsx:106-120` grava `page_view` em `security_events`; o painel pede os 200 últimos da mesma tabela (`SecurityEventsPanel.tsx:36`) | Evento real de segurança sai da tela | 196, 014 |
+| Filtro sempre em memória | `useFilters.ts:43` e `usePagination.ts:45` nascem em `useState`; 16 telas dependem deles | Voltar e recarregar zeram o trabalho | 169–174 |
+| Atalho dispara dentro do campo | `useKeyboardShortcuts.ts:38-55` não olha o elemento em foco | Alt+N no meio de um cadastro troca de tela | 132 |
