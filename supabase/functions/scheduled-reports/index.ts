@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
 import { log } from "../_shared/logger.ts";
 import { withCircuitBreaker } from "../_shared/circuitBreaker.ts";
+import { requireUser } from "../_shared/auth.ts";
 import { safeFetch } from "../_shared/safeFetch.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
@@ -13,8 +14,18 @@ export const handler = async (req: Request) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const auth = await requireUser(req);
+  if (!auth.ok) {
+    return new Response(
+      JSON.stringify({ success: false, error: "Unauthorized" }),
+      { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
+  }
+  // IDOR: userId vem das claims, nunca do body (etapa 011)
+  const userId = auth.claims.sub;
+
   try {
-    const { action, reportId, userId, reportData } = await req.json();
+    const { action, reportId, reportData } = await req.json();
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
     log.info(`[Scheduled Reports] Action: ${action}`);
@@ -103,10 +114,13 @@ export const handler = async (req: Request) => {
       }
 
       default:
-        throw new Error(`Unknown action: ${action}`);
+        return new Response(
+          JSON.stringify({ success: false, error: `Unknown action: ${action}` }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
     }
   } catch (error) {
-    log.error("[Scheduled Reports] Error:", error);
+    log.error("[Scheduled Reports] Error:", { error });
     return new Response(
       JSON.stringify({
         success: false,
@@ -310,11 +324,11 @@ async function sendReportEmail(
     } else {
       log.info(
         "[Scheduled Reports] Email sent successfully to:",
-        recipients.join(", "),
+        { recipients: recipients.join(", ") },
       );
     }
   } catch (err) {
-    log.error("[Scheduled Reports] Failed to send email:", err);
+    log.error("[Scheduled Reports] Failed to send email:", { err });
   }
 }
 

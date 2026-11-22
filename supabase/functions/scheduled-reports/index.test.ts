@@ -7,14 +7,16 @@ Deno.env.set("SUPABASE_URL", "https://jvfhclubfpxrtrrazrgr.supabase.co");
 Deno.env.set("SUPABASE_SERVICE_ROLE_KEY", "test-key");
 Deno.env.set("RESEND_API_KEY", "re_test_123");
 
+// Etapa 011: requireUser via Bearer do service role (short-circuit local).
+const AUTH = { Authorization: "Bearer test-key" };
+
 Deno.test({
   name: "Scheduled Reports - Action: create - Happy Path",
   sanitizeOps: false,
   sanitizeResources: false,
   async fn() {
-    const fetchStub = stub(globalThis, "fetch", (url: any) => {
-      // Return a single object for .single()
-      return Promise.resolve(new Response(JSON.stringify({ id: 'new-report-id', title: 'New Report' }), { 
+    const fetchStub = stub(globalThis, "fetch", (_url: any) => {
+      return Promise.resolve(new Response(JSON.stringify({ id: 'new-report-id', title: 'New Report' }), {
         status: 200,
         headers: { "Content-Type": "application/json" }
       }));
@@ -23,12 +25,12 @@ Deno.test({
     try {
       const payload = {
         action: 'create',
-        userId: 'user-123',
         reportData: { title: 'New Report', report_type: 'entregas' }
       };
 
       const req = new Request("https://localhost/scheduled-reports", {
         method: "POST",
+        headers: AUTH,
         body: JSON.stringify(payload),
       });
 
@@ -56,12 +58,12 @@ Deno.test({
     try {
       const payload = {
         action: 'delete',
-        reportId: 'report-123',
-        userId: 'user-123'
+        reportId: 'report-123'
       };
 
       const req = new Request("https://localhost/scheduled-reports", {
         method: "POST",
+        headers: AUTH,
         body: JSON.stringify(payload),
       });
 
@@ -77,20 +79,36 @@ Deno.test({
 });
 
 Deno.test({
-  name: "Scheduled Reports - Unknown Action - Error Case",
+  name: "Scheduled Reports - Unknown Action - 400 (not 500)",
   sanitizeOps: false,
   sanitizeResources: false,
   async fn() {
     const req = new Request("https://localhost/scheduled-reports", {
       method: "POST",
+      headers: AUTH,
       body: JSON.stringify({ action: 'unknown' }),
     });
 
     const res = await handler(req);
     const data = await res.json();
 
-    assertEquals(res.status, 500);
+    assertEquals(res.status, 400);
     assertEquals(data.success, false);
     assertEquals(data.error, "Unknown action: unknown");
+  }
+});
+
+Deno.test({
+  name: "Scheduled Reports - Missing auth - 401",
+  sanitizeOps: false,
+  sanitizeResources: false,
+  async fn() {
+    const req = new Request("https://localhost/scheduled-reports", {
+      method: "POST",
+      body: JSON.stringify({ action: 'list' }),
+    });
+
+    const res = await handler(req);
+    assertEquals(res.status, 401);
   }
 });
