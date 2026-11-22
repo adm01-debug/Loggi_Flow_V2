@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
 import { log } from "../_shared/logger.ts";
 import { withCircuitBreaker } from "../_shared/circuitBreaker.ts";
+import { safeFetch } from "../_shared/safeFetch.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
 import { getWeatherForRoutes } from "../_shared/weather.ts";
 
@@ -211,9 +212,10 @@ export const handler = async (req: Request) => {
     }]`;
 
     const aiResponse = await withCircuitBreaker("ai-gateway", async () => {
-      const response = await fetch(
+      const response = await safeFetch(
         "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
         {
+          circuitBreakerName: null, // breaker "ai-gateway" ja aplicado no withCircuitBreaker externo
           method: "POST",
           headers: {
             Authorization: `Bearer ${GOOGLE_API_KEY}`,
