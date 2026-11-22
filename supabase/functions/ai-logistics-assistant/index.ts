@@ -4,6 +4,7 @@ import { corsHeaders } from "../_shared/cors.ts";
 import { log } from "../_shared/logger.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
 import { getWeatherForRoutes } from "../_shared/weather.ts";
+import { safeFetch } from "../_shared/safeFetch.ts";
 
 // Type definitions for contextual data
 interface Transportadora {
@@ -188,7 +189,7 @@ export const handler = async (req: Request) => {
 
     Analise o contexto e a pergunta do usuário para dar a melhor recomendação logística possível.`;
 
-    const response = await fetch(
+    const response = await safeFetch(
       "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
       {
         method: "POST",

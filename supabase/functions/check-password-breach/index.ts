@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { log } from "../_shared/logger.ts";
+import { safeFetch } from "../_shared/safeFetch.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -44,7 +45,7 @@ serve(async (req: Request) => {
 
     // Query HIBP API using k-anonymity model
     // This only sends the first 5 characters of the hash, protecting the actual password
-    const response = await fetch(
+    const response = await safeFetch(
       `https://api.pwnedpasswords.com/range/${prefix}`,
       {
         headers: {

@@ -3,10 +3,12 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { log } from "../_shared/logger.ts";
 import { requireUser } from "../_shared/auth.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
+import { safeFetch } from "../_shared/safeFetch.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
 };
 
 interface SecurityEventRequest {
@@ -30,25 +32,22 @@ serve(async (req: Request) => {
       windowMs: 60_000,
     });
     if (!rl.allowed) {
-      return new Response(
-        JSON.stringify({ error: "rate_limited" }),
-        {
-          status: 429,
-          headers: {
-            ...corsHeaders,
-            "Content-Type": "application/json",
-            "Retry-After": "60",
-          },
-        }
-      );
+      return new Response(JSON.stringify({ error: "rate_limited" }), {
+        status: 429,
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json",
+          "Retry-After": "60",
+        },
+      });
     }
 
     const auth = await requireUser(req);
     if (!auth.ok) {
-      return new Response(
-        JSON.stringify({ error: "Unauthorized" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -69,29 +68,41 @@ serve(async (req: Request) => {
     if (!event.event_type || !event.description) {
       return new Response(
         JSON.stringify({ error: "event_type and description are required" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
       );
     }
 
     // Get IP from request headers if not provided
-    const ipAddress = event.ip_address || 
+    const ipAddress =
+      event.ip_address ||
       req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
       req.headers.get("x-real-ip") ||
       null;
 
     const userAgent = event.user_agent || req.headers.get("user-agent") || null;
 
-    log.info(`Logging security event: ${event.event_type} - ${event.description}`);
+    log.info(
+      `Logging security event: ${event.event_type} - ${event.description}`,
+    );
 
-    const { data, error } = await supabaseAdmin.from("security_events").insert([{
-      user_id: event.user_id || null,
-      event_type: event.event_type,
-      severity: event.severity || "info",
-      description: event.description,
-      ip_address: ipAddress,
-      user_agent: userAgent,
-      metadata: event.metadata || {},
-    }]).select().single();
+    const { data, error } = await supabaseAdmin
+      .from("security_events")
+      .insert([
+        {
+          user_id: event.user_id || null,
+          event_type: event.event_type,
+          severity: event.severity || "info",
+          description: event.description,
+          ip_address: ipAddress,
+          user_agent: userAgent,
+          metadata: event.metadata || {},
+        },
+      ])
+      .select()
+      .single();
 
     if (error) {
       log.error("Error logging security event:", error);
@@ -112,48 +123,54 @@ serve(async (req: Request) => {
 
       const tasks: Promise<Response>[] = [];
       if (resendKey && alertEmail) {
-        tasks.push(fetch("https://api.resend.com/emails", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${resendKey}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            from: "security@logiflow.app",
-            to: [alertEmail],
-            subject: alertPayload.subject,
-            text: alertPayload.body,
+        tasks.push(
+          safeFetch("https://api.resend.com/emails", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${resendKey}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              from: "security@logiflow.app",
+              to: [alertEmail],
+              subject: alertPayload.subject,
+              text: alertPayload.body,
+            }),
           }),
-        }));
+        );
       }
       if (slackWebhook) {
-        tasks.push(fetch(slackWebhook, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text: `${alertPayload.subject}\n\`\`\`${alertPayload.body}\`\`\`` }),
-        }));
+        tasks.push(
+          safeFetch(slackWebhook, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              text: `${alertPayload.subject}\n\`\`\`${alertPayload.body}\`\`\``,
+            }),
+          }),
+        );
       }
       if (tasks.length) {
         const results = await Promise.allSettled(tasks);
         results.forEach((r) => {
-          if (r.status === "rejected") log.error("Alert dispatch failed", { reason: String(r.reason) });
+          if (r.status === "rejected")
+            log.error("Alert dispatch failed", { reason: String(r.reason) });
           else void r.value.text();
         });
       }
     }
 
-
-    return new Response(
-      JSON.stringify({ success: true, event_id: data.id }),
-      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
-
+    return new Response(JSON.stringify({ success: true, event_id: data.id }), {
+      status: 200,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
     log.error("Security event logging error:", error);
-    return new Response(
-      JSON.stringify({ error: errorMessage }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: errorMessage }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 });
