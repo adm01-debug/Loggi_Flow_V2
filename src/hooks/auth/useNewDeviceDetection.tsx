@@ -68,7 +68,7 @@ async function getClientIP(): Promise<string> {
 }
 
 export function useNewDeviceDetection() {
-  const { user } = useAuth();
+  const { user, session } = useAuth();
 
   const checkAndRegisterDevice = useCallback(async () => {
     if (!user?.id || !user?.email) return;
@@ -131,9 +131,8 @@ export function useNewDeviceDetection() {
       // If not first device, send email alert
       if (!isFirstDevice) {
         const { error: emailError } = await supabase.functions.invoke('new-device-alert', {
+          headers: { Authorization: `Bearer ${session?.access_token ?? ''}` },
           body: {
-            user_id: user.id,
-            user_email: user.email,
             device_info: {
               browser: deviceInfo.browser,
               os: deviceInfo.os,

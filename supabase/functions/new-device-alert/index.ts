@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { log } from "../_shared/logger.ts";
 import { safeFetch } from "../_shared/safeFetch.ts";
+import { requireUser } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -28,15 +29,23 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const auth = await requireUser(req);
+  if (!auth.ok) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json", ...corsHeaders },
+    });
+  }
+  const userId = auth.claims.sub ?? "";
+  const userEmail = String(auth.claims.email ?? "");
+
   try {
     const {
-      user_id,
-      user_email,
       device_info,
       login_time,
     }: NewDeviceAlertRequest = await req.json();
 
-    log.info(`Sending new device alert to ${user_email}`);
+    log.info(`Sending new device alert to ${userEmail}`);
 
     const formattedDate = new Date(login_time).toLocaleString("pt-BR", {
       dateStyle: "full",
@@ -58,7 +67,7 @@ const handler = async (req: Request): Promise<Response> => {
       },
       body: JSON.stringify({
         from: "Segurança <seguranca@promobrindes.com.br>",
-        to: [user_email],
+        to: [userEmail],
         subject: "🔔 Novo login detectado em sua conta",
         html: `
           <!DOCTYPE html>
@@ -176,7 +185,7 @@ const handler = async (req: Request): Promise<Response> => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     await supabase.from("security_events").insert({
-      user_id,
+      user_id: userId,
       event_type: "new_device_login",
       severity: "warning",
       description: `Novo dispositivo detectado: ${device_info.browser} em ${device_info.os}`,

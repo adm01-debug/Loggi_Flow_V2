@@ -34,8 +34,12 @@ export interface ScheduledReportFormData {
 }
 
 export const useScheduledReports = () => {
-  const { user } = useAuth();
+  const { user, session } = useAuth();
   const queryClient = useQueryClient();
+  const authHeaders = {
+    Authorization: `Bearer ${session?.access_token ?? ""}`,
+  };
+
 
   const { data: reports, isLoading } = useQuery({
     queryKey: ["scheduled-reports", user?.id],
@@ -45,7 +49,8 @@ export const useScheduledReports = () => {
       const { data, error } = await supabase.functions.invoke(
         "scheduled-reports",
         {
-          body: { action: "list", userId: user.id },
+          body: { action: "list" },
+          headers: authHeaders,
         },
       );
 
@@ -60,7 +65,8 @@ export const useScheduledReports = () => {
       const { data, error } = await supabase.functions.invoke(
         "scheduled-reports",
         {
-          body: { action: "create", userId: user?.id, reportData },
+          body: { action: "create", reportData },
+          headers: authHeaders,
         },
       );
       if (error) throw error;
@@ -85,10 +91,10 @@ export const useScheduledReports = () => {
         {
           body: {
             action: "update",
-            userId: user?.id,
             reportId: id,
             reportData,
           },
+          headers: authHeaders,
         },
       );
       if (error) throw error;
@@ -108,7 +114,8 @@ export const useScheduledReports = () => {
       const { data, error } = await supabase.functions.invoke(
         "scheduled-reports",
         {
-          body: { action: "delete", userId: user?.id, reportId },
+          body: { action: "delete", reportId },
+          headers: authHeaders,
         },
       );
       if (error) throw error;
@@ -132,6 +139,7 @@ export const useScheduledReports = () => {
         "scheduled-reports",
         {
           body: { action: "generate", reportData },
+          headers: authHeaders,
         },
       );
       if (error) throw error;
