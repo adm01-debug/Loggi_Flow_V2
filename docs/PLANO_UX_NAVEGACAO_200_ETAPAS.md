@@ -168,7 +168,7 @@ As 200 etapas trazem a lista completa; abaixo as seis decisões que organizam to
 
 - P1 — A navegação fica em português; nomes como "Audit Trail" e "Nexus" podem ser traduzidos ou mantidos como marca, à escolha do dono.
 - P2 — Entrega, coleta e ocorrência podem ter endereço próprio compartilhável entre usuários com permissão.
-- P3 — Existe (ou pode ser semeado) usuário de teste para os roteiros em celular e tablet.
+- P3 — O dono autoriza criar uma conta de teste no ambiente de produção; a criação em si é execução minha, via MCP.
 - P4 — Cinco operadores reais podem participar de uma rodada de revisão ao fim do plano.
 - P5 — O painel administrativo de telemetria é o lugar certo para as métricas de navegação, sem ferramenta nova.
 
@@ -190,7 +190,7 @@ Sem esta fase, toda melhoria de navegação é aplicada em quatro lugares difere
 | 008 | Layout route única | `MainLayout` vira rota pai com `<Outlet/>`; as 55 páginas param de importar `MainLayout` (lote 1: 15 páginas) | Sidebar e header montam uma vez só |
 | 009 | Layout route — lote 2 | 20 páginas seguintes | — |
 | 010 | Layout route — lote 3 | 20 páginas restantes | `grep -rl "<MainLayout" src/pages` vazio |
-| 011 | Páginas órfãs no shell | `PainelSLA.tsx:297` e `ExportacaoDados.tsx:292` renderizam sem sidebar, header, breadcrumb ou Voltar (e o mesmo vale para os retornos de carregamento, `:279` e `:274`); entram na layout route | As duas ganham o shell e nenhum "beco sem saída" permanece |
+| 011 | Páginas órfãs no shell | `PainelSLA.tsx:297` e `ExportacaoDados.tsx:292` renderizam sem sidebar, header, breadcrumb ou Voltar (o mesmo nos retornos de carregamento, `:279` e `:274`): envolver em `<MainLayout>` agora, como as outras 55 — sem esperar a rota de layout das etapas 008–010, que as absorve depois | As duas ganham o shell e nenhum "beco sem saída" permanece |
 | 012 | Fim do remount por rota | Remover `key={location.pathname}` (`App.tsx:116`), que hoje remonta o shell inteiro e zera `collapsed` e `openSection` da sidebar (`AppSidebar.tsx:203,220`); se precisar de animação de troca, aplicá-la ao conteúdo | Estado do shell sobrevive à navegação |
 | 013 | Histórico em provider único | `useNavigationHistory` é chamado em 7 lugares (`App.tsx:111`, `Header.tsx:38`, `MobileBottomNav.tsx:109`, `PageBackButton.tsx:19`, `Breadcrumbs.tsx:137`, `RecentlyVisited.tsx:17`, `PageTransition.tsx:36`) e cada instância tem sua própria pilha e seu próprio `directionRef` (`:66,:68`); virar `NavigationProvider` montado uma vez, com os demais consumindo o contexto | Todas as superfícies leem o mesmo histórico |
 | 014 | Um `page_view` por navegação | O `insert` em `security_events` (`useNavigationHistory.tsx:109-121`, dentro do efeito que começa em `:70`) roda em cada instância montada, multiplicando registros por navegação; mover para o provider | Uma linha por navegação, conferida por query |
@@ -209,7 +209,7 @@ Hoje há quatro controles de voltar simultâneos, dois atalhos Alt+← somados e
 | --- | --- | --- | --- |
 | 021 | Decisão registrada | ADR `docs/adr/0016-navegacao-voltar.md`: desktop = Voltar no header (sempre visível, desabilitado só na raiz); mobile = slot fixo na bottom nav + gesto nativo; nunca dois no mesmo viewport | Dono aprova o padrão |
 | 022 | `goBack` confiável | No provider: usa a pilha interna do app; sem entrada anterior, vai para o `fallbackPath` da rota (pai no registro) ou `/`; nunca `window.history.length > 2` (`useNavigationHistory.tsx:134`, repetido em `useKeyboardShortcuts.ts:69`) | Deep link direto + Voltar leva ao pai, não para fora do app |
-| 023 | Um atalho Alt+← | Remover o listener de `Header.tsx:44-52`, deixando só `useKeyboardShortcuts.ts:64-70`, que chama o `goBack` do provider | Alt+← volta uma página, não duas |
+| 023 | Um atalho Alt+← | Remover o listener de `Header.tsx:44-52` e deixar só `useKeyboardShortcuts.ts:66-73`, que segue com a lógica atual; ligá-lo ao `goBack` do provedor é a etapa 022, não condição desta | Alt+← volta uma página, não duas |
 | 024 | Login sem armadilha | `Auth.tsx:68,142,148,189` usa `navigate("/")` sem `replace`, deixando `/auth` no histórico | Depois de entrar, Voltar não cai na tela de login |
 | 025 | Voltar do header | Único controle no desktop: ícone `ArrowLeft`, `aria-label` dinâmico ("Voltar para Envios"), tooltip com o destino, nunca escondido | Posição fixa em todas as 61 rotas |
 | 026 | `PageBackButton` resolvido | Ou vira `hidden md:flex` sem duplicar o header, ou é removido; a prop `fallbackPath` declarada e nunca lida (`PageBackButton.tsx:8`) passa a funcionar | Um só Voltar por viewport |
@@ -292,8 +292,8 @@ O app tem `Stepper` e `StepProgress`, usados por duas páginas (`CotacaoMultiCan
 | 087 | Progresso sempre visível | Cada fluxo mostra "etapa 2 de 4" e o que falta, inclusive no celular | Usuário sabe quanto falta antes de começar |
 | 088 | Validação por etapa | Avançar valida apenas a etapa atual e mostra o erro no campo, não um toast genérico ao final | Erro aparece onde o usuário pode corrigir |
 | 089 | Voltar sem perder dados | Voltar uma etapa preserva o que foi digitado; os 19 campos de `CotacaoMultiCanal` (`useState` individual) passam para um estado de fluxo único | Ir e voltar entre etapas não apaga nada |
-| 090 | Rascunho da cotação | Estado da cotação salvo (`sessionStorage` + banco para o que já foi enviado), com retomada ao reabrir | Fechar a aba no meio não perde a cotação |
-| 091 | Rascunho da coleta | Mesmo tratamento para o agendamento de coleta | — |
+| 090 | Rascunho da cotação | Estado da cotação salvo em armazenamento que sobrevive ao fechamento da aba (local, por usuário, com validade e limpeza no logout; `sessionStorage` morre com a aba e não serve) e no banco para o que já foi enviado, com retomada ao reabrir | Fechar a aba e voltar depois recupera a cotação |
+| 091 | Rascunho da coleta | Mesmo tratamento para o agendamento de coleta, sem guardar documento nem telefone no navegador | Rascunho volta sem levar dado pessoal para o aparelho |
 | 092 | Rascunho da importação | Arquivo e mapeamento de colunas preservados entre etapas e entre sessões | Importação de 2.000 linhas não recomeça do zero |
 | 093 | Retomada explícita | Ao reabrir um fluxo com rascunho: "Continuar de onde parou" ou "Começar de novo", nunca restaurar em silêncio | Usuário escolhe, não é surpreendido |
 | 094 | Sair pede confirmação | Qualquer navegação para fora de um fluxo com dados pede confirmação, usando o mesmo `useConfirm` | Nenhum fluxo abandonado por clique no menu |
@@ -388,7 +388,7 @@ A barra inferior já trata a área segura do aparelho, mas `ResponsiveTable` (o 
 | 165 | Tablet com layout próprio | Entre 769px e 1024px, sidebar em modo ícone e tabela com menos colunas, em vez de herdar o desktop | Tablet deixa de ser um desktop apertado |
 | 166 | Leitura de QR sem sair do fluxo | A leitura abre sobre a tela atual e devolve o resultado ao formulário, sem trocar de rota | Conferência não perde o contexto |
 | 167 | Teste em aparelho real | Roteiro em celular e tablet (iOS e Android) para os cinco fluxos de campo: coleta, conferência, rastreio, ocorrência e cotação | Roteiro executado com achados registrados |
-| 168 | Testes automáticos de viewport | Playwright em 360px, 768px e 1280px: barra inferior visível, nenhuma rolagem lateral, Voltar presente | Três larguras verdes |
+| 168 | Testes automáticos de viewport | Playwright em 360px (barra inferior visível, menu lateral oculto), 768px e 1280px (menu lateral visível, barra inferior oculta — o corte é `md`, `MobileBottomNav.tsx:119`): em todas, nenhuma rolagem lateral e um Voltar alcançável | Três larguras verdes |
 ## Fase 9 — Endereço, link direto e várias abas (169–186)
 
 Quase nada do estado da tela está no endereço: 6 usos de parâmetros de URL em 3 páginas, 286 conjuntos de abas com apenas 7 controlados, e o login sempre devolve para a raiz.
@@ -436,7 +436,7 @@ Há um canal de telemetria pronto (`useTelemetry` gravando em `telemetry_logs`, 
 | 194 | Eventos de navegação | Registrar, pelo provider: troca de tela, uso do Voltar (e por qual caminho: cabeçalho, barra inferior, gesto, atalho), uso da busca, abertura de menu e item escolhido | Painel mostra por onde as pessoas navegam |
 | 195 | Indicadores definidos | Definir e calcular: uso do Voltar por tela, abandono por etapa nos 8 fluxos, tempo até a primeira ação, repetição de clique no mesmo elemento, erro de formulário por campo, conclusão por fluxo | Seis indicadores com consulta pronta |
 | 196 | Painel de navegação | Painel administrativo com esses indicadores por semana, separando celular e desktop | Dono vê onde o usuário trava sem pedir relatório |
-| 197 | Medida antes de mudar | Antes de aplicar as fases 1 a 9, registrar os números atuais das telas mais usadas, para comparar depois | Linha de base registrada com data |
+| 197 | Medida antes de mudar | A linha de base exige a etapa 194 primeiro: hoje só existe `page_view` (`useNavigationHistory.tsx:106-121`), que não conta uso do Voltar nem abandono por etapa. Sequência: instrumentar (194), deixar rodar uma semana, registrar os números das telas mais usadas e só então aplicar as fases 1 a 9 | Linha de base registrada com data, já com os eventos novos |
 | 198 | Comparação por versão | Como o deploy é contínuo, marcar cada etapa entregue no painel e comparar a semana anterior com a seguinte | Cada fase tem efeito medido, não suposto |
 | 199 | Escuta do usuário | Canal curto dentro do app ("algo confuso nesta tela?") que grava a tela, a rota e o comentário no mesmo canal de telemetria | Operação reclama na hora, com contexto |
 | 200 | Rodada de revisão | Após as fases, roteiro com cinco operadores reais (três no celular) nos fluxos de coleta, cotação e ocorrência; achados viram a próxima lista de etapas | Relatório com os cinco testes e a lista seguinte |
@@ -453,11 +453,11 @@ Há um canal de telemetria pronto (`useTelemetry` gravando em `telemetry_logs`, 
 6. **085–106**: fluxos longos, onde está o maior desperdício de retrabalho.
 7. **107–130 e 149–168**: feedback e celular, em paralelo.
 8. **131–148 e 187–193**: teclado e inclusão.
-9. **194–200**: medição — mas a etapa 197 (linha de base) roda **antes** da fase 1.
+9. **194 e 197 antes de tudo**: instrumentar a navegação e deixar rodar uma semana para ter linha de base; o resto da medição (195, 196, 198–200) acompanha as fases.
 
 ## Só o dono pode fazer
 
 - Confirmar as premissas P1–P5.
 - Decidir os `[AVALIAR]`: 001 (formato do registro), 156 (rotação no tablet), 184 (renomear endereços), 193 (língua da navegação).
 - Aprovar a telemetria de navegação (194) e o painel (196).
-- Semear o usuário de teste (167, 168) e convocar os cinco operadores (200).
+- Autorizar a conta de teste usada em 167 e 168 (a criação é execução minha) e convocar os cinco operadores (200).
