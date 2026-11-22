@@ -219,7 +219,7 @@ Ordem por exposição: quem recebe tráfego anônimo da internet primeiro.
 | 044 | Migrar `nexus-webhook-receiver` | Falhas de negócio (`:93,107,122`) → 404/409 com `ContractError`, não 200 `success:false` | Nenhum 200 com `success:false` |
 | 045 | `bitrix24-integration` action `webhook` `[SEGREDO]` | Schema do evento Bitrix + validação de `application_token` (ou `BITRIX_WEBHOOK_SECRET`) antes de gravar (`:310-333`) | POST sem token recebe 401 |
 | 046 | `ingest-biosync` `[SEGREDO]` | Schema de telemetria (`device_id`, `metrics[]`, `captured_at`) + `x-device-token`/`requireInternalSecret` (`:21`) | Body livre recebe 422; sem token 401 |
-| 047 | Contratos de `webhook-status` (entrada e saída) | Entrada: `discriminatedUnion('action')` do que `useClientWebhooks.tsx` envia (`notify_status_change` com `entrega_id`, `old_status`, `new_status`, …; `index.ts:47-57`). Saída: schema do payload enviado aos parceiros (`event`, `version`, `occurred_at`, `data`) + HMAC com timestamp; ambos em `docs/api/CONTRATOS.md` | Parceiro valida a assinatura com o exemplo da doc; ação inválida recebe 422 |
+| 047 | Contratos de `webhook-status` (entrada e saída) | Entrada: `discriminatedUnion('action')` com base nas ações do servidor (`notify_status_change` com `data{ entrega_id, old_status, new_status, … }`, `index.ts:50`; `list_webhooks`, `index.ts:174`). Bug herdado a corrigir junto: `useClientWebhooks.tsx:104-108` envia só `{ webhookId }`, sem `action`, e hoje cai no erro de ação inválida — o hook passa a enviar a ação correta. Saída: schema do payload enviado aos parceiros (`event`, `version`, `occurred_at`, `data`) + HMAC com timestamp; ambos em `docs/api/CONTRATOS.md` | Parceiro valida a assinatura com o exemplo da doc; ação inválida recebe 422 |
 | 048 | `evolution-whatsapp` e `whatsapp-notification` | `discriminatedUnion('action', ...)` por ação; números E.164; tamanho de mensagem | Ação desconhecida recebe 422 com `fields:[{path:'action'}]` |
 | 049 | Tabela de violações `[DDL]` | `supabase/migrations/<ts>_webhook_contract_violations.sql`: `function`, `version`, `code`, `fields jsonb`, `payload_hash`, `created_at`, RLS admin; `contract_test_logs` para de receber corpo | Migration na PR, dono aplica |
 | 050 | Apagar `contract-validator.ts` | Só depois de 038–048 **e** 059–060 (`normalize-freight-response` e `ocr-receipt-processor` também o importam) | `grep -rn contract-validator supabase` vazio |
@@ -231,7 +231,7 @@ Ordem por exposição: quem recebe tráfego anônimo da internet primeiro.
 | # | Etapa | O que fazer | Pronto quando |
 | --- | --- | --- | --- |
 | 053 | `rodonaves-api` parte 1 | Schemas Zod por `action` de cotação substituindo `requireString`/`requireNumber` (`index.ts:1127-1569`); único 422 já existente vira `ContractError` | Ações de cotação sem `validate.ts` |
-| 054 | `rodonaves-api` parte 2 | Rastreio, coleta, ocorrências. `validate.ts` ainda é importado por 7 funções (4 webhooks, normalize, ocr, rodonaves-api): só é removido depois de 038–044, 059 e 060 | `grep -rn "_shared/validate" supabase` vazio ao fim da fase |
+| 054 | `rodonaves-api` parte 2 | Rastreio, coleta, ocorrências. `validate.ts` ainda é importado por 7 funções (4 webhooks, normalize, ocr, rodonaves-api) e por `contract-validator.ts:1`: só é removido depois de 038–044, 059, 060 e da etapa 050 | `grep -rn "_shared/validate" supabase` vazio ao fim da fase |
 | 055 | `melhor-envio-api` | Schema por `action`; `useSandbox` (`:60`) decidido por env no servidor, nunca pelo cliente | Cliente não consegue mudar sandbox/produção |
 | 056 | `lalamove-api` | Schema por `method` (`:80`); rota desconhecida → 400 `METHOD_NOT_ALLOWED`/422 | Sem 404 para ação inválida |
 | 057 | `lalamove-tracking` | Schema (`orderId`, filtros) | — |
@@ -274,7 +274,7 @@ Caso mínimo por função: válido → 2xx; campo ausente → 422; tipo errado �
 | 087 | Gerador de casos negativos | `tests/contracts/_harness/negativeCases.ts`: a partir de um payload válido e do schema gera: cada obrigatório ausente; cada campo com tipo trocado; `""`/`[]`/`{}`/`null`; campo extra (strict) | Função pura com teste próprio |
 | 088 | Casos comuns parametrizados | `tests/contracts/common.spec.ts` sobre o registro de handlers, parametrizado por método e por existência de contrato de corpo: JSON inválido 400 e 1 MB 413 só para quem tem body (não para 071), método fora da lista 405, `OPTIONS` 204 com CORS | 43 handlers × casos aplicáveis verdes |
 | 089 | `carrier-webhook-receiver` | Válido 200; assinatura errada 401; timestamp antigo 401; duplicado 200 `duplicate`; negativos gerados 422 | Arquivo `supabase/functions/carrier-webhook-receiver/index.contract.test.ts` |
-| 090 | `lalamove-webhook` | Idem 089 + `eventId` ausente 422 | — |
+| 090 | `lalamove-webhook` | Idem 089; em v1 `eventId` ausente é aceito (200) e dois corpos iguais sem id deduplicam; o 422 por `eventId` ausente é caso de v2 (etapa 121) | — |
 | 091 | `rodonaves-webhook` | Idem 089 | — |
 | 092 | `nexus-webhook-receiver` | Idem 089 + `source` inválido 422 + transportadora inexistente 404 | — |
 | 093 | `bitrix24-integration`, `ingest-biosync`, `webhook-status` | Token ausente 401; negativos 422; saída assinada (webhook-status) | — |
@@ -284,7 +284,7 @@ Caso mínimo por função: válido → 2xx; campo ausente → 422; tipo errado �
 | 097 | `ai-logistics-assistant`, `predict-delays`, `predict-delays-scheduled` | Inclui mensagem acima do limite 422 e secret ausente 401 | — |
 | 098 | `scheduled-reports`, `resend-email`, `new-device-alert` | Inclui IDOR (userId de outro) 403 | — |
 | 099 | Funções de auth | `send-password-reset`, `validate-login`, `log-login-attempt`, `log-security-event`, `check-rate-limit`, `check-password-breach`, `secure-store` | — |
-| 100 | `geocode-address`, `get-weather-data`, `get-mapbox-token`, `health`, `health-check` | Inclui `lat=91` 422 e `POST` em `health` 405 | — |
+| 100 | `geocode-address`, `get-weather-data`, `get-mapbox-token`, `health`, `health-check` | Inclui `lat=91` 422; `POST` sem corpo em `health` responde 200 em v1 (chamadores atuais) e 405 só com `X-Contract-Version: 2` | — |
 | 101 | `execute-protocol`, `lgpd-erase-user`, `external-db-bridge` | Inclui tabela fora da allowlist 422 | — |
 | 102 | `nexus-auto-healing`, `accuracy-*`, `db-health-*`, `db-regression-monitor` | Secret ausente 401 | 43/43 funções com `index.contract.test.ts` |
 | 103 | Envelope em toda resposta de erro | `tests/contracts/error-envelope.spec.ts`: para cada handler, cada 4xx/5xx valida contra `ContractErrorSchema` e código↔status bate com o catálogo | Verde para os 43 |
@@ -406,8 +406,8 @@ Caso mínimo por função: válido → 2xx; campo ausente → 422; tipo errado �
 
 1. **001–018 agora**: exposições abertas em produção (webhooks, senha, auth, `.env`).
 2. **019–036**: fundação de contratos — sem ela as fases 3–6 não têm onde se apoiar.
-3. **037–052 → 085–093**: webhooks de terceiro migrados e testados (maior risco externo).
-4. **053–084 → 094–112**: demais funções, cliente tipado, testes e CI bloqueante.
+3. **037–048, 051–052 → 085–093**: webhooks de terceiro migrados e testados (maior risco externo).
+4. **053, 055–084 → 094–112**: demais funções, cliente tipado, testes e CI bloqueante; **050** (apagar `contract-validator.ts`) entra depois de 059–060, e **054** (apagar `validate.ts`) depois de 050.
 5. **113–124**: v2 e compatibilidade retroativa, quando houver pelo menos um parceiro para migrar.
 6. **125–146 e 147–160** em paralelo com as fases 4–6 (front não depende de contratos, exceto 082–084).
 7. **161–176** depois da paginação (129–130) e do IP no servidor (146).
