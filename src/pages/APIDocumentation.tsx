@@ -390,8 +390,7 @@ export default function APIDocumentation() {
           <TabsContent value="examples" className="card-base p-6">
             <h3 className="font-semibold mb-4">Exemplo de Requisição</h3>
             <pre className="bg-muted p-4 rounded-lg overflow-x-auto text-sm">{`curl -X POST ${fullBase ?? "https://<ref>.supabase.co"}/predict-delays \\
-  -H "Authorization: Bearer <token>" \\
-  -H "apikey: <anon_key>" \\
+  -H "Authorization: Bearer <token>" -H "apikey: <anon_key>" \\
   -H "Content-Type: application/json"`}</pre>
           </TabsContent>
         </Tabs>
