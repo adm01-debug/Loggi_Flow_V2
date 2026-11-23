@@ -31,6 +31,7 @@ import {
   CreditCard,
   DollarSign,
   Navigation,
+  Pencil,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
@@ -67,6 +68,8 @@ interface PickupDetailsDialogProps {
     }
   >;
   onStatusUpdate: () => void;
+  /** Etapa 063: callback para abrir o formulário de edição. Opcional para manter compatibilidade. */
+  onEdit?: (pickup: Pickup) => void;
 }
 
 export function PickupDetailsDialog({
@@ -75,6 +78,7 @@ export function PickupDetailsDialog({
   pickup,
   statusConfig,
   onStatusUpdate,
+  onEdit,
 }: PickupDetailsDialogProps) {
   const [timeline, setTimeline] = useState<TimelineEvent[]>([]);
   const [loadingTimeline, setLoadingTimeline] = useState(false);
@@ -275,15 +279,31 @@ export function PickupDetailsDialog({
               </div>
             </div>
             <div className="flex flex-col items-end gap-2">
-              <Badge
-                variant="outline"
-                className={cn(
-                  "px-6 py-2.5 font-black uppercase tracking-widest text-[11px] rounded-full border-2 shadow-xl",
-                  statusConfig[pickup.status]?.color,
+              <div className="flex items-center gap-2">
+                <Badge
+                  variant="outline"
+                  className={cn(
+                    "px-6 py-2.5 font-black uppercase tracking-widest text-[11px] rounded-full border-2 shadow-xl",
+                    statusConfig[pickup.status]?.color,
+                  )}
+                >
+                  {statusConfig[pickup.status]?.label}
+                </Badge>
+                {/* Etapa 063: botão Editar dentro dos detalhes */}
+                {onEdit && (
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-9 w-9 rounded-xl text-white/60 hover:text-white hover:bg-white/10"
+                    onClick={() => {
+                      onOpenChange(false);
+                      onEdit(pickup);
+                    }}
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </Button>
                 )}
-              >
-                {statusConfig[pickup.status]?.label}
-              </Badge>
+              </div>
               <p className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em]">
                 Hash_ID: {pickup.id.substring(0, 8)}
               </p>

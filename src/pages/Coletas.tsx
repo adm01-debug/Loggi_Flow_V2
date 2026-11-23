@@ -25,6 +25,7 @@ import {
   History,
   BarChart3,
   Loader2,
+  Pencil,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -816,6 +817,19 @@ export default function Coletas() {
                             >
                               {statusConfig[c.status]?.label}
                             </Badge>
+                            {/* Etapa 062: botão de edição direto do cartão */}
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="h-8 w-8 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedPickup(c);
+                                setIsDialogOpen(true);
+                              }}
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </Button>
                           </div>
                         </CardContent>
                       </Card>
@@ -875,6 +889,11 @@ export default function Coletas() {
         pickup={selectedPickup}
         statusConfig={statusConfig}
         onStatusUpdate={refetch}
+        onEdit={(c) => {
+          setIsDetailsOpen(false);
+          setSelectedPickup(c);
+          setIsDialogOpen(true);
+        }}
       />
     </MainLayout>
   );
