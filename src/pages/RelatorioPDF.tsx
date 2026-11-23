@@ -90,7 +90,9 @@ export default function RelatorioPDF() {
       const { data, error } = await supabase
         .from("entregas")
         .select(
-          `*, transportadora:transportadoras(nome_fantasia), cliente:clientes(razao_social)`,
+          `id, numero_entrega, status, valor_frete, previsao_entrega, data_entrega_efetiva,
+          endereco_entrega, tipo_frete, transportadora_id, created_at,
+          transportadora:transportadoras(nome_fantasia), cliente:clientes(razao_social)`,
         )
         .is("deleted_at", null)
         .gte("created_at", start.toISOString())
