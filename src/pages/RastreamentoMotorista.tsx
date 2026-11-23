@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -71,7 +71,13 @@ export default function RastreamentoMotorista() {
     },
   });
 
-  useRealtime({ table: "coletas", onUpdate: () => refetchOrders() });
+  // Referencia estavel: esta tela ja renderiza em ciclo curto (setInterval de 10s),
+  // entao arrow inline aqui reassina o canal sem parar (contrato no hook).
+  const onColetaTracking = useCallback(() => {
+    refetchOrders();
+  }, [refetchOrders]);
+
+  useRealtime({ table: "coletas", onUpdate: onColetaTracking });
 
   useEffect(() => {
     if (isLive && selectedOrder) {

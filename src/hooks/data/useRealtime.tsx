@@ -76,6 +76,13 @@ interface UseRealtimeOptions<T> {
   enabled?: boolean;
 }
 
+// CONTRATO DE ESTABILIDADE: `queryKey`, `onInsert`, `onUpdate` e `onDelete`
+// precisam ser referencias estaveis — constante de modulo para o array, `useCallback`
+// para os callbacks (exemplo bom: src/hooks/logistics/useUnifiedTracking.tsx).
+// O hook guarda esses valores em ref (ver `cbRef` abaixo), entao NAO e a assinatura
+// do canal que quebra; o custo de passar arrow inline e o chamador pagar um render a
+// mais sem necessidade e, pior, o `queryKey` literal nunca casar por identidade ao
+// invalidar. O canal tambem deixa de ser derrubado a cada render do pai.
 export function useRealtime<T = Record<string, unknown>>({
   table,
   schema = "public",

@@ -1,5 +1,5 @@
 /* eslint-disable max-lines */
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
@@ -157,15 +157,20 @@ export default function Despachos() {
     },
   });
 
+  // Referencias estaveis: som dentro de callback instavel pode tocar duas vezes se o
+  // canal reabrir no meio do evento (contrato em src/hooks/data/useRealtime.tsx).
+  const onEntregaNova = useCallback(() => {
+    playNotification();
+    refetch();
+  }, [playNotification, refetch]);
+  const onEntregaAtualizada = useCallback(() => {
+    refetch();
+  }, [refetch]);
+
   useRealtime({
     table: "entregas",
-    onInsert: () => {
-      playNotification();
-      refetch();
-    },
-    onUpdate: () => {
-      refetch();
-    },
+    onInsert: onEntregaNova,
+    onUpdate: onEntregaAtualizada,
   });
 
   const {

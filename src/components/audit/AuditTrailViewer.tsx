@@ -1,5 +1,5 @@
 /* eslint-disable max-lines */
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { SortIcon } from "@/components/common/SortIcon";
 import {
   History,
@@ -72,7 +72,12 @@ export function AuditTrailViewer({
     limit: 500,
   });
 
-  useRealtime({ table: "audit_logs", onInsert: () => refetch() });
+  // Referencia estavel (contrato em src/hooks/data/useRealtime.tsx).
+  const onAuditLogInsert = useCallback(() => {
+    refetch();
+  }, [refetch]);
+
+  useRealtime({ table: "audit_logs", onInsert: onAuditLogInsert });
 
   const { filteredData, filters, setSearch, clearFilters, hasActiveFilters } =
     useFilters(logs, {
@@ -157,7 +162,6 @@ export function AuditTrailViewer({
         return FileText;
     }
   };
-
 
   if (isLoading)
     return (

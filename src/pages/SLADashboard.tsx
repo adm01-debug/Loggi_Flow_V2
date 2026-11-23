@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { EmptyState } from "@/components/common/EmptyState";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
@@ -40,10 +40,15 @@ export default function SLADashboard() {
   });
   const { data: metrics, isLoading, isError, error, refetch } = useSLAMetrics();
 
+  // Referencia estavel (contrato em src/hooks/data/useRealtime.tsx).
+  const onEntregaChange = useCallback(() => {
+    refetch();
+  }, [refetch]);
+
   useRealtime({
     table: "entregas",
-    onInsert: () => refetch(),
-    onUpdate: () => refetch(),
+    onInsert: onEntregaChange,
+    onUpdate: onEntregaChange,
   });
 
   const stats = metrics || {

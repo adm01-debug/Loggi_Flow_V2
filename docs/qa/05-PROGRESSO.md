@@ -117,8 +117,8 @@
 
 ### Onda 4
 
-- [ ] **068** — Remover o hook `useSelfHealing` — onda 4 — Média
-- [ ] **069** — Remover o hook `useNexusSimulator` — onda 4 — Média
+- [x] **068** — Remover o hook `useSelfHealing` — onda 4 — Média
+- [x] **069** — Remover o hook `useNexusSimulator` — onda 4 — Média
 - [~] **070** — Decidir o destino da RPC `reconcile_pending_freights` e da tabela que ela não tem — onda 4 — Média · **aguarda o dono**
 - [~] **071** — Levar ao dono a decisão sobre `push-send` — onda 4 — Média · **aguarda o dono**
 - [~] **072** — Executar a decisão sobre `push-send` — onda 4 — Média · **aguarda o dono**
@@ -126,7 +126,7 @@
 - [~] **074** — Levantar o uso real dos três buckets antes de qualquer decisão — onda 4 — Média · **aguarda o dono**
 - [~] **075** — `comprovantes`: um caminho só para o comprovante de entrega — onda 4 — Média · **aguarda o dono**
 - [~] **076** — `entregas-fotos`: ligar a foto de entrega ou remover o bucket — onda 4 — Média · **aguarda o dono**
-- [ ] **077** — Remover `uploadDocument` de `storageService.ts` — onda 4 — Média
+- [x] **077** — Remover `uploadDocument` de `storageService.ts` — onda 4 — Média
 - [ ] **078** — Recusar arquivo cuja assinatura não é conhecida — onda 4 — Média
 - [ ] **079** — Teste unitário da validação de assinatura de arquivo — onda 4 — Média
 - [x] **080** — Provar, arquivo por arquivo, quais dos oito "hooks sem importador" estão realmente mortos — onda 4 — Baixa
@@ -142,24 +142,24 @@
       8. utils/performance.ts — MORTO: useRenderingMonitor e measureAction sem nenhum importador (grep -rn "useRenderingMonitor\|measureAction" src/ → vazio) -->
 - [x] **081** — Remover só o que a etapa 080 provou morto — onda 4 — Baixa
   <!-- Removido: src/utils/performance.ts (useRenderingMonitor + measureAction, zero importadores) -->
-- [ ] **082** — Remover `_shared/service-wrapper.ts`, que nenhuma função usa — onda 4 — Baixa
+- [x] **082** — Remover `_shared/service-wrapper.ts`, que nenhuma função usa — onda 4 — Baixa
 
 ### Onda 2
 
-- [ ] **083** — Estabilizar os callbacks dentro de `useRealtime` (corrige as 12 telas de uma vez) — onda 2 — Crítica
-- [ ] **084** — `Envios`: callbacks de tempo real estáveis — onda 2 — Crítica
-- [ ] **085** — `KanbanEntregas`: callbacks de tempo real estáveis — onda 2 — Crítica
-- [ ] **086** — `Index` (painel): estabilizar a primeira assinatura, de `entregas` — onda 2 — Crítica
-- [ ] **087** — `Index` (painel): estabilizar a segunda assinatura, de `coletas` — onda 2 — Crítica
-- [ ] **088** — `Coletas`: estabilizar a chave da assinatura — onda 2 — Crítica
-- [ ] **089** — `AuditTrailViewer`: callback de tempo real estável — onda 2 — Alta
-- [ ] **090** — `RastreamentoMotorista`: callback de tempo real estável — onda 2 — Alta
-- [ ] **091** — `Ranking`: callback de tempo real estável — onda 2 — Média
-- [ ] **092** — `SLADashboard`: callbacks de tempo real estáveis — onda 2 — Alta
-- [ ] **093** — `Notificacoes`: callbacks de tempo real estáveis — onda 2 — Alta
-- [ ] **094** — `Despachos`: callbacks de tempo real estáveis — onda 2 — Crítica
-- [ ] **095** — `CustosDashboard`: estabilizar `handleRefetch` — onda 2 — Média
-- [ ] **096** — Escrever o contrato no alto de `useRealtime` e varrer os chamadores — onda 2 — Crítica
+- [x] **083** — Estabilizar os callbacks dentro de `useRealtime` (corrige as 12 telas de uma vez) — onda 2 — Crítica
+- [x] **084** — `Envios`: callbacks de tempo real estáveis — onda 2 — Crítica
+- [x] **085** — `KanbanEntregas`: callbacks de tempo real estáveis — onda 2 — Crítica
+- [x] **086** — `Index` (painel): estabilizar a primeira assinatura, de `entregas` — onda 2 — Crítica
+- [x] **087** — `Index` (painel): estabilizar a segunda assinatura, de `coletas` — onda 2 — Crítica
+- [x] **088** — `Coletas`: estabilizar a chave da assinatura — onda 2 — Crítica
+- [x] **089** — `AuditTrailViewer`: callback de tempo real estável — onda 2 — Alta
+- [x] **090** — `RastreamentoMotorista`: callback de tempo real estável — onda 2 — Alta
+- [x] **091** — `Ranking`: callback de tempo real estável — onda 2 — Média
+- [x] **092** — `SLADashboard`: callbacks de tempo real estáveis — onda 2 — Alta
+- [x] **093** — `Notificacoes`: callbacks de tempo real estáveis — onda 2 — Alta
+- [x] **094** — `Despachos`: callbacks de tempo real estáveis — onda 2 — Crítica
+- [x] **095** — `CustosDashboard`: estabilizar `handleRefetch` — onda 2 — Média
+- [x] **096** — Escrever o contrato no alto de `useRealtime` e varrer os chamadores — onda 2 — Crítica
 - [ ] **097** — `Despachos`: ler o erro da consulta — onda 2 — Alta
 - [ ] **098** — `Despachos`: parar de dizer "Fila Limpa" quando a consulta falhou — onda 2 — Crítica
 - [ ] **099** — `Envios`: erro com componente e botão de tentar de novo — onda 2 — Alta
@@ -457,3 +457,49 @@ Atualize ao fim de cada sessão de trabalho.
 | **Total**               | **300**    |
 
 **Última etapa trabalhada:** — · **Data:** — · **Próxima etapa independente:** 267
+
+
+### Registro - etapas 068-096 (2026-11-23)
+
+**068/069/077/082** - ja estavam feitas na `main` antes desta sessao. Evidencia: `grep -rn
+"useSelfHealing|useNexusSimulator|uploadDocument|service-wrapper" src/ supabase/functions/`
+nao retorna nenhuma ocorrencia em codigo (so mencoes em `docs/qa/`).
+
+**083** - ja estava na `main` no commit base `d37ba30`: `cbRef` em `useRealtime.tsx:99-101`
+com `useEffect` sem array de dependencias, `handleChange` lendo `cbRef.current` com deps
+`[queryClient, table, debouncedInvalidate]`, e o `eslint-disable` que existia na linha 157
+removido.
+
+**084-095** - 11 arquivos, 12 chamadas de `useRealtime` corrigidas:
+
+| Etapa | Arquivo | Mudanca |
+|---|---|---|
+| 084 | `src/pages/Envios.tsx` | `onEntregaRealtime` em `useCallback` |
+| 085 | `src/pages/KanbanEntregas.tsx` | `onEntregaKanban` em `useCallback` |
+| 086 | `src/pages/Index.tsx` | `DASHBOARD_ENTREGAS_QUERY_KEY` constante de modulo |
+| 087 | `src/pages/Index.tsx` | `DASHBOARD_COLETAS_QUERY_KEY` constante de modulo |
+| 088 | `src/pages/Coletas.tsx` | `COLETAS_QUERY_KEY` constante de modulo |
+| 089 | `src/components/audit/AuditTrailViewer.tsx` | `onAuditLogInsert` em `useCallback` |
+| 090 | `src/pages/RastreamentoMotorista.tsx` | `onColetaTracking` em `useCallback` |
+| 091 | `src/pages/Ranking.tsx` | `onLevelChange` em `useCallback` |
+| 092 | `src/pages/SLADashboard.tsx` | `onEntregaChange` em `useCallback` |
+| 093 | `src/pages/Notificacoes.tsx` | `onNotificationChange` em `useCallback` |
+| 094 | `src/pages/Despachos.tsx` | `onEntregaNova` e `onEntregaAtualizada` separados; o som (`playNotification`) fica no de insert, para nao tocar duas vezes se o canal reabrir |
+| 095 | `src/pages/CustosDashboard.tsx` | `handleRefetch` era arrow recriada a cada render; virou `useCallback` com deps `[startDate, endDate]` |
+
+**096** - bloco `CONTRATO DE ESTABILIDADE:` acima de `export function useRealtime`
+explicando que o hook absorve a instabilidade via `cbRef`, mas o chamador paga render extra
+e o `queryKey` literal nunca casa por identidade. Varredura: 14 chamadores de `useRealtime(`
+em `src/` - os 12 acima mais 2 em `src/hooks/logistics/useUnifiedTracking.tsx:194,199` que ja
+eram corretos e servem de exemplo no comentario. Nenhum arrow inline restante.
+
+**Verificacao executada**
+- `npm run typecheck` -> 0 erros
+- `npm run lint:budget` -> 77/86 avisos (a main estava em 86/86: estas etapas liberaram 9 de margem), 0 erros
+- `npx vitest run src/hooks/ src/pages/ src/lib/` -> 261 testes passando
+- `git diff -w --stat` conferido arquivo por arquivo: nenhuma linha de churn cosmetico
+
+**Achado novo (nao corrigido - fora do escopo destas etapas)**
+`useMultiTableRealtime` (mesmo arquivo, a partir de `useRealtime.tsx:222`) ainda tem
+`eslint-disable` nas dependencias do efeito e dispara o aviso `refs during render` na
+linha 234. A etapa 083 proibe tocar nele; fica registrado para etapa futura.

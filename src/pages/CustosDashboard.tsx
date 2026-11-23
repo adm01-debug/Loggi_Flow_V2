@@ -1,5 +1,5 @@
 /* eslint-disable max-lines */
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -71,7 +71,12 @@ export default function CustosDashboard() {
     entregas,
   } = useLogisticsCosts(startDate, endDate);
 
-  const handleRefetch = () => setDateRange({ from: startDate, to: endDate });
+  const handleRefetch = useCallback(
+    () => setDateRange({ from: startDate, to: endDate }),
+    [startDate, endDate],
+  );
+  // handleRefetch era funcao recriada a cada render — mesmo efeito de arrow inline
+  // (contrato em src/hooks/data/useRealtime.tsx).
   useRealtime({ table: "entregas", onUpdate: handleRefetch });
 
   const stats = {

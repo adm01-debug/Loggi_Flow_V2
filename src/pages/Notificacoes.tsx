@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -86,11 +86,17 @@ export default function Notificacoes() {
     },
   });
 
+  // Referencia estavel: cada notificacao nova disparava refetch -> render -> canal
+  // novo -> refetch (contrato em src/hooks/data/useRealtime.tsx).
+  const onNotificationChange = useCallback(() => {
+    refetch();
+  }, [refetch]);
+
   useRealtime({
     table: "notifications",
-    onInsert: () => refetch(),
-    onUpdate: () => refetch(),
-    onDelete: () => refetch(),
+    onInsert: onNotificationChange,
+    onUpdate: onNotificationChange,
+    onDelete: onNotificationChange,
   });
 
   // Apply custom filters

@@ -77,6 +77,11 @@ const RefreshTimer = memo(({ lastRefresh }: { lastRefresh: Date }) => {
 });
 RefreshTimer.displayName = "RefreshTimer";
 
+// Constantes de modulo: array literal como queryKey tem identidade nova a cada
+// render e reassina o canal de realtime (contrato em src/hooks/data/useRealtime.tsx).
+const DASHBOARD_ENTREGAS_QUERY_KEY = ["dashboard-metrics", "recent-alerts"];
+const DASHBOARD_COLETAS_QUERY_KEY = ["dashboard-metrics"];
+
 export default function Index() {
   const [performanceMode, setPerformanceMode] = useState(false);
   usePerformanceMonitor();
@@ -133,11 +138,10 @@ export default function Index() {
     ],
   );
 
-  useRealtime({
-    table: "entregas",
-    queryKey: ["dashboard-metrics", "recent-alerts"],
-  });
-  useRealtime({ table: "coletas", queryKey: ["dashboard-metrics"] });
+  // queryKey como constante de modulo: array literal e identidade nova a cada
+  // render e reassina o canal (contrato em src/hooks/data/useRealtime.tsx).
+  useRealtime({ table: "entregas", queryKey: DASHBOARD_ENTREGAS_QUERY_KEY });
+  useRealtime({ table: "coletas", queryKey: DASHBOARD_COLETAS_QUERY_KEY });
 
   const {
     chartData,
