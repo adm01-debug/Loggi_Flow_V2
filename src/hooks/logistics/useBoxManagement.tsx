@@ -1,10 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { toast } from "sonner";
 import { differenceInDays } from "date-fns";
 import { QUERY_STALE_TIME } from "@/lib/queryConfig";
+import { uniqueChannelName } from "@/lib/realtimeChannel";
 
 export interface DeliveryWithRelations {
   id: string;
@@ -81,10 +82,14 @@ export function useBoxManagement() {
     enabled: !!user?.id,
   });
 
+  // Sufixo por instancia: duas montagens com o mesmo topico fazem a segunda
+  // parar de receber atualizacao em silencio (achado R-09).
+  const [canalBoxes] = useState(() => uniqueChannelName("box-realtime"));
+
   // Enable realtime for boxes
   useEffect(() => {
     const channel = supabase
-      .channel("box-realtime")
+      .channel(canalBoxes)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "entregas" },
@@ -97,7 +102,7 @@ export function useBoxManagement() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [refetch]);
+  }, [refetch, canalBoxes]);
 
   // Build box data
   const boxes: BoxData[] = Array.from({ length: TOTAL_BOXES }, (_, i) => {

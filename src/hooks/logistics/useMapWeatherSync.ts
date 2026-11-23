@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { uniqueChannelName } from "@/lib/realtimeChannel";
 
 export interface RiskZone {
   id: string;
@@ -41,12 +42,16 @@ export function useMapWeatherSync() {
     }
   };
 
+  // Nome unico por instancia: o nome fixo anterior fazia a segunda montagem
+  // do hook perder os INSERTs de zonas de risco (achado R-09).
+  const [canalZonas] = useState(() => uniqueChannelName('risk-zones-changes'));
+
   useEffect(() => {
     fetchRiskZones();
     
     // Subscribe to new risk zones
     const channel = supabase
-      .channel('risk-zones-changes')
+      .channel(canalZonas)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'risk_zones' }, () => {
         fetchRiskZones();
       })
@@ -55,7 +60,7 @@ export function useMapWeatherSync() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [canalZonas]);
 
   return { riskZones, isLoading, refetch: fetchRiskZones };
 }
