@@ -30,12 +30,28 @@ export async function validateContract(
 
   const latencyMs = Date.now() - startTime;
 
+  // Etapa 015: gravar hash do payload em vez do corpo bruto (LGPD/privacidade)
+  let payloadHash: string | null = null;
+  try {
+    const raw = JSON.stringify(payload);
+    const digest = await crypto.subtle.digest(
+      "SHA-256",
+      new TextEncoder().encode(raw),
+    );
+    payloadHash = Array.from(new Uint8Array(digest))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+  } catch {
+    // best-effort — não bloqueia o fluxo principal
+  }
+
   // Fire and forget logging (don't block the main flow if logging fails)
   supabaseClient
     .from("contract_test_logs")
     .insert({
       entity_name: entityName,
-      payload: payload,
+      payload_hash: payloadHash,
+      // payload propositalmente omitido — coluna mantida por compatibilidade mas não populada
       is_valid: isValid,
       errors: errors.length > 0 ? errors : null,
       latency_ms: latencyMs
