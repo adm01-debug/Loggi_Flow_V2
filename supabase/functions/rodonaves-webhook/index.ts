@@ -125,26 +125,6 @@ serve(async (req: Request) => {
       event_id ||
       `rodonaves-${nf_numero || codigo_rastreamento}-${status_code}-${data_evento}`;
 
-    // Idempotency check
-    const { data: existingEvent } = await supabaseAdmin
-      .from("webhook_events_processed")
-      .select("id")
-      .eq("event_id", finalEventId)
-      .eq("provider", "rodonaves")
-      .maybeSingle();
-
-    if (existingEvent) {
-      log.info(
-        `Webhook already processed (eventId: ${finalEventId}), skipping`,
-      );
-      return new Response(
-        JSON.stringify({ success: true, message: "Already processed" }),
-        {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        },
-      );
-    }
-
     // Find the entrega
     let query = supabaseAdmin
       .from("entregas")
@@ -183,6 +163,41 @@ serve(async (req: Request) => {
       );
     }
 
+    // Etapa 135 - grava o marcador de idempotencia ANTES do primeiro write de
+    // negocio: o UNIQUE (event_id, provider) resolve a corrida com 23505.
+    // Fica depois das saidas que nao gravam nada ("Entrega nao encontrada" e
+    // status nao mapeado), para nao descartar evento que precisa ser
+    // reprocessado. Fail-open em erro de infraestrutura, igual a
+    // _shared/idempotency.ts.
+    const { error: markerError } = await supabaseAdmin
+      .from("webhook_events_processed")
+      .insert({
+        event_id: finalEventId,
+        provider: "rodonaves",
+        payload: payload,
+      });
+
+    if (markerError) {
+      if (markerError.code === "23505") {
+        log.info(
+          `Webhook already processed (eventId: ${finalEventId}), skipping`,
+        );
+        return new Response(
+          JSON.stringify({
+            success: true,
+            duplicate: true,
+            message: "Already processed",
+          }),
+          {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          },
+        );
+      }
+      log.warn(
+        `Falha ao gravar marcador de idempotencia: ${markerError.message}`,
+      );
+    }
+
     // Update entrega
     const updateData: Record<string, unknown> = { status: newStatus };
     if (newStatus === "entregue") {
@@ -209,13 +224,6 @@ serve(async (req: Request) => {
     }
 
     log.info(`Entrega ${entrega.numero_entrega} updated to ${newStatus}`);
-
-    // Mark as processed
-    await supabaseAdmin.from("webhook_events_processed").insert({
-      event_id: finalEventId,
-      provider: "rodonaves",
-      payload: payload,
-    });
 
     return new Response(
       JSON.stringify({

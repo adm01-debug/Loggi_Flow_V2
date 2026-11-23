@@ -98,18 +98,28 @@ serve(async (req) => {
 
     log.info('Processing Lalamove webhook', { eventType, eventId: finalEventId });
 
-    // Idempotency check
-    const { data: existingEvent } = await supabase
+    // Etapa 133 - grava o marcador ANTES de processar: o UNIQUE
+    // (event_id, provider) resolve a corrida entre duas entregas simultaneas
+    // do mesmo evento com 23505. Fail-open em erro de infraestrutura, igual a
+    // _shared/idempotency.ts.
+    const { error: markerError } = await supabase
       .from('webhook_events_processed')
-      .select('id')
-      .eq('event_id', finalEventId)
-      .eq('provider', 'lalamove')
-      .maybeSingle();
+      .insert({
+        event_id: finalEventId,
+        provider: 'lalamove',
+        payload: webhookData
+      });
 
-    if (existingEvent) {
-      log.info('Webhook already processed, skipping', { eventId: finalEventId });
-      return new Response(JSON.stringify({ success: true, message: 'Already processed' }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    if (markerError) {
+      if (markerError.code === '23505') {
+        log.info('Webhook already processed, skipping', { eventId: finalEventId });
+        return new Response(JSON.stringify({ success: true, duplicate: true, message: 'Already processed' }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      log.warn('Falha ao gravar marcador de idempotencia, seguindo', {
+        eventId: finalEventId,
+        error: markerError.message,
       });
     }
 
@@ -184,13 +194,6 @@ serve(async (req) => {
         break;
       }
     }
-
-    // Mark as processed
-    await supabase.from('webhook_events_processed').insert({
-      event_id: finalEventId,
-      provider: 'lalamove',
-      payload: webhookData
-    });
 
     return new Response(JSON.stringify({ success: true, eventType }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
