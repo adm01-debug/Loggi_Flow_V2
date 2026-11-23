@@ -129,8 +129,19 @@
 - [ ] **077** — Remover `uploadDocument` de `storageService.ts` — onda 4 — Média
 - [ ] **078** — Recusar arquivo cuja assinatura não é conhecida — onda 4 — Média
 - [ ] **079** — Teste unitário da validação de assinatura de arquivo — onda 4 — Média
-- [ ] **080** — Provar, arquivo por arquivo, quais dos oito "hooks sem importador" estão realmente mortos — onda 4 — Baixa
-- [ ] **081** — Remover só o que a etapa 080 provou morto — onda 4 — Baixa
+- [x] **080** — Provar, arquivo por arquivo, quais dos oito "hooks sem importador" estão realmente mortos — onda 4 — Baixa
+  <!-- Veredictos (261123):
+  1. components/accessibility/index.ts — VIVO por caminho direto (SkipLinks, LiveRegionProvider, ReducedMotionProvider importados em MainLayout.tsx:13, LazyProviders.tsx:8-9)
+  2. components/common/index.ts — VIVO (barril; exports EmptyState, ConfirmDialog, Pagination… em uso por caminhos diretos)
+  3. components/pwa/index.ts — VIVO por caminho direto (OfflineBanner, InstallPrompt, UpdatePrompt em MainLayout.tsx:14,47,52)
+  4. hooks/gamification/useGamification.ts — VIVO (importado por GamificationPanel, LevelUpModal, AppSidebar, Header, FavoriteMetricsBar via caminho sem extensão)
+     hooks/gamification/useGamification.tsx — INDEFINIDO: 349 linhas vs .ts 259, implementações divergem; comentário P18 em authService.ts:43 indica .tsx como schema em uso; aguarda decisão do dono
+  5. hooks/rodonaves/index.ts — VIVO por caminho direto (useSLOTargets, useSLOSnapshots, useGatewayHealth importados em RTEGateway* panels)
+  6. hooks/ai/useNexusSimulator.ts — REMOVIDO em etapa 069 (PR #300)
+  7. hooks/security/useSelfHealing.ts — REMOVIDO em etapa 068 (PR #300)
+  8. utils/performance.ts — MORTO: useRenderingMonitor e measureAction sem nenhum importador (grep -rn "useRenderingMonitor\|measureAction" src/ → vazio) -->
+- [x] **081** — Remover só o que a etapa 080 provou morto — onda 4 — Baixa
+  <!-- Removido: src/utils/performance.ts (useRenderingMonitor + measureAction, zero importadores) -->
 - [ ] **082** — Remover `_shared/service-wrapper.ts`, que nenhuma função usa — onda 4 — Baixa
 
 ### Onda 2
