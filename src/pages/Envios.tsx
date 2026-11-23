@@ -350,7 +350,12 @@ export default function Envios() {
       const { data, error } = await supabase
         .from("entregas")
         .select(
-          "*, cliente:clientes(id, razao_social, nome_fantasia), transportadora:transportadoras(id, nome_fantasia)",
+          `id, numero_entrega, endereco_entrega, contato_cliente, status,
+           codigo_rastreamento, previsao_entrega, data_entrega_efetiva,
+           tipo_frete, valor_frete, nf_remessa, nf_remessa_url,
+           comprovante_entrega_url, observacoes, created_at,
+           cliente:clientes(id, razao_social, nome_fantasia),
+           transportadora:transportadoras(id, nome_fantasia)`,
         )
         .is("deleted_at", null)
         .order("created_at", { ascending: false })
