@@ -215,9 +215,9 @@
 - [x] **140** — `nexus-webhook-receiver`: eliminar o `Date.now()` da chave de dedupe — onda 3 — Alta
 - [x] **141** — `carrier-webhook-receiver`: chave estável demais está engolindo evento verdadeiro — onda 3 — Alta
 - [~] **142** — Gate de `grep`: nenhuma chave de dedupe pode conter valor aleatório ou relógio — onda 3 — Média · **aguarda o dono**
-- [ ] **143** — `scheduled-reports`: lista de campos permitidos no `insert` — onda 3 — Crítica
-- [ ] **144** — `scheduled-reports`: a mesma lista de campos permitidos no `update` — onda 3 — Crítica
-- [ ] **145** — `scheduled-reports`: validar `action` e `reportId`, e testar o descarte de campo não permitido — onda 3 — Alta
+- [x] **143** — `scheduled-reports`: lista de campos permitidos no `insert` — onda 3 — Crítica
+- [x] **144** — `scheduled-reports`: a mesma lista de campos permitidos no `update` — onda 3 — Crítica
+- [x] **145** — `scheduled-reports`: validar `action` e `reportId`, e testar o descarte de campo não permitido — onda 3 — Alta
 
 ### Onda 5
 
@@ -434,6 +434,63 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapas 143 a 145 (2026-11-23) - achados B-03/B-04 (`scheduled-reports`)
+
+**Causa:** o corpo da requisição era espalhado direto no banco — `.insert([{ ...reportData, user_id: userId }])`
+e `.update(reportData)` —, então qualquer coluna de `scheduled_reports` era gravável por quem chama. `action` e
+`reportId` vinham do corpo sem checagem: corpo sem eles caía em 500 em vez de erro de cliente.
+
+**Correção:** o payload passou a ser montado campo por campo, com allowlist (`name`, `report_type`,
+`frequency`, `day_of_week`, `day_of_month`, `time_of_day`, `recipients`, `filters`, `is_active` — espelho das
+colunas graváveis de `src/integrations/supabase/types.ts`). `id`, `user_id` e timestamps são descartados mesmo
+que venham no corpo; `user_id` continua vindo de `auth.claims.sub` (`index.ts:34-35`). `action` fora da
+allowlist devolve 400 antes do `switch` (`index.ts:43-50`); `reportId` é obrigatório em `update`/`delete`
+(`index.ts:70` e `:90`); payload inválido devolve 422 estruturado via `validationErrorResponse`
+(`index.ts:159`), nunca 500.
+
+**Desvio consciente da 144:** a montagem ficou em `supabase/functions/scheduled-reports/fields.ts` (módulo puro,
+sem import remoto) em vez de função local em `index.ts`. Motivo: `index.ts:2` importa de `esm.sh`, então o
+vitest não consegue carregar o módulo; com a função inline, a exigência da 145 ("teste que prove o descarte do
+campo") seria impossível de cumprir como teste executável. Precedente no repo: `accuracy-weekly-digest/digest.ts`
+e `accuracy-meta-monitor/escalation.ts` importados pelo próprio `index.ts` de cada function. Não é arquivo em
+`_shared/`, que é o que a etapa pede para evitar.
+
+**Desvio consciente da 145:** `action` é validada por `isAllowedAction` (`fields.ts:27`) com **400**, e não por
+`requireEnum` (que devolveria 422): a própria etapa exige "400, não 500" para ação desconhecida. `requireString`
+sobre `reportId` é usado exatamente onde o caminho exige. `report_type` fica como string validada (o gerador tem
+`default` seguro em `index.ts:304`); `frequency` é enum fechado, porque valor inválido ali faz o agendamento
+nunca rodar.
+
+**Evidência:**
+- `tests/contracts/scheduled-reports-fields.spec.ts` (novo, 7 casos): allowlist descarta `user_id`, `id`,
+  `created_at`, `last_sent_at`, `next_send_at` e campo arbitrário; update parcial não sobrescreve campo ausente;
+  `frequency`, `day_of_week`, `day_of_month`, `time_of_day`, `recipients`, `filters` e `is_active` inválidos
+  lançam `ValidationError` com o campo culpado; `create` exige `name`+`report_type`; `isAllowedAction` recusa
+  `"xpto"`, `""`, `undefined`, número e array; e o último caso lê a fonte da edge e afirma `insert`/`update`
+  validados, `status: 400` e `validationErrorResponse` no catch.
+- Prova de que o teste pega a regressão: com o `index.ts` de `origin/main` o caso de fonte falha (1/7); com
+  `buildReportFields` voltando a copiar o corpo cru (`{ ...fonte }`) o caso da allowlist falha (1/7). Restaurado,
+  7/7.
+- `npx vitest run --coverage`: **44 arquivos / 347 testes, todos passando** (exit 0); `fields.ts` com 100% de
+  statements/linhas e 97,91% de branches; cobertura total subiu de 72,06/67,84/75,94/74,06 para
+  **73,22/70,06/76,63/75,28**.
+- `deno check` limpo nos dois arquivos; `deno lint` de `index.ts` = 14 problemas, exatamente o baseline de
+  `origin/main` com o mesmo `package.json` (nenhum novo); `fields.ts` com 0; `deno fmt --check` de `fields.ts`
+  limpo.
+- `npx tsc --noEmit` 0; `eslint` do teste novo 0; `npm run lint:budget` = "All checks within budget";
+  `npm run automation:test` = fail 0.
+- `supabase/functions/scheduled-reports/index.test.ts` (Deno) **já estava quebrado em `origin/main`**: os
+  `Deno.env.set` rodam depois do `import` de `index.ts`, então `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY`
+  chegam `undefined` e 3 dos 4 casos dão 500. Confirmado rodando o mesmo arquivo contra `origin/main` — mesmas 3
+  falhas, antes e depois desta mudança. Não é executado pela CI (o glob é `**/index_test.ts`, não casa com
+  `index.test.ts`, e o passo termina em `|| true`).
+- A verificação sugerida pela 145 (`npx vitest run supabase/functions/scheduled-reports`) não acha teste nenhum:
+  o `include` do vitest cobre `src/**` e `tests/**`. O comando usado foi
+  `npx vitest run tests/contracts/scheduled-reports-fields.spec.ts`.
+
+**NÃO VERIFICADO:** criar/editar um agendamento pela interface e conferir a linha gravada, depois do deploy da
+edge — não há acesso a banco nesta sessão.
 
 ### Registro - etapas 138 a 141 (2026-11-23) - achado B-02
 
