@@ -64,7 +64,12 @@ export function useDrillDown() {
       let rawItems: Record<string, unknown>[] = [];
 
       if (params.category === "coletas") {
-        let query = supabase.from("coletas").select("*").is("deleted_at", null);
+        let query = supabase
+          .from("coletas")
+          .select(
+            "id, numero_coleta, status, created_at, endereco_coleta, transportadora_id",
+          )
+          .is("deleted_at", null);
         if (dateStart) query = query.gte("created_at", dateStart);
         if (dateEnd) query = query.lte("created_at", dateEnd);
         if (params.filter?.transportadora_id)
@@ -80,7 +85,9 @@ export function useDrillDown() {
       } else if (params.category === "entregas") {
         let query = supabase
           .from("entregas")
-          .select("*")
+          .select(
+            "id, numero_entrega, status, created_at, endereco_entrega, transportadora_id",
+          )
           .is("deleted_at", null);
         if (dateStart) query = query.gte("created_at", dateStart);
         if (dateEnd) query = query.lte("created_at", dateEnd);
@@ -95,7 +102,9 @@ export function useDrillDown() {
         if (error) throw error;
         rawItems = (result || []) as Record<string, unknown>[];
       } else {
-        let query = supabase.from("fretes_internos").select("*");
+        let query = supabase
+          .from("fretes_internos")
+          .select("id, destino, status, created_at");
         if (dateStart) query = query.gte("created_at", dateStart);
         if (dateEnd) query = query.lte("created_at", dateEnd);
         const { data: result, error } = await query
