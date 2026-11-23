@@ -1,6 +1,6 @@
 /* eslint-disable max-lines */
 import { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -242,15 +242,19 @@ export function useRodonavesTracking() {
   const validateCustomerQuotationMutation = useRodonavesMutation<{ taxId: string; origin?: string }>('validate-customer-quotation');
 
   // ===== SYNC =====
+  const queryClient = useQueryClient();
+
   const syncMutation = useMutation({
     mutationFn: async (cnpjRemetente?: string) =>
       invokeRodonaves('sync-tracking', { cnpjRemetente }),
     onSuccess: (data) => {
       const synced = data?.data?.synced || 0;
+      queryClient.invalidateQueries({ queryKey: ['entregas'] });
+      queryClient.invalidateQueries({ queryKey: ['ocorrencias'] });
       toast.success(`${synced} entrega(s) atualizada(s) via Rodonaves`);
     },
     onError: (err: Error) => {
-      // Fail silently or use internal telemetry
+      toast.error(`Falha ao sincronizar com Rodonaves: ${err.message}`);
     },
   });
 

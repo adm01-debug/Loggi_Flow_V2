@@ -170,17 +170,17 @@
 
 ### Onda 4
 
-- [ ] **104** — Fazer a gravação de preferências de previsão avisar quando falha — onda 4 — Alta
-- [ ] **105** — Meta de acurácia e dias de alerta: parar de engolir o erro — onda 4 — Alta
-- [ ] **106** — Interruptor de aviso por e-mail: parar de engolir o erro — onda 4 — Alta
-- [ ] **107** — Endereço de e-mail do aviso: parar de engolir o erro — onda 4 — Alta
-- [ ] **108** — Interruptor de aviso por WhatsApp: parar de engolir o erro — onda 4 — Alta
-- [ ] **109** — Telefone de WhatsApp: parar de engolir o erro e fechar o achado — onda 4 — Alta
-- [ ] **110** — Rodonaves: mostrar a falha da sincronização em vez de engoli-la — onda 4 — Alta
-- [ ] **111** — Rodonaves: atualizar a lista de entregas depois de sincronizar — onda 4 — Alta
-- [ ] **112** — Rodonaves: atualizar também as ocorrências criadas pela sincronização — onda 4 — Média
-- [ ] **113** — Alertas de SLA: avisar quando a gravação da notificação falha — onda 4 — Alta
-- [ ] **114** — Alertas de SLA: fazer o sino acender sem recarregar — onda 4 — Alta
+- [x] **104** — Fazer a gravação de preferências de previsão avisar quando falha — onda 4 — Alta
+- [x] **105** — Meta de acurácia e dias de alerta: parar de engolir o erro — onda 4 — Alta
+- [x] **106** — Interruptor de aviso por e-mail: parar de engolir o erro — onda 4 — Alta
+- [x] **107** — Endereço de e-mail do aviso: parar de engolir o erro — onda 4 — Alta
+- [x] **108** — Interruptor de aviso por WhatsApp: parar de engolir o erro — onda 4 — Alta
+- [x] **109** — Telefone de WhatsApp: parar de engolir o erro e fechar o achado — onda 4 — Alta
+- [x] **110** — Rodonaves: mostrar a falha da sincronização em vez de engoli-la — onda 4 — Alta
+- [x] **111** — Rodonaves: atualizar a lista de entregas depois de sincronizar — onda 4 — Alta
+- [x] **112** — Rodonaves: atualizar também as ocorrências criadas pela sincronização — onda 4 — Média
+- [x] **113** — Alertas de SLA: avisar quando a gravação da notificação falha — onda 4 — Alta
+- [x] **114** — Alertas de SLA: fazer o sino acender sem recarregar — onda 4 — Alta
 - [ ] **115** — Nexus Blast: contar só as cotações que voltaram — onda 4 — Média
 - [ ] **116** — Nexus Blast: dizer **quais** transportadoras falharam — onda 4 — Média
 - [ ] **117** — Importação em massa: guardar a mensagem de erro de cada lote — onda 4 — Média
@@ -434,6 +434,44 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapas 104 a 114 (2026-11-23) - achados R-06 e R-02
+
+**Padrão corrigido:** `.catch(() => undefined)` fazia a tela mostrar o contrário do banco. A
+varredura de fechamento da etapa 109 (`grep -rn 'catch(() => undefined)' src/`) voltou **vazia** —
+não sobrou nenhuma ocorrência no repositório.
+
+**104** — `usePredictionAccuracySettings.ts`: o corpo do `save` foi para um `try/catch` que avisa
+(`toast.error("Não foi possível salvar: " + mensagem)`) e **relança**, preservando o contrato — quem
+já tratava continua tratando. O `qc.setQueryData` continua só no caminho de sucesso.
+
+**105 a 109** — `PredictionAccuracyTimeline.tsx`: as cinco chamadas viraram `void settings.save(...)`.
+Com o aviso saindo de dentro do hook, não há mais erro engolido. Os dois `Switch` seguem controlados
+pelo servidor (`settings.data?.notify_email ?? false` e `?? notify_whatsapp`), então a tela continua
+fiel ao banco nos dois sentidos — conferido, não alterado. Os campos de e-mail e telefone usam
+`defaultValue` e **não** voltam ao valor do servidor quando a gravação falha: fragilidade real,
+anotada em "Achados novos", fora do escopo desta etapa.
+
+**110 a 112** — `useRodonavesTracking.tsx`: o `onError` do `syncMutation` tinha corpo vazio
+(`// Fail silently or use internal telemetry`) e agora avisa
+(`Falha ao sincronizar com Rodonaves: ${err.message}`), com o comentário antigo removido. O
+encerramento do `toast.loading` já estava certo nos dois caminhos de `syncAll`, conferido e não
+alterado. O `onSuccess` passou a invalidar as duas chaves que a edge function realmente escreve:
+`["entregas"]` (`src/pages/Envios.tsx:348`) e `["ocorrencias"]` (`src/pages/Ocorrencias.tsx:134`) —
+ambas lidas da fonte, não deduzidas.
+
+**113 e 114** — `useSLAAlerts.tsx`: a mutation `createNotification` não tinha `onSuccess` nem
+`onError`. Como ela é disparada por efeito, e não por clique, o aviso foi posto no **lote**
+(`Promise.allSettled` + um único `toast.error` quando alguma gravação falha), para não entupir a tela
+com um toast por alerta crítico; e o `onSuccess` invalida `["notifications", user?.id]`, a chave
+exata do sino (`src/hooks/notifications/useNotifications.tsx:27`), fazendo o alerta aparecer sem
+recarregar a página.
+
+**Verificação**
+- `npx tsc --noEmit` -> 0 erros
+- `npx vitest run --coverage` -> 40 arquivos, All files 71.53 st / 67.34 br / 75.14 fn / 73.58 li, sem `ERROR: Coverage`
+- `npx eslint` nos 4 arquivos -> 0 erros, 1 aviso **herdado** (`PredictionAccuracyTimeline.tsx:82`, `react-hooks/set-state-in-effect`; linhas idênticas na `main`)
+- `grep -rn 'catch(() => undefined)' src/` -> vazio
 
 ### Registro - etapas 078 e 079 (2026-11-23) - achado A-11
 
