@@ -31,20 +31,3 @@ export async function getSignedAvatarUrl(
   return data.signedUrl;
 }
 
-export async function uploadDocument(
-  file: File,
-  pathPrefix: string,
-): Promise<{ path: string; signedUrl: string | null } | null> {
-  const ext = file.name.split(".").pop();
-  const path = `${pathPrefix}/${crypto.randomUUID()}.${ext}`;
-  const { error } = await supabase.storage.from("documents").upload(path, file, {
-    cacheControl: "3600",
-    upsert: false,
-  });
-  if (error) {
-    console.error("[storageService] upload failed:", error.message);
-    return null;
-  }
-  const signedUrl = await getSignedDocumentUrl(path);
-  return { path, signedUrl };
-}
