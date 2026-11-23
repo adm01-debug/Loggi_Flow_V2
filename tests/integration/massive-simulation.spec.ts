@@ -40,7 +40,11 @@ describe("Massive Webhook & Edge Function Simulation (10,000 scenarios)", () => 
       const carrier = ["MELHOR_ENVIO", "RODONAVES", "LALAMOVE", "LOGGI"][i % 4];
       const status =
         ALLOWED_STATUSES[Math.floor(Math.random() * ALLOWED_STATUSES.length)];
-      const trackingCode = `BR${Math.random().toString(36).substring(2, 11).toUpperCase()}`;
+      const trackingCode = `BR${Math.random()
+        .toString(36)
+        .substring(2, 11)
+        .toUpperCase()
+        .padEnd(7, "0")}`;
 
       const payload = simulateWebhookPayload(
         `${carrier.toLowerCase()}.status_update`,
