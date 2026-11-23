@@ -1,5 +1,13 @@
 # ESTADO ATUAL DO SISTEMA — LogiFlow / loggi-flow-v2
 
+> **ATENCAO - DOCUMENTO HISTORICO**: este retrato foi medido em **16/08/2026** sobre o commit
+> `513ab5a` e **nao descreve o estado atual**. O banco medido foi o projeto Supabase
+> `hgicfqjayrjurivtygqf` (Lovable Cloud), que o `AGENTS.md:84-86` classifica como **"nao escrever"** -
+> **nao e o banco de producao**, que e `jvfhclubfpxrtrrazrgr`. Tres afirmacoes centrais da tabela
+> abaixo (typecheck com 21 erros, lint sem executar e `npm ci` com ERESOLVE) ja foram refutadas por
+> medicao e estao corrigidas na etapa 242. Para o estado real use `docs/prod-readiness.md`; para a
+> auditoria que levantou estes achados, `docs/qa/03-ACHADOS.md`.
+
 > **Auditoria de estado** executada em 16/08/2026 sobre o commit `513ab5a` (branch `main`).
 > Metodologia: _medir, não confiar_. Toda linha desta tabela cita `arquivo:linha`, objeto de banco,
 > nome de workflow ou resposta HTTP verificada. Documentação pré-existente foi tratada como
@@ -15,17 +23,17 @@ O **código do produto está substancialmente construído e implantado**. O que 
 **cadeia de qualidade e o plano de manutenção** — e isso já produziu pelo menos um bug que atinge
 o usuário final em produção.
 
-| Camada              | Situação medida                                                                                   |
-| ------------------- | ------------------------------------------------------------------------------------------------- |
-| Frontend / rotas    | 61 rotas registradas, 0 páginas órfãs — íntegro                                                   |
-| Edge Functions      | **43 de 43 do repo implantadas**; porém `migrate-helper` roda em produção **sem existir no repo** |
-| Banco (estrutura)   | 100 tabelas base + 30 partições, 4 views e 79 RPCs — **sem drift**                                |
-| **Pipeline de CI**  | **🔴 0 execuções verdes em 120 amostradas (20/05 → 16/08/2026)**                                  |
-| **Typecheck**       | **🔴 21 erros — o orçamento exige 0**                                                             |
-| **Lint**            | **🔴 não executa: crash de configuração**                                                         |
-| **`npm ci`**        | **🔴 falha (ERESOLVE) — instalação limpa impossível**                                             |
-| Testes              | 257 passam localmente, mas **7 de 32 arquivos testam a si mesmos**                                |
-| Cron / agendamentos | **🔴 heartbeat parado há ~3 meses**; cron horário de saúde roda mas **não está versionado**       |
+| Camada              | Situação medida                                                                                                                                                                          |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Frontend / rotas    | 61 rotas registradas, 0 páginas órfãs — íntegro                                                                                                                                          |
+| Edge Functions      | **43 de 43 do repo implantadas**; porém `migrate-helper` roda em produção **sem existir no repo**                                                                                        |
+| Banco (estrutura)   | 100 tabelas base + 30 partições, 4 views e 79 RPCs — **sem drift**                                                                                                                       |
+| **Pipeline de CI**  | **🔴 0 execuções verdes em 120 amostradas (20/05 → 16/08/2026)**                                                                                                                         |
+| **Typecheck**       | **🔴 21 erros — o orçamento exige 0** — ⚠️ superado em 2026-11-23: `npx tsc --noEmit` sai com 0 erros, exit 0 (docs/qa/02-CENARIOS.md secao 0, E1), reconfirmado em 2026-11-23           |
+| **Lint**            | **🔴 não executa: crash de configuração** — ⚠️ superado em 2026-11-23: `npm run lint:budget` passa com 77 avisos / 0 erros, dentro do teto de 86 (docs/qa/02-CENARIOS.md secao 0, E2/E3) |
+| **`npm ci`**        | **🔴 falha (ERESOLVE) — instalação limpa impossível** — ⚠️ superado em 2026-11-23: `npm ci` instala sem ERESOLVE neste clone                                                             |
+| Testes              | 257 passam localmente, mas **7 de 32 arquivos testam a si mesmos**                                                                                                                       |
+| Cron / agendamentos | **🔴 heartbeat parado há ~3 meses**; cron horário de saúde roda mas **não está versionado**                                                                                              |
 
 **O bloco vermelho tem duas idades, e confundi-las leva a corrigir a coisa errada.** As falhas de
 CI são contínuas desde pelo menos 20/05/2026, mas o que falhava mudou: até 16/08 o `npm ci`
