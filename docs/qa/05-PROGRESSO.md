@@ -387,10 +387,10 @@
 
 ### Onda 7
 
-- [ ] **291** — `MapboxMap`: parar de interpolar dado de rastreamento dentro de `innerHTML` — onda 7 — Média
-- [ ] **292** — `MapboxMap`: escapar o texto dos balões do mapa — onda 7 — Média
-- [ ] **293** — Pôr `rel="noopener noreferrer"` nos quatro links externos que só têm `noreferrer` — onda 7 — Baixa
-- [~] **294** — Fazer o lint cobrar link externo e `innerHTML` interpolado — onda 7 — Baixa · **aguarda o dono**
+- [x] **291** — `MapboxMap`: parar de interpolar dado de rastreamento dentro de `innerHTML` — onda 7 — Média
+- [x] **292** — `MapboxMap`: escapar o texto dos balões do mapa — onda 7 — Média
+- [x] **293** — Pôr `rel="noopener noreferrer"` nos quatro links externos que só têm `noreferrer` — onda 7 — Baixa
+- [x] **294** — Fazer o lint cobrar link externo e `innerHTML` interpolado — onda 7 — Baixa
 
 ### Onda 8
 
