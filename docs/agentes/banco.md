@@ -32,7 +32,7 @@ testar tela e nunca rode script de escrita "só para ver".
 ### Projetos que NÃO são o destino (não escrever neles)
 
 - **`hgicfqjayrjurivtygqf`** — Lovable Cloud, **origem** do cutover. Serve só como referência de paridade
-  (policies, corpo de função, cron) e é a fonte de `scripts/cleanup_triggers_source.sql`,
+  (policies, corpo de função, cron) e é a fonte de `scripts/historico/cleanup_triggers_source.sql`,
   `scripts/ops/backup_origem.sh` e `docs/ops/cron_jobs_origem.json`. Escrita ali não afeta o app.
 - **`uwbpzfcysppwikfpnzok`** — ref **morto**, ainda citado em `index.html` (dns-prefetch/preconnect) e em
   `supabase/functions/send-password-reset/index.ts` (URL de fallback do e-mail de reset). É dívida a limpar,
