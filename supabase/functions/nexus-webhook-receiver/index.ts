@@ -33,14 +33,12 @@ serve(async (req) => {
 
     const raw = await req.text();
     const signature = req.headers.get("x-webhook-signature") || "";
-    // HMAC is enforced when NEXUS_WEBHOOK_SECRET is configured (fail-closed)
-    if (Deno.env.get("NEXUS_WEBHOOK_SECRET")) {
-      if (!(await verifyWebhookHmac(raw, signature, "NEXUS_WEBHOOK_SECRET"))) {
-        return new Response(JSON.stringify({ error: "Invalid signature" }), {
-          status: 401,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
+    // HMAC is always enforced; verifyWebhookHmac returns false when secret is absent (fail-closed)
+    if (!(await verifyWebhookHmac(raw, signature, "NEXUS_WEBHOOK_SECRET"))) {
+      return new Response(JSON.stringify({ error: "Invalid signature" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     const body = JSON.parse(raw);
