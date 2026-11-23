@@ -83,6 +83,7 @@ export const useFreightQuotation = () => {
       const { data, error } = await supabase
         .from("transportadoras")
         .select("id, nome_fantasia, score_performance, homologada")
+        .is("deleted_at", null)
         .eq("homologada", true)
         .order("nome_fantasia");
 

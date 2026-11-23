@@ -85,6 +85,7 @@ export default function ExportacaoDados() {
       const { data, error } = await supabase
         .from("transportadoras")
         .select("id, nome_fantasia")
+        .is("deleted_at", null)
         .order("nome_fantasia", { ascending: true });
       if (error) throw error;
       return (data ?? []) as Transportadora[];
