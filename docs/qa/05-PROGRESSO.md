@@ -221,7 +221,7 @@
 
 ### Onda 5
 
-- [ ] **146** — `smart-carrier-selection`: validar `peso_kg` e os números do cálculo de frete — onda 5 — Alta
+- [x] **146** — `smart-carrier-selection`: validar `peso_kg` e os números do cálculo de frete — onda 5 — Alta
 - [ ] **147** — `webhook-status`: exigir `data` antes de desestruturar — onda 5 — Alta
 - [ ] **148** — `ingest-biosync`: validar `heart_rate` como número antes de comparar com o limite — onda 5 — Alta
 - [ ] **149** — `lalamove-api`: `path` e `method` do corpo decidem o roteamento sem `requireEnum` — onda 5 — Alta
@@ -434,6 +434,59 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapa 146 (2026-11-23) - achado B-04 (`smart-carrier-selection`)
+
+**Causa:** `index.ts:13` desestruturava o corpo direto (`const { estado_destino, peso_kg, ... } = await req.json()`),
+sem checagem de tipo. `peso_kg` em texto entrava na conta de frete (`index.ts:56-215`) e devolvia cotação sem
+sentido ou `NaN` propagado, sem erro de cliente.
+
+**Correção:** o parse passou a ser validado antes de qualquer cálculo (`index.ts:15-17`), por
+`parseSmartSelectionInput` (`parse.ts:23`): `estado_destino` é UF de 2 letras (obrigatória, normalizada para
+maiúscula — `requireString` com `minLength/maxLength: 2` e `pattern`), `peso_kg` é número com `min: 0`
+(`requireNumber`, que rejeita `NaN` e texto), e `urgencia`/`tipo_carga` continuam opcionais
+(`optionalString`). `ValidationError` devolve 422 estruturado (`index.ts:238-240`) antes do log e do 500.
+Nenhuma mudança em `_shared/validate.ts`.
+
+**Desvio consciente (400 do plano → 422):** o plano esperava "400 com a mensagem do campo"; o próprio plano
+manda usar `validationErrorResponse`, que responde **422** (`_shared/validate.ts:59-64`) — mesma escolha da
+etapa 133. É erro de cliente com o campo nomeado, não 500.
+
+**Desvio consciente (módulo puro `parse.ts`):** a validação ficou em `parse.ts` (módulo puro, sem import remoto)
+em vez de inline em `index.ts`, porque `index.ts:3` importa de `esm.sh` e o vitest não carrega o módulo — sem
+isso não haveria teste executável. Mesmo precedente de `scheduled-reports/fields.ts` (etapas 143-145),
+`accuracy-weekly-digest/digest.ts` e `accuracy-meta-monitor/escalation.ts`.
+
+**Endurecimento além do texto do plano:** `Number(null)`, `Number("")` e `Number([]`) valem 0, então
+`requireNumber` sozinho aceitaria esses valores como peso zero — cotação errada em silêncio, exatamente o
+"atalho tentador a evitar" citado na etapa. `requirePesoKg` (`parse.ts:37`) rejeita qualquer coisa que não seja
+número ou string numérica não vazia. `true`, `null`, `""`, `{}` e `[]` passam a dar 422.
+
+**Quem chama, conferido antes de mexer (risco citado na etapa):** `src/hooks/logistics/useSmartCarrierSelection.tsx:57`
+invoca a função; `:31`/`:32` tipam `estado_destino: string` e `peso_kg: number`;
+`src/components/freight/SmartCarrierSelector.tsx:93` bloqueia envio sem destino/peso e `:99` envia
+`parseFloat(formData.peso_kg)`; `src/hooks/logistics/useQuotationFlow.tsx:121` e `:137` repassam números. Nenhum
+chamador envia peso em texto, então não há chamada legítima que passe a ser recusada.
+
+**Evidência:**
+- `tests/contracts/smart-carrier-selection-input.spec.ts` (novo, 8 casos): UF normalizada; peso `0` aceito como
+  limite válido; `"abc"` recusado; `undefined`/`null`/`""`/`"   "`/`[]`/`{}`/`true`/`-1` recusados; UF ausente,
+  curta, longa, vazia ou não alfabética recusada; opcionais preservados e tipo errado recusado; só os 4 campos do
+  contrato saem do parse; e o último caso lê a fonte da edge e afirma validação antes da consulta a
+  `tabelas_frete` e `validationErrorResponse` no catch.
+- Prova de que o teste pega a regressão, duas mutações: com `peso_kg` voltando a
+  `Number(body["peso_kg"]) || 0` falham 2 de 8 casos; com `index.ts` voltando a desestruturar o corpo cru falha
+  1 de 8. Restaurado, 8/8.
+- `npx vitest run --coverage`: **45 arquivos / 355 testes, todos passando** (exit 0); `parse.ts` com
+  100/100/100/100; cobertura total subiu de 73,22/70,06/76,63/75,28 para **73,59/70,51/76,77/75,62**.
+- `deno check` = 3 erros, os mesmos herdados de `origin/main` (`userId` em `:39` e `error.message` em
+  `:246`/`:251` — este último é B-06/etapa 177 e **não** foi tocado); `deno lint` do diretório = 13 problemas
+  (`index.ts` = 11, o baseline; `parse.ts` = 0); `deno fmt --check` de `parse.ts` limpo — `index.ts` **não** foi
+  reformatado, para não gerar churn.
+- `npx tsc --noEmit` 0; `eslint` do teste novo 0; `npm run lint:budget` = "All checks within budget".
+
+**NÃO VERIFICADO:** a requisição real com `{"peso_kg":"abc"}` depois do deploy (exige `authenticated`/`anon` key
+com a sessão válida — não disponível nesta sessão); e a cotação ponta a ponta pela interface.
 
 ### Registro - etapas 143 a 145 (2026-11-23) - achados B-03/B-04 (`scheduled-reports`)
 
