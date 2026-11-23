@@ -61,6 +61,38 @@ export async function requireUser(req: Request): Promise<AuthResult> {
 }
 
 /**
+ * Verifica se o usuário autenticado tem pelo menos um dos papéis indicados.
+ * Consulta via RPC `has_role` (padrão ADR-0014 / user_roles).
+ * FAIL-CLOSED: sem sessão → 401; papel insuficiente → 403.
+ * service_role bypassa a verificação (chamador interno confiável).
+ */
+export async function requireRole(
+  req: Request,
+  roles: string[],
+): Promise<{ ok: true; claims: AuthClaims } | { ok: false; status: 401 | 403 }> {
+  const auth = await requireUser(req);
+  if (!auth.ok) return auth;
+
+  // service_role está autorizado a tudo
+  if (auth.claims.role === "service_role") return auth;
+
+  const sub = auth.claims.sub;
+  if (!sub) return { ok: false, status: 401 };
+
+  const supabase = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+  );
+
+  for (const role of roles) {
+    const { data } = await supabase.rpc("has_role", { _role: role, _user_id: sub });
+    if (data === true) return auth;
+  }
+
+  return { ok: false, status: 403 };
+}
+
+/**
  * Compara o header `x-internal-secret` com INTERNAL_FN_SECRET em tempo
  * constante. FAIL-CLOSED: env ausente ⇒ false.
  */

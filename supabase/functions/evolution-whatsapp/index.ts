@@ -1,9 +1,10 @@
 import { safeFetch } from "../_shared/safeFetch.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { withCircuitBreaker } from "../_shared/circuitBreaker.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { log } from "../_shared/logger.ts";
 import { corsHeaders } from "../_shared/cors.ts";
-import { requireUser } from "../_shared/auth.ts";
+import { requireRole } from "../_shared/auth.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
 
 serve(async (req) => {
@@ -31,12 +32,13 @@ serve(async (req) => {
       );
     }
 
-    const auth = await requireUser(req);
+    // Exige papel admin ou user (qualquer colaborador da empresa); rejeita anon e roles externas
+    const auth = await requireRole(req, ["admin", "user"]);
     if (!auth.ok) {
       return new Response(
-        JSON.stringify({ success: false, error: "Unauthorized" }),
+        JSON.stringify({ success: false, error: auth.status === 403 ? "Forbidden" : "Unauthorized" }),
         {
-          status: 401,
+          status: auth.status,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         },
       );
@@ -103,6 +105,19 @@ serve(async (req) => {
           }
           return data;
         });
+
+        // Etapa 007: auditoria de quem enviou mensagem WhatsApp de negócios
+        const supabaseAudit = createClient(
+          Deno.env.get("SUPABASE_URL")!,
+          Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+        );
+        await supabaseAudit.from("audit_logs").insert({
+          action: "whatsapp_send_text",
+          table_name: "evolution_whatsapp",
+          record_id: data.instance ?? "unknown",
+          user_id: auth.claims.sub ?? null,
+          new_data: { phone: data.phone, instance: data.instance, action: "send_text" },
+        }).then(() => {/* best-effort */});
 
         return new Response(JSON.stringify({ success: true, data: result }), {
           status: 200,

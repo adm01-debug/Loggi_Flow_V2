@@ -19,8 +19,9 @@ serve(async (req) => {
   const checks: Record<string, any> = {};
 
   try {
+    // Etapa 012: health é pública (verify_jwt=false); usar anon_key para não expor service_role
     const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''; // Use service role for internal health
+    const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
     const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
     // 1. Database Check
