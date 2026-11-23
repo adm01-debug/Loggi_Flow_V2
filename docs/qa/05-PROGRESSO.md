@@ -435,6 +435,32 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 
 ## Registro de execução
 
+### Registro - etapa 060 (2026-11-24) - implementada, aguarda aprovacao (Regra 8)
+
+Dois `.sql` pontuais de agosto/2026 estavam soltos na raiz de `scripts/`, entre
+utilitarios que sao para rodar. Alteram banco, nao tem runner, e o aviso de
+"HISTORICO - NAO REEXECUTAR" so aparecia para quem abrisse o arquivo - a listagem
+da pasta dizia o contrario.
+
+Movidos com `git mv` (historico preservado) para `scripts/historico/`, com
+`README.md` curto declarando que ali so entra SQL ja aplicado e que nada ali se executa.
+
+Os tres pontos de referencia atualizados:
+
+- `scripts/audit/sql.unit.mjs:26-27` (constantes `cleanup` e `remediacao`)
+- `scripts/audit/README.md:58`
+- `docs/agentes/banco.md:35`
+
+Conteudo SQL **nao** foi tocado - a revisao de 2026-11-09 ja os deixou replay-safe,
+e qualquer edicao invalidaria os testes que verificam o conteudo.
+
+**Verificacao**
+- `node --test scripts/audit/sql.unit.mjs` -> **28 testes, 0 falhas, 0 pulados**; o
+  Postgres descartavel subiu e os dois arquivos foram executados de verdade no novo caminho
+- `npm run automation:test` -> **103 testes, 0 falhas**
+- `node scripts/ci/check-claude-md-integrity.mjs` -> exit 0
+- `grep` nao encontra nenhuma referencia apontando para a raiz de `scripts/`
+
 Uma linha por etapa concluída. A coluna **Evidência** é o que diferencia etapa concluída de etapa
 "deveria funcionar": cole o comando e o resultado, ou a consulta e o retorno.
 
