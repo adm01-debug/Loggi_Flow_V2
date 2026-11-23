@@ -425,7 +425,7 @@ export default function RastreamentoPublico() {
                     <a
                       href={tracking.comprovante_entrega_url}
                       target="_blank"
-                      rel="noreferrer"
+                      rel="noopener noreferrer"
                     >
                       <Eye className="w-4 h-4 mr-2" /> VER
                     </a>
