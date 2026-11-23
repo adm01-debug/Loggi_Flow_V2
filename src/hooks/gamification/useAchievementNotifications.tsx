@@ -1,4 +1,4 @@
-import { useState, useCallback, createContext, useContext, ReactNode } from "react";
+import { useState, useCallback, useEffect, useRef, createContext, useContext, ReactNode } from "react";
 import { playCelebrationSound } from "@/utils/celebrationSounds";
 
 export interface Achievement {
@@ -26,6 +26,16 @@ const AchievementContext = createContext<AchievementContextType | undefined>(und
 
 export function AchievementProvider({ children }: { children: ReactNode }) {
   const [notifications, setNotifications] = useState<AchievementNotification[]>([]);
+  const dismissTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  // Cancela os descartes automaticos pendentes quando o provider desmonta
+  useEffect(() => {
+    const timers = dismissTimersRef.current;
+    return () => {
+      timers.forEach(clearTimeout);
+      timers.length = 0;
+    };
+  }, []);
 
   const unlockAchievement = useCallback((achievement: Achievement) => {
     const notification: AchievementNotification = {
@@ -39,9 +49,11 @@ export function AchievementProvider({ children }: { children: ReactNode }) {
     playCelebrationSound(achievement.rarity);
 
     // Auto-dismiss after 5 seconds
-    setTimeout(() => {
-      setNotifications((prev) => prev.filter((n) => n.timestamp !== notification.timestamp));
-    }, 5000);
+    dismissTimersRef.current.push(
+      setTimeout(() => {
+        setNotifications((prev) => prev.filter((n) => n.timestamp !== notification.timestamp));
+      }, 5000)
+    );
   }, []);
 
   const dismissNotification = useCallback((id: string) => {
