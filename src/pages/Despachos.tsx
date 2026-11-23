@@ -34,6 +34,7 @@ import { ExpeditionDetailsDialog } from "@/components/shipping/ExpeditionDetails
 import { useAudioFeedback } from "@/hooks/notifications/useAudioFeedback";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { useRuleTriggers } from "@/hooks/logistics/useRuleTriggers";
+import { TRANSICOES_ENTREGA } from "@/lib/statusTransitions";
 
 interface Despacho {
   id: string;
@@ -92,11 +93,16 @@ const statusConfig: Record<
   },
 };
 
-const validTransitions: Record<string, string> = {
-  pronto_despacho: "cotacao_frete",
-  cotacao_frete: "nf_emitida",
-  nf_emitida: "despachado",
-};
+/**
+ * Proximo destino de avanco automatico. Retorna so quando existe exatamente um
+ * destino valido: em bifurcacao (ex.: saiu_entrega -> entregue|ocorrencia) quem
+ * decide e o operador, nao o botao.
+ */
+function proximoDestinoUnico(status: string): EntregaStatus | undefined {
+  const destinos = TRANSICOES_ENTREGA[status as EntregaStatus];
+  if (!destinos || destinos.length !== 1) return undefined;
+  return destinos[0];
+}
 
 export default function Despachos() {
   const { user } = useAuth();
@@ -197,7 +203,7 @@ export default function Despachos() {
 
   const moveToNextMutation = useMutation({
     mutationFn: async (item: Despacho) => {
-      const nextStatus = validTransitions[item.status];
+      const nextStatus = proximoDestinoUnico(item.status);
       if (!nextStatus) return;
 
       const { error, count } = await supabase
@@ -238,7 +244,7 @@ export default function Despachos() {
   });
 
   const moveToNext = (item: Despacho) => {
-    const nextStatus = validTransitions[item.status];
+    const nextStatus = proximoDestinoUnico(item.status);
     if (!nextStatus) return;
 
     if (nextStatus === "despachado" && !item.nf_remessa) {
@@ -509,21 +515,22 @@ export default function Despachos() {
                               )}
                             </div>
 
-                            {validTransitions[col] && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                disabled={moveToNextMutation.isPending}
-                                className="h-9 px-4 rounded-xl bg-primary/10 text-primary hover:bg-primary hover:text-white transition-all font-black text-[10px] uppercase tracking-widest gap-2 group/btn"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  moveToNext(item);
-                                }}
-                              >
-                                PROSSEGUIR
-                                <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
-                              </Button>
-                            )}
+                            {col !== "despachado" &&
+                              proximoDestinoUnico(col) && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  disabled={moveToNextMutation.isPending}
+                                  className="h-9 px-4 rounded-xl bg-primary/10 text-primary hover:bg-primary hover:text-white transition-all font-black text-[10px] uppercase tracking-widest gap-2 group/btn"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    moveToNext(item);
+                                  }}
+                                >
+                                  PROSSEGUIR
+                                  <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
+                                </Button>
+                              )}
                           </div>
                         </motion.div>
                       ))}
@@ -548,7 +555,12 @@ export default function Despachos() {
           open={detailsOpen}
           onOpenChange={setDetailsOpen}
           delivery={selectedItem}
-          statusConfig={statusConfig as unknown as Record<string, { color: string; label: string; icon: LucideIcon }>}
+          statusConfig={
+            statusConfig as unknown as Record<
+              string,
+              { color: string; label: string; icon: LucideIcon }
+            >
+          }
           onStatusUpdate={() => {
             refetch();
           }}

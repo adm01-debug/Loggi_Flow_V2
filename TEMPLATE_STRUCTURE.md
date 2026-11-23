@@ -1,5 +1,12 @@
 # 🚀 Template de Estrutura - Guia de Setup
 
+> **ATENCAO — MOLDE, NAO DESCRICAO DESTE REPOSITORIO**: este arquivo ensina a criar um projeto novo.
+> **Neste** repositorio vale o ADR 0008 (`docs/adr/0008-feature-driven-architecture.md`): hooks
+> vivem por domínio (`src/hooks/common/`, `src/hooks/auth/`, `src/hooks/logistics/`, ...), nunca na raiz de
+> `src/hooks/`. Os titulos de seção abaixo ja usam o caminho por domínio deste repositorio;
+> o **codigo de exemplo** dentro dos blocos de código fica como está, porque é molde.
+> Exceção: `src/hooks/index.ts` realmente mora na raiz — é o barrel export do diretório.
+
 > Passo a passo para criar um novo projeto com a mesma estrutura base do Loggi-Flow.
 
 ---
@@ -304,7 +311,7 @@ export default {
     --input: 214.3 31.8% 91.4%;
     --ring: 221.2 83.2% 53.3%;
     --radius: 0.5rem;
-    
+
     /* Sidebar */
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -314,7 +321,7 @@ export default {
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
-    
+
     /* Custom */
     --success: 142 76% 36%;
     --warning: 38 92% 50%;
@@ -341,7 +348,7 @@ export default {
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 224.3 76.3% 48%;
-    
+
     /* Sidebar Dark */
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
@@ -468,7 +475,7 @@ supabase/
 ### src/integrations/supabase/client.ts
 
 ```typescript
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
@@ -561,10 +568,10 @@ as $$
 begin
   insert into public.profiles (id, email, full_name)
   values (new.id, new.email, new.raw_user_meta_data->>'full_name');
-  
+
   insert into public.user_roles (user_id, role)
   values (new.id, 'user');
-  
+
   return new;
 end;
 $$;
@@ -646,26 +653,32 @@ create policy "System can insert audit logs"
 ### src/hooks/index.ts
 
 ```typescript
-export { usePagination } from './usePagination';
-export { useFilters } from './useFilters';
-export { useSorting } from './useSorting';
-export { useDebounce } from './useDebounce';
-export { useLocalStorage } from './useLocalStorage';
-export { useAuth } from './useAuth';
-export { useKeyboardShortcut, useGlobalShortcuts } from './useKeyboardShortcuts';
+export { usePagination } from "./usePagination";
+export { useFilters } from "./useFilters";
+export { useSorting } from "./useSorting";
+export { useDebounce } from "./useDebounce";
+export { useLocalStorage } from "./useLocalStorage";
+export { useAuth } from "./useAuth";
+export {
+  useKeyboardShortcut,
+  useGlobalShortcuts,
+} from "./useKeyboardShortcuts";
 ```
 
-### src/hooks/usePagination.ts
+### src/hooks/common/usePagination.ts
 
 ```typescript
-import { useState, useCallback } from 'react';
+import { useState, useCallback } from "react";
 
 interface UsePaginationOptions {
   initialPage?: number;
   initialPageSize?: number;
 }
 
-export function usePagination({ initialPage = 1, initialPageSize = 10 }: UsePaginationOptions = {}) {
+export function usePagination({
+  initialPage = 1,
+  initialPageSize = 10,
+}: UsePaginationOptions = {}) {
   const [page, setPage] = useState(initialPage);
   const [pageSize, setPageSize] = useState(initialPageSize);
 
@@ -676,20 +689,23 @@ export function usePagination({ initialPage = 1, initialPageSize = 10 }: UsePagi
   }, []);
 
   const nextPage = useCallback(() => {
-    setPage(prev => prev + 1);
+    setPage((prev) => prev + 1);
   }, []);
 
   const prevPage = useCallback(() => {
-    setPage(prev => Math.max(1, prev - 1));
+    setPage((prev) => Math.max(1, prev - 1));
   }, []);
 
   const resetPage = useCallback(() => {
     setPage(1);
   }, []);
 
-  const getTotalPages = useCallback((totalItems: number) => {
-    return Math.ceil(totalItems / pageSize);
-  }, [pageSize]);
+  const getTotalPages = useCallback(
+    (totalItems: number) => {
+      return Math.ceil(totalItems / pageSize);
+    },
+    [pageSize],
+  );
 
   return {
     page,
@@ -705,30 +721,38 @@ export function usePagination({ initialPage = 1, initialPageSize = 10 }: UsePagi
 }
 ```
 
-### src/hooks/useFilters.ts
+### src/hooks/common/useFilters.ts
 
 ```typescript
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from "react";
 
 export function useFilters<T extends Record<string, any>>(initialFilters: T) {
   const [filters, setFilters] = useState<T>(initialFilters);
 
   const updateFilter = useCallback(<K extends keyof T>(key: K, value: T[K]) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+    setFilters((prev) => ({ ...prev, [key]: value }));
   }, []);
 
   const clearFilters = useCallback(() => {
     setFilters(initialFilters);
   }, [initialFilters]);
 
-  const clearFilter = useCallback(<K extends keyof T>(key: K) => {
-    setFilters(prev => ({ ...prev, [key]: initialFilters[key] }));
-  }, [initialFilters]);
+  const clearFilter = useCallback(
+    <K extends keyof T>(key: K) => {
+      setFilters((prev) => ({ ...prev, [key]: initialFilters[key] }));
+    },
+    [initialFilters],
+  );
 
   const activeFiltersCount = useMemo(() => {
     return Object.entries(filters).filter(([key, value]) => {
       const initial = initialFilters[key as keyof T];
-      return value !== initial && value !== '' && value !== null && value !== undefined;
+      return (
+        value !== initial &&
+        value !== "" &&
+        value !== null &&
+        value !== undefined
+      );
     }).length;
   }, [filters, initialFilters]);
 
@@ -746,50 +770,56 @@ export function useFilters<T extends Record<string, any>>(initialFilters: T) {
 }
 ```
 
-### src/hooks/useSorting.ts
+### src/hooks/common/useSorting.ts
 
 ```typescript
-import { useState, useCallback } from 'react';
+import { useState, useCallback } from "react";
 
-export type SortDirection = 'asc' | 'desc' | null;
+export type SortDirection = "asc" | "desc" | null;
 
 interface SortConfig {
   column: string;
   direction: SortDirection;
 }
 
-export function useSorting(initialColumn?: string, initialDirection: SortDirection = null) {
+export function useSorting(
+  initialColumn?: string,
+  initialDirection: SortDirection = null,
+) {
   const [sortConfig, setSortConfig] = useState<SortConfig>({
-    column: initialColumn || '',
+    column: initialColumn || "",
     direction: initialDirection,
   });
 
   const handleSort = useCallback((column: string) => {
-    setSortConfig(prev => {
+    setSortConfig((prev) => {
       if (prev.column !== column) {
-        return { column, direction: 'asc' };
+        return { column, direction: "asc" };
       }
-      
-      if (prev.direction === 'asc') {
-        return { column, direction: 'desc' };
+
+      if (prev.direction === "asc") {
+        return { column, direction: "desc" };
       }
-      
-      if (prev.direction === 'desc') {
-        return { column: '', direction: null };
+
+      if (prev.direction === "desc") {
+        return { column: "", direction: null };
       }
-      
-      return { column, direction: 'asc' };
+
+      return { column, direction: "asc" };
     });
   }, []);
 
   const clearSort = useCallback(() => {
-    setSortConfig({ column: '', direction: null });
+    setSortConfig({ column: "", direction: null });
   }, []);
 
-  const getSortIcon = useCallback((column: string) => {
-    if (sortConfig.column !== column) return null;
-    return sortConfig.direction;
-  }, [sortConfig]);
+  const getSortIcon = useCallback(
+    (column: string) => {
+      if (sortConfig.column !== column) return null;
+      return sortConfig.direction;
+    },
+    [sortConfig],
+  );
 
   return {
     sortConfig,
@@ -802,10 +832,10 @@ export function useSorting(initialColumn?: string, initialDirection: SortDirecti
 }
 ```
 
-### src/hooks/useDebounce.ts
+### src/hooks/common/useDebounce.ts
 
 ```typescript
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 export function useDebounce<T>(value: T, delay: number = 300): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
@@ -824,15 +854,18 @@ export function useDebounce<T>(value: T, delay: number = 300): T {
 }
 ```
 
-### src/hooks/useLocalStorage.ts
+### src/hooks/common/useLocalStorage.ts
 
 ```typescript
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect } from "react";
 
-export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T | ((prev: T) => T)) => void, () => void] {
+export function useLocalStorage<T>(
+  key: string,
+  initialValue: T,
+): [T, (value: T | ((prev: T) => T)) => void, () => void] {
   const [storedValue, setStoredValue] = useState<T>(() => {
-    if (typeof window === 'undefined') return initialValue;
-    
+    if (typeof window === "undefined") return initialValue;
+
     try {
       const item = window.localStorage.getItem(key);
       return item ? JSON.parse(item) : initialValue;
@@ -842,23 +875,27 @@ export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T 
     }
   });
 
-  const setValue = useCallback((value: T | ((prev: T) => T)) => {
-    try {
-      const valueToStore = value instanceof Function ? value(storedValue) : value;
-      setStoredValue(valueToStore);
-      
-      if (typeof window !== 'undefined') {
-        window.localStorage.setItem(key, JSON.stringify(valueToStore));
+  const setValue = useCallback(
+    (value: T | ((prev: T) => T)) => {
+      try {
+        const valueToStore =
+          value instanceof Function ? value(storedValue) : value;
+        setStoredValue(valueToStore);
+
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem(key, JSON.stringify(valueToStore));
+        }
+      } catch (error) {
+        console.warn(`Error setting localStorage key "${key}":`, error);
       }
-    } catch (error) {
-      console.warn(`Error setting localStorage key "${key}":`, error);
-    }
-  }, [key, storedValue]);
+    },
+    [key, storedValue],
+  );
 
   const removeValue = useCallback(() => {
     try {
       setStoredValue(initialValue);
-      if (typeof window !== 'undefined') {
+      if (typeof window !== "undefined") {
         window.localStorage.removeItem(key);
       }
     } catch (error) {
@@ -870,7 +907,7 @@ export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T 
 }
 ```
 
-### src/hooks/useAuth.tsx
+### src/hooks/auth/useAuth.tsx
 
 ```typescript
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
@@ -957,16 +994,16 @@ export function useAuth() {
 ### src/components/common/index.ts
 
 ```typescript
-export { Pagination } from './Pagination';
-export { FilterBar } from './FilterBar';
-export { LoadingSpinner } from './LoadingSpinner';
-export { EmptyState } from './EmptyState';
-export { ConfirmDialog } from './ConfirmDialog';
-export { PageHeader } from './PageHeader';
-export { StatsCard } from './StatsCard';
-export { StatusBadge } from './StatusBadge';
-export { ExportButton } from './ExportButton';
-export { TooltipWrapper } from './TooltipWrapper';
+export { Pagination } from "./Pagination";
+export { FilterBar } from "./FilterBar";
+export { LoadingSpinner } from "./LoadingSpinner";
+export { EmptyState } from "./EmptyState";
+export { ConfirmDialog } from "./ConfirmDialog";
+export { PageHeader } from "./PageHeader";
+export { StatsCard } from "./StatsCard";
+export { StatusBadge } from "./StatusBadge";
+export { ExportButton } from "./ExportButton";
+export { TooltipWrapper } from "./TooltipWrapper";
 ```
 
 ### src/components/common/LoadingSpinner.tsx
@@ -1093,12 +1130,12 @@ function App() {
             <Toaster richColors position="top-right" />
             <Routes>
               <Route path="/auth" element={<Auth />} />
-              
+
               <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
                 <Route index element={<Index />} />
                 <Route path="/profile" element={<Profile />} />
               </Route>
-              
+
               <Route path="/404" element={<NotFound />} />
               <Route path="*" element={<Navigate to="/404" replace />} />
             </Routes>
@@ -1184,42 +1221,37 @@ export function ProtectedRoute({ children, requireAdmin = false }: ProtectedRout
 ### public/sw.js
 
 ```javascript
-const CACHE_NAME = 'app-cache-v1';
-const urlsToCache = [
-  '/',
-  '/offline.html',
-  '/manifest.json'
-];
+const CACHE_NAME = "app-cache-v1";
+const urlsToCache = ["/", "/offline.html", "/manifest.json"];
 
-self.addEventListener('install', (event) => {
+self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(urlsToCache))
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(urlsToCache)),
   );
 });
 
-self.addEventListener('fetch', (event) => {
+self.addEventListener("fetch", (event) => {
   event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        if (response) return response;
-        return fetch(event.request).catch(() => {
-          if (event.request.mode === 'navigate') {
-            return caches.match('/offline.html');
-          }
-        });
-      })
+    caches.match(event.request).then((response) => {
+      if (response) return response;
+      return fetch(event.request).catch(() => {
+        if (event.request.mode === "navigate") {
+          return caches.match("/offline.html");
+        }
+      });
+    }),
   );
 });
 
-self.addEventListener('activate', (event) => {
+self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
-        cacheNames.filter((name) => name !== CACHE_NAME)
-          .map((name) => caches.delete(name))
+        cacheNames
+          .filter((name) => name !== CACHE_NAME)
+          .map((name) => caches.delete(name)),
       );
-    })
+    }),
   );
 });
 ```
@@ -1229,44 +1261,49 @@ self.addEventListener('activate', (event) => {
 ```html
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Offline</title>
-  <style>
-    body {
-      font-family: system-ui, sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      margin: 0;
-      background: #f5f5f5;
-    }
-    .container {
-      text-align: center;
-      padding: 2rem;
-    }
-    h1 { color: #333; margin-bottom: 1rem; }
-    p { color: #666; }
-    button {
-      margin-top: 1rem;
-      padding: 0.75rem 1.5rem;
-      background: #3b82f6;
-      color: white;
-      border: none;
-      border-radius: 0.5rem;
-      cursor: pointer;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1>📵 Sem conexão</h1>
-    <p>Verifique sua conexão com a internet e tente novamente.</p>
-    <button onclick="location.reload()">Tentar novamente</button>
-  </div>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Offline</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        margin: 0;
+        background: #f5f5f5;
+      }
+      .container {
+        text-align: center;
+        padding: 2rem;
+      }
+      h1 {
+        color: #333;
+        margin-bottom: 1rem;
+      }
+      p {
+        color: #666;
+      }
+      button {
+        margin-top: 1rem;
+        padding: 0.75rem 1.5rem;
+        background: #3b82f6;
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>📵 Sem conexão</h1>
+      <p>Verifique sua conexão com a internet e tente novamente.</p>
+      <button onclick="location.reload()">Tentar novamente</button>
+    </div>
+  </body>
 </html>
 ```
 
@@ -1278,9 +1315,9 @@ self.addEventListener('activate', (event) => {
 <link rel="apple-touch-icon" href="/icons/icon-192.svg" />
 
 <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js');
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("/sw.js");
     });
   }
 </script>
@@ -1293,21 +1330,21 @@ self.addEventListener('activate', (event) => {
 ### vitest.config.ts
 
 ```typescript
-import { defineConfig } from 'vitest/config';
-import react from '@vitejs/plugin-react';
-import path from 'path';
+import { defineConfig } from "vitest/config";
+import react from "@vitejs/plugin-react";
+import path from "path";
 
 export default defineConfig({
   plugins: [react()],
   test: {
-    environment: 'jsdom',
-    setupFiles: ['./src/test/setup.ts'],
+    environment: "jsdom",
+    setupFiles: ["./src/test/setup.ts"],
     globals: true,
     css: true,
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      "@": path.resolve(__dirname, "./src"),
     },
   },
 });
@@ -1316,13 +1353,13 @@ export default defineConfig({
 ### src/test/setup.ts
 
 ```typescript
-import '@testing-library/jest-dom';
-import { vi } from 'vitest';
+import "@testing-library/jest-dom";
+import { vi } from "vitest";
 
 // Mock matchMedia
-Object.defineProperty(window, 'matchMedia', {
+Object.defineProperty(window, "matchMedia", {
   writable: true,
-  value: vi.fn().mockImplementation(query => ({
+  value: vi.fn().mockImplementation((query) => ({
     matches: false,
     media: query,
     onchange: null,
@@ -1364,18 +1401,21 @@ global.ResizeObserver = vi.fn().mockImplementation(() => ({
 ## ✅ Checklist Final
 
 ### Setup Inicial
+
 - [ ] Projeto criado (Lovable ou Vite)
 - [ ] Dependências instaladas
 - [ ] Tailwind configurado
 - [ ] Shadcn/UI inicializado
 
 ### Design System
+
 - [ ] tailwind.config.ts configurado
 - [ ] index.css com variáveis CSS
 - [ ] Dark mode funcionando
 - [ ] Componentes UI instalados
 
 ### Supabase
+
 - [ ] Cliente configurado
 - [ ] Tabelas base criadas
 - [ ] RLS policies aplicadas
@@ -1383,23 +1423,27 @@ global.ResizeObserver = vi.fn().mockImplementation(() => ({
 - [ ] Trigger de novo usuário
 
 ### Estrutura
+
 - [ ] Pastas criadas
 - [ ] Hooks base implementados
 - [ ] Componentes comuns criados
 - [ ] Layout principal
 
 ### Rotas
+
 - [ ] React Router configurado
 - [ ] ProtectedRoute implementado
 - [ ] Páginas base criadas
 
 ### PWA
+
 - [ ] manifest.json
 - [ ] Service Worker
 - [ ] Página offline
 - [ ] Ícones
 
 ### Qualidade
+
 - [ ] Vitest configurado
 - [ ] ESLint configurado
 - [ ] TypeScript strict
@@ -1418,4 +1462,4 @@ global.ResizeObserver = vi.fn().mockImplementation(() => ({
 
 ---
 
-*Template baseado no projeto Loggi-Flow - Dezembro 2024*
+_Template baseado no projeto Loggi-Flow - Dezembro 2024_
