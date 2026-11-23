@@ -200,12 +200,16 @@ export default function Despachos() {
       const nextStatus = validTransitions[item.status];
       if (!nextStatus) return;
 
-      const { error } = await supabase
+      const { error, count } = await supabase
         .from("entregas")
-        .update({ status: nextStatus as EntregaStatus })
+        .update({ status: nextStatus as EntregaStatus }, { count: "exact" })
         .eq("id", item.id)
         .eq("version", item.version);
       if (error) throw error;
+      if (count === 0)
+        throw new Error(
+          "Conflito de versão — registro alterado por outro usuário, por favor recarregue",
+        );
 
       await onStatusChange("entrega", item.id, { status: nextStatus });
 
@@ -254,15 +258,22 @@ export default function Despachos() {
 
   const confirmDispatchMutation = useMutation({
     mutationFn: async (item: Despacho) => {
-      const { error } = await supabase
+      const { error, count } = await supabase
         .from("entregas")
-        .update({
-          status: "despachado" as EntregaStatus,
-          data_despacho: new Date().toISOString(),
-        })
+        .update(
+          {
+            status: "despachado" as EntregaStatus,
+            data_despacho: new Date().toISOString(),
+          },
+          { count: "exact" },
+        )
         .eq("id", item.id)
         .eq("version", item.version);
       if (error) throw error;
+      if (count === 0)
+        throw new Error(
+          "Conflito de versão — registro alterado por outro usuário, por favor recarregue",
+        );
 
       await onStatusChange("entrega", item.id, { status: "despachado" });
 
