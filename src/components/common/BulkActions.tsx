@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 
 interface BulkAction {
   id: string;
@@ -16,6 +17,8 @@ interface BulkAction {
   icon?: React.ComponentType<{ className?: string }>;
   variant?: "default" | "destructive";
   onClick: (selectedIds: string[]) => void;
+  confirmTitle?: string;
+  confirmDescription?: string | ((count: number) => string);
 }
 
 interface BulkActionsProps {
@@ -35,9 +38,41 @@ export function BulkActions({
   actions,
   className,
 }: BulkActionsProps) {
+  const [pendingAction, setPendingAction] = React.useState<BulkAction | null>(null);
+
   if (selectedIds.length === 0) return null;
 
+  const handleActionClick = (action: BulkAction) => {
+    if (action.variant === "destructive") {
+      setPendingAction(action);
+    } else {
+      action.onClick(selectedIds);
+    }
+  };
+
+  const confirmTitle = pendingAction?.confirmTitle ?? `${pendingAction?.label ?? ""}?`;
+
+  const resolveDescription = (action: BulkAction | null): string => {
+    if (!action) return "";
+    if (typeof action.confirmDescription === "function") return action.confirmDescription(selectedIds.length);
+    return action.confirmDescription ?? `Confirma a ação em ${selectedIds.length} item(s)? Esta operação não pode ser desfeita.`;
+  };
+  const confirmDescription = resolveDescription(pendingAction);
+
   return (
+    <>
+    <ConfirmDialog
+      open={pendingAction !== null}
+      onOpenChange={(open) => { if (!open) setPendingAction(null); }}
+      title={confirmTitle}
+      description={confirmDescription}
+      confirmText={pendingAction?.label ?? "Confirmar"}
+      type="danger"
+      onConfirm={() => {
+        pendingAction?.onClick(selectedIds);
+        setPendingAction(null);
+      }}
+    />
     <div
       className={cn(
         "flex items-center gap-4 p-4 bg-primary/5 border rounded-lg",
@@ -71,7 +106,7 @@ export function BulkActions({
                 action.variant === "destructive" ? "destructive" : "outline"
               }
               size="sm"
-              onClick={() => action.onClick(selectedIds)}
+              onClick={() => handleActionClick(action)}
               className="text-xs h-8"
             >
               {action.icon && <action.icon className="h-3.5 w-3.5 mr-1.5" />}
@@ -92,7 +127,7 @@ export function BulkActions({
                     <DropdownMenuSeparator />
                   )}
                   <DropdownMenuItem
-                    onClick={() => action.onClick(selectedIds)}
+                    onClick={() => handleActionClick(action)}
                     className={cn(
                       "text-xs",
                       action.variant === "destructive" && "text-destructive",
@@ -119,6 +154,7 @@ export function BulkActions({
         </Button>
       </div>
     </div>
+    </>
   );
 }
 
