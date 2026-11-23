@@ -87,6 +87,31 @@ export default tseslint.config(
       // Kept as errors: these flag genuine correctness / security problems.
       // sonarjs/no-unenclosed-multiline-block, sonarjs/no-hardcoded-secrets and
       // sonarjs/link-with-target-blank remain at their recommended "error" severity.
+
+      // O sonarjs instalado nao tem regra para innerHTML. Os dois pontos legitimos
+      // (icones SVG estaticos de MapboxMap) sao literais sem interpolacao: a regra
+      // barra so o caso que e XSS, atribuir ao DOM HTML montado com dado dinamico.
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector:
+            "AssignmentExpression[left.property.name=/^(innerHTML|outerHTML)$/] > TemplateLiteral > :not(TemplateElement)",
+          message:
+            "Nao interpole dado em innerHTML/outerHTML: monte o no com createElement/textContent ou escape antes (etapa 291).",
+        },
+        {
+          selector:
+            "AssignmentExpression[left.property.name=/^(innerHTML|outerHTML)$/][right.type='BinaryExpression']",
+          message:
+            "Nao concatene dado em innerHTML/outerHTML: monte o no com createElement/textContent ou escape antes (etapa 291).",
+        },
+        {
+          selector:
+            "CallExpression[callee.property.name='insertAdjacentHTML'] > TemplateLiteral > :not(TemplateElement)",
+          message:
+            "Nao interpole dado em insertAdjacentHTML: monte o no com createElement/textContent ou escape antes (etapa 291).",
+        },
+      ],
     },
   },
   {
