@@ -73,3 +73,12 @@ export {
 
 // Query Configuration
 export { QUERY_STALE_TIME, QUERY_REFETCH_INTERVAL } from './queryConfig';
+
+// Status Transitions
+export {
+  TRANSICOES_ENTREGA,
+  TRANSICOES_COLETA,
+  podeTransicionarEntrega,
+  podeTransicionarColeta,
+} from "./statusTransitions";
+export type { EntregaStatus, ColetaStatus } from "./statusTransitions";
