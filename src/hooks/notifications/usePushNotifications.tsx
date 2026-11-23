@@ -200,6 +200,35 @@ export const usePushNotifications = () => {
     });
   }, [isSupported, permission]);
 
+  const sendPushNotification = useCallback(
+    async (params: {
+      title: string;
+      body: string;
+      userId?: string;
+      url?: string;
+    }): Promise<boolean> => {
+      try {
+        const { data, error } = await supabase.functions.invoke('push-send', {
+          body: {
+            title: params.title,
+            body: params.body,
+            userId: params.userId ?? null,
+            url: params.url ?? null,
+          },
+        });
+        if (error) {
+          console.error('[push-send] erro:', error);
+          return false;
+        }
+        return data?.sent > 0;
+      } catch (err) {
+        console.error('[push-send] falha inesperada:', err);
+        return false;
+      }
+    },
+    [],
+  );
+
   return {
     isSupported,
     permission,
@@ -210,6 +239,7 @@ export const usePushNotifications = () => {
     subscribe,
     unsubscribe,
     sendLocalNotification,
+    sendPushNotification,
   };
 };
 
