@@ -1,6 +1,6 @@
 /* eslint-disable max-lines */
 import { useState, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { EmptyState } from "@/components/common/EmptyState";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Card, CardContent } from "@/components/ui/card";
@@ -26,6 +26,7 @@ import {
   BarChart3,
   Loader2,
   Pencil,
+  Trash2,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -55,6 +56,8 @@ import { useSorting } from "@/hooks/common/useSorting";
 import { useRealtime } from "@/hooks/data/useRealtime";
 import { PickupDialog } from "@/components/coletas/PickupDialog";
 import { PickupDetailsDialog } from "@/components/coletas/PickupDetailsDialog";
+import { ConfirmDialog } from "@/components/common/ConfirmDialog";
+import { toast } from "sonner";
 
 import { Coleta, ColetaStatus } from "@/components/coletas/types";
 import { QUERY_STALE_TIME } from "@/lib/queryConfig";
@@ -104,11 +107,29 @@ const statusConfig: Record<
 export default function Coletas() {
   const { exportToCSV } = useExport();
 
+  const qc = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedPickup, setSelectedPickup] = useState<Coleta | null>(null);
+  const [pickupToDelete, setPickupToDelete] = useState<Coleta | null>(null);
   const { playAction } = useAudioFeedback();
   const [activeView, setActiveView] = useState("grid");
+
+  const deleteColetaMut = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("coletas")
+        .update({ deleted_at: new Date().toISOString() })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["coletas-list"] });
+      setPickupToDelete(null);
+      toast.success("Coleta movida para lixeira!");
+    },
+    onError: (e) => toast.error("Erro ao remover coleta: " + e.message),
+  });
 
   const {
     data: coletas = [],
@@ -808,7 +829,7 @@ export default function Coletas() {
                             </div>
                           </div>
 
-                          <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-2">
                             <Badge
                               className={cn(
                                 "px-4 py-1.5 font-black uppercase tracking-widest text-[10px] rounded-xl shadow-sm",
@@ -817,7 +838,7 @@ export default function Coletas() {
                             >
                               {statusConfig[c.status]?.label}
                             </Badge>
-                            {/* Etapa 062: botão de edição direto do cartão */}
+                            {/* Etapa 062: edição direto do cartão */}
                             <Button
                               size="icon"
                               variant="ghost"
@@ -827,8 +848,21 @@ export default function Coletas() {
                                 setSelectedPickup(c);
                                 setIsDialogOpen(true);
                               }}
+                              title="Editar coleta"
                             >
-                              <Pencil className="w-4 h-4" />
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="h-8 w-8 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setPickupToDelete(c);
+                              }}
+                              title="Excluir coleta"
+                            >
+                              <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
                         </CardContent>
@@ -875,6 +909,17 @@ export default function Coletas() {
           onLastPage={pagination.lastPage}
         />
       </div>
+
+      <ConfirmDialog
+        open={!!pickupToDelete}
+        onOpenChange={(open) => !open && setPickupToDelete(null)}
+        title="Excluir coleta"
+        description={`Mover a coleta ${pickupToDelete?.numero_coleta ?? ""} para a lixeira? A exclusão é lógica e pode ser desfeita pelo banco de dados.`}
+        confirmText="Excluir"
+        type="danger"
+        onConfirm={() => { if (pickupToDelete) deleteColetaMut.mutate(pickupToDelete.id); }}
+        isLoading={deleteColetaMut.isPending}
+      />
 
       <PickupDialog
         open={isDialogOpen}
