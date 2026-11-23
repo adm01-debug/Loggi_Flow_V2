@@ -187,8 +187,8 @@
 - [x] **118** — Importação em massa: parar de condenar o lote inteiro por causa de uma linha — onda 4 — Média
 - [x] **119** — Importação em massa: mostrar e exportar as linhas que falharam — onda 4 — Média
 - [~] **120** — Importação em massa: decidir se o histórico deve sobreviver à tela — onda 4 — Média · **aguarda o dono**
-- [ ] **121** — VERIFICAR se o duplo clique cria registro duplicado (o achado é hipótese) — onda 4 — Média
-- [ ] **122** — Fechar os formulários que a etapa 121 encontrou desprotegidos — onda 4 — Média
+- [x] **121** — VERIFICAR se o duplo clique cria registro duplicado (o achado é hipótese) — onda 4 — Média
+- [x] **122** — Fechar os formulários que a etapa 121 encontrou desprotegidos — onda 4 — Média
 
 ### Onda 5
 
@@ -434,6 +434,54 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapas 121 e 122 (2026-11-23) - achado R-05
+
+**121 - verificação, sem mudança de código.** A lista saiu do grep que o próprio
+plano indica (`grep -rln "createMut\|createMutation" src/pages/ src/components/`) mais o
+`PickupDialog` que ele nomeia. Resultado: **1 formulário de criação desprotegido em 6**, o
+`AdminADR`. A hipótese R-05 não cai inteira, mas quase: o padrão `disabled={...isPending}` é
+de fato o da casa.
+
+| Tela / formulário | Evidência | Protegido? |
+| --- | --- | --- |
+| `PickupDialog` (criar coleta) | `src/components/coletas/PickupDialog.tsx:69` (`loading`) e `:468` (`disabled={loading}`) | sim |
+| `Envios` (criar entrega) | `src/pages/Envios.tsx:1117` (`disabled={!form.endereco_entrega \|\| createMut.isPending}`) | sim |
+| `Clientes` (criar) | `src/pages/Clientes.tsx:921-924` (+ `:927` com `Loader2`) | sim |
+| `Clientes` (editar) | `src/pages/Clientes.tsx:948-951` | sim |
+| `Fornecedores` (criar) | `src/pages/Fornecedores.tsx:780-783` | sim |
+| `Fornecedores` (editar) | `src/pages/Fornecedores.tsx:806-809` | sim |
+| `FretesInternos` (criar) | `src/pages/FretesInternos.tsx:702-703` | sim |
+| `FretesInternos` (editar) | `src/pages/FretesInternos.tsx:729-730` | sim |
+| `Ocorrencias` (criar) | `src/pages/Ocorrencias.tsx:788` (+ `:775` com `uploading`) | sim |
+| `Ocorrencias` (editar) | `src/pages/Ocorrencias.tsx:910` | sim |
+| **`AdminADR` (criar ADR)** | `src/pages/AdminADR.tsx:247` — só `disabled={!newAdr.title \|\| !newAdr.decision}`, sem `isPending` | **não** |
+| `Coletas` (excluir) | `src/components/common/ConfirmDialog.tsx:87` (`disabled={isLoading \|\| !canConfirm}`) | sim |
+| `Despachos` (despachar/confirmar) | `src/pages/Despachos.tsx:552` e `:604` via `ConfirmDialog` | sim |
+
+**NÃO VERIFICADO:** o teste de duplo clique no navegador com dado real e a consulta
+`select count(*), numero_coleta ... having count(*) > 1` que o plano pede. Não há staging: o teste
+criaria registro em produção. O que está acima é leitura de código, com arquivo e linha.
+O achado R-05 **não** foi corrigido em `docs/qa/03-ACHADOS.md` porque a hipótese não caiu —
+ela ficou parcialmente confirmada (1 tela real).
+
+**122 - fechado o único formulário desprotegido.** `src/pages/AdminADR.tsx:247` passou a
+`disabled={!newAdr.title || !newAdr.decision || createMutation.isPending}` e o ícone virou `Loader2`
+girando enquanto grava (`:251-255`), igual ao padrão de `src/pages/Envios.tsx:1119-1121`. O caminho de
+erro reabilita sozinho: `isPending` do React Query volta a `false` no `onError` (`:86-92`), então o
+usuário não fica travado depois de uma falha. Nenhum outro formulário foi tocado.
+
+**Achado novo registrado (não corrigido).** O botão de excluir ADR (`src/pages/AdminADR.tsx:283`,
+`onClick={() => deleteMutation.mutate(adr.id)}`) não tem confirmação nem `isPending` — clique
+duplo no ícone de lixeira dispara dois deletes. Fora do escopo da 122 (que só cobre formulário de
+envio nomeado pela 121); entra em "Próximos passos".
+
+**Verificação**
+- `grep -rn "disabled={.*isPending\|disabled={loading"` nos arquivos da tabela → todos os envios com o
+  `disabled` ligado ao estado da gravação
+- `npx tsc --noEmit` → 0
+- `npx eslint src/pages/AdminADR.tsx` → 0 erros, 0 avisos
+- `npx vitest run --coverage` → 41 arquivos, 326 testes, cobertura igual à baseline da `main`
 
 ### Registro - etapas 115 a 119 (2026-11-23) - achado R-07
 
