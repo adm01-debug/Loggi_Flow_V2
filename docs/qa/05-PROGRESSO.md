@@ -162,11 +162,11 @@
 - [x] **096** — Escrever o contrato no alto de `useRealtime` e varrer os chamadores — onda 2 — Crítica
 - [ ] **097** — `Despachos`: ler o erro da consulta — onda 2 — Alta
 - [ ] **098** — `Despachos`: parar de dizer "Fila Limpa" quando a consulta falhou — onda 2 — Crítica
-- [ ] **099** — `Envios`: erro com componente e botão de tentar de novo — onda 2 — Alta
-- [ ] **100** — `Clientes`: erro com componente e botão de tentar de novo — onda 2 — Alta
-- [ ] **101** — `Fornecedores`: erro com componente e botão de tentar de novo — onda 2 — Alta
-- [ ] **102** — `FretesInternos`: erro com componente e botão de tentar de novo — onda 2 — Alta
-- [ ] **103** — `Ocorrencias`: erro com componente e botão de tentar de novo — onda 2 — Alta
+- [x] **099** — `Envios`: erro com componente e botão de tentar de novo — onda 2 — Alta
+- [x] **100** — `Clientes`: erro com componente e botão de tentar de novo — onda 2 — Alta
+- [x] **101** — `Fornecedores`: erro com componente e botão de tentar de novo — onda 2 — Alta
+- [x] **102** — `FretesInternos`: erro com componente e botão de tentar de novo — onda 2 — Alta
+- [x] **103** — `Ocorrencias`: erro com componente e botão de tentar de novo — onda 2 — Alta
 
 ### Onda 4
 
@@ -434,6 +434,41 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapas 099-103 (2026-11-23) - achado R-01
+
+As cinco telas ja tinham um bloco `if (error)`, mas todas com o mesmo desenho ruim:
+um `AlertCircle` solto e `<p className="text-destructive">Erro: {error.message}</p>`, sem
+contexto e **sem botao de tentar de novo**. Quem batia em erro so podia recarregar a
+pagina inteira, o que perde filtro e estado da tela.
+
+Trocado pelo desenho de `Coletas.tsx:288-303`: `EmptyState variant="error"` com titulo
+especifico de cada tela e `action={{ label: "Tentar novamente", onClick: () => refetch() }}`.
+
+| Etapa | Tela | Titulo | `refetch` |
+| --- | --- | --- | --- |
+| 099 | Envios | Erro ao carregar entregas | ja existia |
+| 100 | Clientes | Erro ao carregar clientes | acrescentado |
+| 101 | Fornecedores | Erro ao carregar fornecedores | acrescentado |
+| 102 | FretesInternos | Erro ao carregar fretes internos | acrescentado |
+| 103 | Ocorrencias | Erro ao carregar ocorrencias | acrescentado |
+
+Quatro das cinco nao desestruturavam `refetch`, que e o que o botao precisa - por isso o
+botao nao podia ter sido ligado antes. O `AlertCircle` ficou orfao em quatro arquivos
+assim que o paragrafo saiu; removido do import do `lucide-react` para nao gastar o
+orcamento de avisos. Em `Ocorrencias` o icone continua em uso na lista de tipos de
+ocorrencia, entao o import ficou.
+
+Nada de `window.location.reload()` no botao, como o plano alerta: recarrega a aplicacao
+inteira e esconde que a falha era de uma consulta so.
+
+**Verificacao**
+- `npx tsc --noEmit` -> 0 erros
+- `npx eslint <as cinco>` -> 0 erros, 6 avisos (exatamente o baseline da main)
+- `npm run lint:budget` -> 77/86
+- `grep 'text-destructive">Erro'` nas cinco telas -> 0. Os 22 restantes estao em
+  `src/features/db-observability/` e no `ErrorBoundary`, contexto diferente, fora do escopo
+- Diff: 59 insercoes, 19 remocoes, sem churn (`--numstat` igual a `-w --numstat`)
 
 Uma linha por etapa concluída. A coluna **Evidência** é o que diferencia etapa concluída de etapa
 "deveria funcionar": cole o comando e o resultado, ou a consulta e o retorno.
