@@ -4,10 +4,10 @@
   "resumo": {
     "urls": 61,
     "telas": 61,
-    "itens_de_menu": 52,
-    "hooks_distintos": 145,
+    "itens_de_menu": 56,
+    "hooks_distintos": 152,
     "arquivos_em_pages": 78,
-    "problemas": 5
+    "problemas": 1
   },
   "urls": [
     {
@@ -548,7 +548,7 @@
           "grupo": "Visão Geral"
         }
       ],
-      "arquivos_lidos": 99,
+      "arquivos_lidos": 107,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -611,12 +611,20 @@
           "arquivo": "src/hooks/logistics/useLogisticsIntelligence.tsx"
         },
         {
+          "nome": "useMapIntelligence",
+          "arquivo": "src/hooks/logistics/useMapIntelligence.ts"
+        },
+        {
           "nome": "useMapWeatherSync",
           "arquivo": "src/hooks/logistics/useMapWeatherSync.ts"
         },
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -689,6 +697,10 @@
         {
           "nome": "useUserPreferences",
           "arquivo": "src/features/preferences/index.ts"
+        },
+        {
+          "nome": "useWebAuthn",
+          "arquivo": "src/hooks/auth/useWebAuthn.tsx"
         }
       ],
       "buckets": [],
@@ -714,7 +726,6 @@
         "entregas",
         "error_events",
         "fornecedores",
-        "integracoes_bitrix",
         "nexus_tactical_logs",
         "notifications",
         "ocorrencias",
@@ -730,7 +741,9 @@
         "user_levels",
         "user_onboarding",
         "user_roles",
-        "v_prediction_accuracy"
+        "v_prediction_accuracy",
+        "webauthn_challenges",
+        "webauthn_credentials"
       ],
       "imports_quebrados": []
     },
@@ -738,8 +751,14 @@
       "id": "/admin/adr",
       "componente": "AdminADR",
       "arquivo": "src/pages/AdminADR.tsx",
-      "menu": [],
-      "arquivos_lidos": 59,
+      "menu": [
+        {
+          "rotulo": "ADR",
+          "secao": "adminItems",
+          "grupo": null
+        }
+      ],
+      "arquivos_lidos": 62,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -764,6 +783,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -855,7 +878,7 @@
           "grupo": null
         }
       ],
-      "arquivos_lidos": 139,
+      "arquivos_lidos": 141,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -980,6 +1003,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -1181,8 +1208,14 @@
       "id": "/admin/quality-gate",
       "componente": "AdminQualityGate",
       "arquivo": "src/pages/admin/QualityGate.tsx",
-      "menu": [],
-      "arquivos_lidos": 59,
+      "menu": [
+        {
+          "rotulo": "Quality Gate",
+          "secao": "adminItems",
+          "grupo": null
+        }
+      ],
+      "arquivos_lidos": 61,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -1207,6 +1240,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -1290,8 +1327,14 @@
       "id": "/admin/telemetria",
       "componente": "AdminTelemetria",
       "arquivo": "src/pages/AdminTelemetria.tsx",
-      "menu": [],
-      "arquivos_lidos": 68,
+      "menu": [
+        {
+          "rotulo": "Telemetria",
+          "secao": "adminItems",
+          "grupo": null
+        }
+      ],
+      "arquivos_lidos": 73,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -1306,6 +1349,10 @@
           "arquivo": "src/hooks/gamification/useGamification.tsx"
         },
         {
+          "nome": "useGlobalHealthScore",
+          "arquivo": "src/features/db-observability/hooks/useGlobalHealthScore.ts"
+        },
+        {
           "nome": "useGlobalSearch",
           "arquivo": "src/hooks/common/useGlobalSearch.tsx"
         },
@@ -1316,6 +1363,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -1340,6 +1391,18 @@
         {
           "nome": "useQRScanner",
           "arquivo": "src/hooks/ui/useQRScanner.tsx"
+        },
+        {
+          "nome": "useRemediationActions",
+          "arquivo": "src/features/db-observability/hooks/useRemediationActions.ts"
+        },
+        {
+          "nome": "useRemediationMttr",
+          "arquivo": "src/features/db-observability/hooks/useRemediationMttr.ts"
+        },
+        {
+          "nome": "useRemediationSuggestions",
+          "arquivo": "src/features/db-observability/hooks/useRemediationSuggestions.ts"
         },
         {
           "nome": "useSLANotifications",
@@ -1373,7 +1436,9 @@
         "nexus-auto-healing"
       ],
       "rpcs": [
-        "add_user_xp"
+        "add_user_xp",
+        "get_global_health_score_fast",
+        "get_remediation_mttr_fast"
       ],
       "tabelas": [
         "achievements",
@@ -1387,6 +1452,7 @@
         "notifications",
         "profiles",
         "query_telemetry",
+        "remediation_actions",
         "security_events",
         "telemetry_logs",
         "transportadoras",
@@ -1408,7 +1474,7 @@
           "grupo": "Financeiro"
         }
       ],
-      "arquivos_lidos": 68,
+      "arquivos_lidos": 71,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -1441,6 +1507,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -1545,7 +1615,7 @@
           "grupo": "Visão Geral"
         }
       ],
-      "arquivos_lidos": 64,
+      "arquivos_lidos": 67,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -1578,6 +1648,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -1675,7 +1749,7 @@
           "grupo": null
         }
       ],
-      "arquivos_lidos": 62,
+      "arquivos_lidos": 64,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -1704,6 +1778,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -1757,8 +1835,24 @@
       "buckets": [],
       "edges": [
         "ai-logistics-assistant",
+        "carrier-webhook-receiver",
+        "check-password-breach",
+        "geocode-address",
+        "get-mapbox-token",
+        "get-weather-data",
         "health-check",
-        "nexus-auto-healing"
+        "lalamove-api",
+        "lgpd-erase-user",
+        "melhor-envio-api",
+        "nexus-auto-healing",
+        "normalize-freight-response",
+        "predict-delays",
+        "resend-email",
+        "rodonaves-api",
+        "secure-store",
+        "send-password-reset",
+        "smart-carrier-selection",
+        "webhook-status"
       ],
       "rpcs": [
         "add_user_xp"
@@ -1794,7 +1888,7 @@
           "grupo": null
         }
       ],
-      "arquivos_lidos": 60,
+      "arquivos_lidos": 62,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -1819,6 +1913,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -1916,7 +2014,7 @@
           "grupo": null
         }
       ],
-      "arquivos_lidos": 74,
+      "arquivos_lidos": 76,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -1953,6 +2051,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -2058,7 +2160,7 @@
       "componente": "Auth",
       "arquivo": "src/pages/Auth.tsx",
       "menu": [],
-      "arquivos_lidos": 12,
+      "arquivos_lidos": 15,
       "hooks": [
         {
           "nome": "useAuth",
@@ -2067,6 +2169,10 @@
         {
           "nome": "useDebounce",
           "arquivo": "src/hooks/common/useDebounce.ts"
+        },
+        {
+          "nome": "useMFA",
+          "arquivo": "src/hooks/auth/useMFA.ts"
         },
         {
           "nome": "useToast",
@@ -2083,6 +2189,7 @@
       "tabelas": [
         "password_reset_requests",
         "profiles",
+        "security_events",
         "user_levels",
         "user_roles"
       ],
@@ -2099,7 +2206,7 @@
           "grupo": "Cadastros"
         }
       ],
-      "arquivos_lidos": 62,
+      "arquivos_lidos": 64,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -2128,6 +2235,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -2219,7 +2330,7 @@
           "grupo": "Rede Logística"
         }
       ],
-      "arquivos_lidos": 59,
+      "arquivos_lidos": 61,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -2244,6 +2355,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -2337,7 +2452,7 @@
           "grupo": "Visão Geral"
         }
       ],
-      "arquivos_lidos": 60,
+      "arquivos_lidos": 63,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -2366,6 +2481,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -2456,7 +2575,7 @@
           "grupo": "Rede Logística"
         }
       ],
-      "arquivos_lidos": 66,
+      "arquivos_lidos": 68,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -2485,6 +2604,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -2588,7 +2711,7 @@
           "grupo": "Cadastros"
         }
       ],
-      "arquivos_lidos": 74,
+      "arquivos_lidos": 76,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -2617,6 +2740,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -2724,7 +2851,7 @@
           "grupo": "Operações"
         }
       ],
-      "arquivos_lidos": 74,
+      "arquivos_lidos": 80,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -2737,6 +2864,14 @@
         {
           "nome": "useAuth",
           "arquivo": "src/hooks/auth/useAuth.tsx"
+        },
+        {
+          "nome": "useBusinessRuleEngine",
+          "arquivo": "src/hooks/logistics/useBusinessRuleEngine.tsx"
+        },
+        {
+          "nome": "useBusinessRules",
+          "arquivo": "src/hooks/logistics/useBusinessRules.tsx"
         },
         {
           "nome": "useExport",
@@ -2761,6 +2896,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -2793,6 +2932,10 @@
         {
           "nome": "useRealtime",
           "arquivo": "src/hooks/data/useRealtime.tsx"
+        },
+        {
+          "nome": "useRuleTriggers",
+          "arquivo": "src/hooks/logistics/useRuleTriggers.ts"
         },
         {
           "nome": "useSLANotifications",
@@ -2835,13 +2978,16 @@
       "tabelas": [
         "achievements",
         "audit_logs",
+        "business_rules",
         "clientes",
         "coletas",
         "entregas",
         "error_events",
         "fornecedores",
         "notifications",
+        "ocorrencias",
         "profiles",
+        "rule_execution_logs",
         "security_events",
         "telemetry_logs",
         "transportadoras",
@@ -2863,7 +3009,7 @@
           "grupo": "Financeiro"
         }
       ],
-      "arquivos_lidos": 155,
+      "arquivos_lidos": 160,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -2872,6 +3018,10 @@
         {
           "nome": "useAuth",
           "arquivo": "src/hooks/auth/useAuth.tsx"
+        },
+        {
+          "nome": "useBusinessRuleEngine",
+          "arquivo": "src/hooks/logistics/useBusinessRuleEngine.tsx"
         },
         {
           "nome": "useBusinessRules",
@@ -2912,6 +3062,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -2978,7 +3132,6 @@
         "evolution-whatsapp",
         "external-db-bridge",
         "geocode-address",
-        "get-mapbox-token",
         "health-check",
         "lalamove-api",
         "lalamove-tracking",
@@ -3066,7 +3219,7 @@
           "grupo": "Cadastros"
         }
       ],
-      "arquivos_lidos": 61,
+      "arquivos_lidos": 63,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -3091,6 +3244,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -3182,7 +3339,7 @@
           "grupo": "Rede Logística"
         }
       ],
-      "arquivos_lidos": 61,
+      "arquivos_lidos": 63,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -3207,6 +3364,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -3301,7 +3462,7 @@
           "grupo": null
         }
       ],
-      "arquivos_lidos": 154,
+      "arquivos_lidos": 159,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -3310,6 +3471,10 @@
         {
           "nome": "useAuth",
           "arquivo": "src/hooks/auth/useAuth.tsx"
+        },
+        {
+          "nome": "useBusinessRuleEngine",
+          "arquivo": "src/hooks/logistics/useBusinessRuleEngine.tsx"
         },
         {
           "nome": "useBusinessRules",
@@ -3356,6 +3521,10 @@
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
         },
         {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
+        },
+        {
           "nome": "useNotificationPreferences",
           "arquivo": "src/hooks/notifications/useNotificationPreferences.tsx"
         },
@@ -3392,6 +3561,10 @@
           "arquivo": "src/hooks/logistics/useSLANotifications.tsx"
         },
         {
+          "nome": "useSessionTimeout",
+          "arquivo": "src/hooks/auth/useSessionTimeout.ts"
+        },
+        {
           "nome": "useSmartAlerts",
           "arquivo": "src/hooks/logistics/useSmartAlerts.tsx"
         },
@@ -3424,7 +3597,6 @@
         "evolution-whatsapp",
         "external-db-bridge",
         "geocode-address",
-        "get-mapbox-token",
         "health-check",
         "lalamove-api",
         "lalamove-tracking",
@@ -3512,7 +3684,7 @@
           "grupo": null
         }
       ],
-      "arquivos_lidos": 65,
+      "arquivos_lidos": 68,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -3541,6 +3713,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -3639,7 +3815,7 @@
           "grupo": "Rede Logística"
         }
       ],
-      "arquivos_lidos": 176,
+      "arquivos_lidos": 181,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -3648,6 +3824,10 @@
         {
           "nome": "useAuth",
           "arquivo": "src/hooks/auth/useAuth.tsx"
+        },
+        {
+          "nome": "useBusinessRuleEngine",
+          "arquivo": "src/hooks/logistics/useBusinessRuleEngine.tsx"
         },
         {
           "nome": "useBusinessRules",
@@ -3696,6 +3876,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -3782,7 +3966,6 @@
         "evolution-whatsapp",
         "external-db-bridge",
         "geocode-address",
-        "get-mapbox-token",
         "health-check",
         "lalamove-api",
         "lalamove-tracking",
@@ -3870,7 +4053,7 @@
           "grupo": "Rede Logística"
         }
       ],
-      "arquivos_lidos": 176,
+      "arquivos_lidos": 181,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -3879,6 +4062,10 @@
         {
           "nome": "useAuth",
           "arquivo": "src/hooks/auth/useAuth.tsx"
+        },
+        {
+          "nome": "useBusinessRuleEngine",
+          "arquivo": "src/hooks/logistics/useBusinessRuleEngine.tsx"
         },
         {
           "nome": "useBusinessRules",
@@ -3931,6 +4118,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -4017,7 +4208,6 @@
         "evolution-whatsapp",
         "external-db-bridge",
         "geocode-address",
-        "get-mapbox-token",
         "health-check",
         "lalamove-api",
         "lalamove-tracking",
@@ -4105,7 +4295,7 @@
           "grupo": "Financeiro"
         }
       ],
-      "arquivos_lidos": 62,
+      "arquivos_lidos": 65,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -4134,6 +4324,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -4228,7 +4422,7 @@
           "grupo": "Rede Logística"
         }
       ],
-      "arquivos_lidos": 155,
+      "arquivos_lidos": 159,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -4237,6 +4431,10 @@
         {
           "nome": "useAuth",
           "arquivo": "src/hooks/auth/useAuth.tsx"
+        },
+        {
+          "nome": "useBusinessRuleEngine",
+          "arquivo": "src/hooks/logistics/useBusinessRuleEngine.tsx"
         },
         {
           "nome": "useBusinessRules",
@@ -4277,6 +4475,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -4343,7 +4545,6 @@
         "evolution-whatsapp",
         "external-db-bridge",
         "geocode-address",
-        "get-mapbox-token",
         "health-check",
         "lalamove-api",
         "lalamove-tracking",
@@ -4432,7 +4633,7 @@
           "grupo": "Visão Geral"
         }
       ],
-      "arquivos_lidos": 64,
+      "arquivos_lidos": 69,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -4467,6 +4668,10 @@
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
         },
         {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
+        },
+        {
           "nome": "useNotifications",
           "arquivo": "src/hooks/notifications/useNotifications.tsx"
         },
@@ -4489,6 +4694,10 @@
         {
           "nome": "useQRScanner",
           "arquivo": "src/hooks/ui/useQRScanner.tsx"
+        },
+        {
+          "nome": "useRecentAlerts",
+          "arquivo": "src/hooks/analytics/useDashboardMetrics.tsx"
         },
         {
           "nome": "useSLANotifications",
@@ -4523,13 +4732,16 @@
       ],
       "rpcs": [
         "add_user_xp",
+        "get_dashboard_metrics",
         "get_monthly_analytics"
       ],
       "tabelas": [
         "achievements",
+        "ai_delay_predictions",
         "audit_logs",
         "clientes",
         "coletas",
+        "cotacoes_multicanal",
         "entregas",
         "error_events",
         "fornecedores",
@@ -4537,6 +4749,7 @@
         "ocorrencias",
         "profiles",
         "security_events",
+        "sla_alerts",
         "telemetry_logs",
         "transportadoras",
         "user_achievements",
@@ -4557,7 +4770,7 @@
           "grupo": "Operações"
         }
       ],
-      "arquivos_lidos": 70,
+      "arquivos_lidos": 76,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -4570,6 +4783,14 @@
         {
           "nome": "useAuth",
           "arquivo": "src/hooks/auth/useAuth.tsx"
+        },
+        {
+          "nome": "useBusinessRuleEngine",
+          "arquivo": "src/hooks/logistics/useBusinessRuleEngine.tsx"
+        },
+        {
+          "nome": "useBusinessRules",
+          "arquivo": "src/hooks/logistics/useBusinessRules.tsx"
         },
         {
           "nome": "useFilters",
@@ -4590,6 +4811,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -4620,6 +4845,10 @@
           "arquivo": "src/hooks/data/useRealtime.tsx"
         },
         {
+          "nome": "useRuleTriggers",
+          "arquivo": "src/hooks/logistics/useRuleTriggers.ts"
+        },
+        {
           "nome": "useSLANotifications",
           "arquivo": "src/hooks/logistics/useSLANotifications.tsx"
         },
@@ -4645,6 +4874,7 @@
         }
       ],
       "buckets": [
+        "avatars",
         "documents"
       ],
       "edges": [
@@ -4659,6 +4889,7 @@
       "tabelas": [
         "achievements",
         "audit_logs",
+        "business_rules",
         "clientes",
         "coletas",
         "delivery_receipt_audit",
@@ -4667,7 +4898,9 @@
         "fornecedores",
         "kanban_history",
         "notifications",
+        "ocorrencias",
         "profiles",
+        "rule_execution_logs",
         "security_events",
         "telemetry_logs",
         "transportadoras",
@@ -4689,7 +4922,7 @@
           "grupo": "Operações"
         }
       ],
-      "arquivos_lidos": 78,
+      "arquivos_lidos": 83,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -4702,6 +4935,14 @@
         {
           "nome": "useAuth",
           "arquivo": "src/hooks/auth/useAuth.tsx"
+        },
+        {
+          "nome": "useBusinessRuleEngine",
+          "arquivo": "src/hooks/logistics/useBusinessRuleEngine.tsx"
+        },
+        {
+          "nome": "useBusinessRules",
+          "arquivo": "src/hooks/logistics/useBusinessRules.tsx"
         },
         {
           "nome": "useDocumentUpload",
@@ -4726,6 +4967,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -4762,6 +5007,10 @@
         {
           "nome": "useRodonavesTracking",
           "arquivo": "src/hooks/logistics/useRodonavesTracking.tsx"
+        },
+        {
+          "nome": "useRuleTriggers",
+          "arquivo": "src/hooks/logistics/useRuleTriggers.ts"
         },
         {
           "nome": "useSLANotifications",
@@ -4809,13 +5058,16 @@
       "tabelas": [
         "achievements",
         "audit_logs",
+        "business_rules",
         "clientes",
         "coletas",
         "entregas",
         "error_events",
         "fornecedores",
         "notifications",
+        "ocorrencias",
         "profiles",
+        "rule_execution_logs",
         "security_events",
         "telemetry_logs",
         "transportadoras",
@@ -4837,7 +5089,7 @@
           "grupo": "Visão Geral"
         }
       ],
-      "arquivos_lidos": 4,
+      "arquivos_lidos": 7,
       "hooks": [
         {
           "nome": "useAuth",
@@ -4869,7 +5121,7 @@
           "grupo": "Cadastros"
         }
       ],
-      "arquivos_lidos": 69,
+      "arquivos_lidos": 71,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -4898,6 +5150,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -5000,7 +5256,7 @@
           "grupo": "Operações"
         }
       ],
-      "arquivos_lidos": 72,
+      "arquivos_lidos": 74,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -5033,6 +5289,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -5136,7 +5396,7 @@
           "grupo": null
         }
       ],
-      "arquivos_lidos": 59,
+      "arquivos_lidos": 62,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -5161,6 +5421,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -5251,7 +5515,7 @@
           "grupo": "Operações"
         }
       ],
-      "arquivos_lidos": 71,
+      "arquivos_lidos": 73,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -5292,6 +5556,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -5391,7 +5659,7 @@
           "grupo": "Rede Logística"
         }
       ],
-      "arquivos_lidos": 81,
+      "arquivos_lidos": 83,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -5420,6 +5688,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -5532,7 +5804,7 @@
           "grupo": "Cadastros"
         }
       ],
-      "arquivos_lidos": 63,
+      "arquivos_lidos": 65,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -5557,6 +5829,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -5647,7 +5923,7 @@
           "grupo": "Financeiro"
         }
       ],
-      "arquivos_lidos": 171,
+      "arquivos_lidos": 176,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -5656,6 +5932,10 @@
         {
           "nome": "useAuth",
           "arquivo": "src/hooks/auth/useAuth.tsx"
+        },
+        {
+          "nome": "useBusinessRuleEngine",
+          "arquivo": "src/hooks/logistics/useBusinessRuleEngine.tsx"
         },
         {
           "nome": "useBusinessRules",
@@ -5700,6 +5980,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -5782,7 +6066,6 @@
         "evolution-whatsapp",
         "external-db-bridge",
         "geocode-address",
-        "get-mapbox-token",
         "health-check",
         "lalamove-api",
         "lalamove-tracking",
@@ -5870,7 +6153,7 @@
           "grupo": "Operações"
         }
       ],
-      "arquivos_lidos": 62,
+      "arquivos_lidos": 69,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -5883,6 +6166,14 @@
         {
           "nome": "useAuth",
           "arquivo": "src/hooks/auth/useAuth.tsx"
+        },
+        {
+          "nome": "useBusinessRuleEngine",
+          "arquivo": "src/hooks/logistics/useBusinessRuleEngine.tsx"
+        },
+        {
+          "nome": "useBusinessRules",
+          "arquivo": "src/hooks/logistics/useBusinessRules.tsx"
         },
         {
           "nome": "useGamification",
@@ -5899,6 +6190,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -5929,6 +6224,10 @@
           "arquivo": "src/hooks/data/useRealtime.tsx"
         },
         {
+          "nome": "useRuleTriggers",
+          "arquivo": "src/hooks/logistics/useRuleTriggers.ts"
+        },
+        {
           "nome": "useSLANotifications",
           "arquivo": "src/hooks/logistics/useSLANotifications.tsx"
         },
@@ -5954,6 +6253,7 @@
         }
       ],
       "buckets": [
+        "avatars",
         "documents"
       ],
       "edges": [
@@ -5968,6 +6268,7 @@
       "tabelas": [
         "achievements",
         "audit_logs",
+        "business_rules",
         "clientes",
         "coletas",
         "delivery_receipt_audit",
@@ -5975,7 +6276,9 @@
         "error_events",
         "fornecedores",
         "notifications",
+        "ocorrencias",
         "profiles",
+        "rule_execution_logs",
         "security_events",
         "telemetry_logs",
         "transportadoras",
@@ -5997,7 +6300,7 @@
           "grupo": "Operações"
         }
       ],
-      "arquivos_lidos": 151,
+      "arquivos_lidos": 156,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -6006,6 +6309,10 @@
         {
           "nome": "useAuth",
           "arquivo": "src/hooks/auth/useAuth.tsx"
+        },
+        {
+          "nome": "useBusinessRuleEngine",
+          "arquivo": "src/hooks/logistics/useBusinessRuleEngine.tsx"
         },
         {
           "nome": "useBusinessRules",
@@ -6022,6 +6329,10 @@
         {
           "nome": "useExecutiveMetrics",
           "arquivo": "src/hooks/analytics/useExecutiveMetrics.tsx"
+        },
+        {
+          "nome": "useExport",
+          "arquivo": "src/hooks/common/useExport.tsx"
         },
         {
           "nome": "useFreightQuotation",
@@ -6046,6 +6357,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -6112,7 +6427,6 @@
         "evolution-whatsapp",
         "external-db-bridge",
         "geocode-address",
-        "get-mapbox-token",
         "health-check",
         "lalamove-api",
         "lalamove-tracking",
@@ -6200,7 +6514,7 @@
           "grupo": null
         }
       ],
-      "arquivos_lidos": 67,
+      "arquivos_lidos": 70,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -6229,6 +6543,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -6334,7 +6652,7 @@
           "grupo": "Rede Logística"
         }
       ],
-      "arquivos_lidos": 66,
+      "arquivos_lidos": 72,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -6371,6 +6689,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -6425,7 +6747,6 @@
       "edges": [
         "ai-logistics-assistant",
         "geocode-address",
-        "get-mapbox-token",
         "health-check",
         "nexus-auto-healing"
       ],
@@ -6466,7 +6787,7 @@
           "grupo": "Rede Logística"
         }
       ],
-      "arquivos_lidos": 89,
+      "arquivos_lidos": 91,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -6503,6 +6824,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -6598,7 +6923,7 @@
           "grupo": null
         }
       ],
-      "arquivos_lidos": 67,
+      "arquivos_lidos": 71,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -6629,6 +6954,10 @@
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
         },
         {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
+        },
+        {
           "nome": "useNotifications",
           "arquivo": "src/hooks/notifications/useNotifications.tsx"
         },
@@ -6651,6 +6980,10 @@
         {
           "nome": "usePrefetch",
           "arquivo": "src/hooks/data/usePrefetch.ts"
+        },
+        {
+          "nome": "usePushNotifications",
+          "arquivo": "src/hooks/notifications/usePushNotifications.tsx"
         },
         {
           "nome": "useQRScanner",
@@ -6708,6 +7041,7 @@
         "fornecedores",
         "notifications",
         "profiles",
+        "push_subscriptions",
         "security_events",
         "telemetry_logs",
         "transportadoras",
@@ -6729,7 +7063,7 @@
           "grupo": "Operações"
         }
       ],
-      "arquivos_lidos": 73,
+      "arquivos_lidos": 75,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -6770,6 +7104,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -6874,7 +7212,7 @@
           "grupo": "Visão Geral"
         }
       ],
-      "arquivos_lidos": 60,
+      "arquivos_lidos": 62,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -6899,6 +7237,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -6989,7 +7331,7 @@
           "grupo": "Visão Geral"
         }
       ],
-      "arquivos_lidos": 29,
+      "arquivos_lidos": 30,
       "hooks": [
         {
           "nome": "useAccuracyMetaAudit",
@@ -7064,7 +7406,7 @@
       "componente": "Profile",
       "arquivo": "src/pages/Profile.tsx",
       "menu": [],
-      "arquivos_lidos": 61,
+      "arquivos_lidos": 64,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -7097,6 +7439,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -7187,7 +7533,7 @@
           "grupo": null
         }
       ],
-      "arquivos_lidos": 67,
+      "arquivos_lidos": 70,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -7216,6 +7562,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -7285,7 +7635,8 @@
         "nexus-auto-healing"
       ],
       "rpcs": [
-        "add_user_xp"
+        "add_user_xp",
+        "get_leaderboard"
       ],
       "tabelas": [
         "achievements",
@@ -7318,7 +7669,7 @@
           "grupo": "Rede Logística"
         }
       ],
-      "arquivos_lidos": 61,
+      "arquivos_lidos": 64,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -7347,6 +7698,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -7438,7 +7793,7 @@
       "componente": "RastreamentoRealTime",
       "arquivo": "src/pages/RastreamentoRealTime.tsx",
       "menu": [],
-      "arquivos_lidos": 66,
+      "arquivos_lidos": 71,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -7471,6 +7826,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -7537,7 +7896,6 @@
       "edges": [
         "ai-logistics-assistant",
         "geocode-address",
-        "get-mapbox-token",
         "health-check",
         "nexus-auto-healing",
         "predict-delays"
@@ -7584,8 +7942,14 @@
       "id": "/rate-limit",
       "componente": "RateLimitDashboard",
       "arquivo": "src/pages/RateLimitDashboard.tsx",
-      "menu": [],
-      "arquivos_lidos": 61,
+      "menu": [
+        {
+          "rotulo": "Rate Limit",
+          "secao": "adminItems",
+          "grupo": null
+        }
+      ],
+      "arquivos_lidos": 63,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -7610,6 +7974,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -7706,7 +8074,7 @@
           "grupo": "Cadastros"
         }
       ],
-      "arquivos_lidos": 60,
+      "arquivos_lidos": 63,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -7731,6 +8099,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -7821,7 +8193,7 @@
           "grupo": "Cadastros"
         }
       ],
-      "arquivos_lidos": 65,
+      "arquivos_lidos": 68,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -7858,6 +8230,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -7973,7 +8349,7 @@
           "grupo": "Rede Logística"
         }
       ],
-      "arquivos_lidos": 66,
+      "arquivos_lidos": 69,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -7998,6 +8374,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -8093,7 +8473,7 @@
           "grupo": null
         }
       ],
-      "arquivos_lidos": 81,
+      "arquivos_lidos": 83,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -8122,6 +8502,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -8243,7 +8627,7 @@
           "grupo": "Visão Geral"
         }
       ],
-      "arquivos_lidos": 62,
+      "arquivos_lidos": 65,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -8268,6 +8652,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -8368,7 +8756,7 @@
           "grupo": "Rede Logística"
         }
       ],
-      "arquivos_lidos": 71,
+      "arquivos_lidos": 74,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -8401,6 +8789,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -8505,7 +8897,7 @@
           "grupo": null
         }
       ],
-      "arquivos_lidos": 61,
+      "arquivos_lidos": 63,
       "hooks": [
         {
           "nome": "useAchievementNotifications",
@@ -8534,6 +8926,10 @@
         {
           "nome": "useNavigationHistory",
           "arquivo": "src/hooks/common/useNavigationHistory.tsx"
+        },
+        {
+          "nome": "useNexusHealth",
+          "arquivo": "src/hooks/system/useNexusHealth.ts"
         },
         {
           "nome": "useNotifications",
@@ -8825,16 +9221,36 @@
         "/painel-sla"
       ]
     },
-    "useBusinessRules": {
-      "arquivo": "src/hooks/logistics/useBusinessRules.tsx",
+    "useBusinessRuleEngine": {
+      "arquivo": "src/hooks/logistics/useBusinessRuleEngine.tsx",
       "telas": [
-        "/automacao-regras",
+        "/coletas",
         "/conciliacao",
         "/configuracoes",
         "/cotacao-frete",
         "/cotacao-multicanal",
         "/dashboard-cotacoes",
+        "/despachos",
+        "/envios",
         "/inteligencia-frete",
+        "/kanban-entregas",
+        "/logistica-reversa"
+      ]
+    },
+    "useBusinessRules": {
+      "arquivo": "src/hooks/logistics/useBusinessRules.tsx",
+      "telas": [
+        "/automacao-regras",
+        "/coletas",
+        "/conciliacao",
+        "/configuracoes",
+        "/cotacao-frete",
+        "/cotacao-multicanal",
+        "/dashboard-cotacoes",
+        "/despachos",
+        "/envios",
+        "/inteligencia-frete",
+        "/kanban-entregas",
         "/logistica-reversa"
       ]
     },
@@ -9039,6 +9455,7 @@
         "/audit-trail",
         "/coletas",
         "/cotacao-frete",
+        "/logistica-reversa",
         "/melhor-envio",
         "/relatorios",
         "/transportadoras"
@@ -9174,7 +9591,8 @@
     "useGlobalHealthScore": {
       "arquivo": "src/features/db-observability/hooks/useGlobalHealthScore.ts",
       "telas": [
-        "/admin/db-health"
+        "/admin/db-health",
+        "/admin/telemetria"
       ]
     },
     "useGlobalSearch": {
@@ -9420,10 +9838,22 @@
         "/admin/db-health"
       ]
     },
+    "useMFA": {
+      "arquivo": "src/hooks/auth/useMFA.ts",
+      "telas": [
+        "/auth"
+      ]
+    },
     "useMaintenanceWindows": {
       "arquivo": "src/features/db-observability/hooks/useMaintenanceWindows.ts",
       "telas": [
         "/admin/db-health"
+      ]
+    },
+    "useMapIntelligence": {
+      "arquivo": "src/hooks/logistics/useMapIntelligence.ts",
+      "telas": [
+        "/"
       ]
     },
     "useMapWeatherSync": {
@@ -9459,6 +9889,66 @@
     },
     "useNavigationHistory": {
       "arquivo": "src/hooks/common/useNavigationHistory.tsx",
+      "telas": [
+        "/",
+        "/admin/adr",
+        "/admin/db-health",
+        "/admin/quality-gate",
+        "/admin/telemetria",
+        "/alertas-custo",
+        "/analytics",
+        "/api-docs",
+        "/aprovacao-reset-senha",
+        "/audit-trail",
+        "/automacao-regras",
+        "/bitrix24",
+        "/calendario",
+        "/central-rastreamento",
+        "/clientes",
+        "/coletas",
+        "/conciliacao",
+        "/conciliacao-automatica",
+        "/config-frete",
+        "/configuracoes",
+        "/conquistas",
+        "/cotacao-frete",
+        "/cotacao-multicanal",
+        "/custos",
+        "/dashboard-cotacoes",
+        "/dashboard-executivo",
+        "/despachos",
+        "/envios",
+        "/fornecedores",
+        "/fretes-internos",
+        "/gerenciamento-usuarios",
+        "/gestao-box",
+        "/gestao-rodonaves",
+        "/importacao-massa",
+        "/inteligencia-frete",
+        "/kanban-entregas",
+        "/logistica-reversa",
+        "/loja",
+        "/mapa-rotas",
+        "/melhor-envio",
+        "/notificacoes",
+        "/ocorrencias",
+        "/painel-otif",
+        "/perfil",
+        "/ranking",
+        "/rastreamento-motorista",
+        "/rastreamento/:id",
+        "/rate-limit",
+        "/relatorio-pdf",
+        "/relatorios",
+        "/rotas-transportadoras",
+        "/seguranca",
+        "/sla-dashboard",
+        "/transportadoras",
+        "/webhooks"
+      ]
+    },
+    "useNexusHealth": {
+      "arquivo": "src/hooks/system/useNexusHealth.ts",
       "telas": [
         "/",
         "/admin/adr",
@@ -9871,6 +10361,12 @@
         "/admin/db-health"
       ]
     },
+    "usePushNotifications": {
+      "arquivo": "src/hooks/notifications/usePushNotifications.tsx",
+      "telas": [
+        "/notificacoes"
+      ]
+    },
     "useQRScanner": {
       "arquivo": "src/hooks/ui/useQRScanner.tsx",
       "telas": [
@@ -9984,7 +10480,8 @@
     "useRecentAlerts": {
       "arquivo": "src/hooks/analytics/useDashboardMetrics.tsx",
       "telas": [
-        "/"
+        "/",
+        "/dashboard-executivo"
       ]
     },
     "useRecordHistory": {
@@ -10002,19 +10499,22 @@
     "useRemediationActions": {
       "arquivo": "src/features/db-observability/hooks/useRemediationActions.ts",
       "telas": [
-        "/admin/db-health"
+        "/admin/db-health",
+        "/admin/telemetria"
       ]
     },
     "useRemediationMttr": {
       "arquivo": "src/features/db-observability/hooks/useRemediationMttr.ts",
       "telas": [
-        "/admin/db-health"
+        "/admin/db-health",
+        "/admin/telemetria"
       ]
     },
     "useRemediationSuggestions": {
       "arquivo": "src/features/db-observability/hooks/useRemediationSuggestions.ts",
       "telas": [
-        "/admin/db-health"
+        "/admin/db-health",
+        "/admin/telemetria"
       ]
     },
     "useReplicationStatus": {
@@ -10056,6 +10556,15 @@
       "arquivo": "src/hooks/logistics/useRootCauseAnalysis.ts",
       "telas": [
         "/painel-sla"
+      ]
+    },
+    "useRuleTriggers": {
+      "arquivo": "src/hooks/logistics/useRuleTriggers.ts",
+      "telas": [
+        "/coletas",
+        "/despachos",
+        "/envios",
+        "/kanban-entregas"
       ]
     },
     "useSLAMetrics": {
@@ -10177,6 +10686,12 @@
       "arquivo": "src/features/db-observability/hooks/useSeqScanHotspots.ts",
       "telas": [
         "/admin/db-health"
+      ]
+    },
+    "useSessionTimeout": {
+      "arquivo": "src/hooks/auth/useSessionTimeout.ts",
+      "telas": [
+        "/configuracoes"
       ]
     },
     "useSloDaily": {
@@ -10609,6 +11124,7 @@
     "useWebAuthn": {
       "arquivo": "src/hooks/auth/useWebAuthn.tsx",
       "telas": [
+        "/",
         "/seguranca"
       ]
     },
@@ -10622,27 +11138,7 @@
   "problemas": [
     {
       "tipo": "rota_sem_menu",
-      "id": "/admin/adr",
-      "detalhe": "sem item em src/components/layout/AppSidebar.tsx: so se chega por link direto"
-    },
-    {
-      "tipo": "rota_sem_menu",
-      "id": "/admin/quality-gate",
-      "detalhe": "sem item em src/components/layout/AppSidebar.tsx: so se chega por link direto"
-    },
-    {
-      "tipo": "rota_sem_menu",
-      "id": "/admin/telemetria",
-      "detalhe": "sem item em src/components/layout/AppSidebar.tsx: so se chega por link direto"
-    },
-    {
-      "tipo": "rota_sem_menu",
       "id": "/perfil",
-      "detalhe": "sem item em src/components/layout/AppSidebar.tsx: so se chega por link direto"
-    },
-    {
-      "tipo": "rota_sem_menu",
-      "id": "/rate-limit",
       "detalhe": "sem item em src/components/layout/AppSidebar.tsx: so se chega por link direto"
     }
   ]
