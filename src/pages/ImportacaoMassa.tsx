@@ -7,6 +7,7 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Upload,
   Package,
@@ -17,10 +18,12 @@ import {
   FileText,
   CheckCircle2,
   AlertTriangle,
+  Download,
 } from "lucide-react";
 import { CSVImporter } from "@/components/common/CSVImporter";
 import { ExcelImporter } from "@/components/common/ExcelImporter";
 import { supabase } from "@/integrations/supabase/client";
+import { useExport } from "@/hooks/common/useExport";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -114,12 +117,53 @@ const clienteCols = [
 
 type ImportEntity = "entregas" | "coletas" | "fornecedores" | "clientes";
 
+interface ImportFailure {
+  registro: number;
+  motivo: string;
+}
+
 interface ImportStats {
   entity: string;
   total: number;
   success: number;
   errors: number;
   timestamp: Date;
+  falhas: ImportFailure[];
+}
+
+// A mensagem do PostgREST pode carregar os valores da linha no campo `details`
+// (ex.: "Key (cnpj)=(123) already exists."). Guardamos apenas `message`, que
+// descreve a regra violada sem expor dado da planilha (LGPD).
+function motivoDoErro(error: { message: string; code?: string }): string {
+  if (error.code === "23505") {
+    return "Registro duplicado: já existe um registro com esse identificador";
+  }
+  return error.message;
+}
+
+// Reprocessa um lote condenado linha a linha. O Postgres aborta a instrução
+// inteira na primeira violação, então nenhuma linha do lote entrou e
+// reprocessar é seguro — sem isso, 1 linha ruim condena as outras 49.
+async function inserirLoteIndividualmente(
+  entity: ImportEntity,
+  batch: Record<string, unknown>[],
+  offset: number,
+  falhas: ImportFailure[],
+): Promise<{ ok: number; comErro: number }> {
+  let ok = 0;
+  let comErro = 0;
+  for (let j = 0; j < batch.length; j++) {
+    const { error: rowError } = await supabase
+      .from(entity)
+      .insert([batch[j]] as never[]);
+    if (rowError) {
+      comErro++;
+      falhas.push({ registro: offset + j + 1, motivo: motivoDoErro(rowError) });
+    } else {
+      ok++;
+    }
+  }
+  return { ok, comErro };
 }
 
 export default function ImportacaoMassa() {
@@ -128,6 +172,10 @@ export default function ImportacaoMassa() {
   const [isImporting, setIsImporting] = useState(false);
   const [importProgress, setImportProgress] = useState(0);
   const [currentStep, setCurrentStep] = useState(0);
+  const [ultimaImportacao, setUltimaImportacao] = useState<ImportStats | null>(
+    null,
+  );
+  const { exportToCSV } = useExport();
 
   const importSteps = [
     { title: "Seleção", description: "Escolha o tipo de dados" },
@@ -144,8 +192,10 @@ export default function ImportacaoMassa() {
     setImportProgress(0);
     setCurrentStep(2); // Processamento
 
+    setUltimaImportacao(null);
     let successCount = 0;
     let errorCount = 0;
+    const falhas: ImportFailure[] = [];
     const batchSize = 50;
 
     try {
@@ -154,7 +204,9 @@ export default function ImportacaoMassa() {
         const { error } = await supabase.from(entity).insert(batch as never[]);
 
         if (error) {
-          errorCount += batch.length;
+          const r = await inserirLoteIndividualmente(entity, batch, i, falhas);
+          successCount += r.ok;
+          errorCount += r.comErro;
         } else {
           successCount += batch.length;
         }
@@ -169,8 +221,10 @@ export default function ImportacaoMassa() {
         success: successCount,
         errors: errorCount,
         timestamp: new Date(),
+        falhas,
       };
       setHistory((h) => [stat, ...h]);
+      setUltimaImportacao(stat);
       setImportProgress(100);
       setCurrentStep(3); // Finalizado
 
@@ -193,6 +247,17 @@ export default function ImportacaoMassa() {
     } finally {
       setIsImporting(false);
     }
+  };
+
+  const handleExportFalhas = () => {
+    if (!ultimaImportacao) return;
+    exportToCSV(
+      ultimaImportacao.falhas.map((f) => ({
+        Registro: f.registro,
+        Motivo: f.motivo,
+      })),
+      { filename: `falhas_${ultimaImportacao.entity}` },
+    );
   };
 
   const entities: {
@@ -399,6 +464,48 @@ export default function ImportacaoMassa() {
             </div>
           </TabsContent>
         </Tabs>
+
+        {/* Falhas da última importação */}
+        {ultimaImportacao && ultimaImportacao.falhas.length > 0 && (
+          <Card className="border-destructive/40">
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2 text-destructive">
+                <AlertTriangle className="w-4 h-4" />
+                {ultimaImportacao.falhas.length} registro(s) não importado(s)
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <p className="text-xs text-muted-foreground">
+                O número indica a posição do registro entre os{" "}
+                {ultimaImportacao.total} registros válidos enviados. Linhas com
+                erro de formato são recusadas antes desta etapa.
+              </p>
+              <div className="max-h-60 overflow-y-auto space-y-1">
+                {ultimaImportacao.falhas.slice(0, 50).map((f) => (
+                  <p
+                    key={`${f.registro}-${f.motivo}`}
+                    className="text-xs border-b border-destructive/10 py-1 last:border-0"
+                  >
+                    <span className="font-semibold">
+                      Registro {f.registro}:
+                    </span>{" "}
+                    <span className="text-muted-foreground">{f.motivo}</span>
+                  </p>
+                ))}
+                {ultimaImportacao.falhas.length > 50 && (
+                  <p className="text-xs text-muted-foreground italic">
+                    + {ultimaImportacao.falhas.length - 50} registro(s)
+                    oculto(s) — baixe o CSV para ver todos.
+                  </p>
+                )}
+              </div>
+              <Button variant="outline" size="sm" onClick={handleExportFalhas}>
+                <Download className="w-4 h-4 mr-2" />
+                Baixar CSV das falhas
+              </Button>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Import History */}
         {history.length > 0 && (
