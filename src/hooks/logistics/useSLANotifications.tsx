@@ -275,7 +275,7 @@ export function useSLANotifications() {
       // Check entregas
       const { data: entregas } = await supabase
         .from('entregas')
-        .select('*')
+        .select('id, numero_entrega, status, previsao_entrega')
         .gt('updated_at', lastCheckedAt)
         .limit(50);
 
@@ -289,7 +289,7 @@ export function useSLANotifications() {
       // Check coletas
       const { data: coletas } = await supabase
         .from('coletas')
-        .select('*')
+        .select('id, numero_coleta, status, data_prevista_coleta')
         .gt('updated_at', lastCheckedAt)
         .limit(50);
 
