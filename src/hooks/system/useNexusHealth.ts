@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { uniqueChannelName } from "@/lib/realtimeChannel";
 
 export interface NexusHealthChecks {
   database: boolean;
@@ -21,7 +22,9 @@ export interface NexusHealth {
 async function measureLatency(): Promise<number | null> {
   return new Promise((resolve) => {
     const start = Date.now();
-    const channel = supabase.channel("nexus-latency-probe");
+    // Unico por medicao: a sonda roda de tempos em tempos e duas instancias
+    // com o mesmo topico falseariam a latencia medida (achado R-09).
+    const channel = supabase.channel(uniqueChannelName("nexus-latency-probe"));
     const timeout = setTimeout(() => {
       supabase.removeChannel(channel);
       // O subscribe não confirmou em 4s — sem medição confiável.

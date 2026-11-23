@@ -1,6 +1,7 @@
 import { useEffect, useCallback, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { uniqueChannelName } from "@/lib/realtimeChannel";
 import type { Database } from "@/integrations/supabase/types";
 
 type ColetaRow = Database["public"]["Tables"]["coletas"]["Row"];
@@ -164,10 +165,16 @@ export function useSmartAlerts() {
     return () => clearInterval(interval);
   }, [checkCriticalDeadlines]);
 
+  // Nome unico por instancia: alerta tatico que nao chega na segunda montagem
+  // do hook era o pior caso do achado R-09.
+  const [canalTatico] = useState(() =>
+    uniqueChannelName("nexus-tactical-realtime-alerts"),
+  );
+
   // Real-time listener for Nexus Tactical Logs
   useEffect(() => {
     const channel = supabase
-      .channel("nexus-tactical-realtime-alerts")
+      .channel(canalTatico)
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "nexus_tactical_logs" },
@@ -193,7 +200,7 @@ export function useSmartAlerts() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [canalTatico]);
 
   const markAsRead = useCallback((alertId: string) => {
     alertsStore = alertsStore.map((a) =>

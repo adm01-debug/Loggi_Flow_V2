@@ -197,10 +197,10 @@
 - [x] **125** — `useAchievementNotifications`: cancelar o auto-descarte da notificação — onda 5 — Baixa
 - [x] **126** — `useImportData`: cancelar o reset de dois segundos — onda 5 — Baixa
 - [x] **127** — `useDocumentUpload` e `useSecurityPushNotifications`: os dois últimos temporizadores — onda 5 — Baixa
-- [ ] **128** — `useBoxManagement`: canal de tempo real com nome único — onda 5 — Média
-- [ ] **129** — `useMapWeatherSync`: canal de zonas de risco com nome único — onda 5 — Média
-- [ ] **130** — `useSmartAlerts`: canal de alertas táticos com nome único — onda 5 — Média
-- [ ] **131** — `useNexusHealth`: canal da sonda de latência com nome único, e fim do achado — onda 5 — Média
+- [x] **128** — `useBoxManagement`: canal de tempo real com nome único — onda 5 — Média
+- [x] **129** — `useMapWeatherSync`: canal de zonas de risco com nome único — onda 5 — Média
+- [x] **130** — `useSmartAlerts`: canal de alertas táticos com nome único — onda 5 — Média
+- [x] **131** — `useNexusHealth`: canal da sonda de latência com nome único, e fim do achado — onda 5 — Média
 
 ### Onda 3
 
@@ -434,6 +434,65 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapas 128 a 131 (2026-11-23) - achado R-09
+
+**Decisão de nome, comum às quatro:** criei `src/lib/realtimeChannel.ts:12`
+(`uniqueChannelName(base)` devolve `base-<timestamp base36>-<contador do módulo>`) e usei **sufixo por
+instância nas quatro**, não `user.id`. Motivo: o caso que o achado descreve é *duas montagens do mesmo
+usuário* (duas abas, dois componentes, widget mais página) e nome por usuário não separa isso. O helper
+evita copiar o contador em quatro arquivos e não depende de `crypto` (ausente em parte dos ambientes de
+teste). No lugar do `useRef` do padrão de `useRealtime.tsx:94` usei `useState(() => ...)`: o inicializador
+preguiçoso roda uma vez por instância, então o nome é estável entre renders - que é o que o plano exige
+do `ref` - e não cai na regra de escrita de `ref` durante o render.
+
+**128 - `useBoxManagement` (`src/hooks/logistics/useBoxManagement.tsx`).** `canalBoxes` (`:87`), aplicado no
+`.channel()` de `:92`, deps `[refetch, canalBoxes]` (`:105`). O `removeChannel` já existia no `return` -
+conferido antes de mexer, como o plano pede.
+
+**129 - `useMapWeatherSync` (`src/hooks/logistics/useMapWeatherSync.ts`).** `canalZonas` (`:47`), aplicado em
+`:54`, deps `[]` → `[canalZonas]` (`:63`) - só a dependência nova, que é estável; `fetchRiskZones`
+continua fora das deps, como estava (não mexi para não reproduzir o R-02 aqui). O filtro do
+`postgres_changes` e a chamada `fetchRiskZones()` estão intactos.
+
+**130 - `useSmartAlerts` (`src/hooks/logistics/useSmartAlerts.tsx`).** `canalTatico` (`:170-172`), aplicado em
+`:177`, deps `[canalTatico]` (`:203`). `removeChannel` já existia. `addAlert` e a classificação
+`crit`/`warning` intocados; o `setInterval` de `:163-165` continua com o `clearInterval` dele.
+
+**131 - `useNexusHealth` (`src/hooks/system/useNexusHealth.ts`).** Nome único **por medição**:
+`measureLatency` chama `uniqueChannelName("nexus-latency-probe")` dentro da própria função (`:27`) e o
+contador do módulo garante sufixo novo a cada chamada - não foi preciso mudar a assinatura nem passar
+sufixo por argumento. Os **dois** caminhos de saída removem o canal: o timeout de 4 s (`:29`) e o
+`SUBSCRIBED` (`:37`), então não há vazamento por medição (o risco que o plano aponta). O `useEffect` de
+`:81-89`, que é o padrão de referência do R-08, **não foi tocado**.
+
+#### Varredura de fechamento do R-09 (exigida pela etapa 131)
+
+`grep -rn 'supabase.channel(\|\.channel(' src/ | grep -v '\${'`, sem `*.test.*`: os **4 canais do R-09**
+agora passam por `uniqueChannelName`. Sobraram **6 nomes fixos**, todos fora do escopo do achado (o achado
+nomeia hooks; estes são componentes, página e utilitário):
+
+| Arquivo | Nome fixo | Risco |
+| --- | --- | --- |
+| `src/components/map/TacticalTerminal.tsx:49` | `tactical-logs` | **colide** com `MapaRotas.tsx:139` |
+| `src/pages/MapaRotas.tsx:139` | `tactical-logs` | mesmo tópico do terminal tático |
+| `src/components/common/RealtimeStatus.tsx:25` | `system-health-check` | um por app - benigno |
+| `src/components/common/RealtimeBadge.tsx:22` | `presence-health` | um por app - benigno |
+| `src/components/freight/ResponseConsole.tsx:35` | `raw_responses` | duas telas abertas → a segunda perde eventos |
+| `src/utils/systemTester.ts:37` | `health-ping` | roda uma vez no auto-teste - benigno |
+
+**Achado novo R-09b:** `TacticalTerminal.tsx:49` e `MapaRotas.tsx:139` assinam **o mesmo tópico**,
+`tactical-logs`. Com as duas telas montadas, a segunda faz `.on()` depois do `.subscribe()` da primeira -
+exatamente o estouro que `useRealtime.tsx:22-24` documenta. Não corrigido: são componentes e a etapa 131
+manda registrar, não consertar.
+
+**Validação:** `tsc --noEmit` 0 erros; `eslint` nos 5 arquivos 0 erros e **1 aviso herdado**
+(`react-hooks/set-state-in-effect` em `useMapWeatherSync`, o mesmo que `origin/main` já tinha - conferido
+com `git stash`); `prettier --check` limpo no arquivo novo e em `useSmartAlerts.tsx` (que era limpo na main;
+`useBoxManagement.tsx` e `useMapWeatherSync.ts` já estavam fora do padrão na main, não rodei `--write`
+para não reformatar alheio); `vitest run --coverage` 41 arquivos / 326 testes passando, cobertura idêntica
+à linha de base. **NÃO VERIFICADO** o comportamento em tempo real (duas abas recebendo o mesmo evento):
+exige projeto Supabase com Realtime habilitado e duas sessões simultâneas; não há staging.
 
 ### Registro - etapas 123 a 127 (2026-11-23) - achado R-08
 
