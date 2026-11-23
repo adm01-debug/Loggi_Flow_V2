@@ -1,11 +1,12 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { log } from "../_shared/logger.ts";
+import { log, redact } from "../_shared/logger.ts";
 import { corsHeaders } from "../_shared/cors.ts";
 import { validateContract } from "../_shared/contract-validator.ts";
 import { verifyWebhookHmac } from "../_shared/webhookSignature.ts";
 import { requireString } from "../_shared/validate.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
+import { bodyHash, buildEventKey } from "../_shared/idempotency.ts";
 
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -94,7 +95,32 @@ serve(async (req) => {
     }
 
     const { eventType, data, eventId } = webhookData;
-    const finalEventId = eventId || data?.orderId || crypto.randomUUID();
+
+    // Etapa 139 (B-02): chave aleatoria anula a dedupe. `eventId` isolado e o
+    // identificador forte; sem ele, orderId + status + momento do evento ainda
+    // identificam - e o `status` entra porque duas mudancas de status do MESMO
+    // pedido sao dois eventos legitimos. `eventType` sozinho nao identifica nada
+    // (dois eventos do mesmo tipo colidiriam), entao sem orderId recusamos.
+    const partesEvento: Array<string | undefined> = [eventId];
+    if (!eventId && data?.orderId) {
+      const quando = data?.timestamp || (await bodyHash(data));
+      partesEvento.push(`${data.orderId}-${data.status ?? ""}-${quando}`);
+    }
+
+    const eventKey = await buildEventKey('lalamove', partesEvento);
+
+    if (!eventKey) {
+      log.error('Lalamove webhook sem identificador estavel, recusando', {
+        eventType,
+        payload: redact(webhookData),
+      });
+      return new Response(JSON.stringify({ error: 'Event without stable identifier' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const finalEventId = eventKey.id;
 
     log.info('Processing Lalamove webhook', { eventType, eventId: finalEventId });
 

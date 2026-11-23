@@ -4,7 +4,7 @@ import { validateContract } from "../_shared/contract-validator.ts";
 import { requireString } from "../_shared/validate.ts";
 import { verifyWebhookHmac } from "../_shared/webhookSignature.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
-import { claimIdempotencyKey } from "../_shared/idempotency.ts";
+import { bodyHash, buildEventKey, claimIdempotencyKey } from "../_shared/idempotency.ts";
 import { log, redact } from "../_shared/logger.ts";
 
 /**
@@ -124,17 +124,31 @@ serve(async (req) => {
     }
 
     // Idempotency guard: dedupe by (carrier_id + event_id|timestamp)
-    const eventId = String(
-      payload.event_id ??
-        payload.id ??
-        `${payload.carrier_id}:${payload.event_type}:${
-          payload.timestamp ?? ""
-        }`,
-    );
-    const idem = await claimIdempotencyKey(
+    // Etapa 141 (B-02): sem `timestamp` a chave antiga virava
+    // `carrier_id:event_type:` - a MESMA para todos os eventos daquele tipo, e o
+    // segundo evento legitimo era descartado como duplicata. O hash do corpo entra
+    // no lugar do vazio, entao payloads diferentes voltam a se distinguir.
+    const identificador = payload.event_id || payload.id;
+    const eventKey = await buildEventKey(
       `carrier:${payload.carrier_id}`,
-      eventId,
+      identificador
+        ? [identificador]
+        : [payload.event_type, payload.timestamp || (await bodyHash(payload))],
+      payload,
     );
+
+    if (!eventKey) {
+      log.error('Carrier webhook sem identificador estavel, recusando', {
+        carrier_id: payload.carrier_id,
+        event_type: payload.event_type,
+      });
+      return new Response(
+        JSON.stringify({ error: 'Event without stable identifier' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      );
+    }
+
+    const idem = await claimIdempotencyKey(eventKey.provider, eventKey.id);
     if (idem.duplicate) {
       return new Response(
         JSON.stringify({

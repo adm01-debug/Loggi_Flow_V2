@@ -210,10 +210,10 @@
 - [x] **135** — `rodonaves-webhook`: trocar "consulta e depois grava" por "grava primeiro e trata o conflito" — onda 3 — Crítica
 - [x] **136** — `rodonaves-webhook`: remover a gravação tardia do marcador — onda 3 — Alta
 - [x] **137** — Teste automatizado: o mesmo evento enviado duas vezes grava o dado de negócio uma vez — onda 3 — Alta
-- [ ] **138** — Criar `buildEventKey` em `_shared/idempotency.ts`, copiando a chave da Rodonaves — onda 3 — Alta
-- [ ] **139** — `lalamove-webhook`: eliminar o `crypto.randomUUID()` da chave de dedupe — onda 3 — Alta
-- [ ] **140** — `nexus-webhook-receiver`: eliminar o `Date.now()` da chave de dedupe — onda 3 — Alta
-- [ ] **141** — `carrier-webhook-receiver`: chave estável demais está engolindo evento verdadeiro — onda 3 — Alta
+- [x] **138** — Criar `buildEventKey` em `_shared/idempotency.ts`, copiando a chave da Rodonaves — onda 3 — Alta
+- [x] **139** — `lalamove-webhook`: eliminar o `crypto.randomUUID()` da chave de dedupe — onda 3 — Alta
+- [x] **140** — `nexus-webhook-receiver`: eliminar o `Date.now()` da chave de dedupe — onda 3 — Alta
+- [x] **141** — `carrier-webhook-receiver`: chave estável demais está engolindo evento verdadeiro — onda 3 — Alta
 - [~] **142** — Gate de `grep`: nenhuma chave de dedupe pode conter valor aleatório ou relógio — onda 3 — Média · **aguarda o dono**
 - [ ] **143** — `scheduled-reports`: lista de campos permitidos no `insert` — onda 3 — Crítica
 - [ ] **144** — `scheduled-reports`: a mesma lista de campos permitidos no `update` — onda 3 — Crítica
@@ -434,6 +434,80 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapas 138 a 141 (2026-11-23) - achado B-02
+
+**Causa raiz (comum às três):** não existia lugar único para responder "qual é a chave deste evento",
+então cada webhook decidia sozinho — e três dos quatro decidiam errado. `lalamove-webhook/index.ts:97`
+usava `crypto.randomUUID()` e `nexus-webhook-receiver/index.ts:78` usava `Date.now()`: nos dois a chave é
+nova a cada reenvio, então a dedupe **nunca** acerta. `carrier-webhook-receiver/index.ts:130-132` errava ao
+contrário: com `?? ""` no lugar do `timestamp`, a chave virava `carrier_id:event_type:` — a mesma para todos
+os eventos daquele tipo — e o segundo evento legítimo era descartado como duplicata, sumindo do rastreio do
+cliente. Só `rodonaves-webhook` estava correto.
+
+**138 — `supabase/functions/_shared/eventKey.ts` (arquivo novo) + reexport em `_shared/idempotency.ts`.**
+`buildEventKey(provider, parts, fallbackBody?)` (`:55-69`) recebe os identificadores **na ordem**, descarta
+vazio/nulo/espaço em branco (`normalizePart`, `:17`), junta com `-` e devolve `{ provider, id, key }` — ou
+`null` quando nada identifica o evento, que é o sinal para o chamador recusar com 400 em vez de inventar
+valor. Último recurso para payload sem campo estável: `bodyHash` (`:34`), SHA-256 do **JSON canônico**
+(chaves ordenadas, `canonicalJson`, `:24`) — determinístico, ao contrário do `randomUUID()`. O hash é
+usado só quando `parts` não tem nenhum valor; não passou a existir fallback aleatório, que é justamente o
+atalho que anula a dedupe.
+
+**Desvio consciente da etapa 138 (por favor leia).** O plano manda acrescentar a função a
+`supabase/functions/_shared/idempotency.ts`. Pus a **implementação** num módulo novo e puro,
+`_shared/eventKey.ts`, e o `idempotency.ts` só a reexporta (`export { bodyHash, buildEventKey } from
+"./eventKey.ts"`, última linha). Motivo único: `idempotency.ts:3` importa `@supabase/supabase-js` de
+`https://esm.sh`, e o vitest do repositório não carrega dependência `https:` — por isso os testes de
+`tests/integration/*.spec.ts` só importam módulos puros de `_shared` (`validate.ts`, `number.ts`). Com a
+implementação no mesmo arquivo do import remoto, a etapa 138 não teria teste executável na CI. Os três
+webhooks importam de `../_shared/idempotency.ts`, como o plano descreve, e `claimIdempotencyKey` (`:28-61`)
+não foi tocado — o helper continua fail-open de propósito.
+
+**139 — `lalamove-webhook/index.ts`.** Import de `bodyHash`/`buildEventKey` e de `redact`; a linha
+`finalEventId = eventId || data?.orderId || crypto.randomUUID()` virou `buildEventKey('lalamove', ...)`
+seguido de `const finalEventId = eventKey.id;`. `eventId` isolado é o identificador forte; sem ele entra
+`orderId` **+ `status` + momento do próprio evento** (`data.timestamp`, e o hash de `data` quando o evento
+não traz timestamp). O `status` entra porque duas mudanças de status do **mesmo** pedido são dois eventos
+legítimos — chave só com `orderId` engoliria a segunda (o mesmo defeito da 141). `eventType` **não** entra
+como discriminador sozinho: é campo obrigatório do contrato, então usá-lo geraria uma chave única para todo
+evento do tipo. Sem `eventId` e sem `orderId` a resposta é **400** com erro genérico, e o payload vai para o
+log via `redact(webhookData)`. O bloco de idempotência da etapa 133 (`:127-150`) não foi tocado.
+
+**140 — `nexus-webhook-receiver/index.ts`.** A chave deixou de terminar em `:${Date.now()}`. Agora usa os
+identificadores reais do payload: `data.key.id` (id da mensagem no Evolution API), `event_id`, `id`,
+`carrier_id`, `cotacao_id`, `data.key.remoteJid` e `text`; `body` entra como hash de último recurso. O
+`provider` passado ao helper continua sendo `nexus:<event|source>`, então a chave final ficou
+`nexus:messages.upsert:<id>`. HMAC (`:36-42`) e os `functions.invoke` (`:162`/`:175`) não foram tocados.
+
+**141 — `carrier-webhook-receiver/index.ts`.** A chave `${carrier_id}:${event_type}:${timestamp ?? ""}` virou
+`buildEventKey` com provider `carrier:<carrier_id>`, identificador ? [identificador] : [payload.event_type,
+payload.timestamp || await bodyHash(payload)], payload)`. Com `event_id`/`id` a chave é o identificador; sem
+ele, `event_type` ainda entra, mas o componente que discriminava vazio passa a ser **o hash do corpo** —
+dois payloads diferentes do mesmo tipo geram chaves diferentes e dois payloads idênticos continuam
+deduplicando. Nada mais na função mudou: o padrão de referência de erro sem vazamento e o `mapCarrierStatus`
+estão intocados.
+
+**Validação (executada nesta sessão).** `deno check` nos 4 arquivos + o novo: **3 erros herdados antes e
+depois**, lista idêntica linha a linha (2 chamadas `log.info(msg, redact(x))` com `unknown` e
+`rl.retryAfter` do `rateLimiter`), zero erro novo; `deno lint` idem aos da main; `tsc -p tsconfig.app.json`
+0; `eslint` 0; `npm run lint:budget` OK (0 erros, dentro do budget); **`npm run automation:test` 103/103**
+(obrigatório porque o teste novo vive em `tests/`); `vitest run --coverage` **43 arquivos, 0 falha**, e a
+cobertura **subiu** em relação à linha de base (72.06 / 67.84 / 75.94 / 74.06 contra 71.65 / 67.41 / 75.29 /
+73.67) — `eventKey.ts` 95,83% de linhas. O teste novo (`tests/contracts/event-key.spec.ts`) tem 7 casos:
+mesma entrada → mesma chave; vazio/nulo/espaço → `null`; sem identificador → `sha256-<32 hex>` determinístico
+e ordem de chaves do corpo irrelevante; corpo diferente → chave diferente; e três contratos na fonte (zero
+`randomUUID` no lalamove, zero `Date.now()` no nexus, ausência do `?? ""` no carrier). Provado que ele pega
+regressão: com as três edges revertidas para a `main`, **3 dos 7 casos falham**; restauradas, 7/7 passam.
+
+**NÃO VERIFICADO.** Comportamento ponta a ponta nos provedores: nenhuma das três transportadoras foi
+acionada com payload real (os secrets de produção não estão disponíveis nesta sessão), então não confirmei
+com envio real que o reenvio cai na dedupe nem que a Lalamove responde 400 sem identificador. Não há
+staging. Também não medi nos logs quantos eventos o lalamove recebia sem `eventId`/`orderId` nem quantos do
+carrier vinham sem `timestamp` — números que o plano pede para registrar: como os payloads são gravados
+brutos em `webhook_events_processed.payload`, dá para contar depois do deploy. E a **142** (gate de `grep`
+em `scripts/ci/`) continua `[~]`, aguardando o dono: toca `scripts/` e a automação da CI.
+
 
 ### Registro - etapas 132 a 137 (2026-11-23) - achado B-01
 

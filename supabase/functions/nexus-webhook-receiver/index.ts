@@ -4,7 +4,7 @@ import { validateContract } from "../_shared/contract-validator.ts";
 import { requireString } from "../_shared/validate.ts";
 import { verifyWebhookHmac } from "../_shared/webhookSignature.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
-import { claimIdempotencyKey } from "../_shared/idempotency.ts";
+import { buildEventKey, claimIdempotencyKey } from "../_shared/idempotency.ts";
 import { log, redact } from "../_shared/logger.ts";
 
 const corsHeaders = {
@@ -74,9 +74,32 @@ serve(async (req) => {
       });
     }
 
-    // Idempotency guard
-    const eventId = String(body.data?.key?.id ?? body.event_id ?? body.id ?? `${body.event ?? body.source}:${Date.now()}`);
-    const idem = await claimIdempotencyKey(`nexus:${body.event ?? body.source ?? "unknown"}`, eventId);
+    // Idempotency guard - etapa 140 (B-02): a chave nao pode depender do relogio do
+    // servidor, que muda a cada reenvio. Identificadores reais do evento, na ordem,
+    // e o hash do corpo como ultimo recurso (deterministico).
+    const eventKey = await buildEventKey(
+      `nexus:${body.event ?? body.source ?? "unknown"}`,
+      [
+        body.data?.key?.id,
+        body.event_id,
+        body.id,
+        body.carrier_id,
+        body.cotacao_id,
+        body.data?.key?.remoteJid,
+        body.text,
+      ],
+      body,
+    );
+
+    if (!eventKey) {
+      log.error('Nexus webhook sem identificador estavel, recusando', { payload: redact(body) });
+      return new Response(JSON.stringify({ error: 'Event without stable identifier' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const idem = await claimIdempotencyKey(eventKey.provider, eventKey.id);
     if (idem.duplicate) {
       return new Response(JSON.stringify({ success: true, duplicate: true }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
