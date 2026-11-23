@@ -43,7 +43,7 @@
 - [ ] **012** — `health`: trocar `service_role` por uma verificação sem privilégio — onda 1 — Média
 - [ ] **013** — `health-check`: parar de chamar a API administrativa de usuários e exigir sessão — onda 1 — Média
 - [~] **014** — Decidir com o dono qual dos dois endpoints de saúde fica aberto e fechar o outro no `config.toml` — onda 1 — Média · **aguarda o dono**
-- [ ] **015** — Tirar o `.env` do controle de versão, sem reescrever histórico — onda 1 — Alta
+- [x] **015** — Tirar o `.env` do controle de versão, sem reescrever histórico — onda 1 — Alta
 - [~] **016** — Corrigir o `AGENTS.md` e o comentário da CI que afirmam que o repositório é privado — onda 1 — Alta · **aguarda o dono**
 - [~] **017** — Levar ao dono a decisão sobre a visibilidade do repositório — onda 1 — Alta · **aguarda o dono**
 - [~] **018** — Transformar "não commite `.env`" em teste automático — onda 1 — Média · **aguarda o dono**
@@ -94,7 +94,7 @@
 - [ ] **051** — Exigir digitação para confirmar exclusão em massa de cadastro — onda 1 — Alta
 - [ ] **052** — Teste do `BulkActions`: ação destrutiva não executa sem confirmação — onda 1 — Média
 - [ ] **053** — `Transportadoras`: trocar exclusão real por exclusão lógica — onda 1 — Alta
-- [ ] **054** — Filtrar `deleted_at IS NULL` em todas as leituras de `transportadoras` — onda 1 — Alta
+- [x] **054** — Filtrar `deleted_at IS NULL` em todas as leituras de `transportadoras` — onda 1 — Alta
 - [~] **055** — Migration: acrescentar `deleted_at` a `fretes_internos` — onda 1 — Alta · **aguarda o dono**
 - [~] **056** — Aplicar a migration de `deleted_at` e sincronizar os tipos — onda 1 — Alta · **aguarda o dono**
 - [ ] **057** — `FretesInternos`: exclusão lógica e filtro em todas as leituras da tabela — onda 1 — Alta
@@ -434,6 +434,33 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapas 015 e 054 (2026-11-24)
+
+**015 - `.env` fora do controle de versao.** Ja estava correto: `git ls-files` lista
+apenas `.env.example`; `.env`, `.env.local` e `.env.*.local` estao no `.gitignore`.
+Nenhum arquivo alterado, historico nao reescrito.
+
+**054 - filtro `deleted_at` nas leituras de `transportadoras`.** Auditado consulta por
+consulta, nao por contagem de linha. Todas as leituras filtram:
+
+| Arquivo | Onde |
+| --- | --- |
+| `Transportadoras.tsx` | `:206-208` |
+| `ConfiguracoesFrete.tsx` | `:171-173` |
+| `ExportacaoDados.tsx` | `:86-88` |
+| `Envios.tsx` | `:386-388` |
+| `usePrefetch.ts` | `:60-62` |
+| `useDashboardMetrics.tsx` | `:331-335` |
+| `useExecutiveMetrics.tsx` | `:111-113` |
+| `useGlobalSearch.tsx` | `:129-131` |
+| `PickupDialog.tsx` | `:132-134` |
+
+As consultas sem o filtro sao `.insert()` e `.update()` (`Transportadoras.tsx:269`,
+`:303`, `:337`, `:366`; `ConfiguracoesFrete.tsx:187`) - ali o filtro nao se aplica,
+porque escrever precisa achar o registro pelo `id`, inclusive para desfaze-lo.
+
+Nenhuma alteracao de codigo: as duas etapas ja estavam atendidas.
 
 Uma linha por etapa concluída. A coluna **Evidência** é o que diferencia etapa concluída de etapa
 "deveria funcionar": cole o comando e o resultado, ou a consulta e o retorno.
