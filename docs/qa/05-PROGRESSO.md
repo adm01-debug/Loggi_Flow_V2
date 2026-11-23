@@ -160,8 +160,8 @@
 - [x] **094** — `Despachos`: callbacks de tempo real estáveis — onda 2 — Crítica
 - [x] **095** — `CustosDashboard`: estabilizar `handleRefetch` — onda 2 — Média
 - [x] **096** — Escrever o contrato no alto de `useRealtime` e varrer os chamadores — onda 2 — Crítica
-- [ ] **097** — `Despachos`: ler o erro da consulta — onda 2 — Alta
-- [ ] **098** — `Despachos`: parar de dizer "Fila Limpa" quando a consulta falhou — onda 2 — Crítica
+- [x] **097** — `Despachos`: ler o erro da consulta — onda 2 — Alta
+- [x] **098** — `Despachos`: parar de dizer "Fila Limpa" quando a consulta falhou — onda 2 — Crítica
 - [ ] **099** — `Envios`: erro com componente e botão de tentar de novo — onda 2 — Alta
 - [ ] **100** — `Clientes`: erro com componente e botão de tentar de novo — onda 2 — Alta
 - [ ] **101** — `Fornecedores`: erro com componente e botão de tentar de novo — onda 2 — Alta
@@ -434,6 +434,31 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapas 097-098 (2026-11-23) - achado R-01
+
+`src/pages/Despachos.tsx` desestruturava so `data`, `isLoading` e `refetch` do
+`useQuery`; o `error` e o `isError` eram descartados, entao a tela nao tinha como saber
+que a consulta falhou e caia no bloco `items.length === 0`, exibindo **"Fila Limpa"**
+mesmo com a malha quebrada.
+
+- **097** - `isError` e `error` acrescentados a desestruturacao
+- **098** - `if (isError)` com `EmptyState variant="error"` e botao "Tentar novamente"
+  chamando `refetch()`, colocado antes do `return` principal; o import do `EmptyState`
+  foi acrescentado. O "Fila Limpa" continua existindo para fila realmente vazia, que
+  segue sendo informacao util. O ternario `isLoading` nao foi tocado.
+
+Feitas juntas, como o plano manda: 097 sozinha deixaria `isError` e `error` declarados e
+nao usados, o que o ESLint reprova. A primeira tentativa foi um ternario encadeado
+(`isLoading ? ... : isError ? ... : ...`), que gerou um aviso novo de
+`sonarjs/no-nested-conditional` (78/86) - por isso a versao final usa if-chain.
+
+**Verificacao**
+- `npx tsc --noEmit` -> 0 erros
+- `npx eslint src/pages/Despachos.tsx` -> 0 erros, 0 avisos
+- `npm run lint:budget` -> 77/86 avisos (sem aviso novo)
+- `npx vitest run src/pages/ src/lib/` -> 239 testes passando
+- Diff: 18 linhas em um arquivo, nenhuma linha de churn
 
 Uma linha por etapa concluída. A coluna **Evidência** é o que diferencia etapa concluída de etapa
 "deveria funcionar": cole o comando e o resultado, ou a consulta e o retorno.
