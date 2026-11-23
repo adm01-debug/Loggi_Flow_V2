@@ -3,7 +3,8 @@
 > **ATENCAO**: este documento pode descrever funcionalidades NAO implementadas. Fonte autoritativa do estado real: docs/audit/2026-11-20_funcionalidades_nao_implementadas.md (item 13). Consulte-a antes de procurar hooks/tabelas/funcoes citados aqui.
 
 > Última atualização: 2026-03-14 (Sprint 7 — FINALIZADO)
-> Status: 39/39 itens concluídos ✅
+> Status: 39/39 itens concluídos ✅ — **numero nao reconferido** nesta auditoria de 2026-11-23; o
+> próprio arquivo declara última atualização em 2026-03-14 (`:5`), 8 meses antes.
 
 ---
 
@@ -103,13 +104,16 @@ Todos os 39 itens do plano de melhorias foram implementados com sucesso.
 #### Arquivos criados nesta sprint final:
 
 - `supabase/functions/whatsapp-notification/index.ts` — Edge function para envio de WhatsApp via A-Ticket
-- `src/hooks/useWhatsAppNotification.tsx` — Hook para notificações WhatsApp
-- `src/test/validateCNPJ.test.ts` — Testes de validação CNPJ
-- `src/test/useDocumentUpload.test.ts` — Testes de upload de documentos
-- `src/test/queryConfig.test.ts` — Testes de configuração de queries
+- `src/hooks/notifications/useWhatsAppNotification.tsx` — Hook para notificações WhatsApp (caminho por
+  domínio, ADR 0008; corrigido 2026-11-23, o texto original dizia a raiz de `src/hooks/`)
+
+> Os tres testes abaixo **nao existem** em 2026-11-23 (verificado com `find src -name "*.test.ts*"`):
+> `src/test/validateCNPJ.test.ts`, `src/test/useDocumentUpload.test.ts` e `src/test/queryConfig.test.ts`. O conteudo
+> equivalente vive em `src/lib/validations.test.ts`. Os tres caminhos originais deste bloco foram
+> removidos em vez de corrigidos porque o arquivo nunca existiu com esses nomes.
 
 #### Arquivos modificados:
 
 - `src/index.css` — Light mode reescrito com cores claras reais
 - `supabase/functions/bitrix24-integration/index.ts` — Sync bidirecional (get_deals, update_deal, sync_deals)
-- `src/hooks/useKeyboardShortcuts.ts` — 4 novos atalhos globais
+- `src/hooks/common/useKeyboardShortcuts.ts` — 4 novos atalhos globais (caminho por domínio, ADR 0008)
