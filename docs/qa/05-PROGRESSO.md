@@ -89,11 +89,11 @@
 
 ### Onda 1
 
-- [ ] **049** — `BulkActions`: ação destrutiva passa a pedir confirmação — onda 1 — Crítica
-- [ ] **050** — Deixar cada tela escrever o texto da própria confirmação — onda 1 — Alta
-- [ ] **051** — Exigir digitação para confirmar exclusão em massa de cadastro — onda 1 — Alta
-- [ ] **052** — Teste do `BulkActions`: ação destrutiva não executa sem confirmação — onda 1 — Média
-- [ ] **053** — `Transportadoras`: trocar exclusão real por exclusão lógica — onda 1 — Alta
+- [x] **049** — `BulkActions`: ação destrutiva passa a pedir confirmação — onda 1 — Crítica
+- [x] **050** — Deixar cada tela escrever o texto da própria confirmação — onda 1 — Alta
+- [x] **051** — Exigir digitação para confirmar exclusão em massa de cadastro — onda 1 — Alta
+- [x] **052** — Teste do `BulkActions`: ação destrutiva não executa sem confirmação — onda 1 — Média
+- [x] **053** — `Transportadoras`: trocar exclusão real por exclusão lógica — onda 1 — Alta
 - [ ] **054** — Filtrar `deleted_at IS NULL` em todas as leituras de `transportadoras` — onda 1 — Alta
 - [~] **055** — Migration: acrescentar `deleted_at` a `fretes_internos` — onda 1 — Alta · **aguarda o dono**
 - [~] **056** — Aplicar a migration de `deleted_at` e sincronizar os tipos — onda 1 — Alta · **aguarda o dono**
@@ -434,6 +434,37 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapas 049-053 (2026-11-23) - exclusao em massa pede confirmacao
+
+049, 050 e 053 ja estavam na `main`. Faltava ligar o que ja existia:
+
+**051 (implementada agora).** `ConfirmDialog` ja tinha a prop `requireTyping`, mas o
+`BulkActions` nao repassava e nenhuma tela pedia digitacao. Acrescentei o campo
+`confirmTyping` a interface `BulkAction` e a passagem `requireTyping={pendingAction?.confirmTyping}`
+no dialogo. Clientes e Fornecedores passam a exigir digitar **EXCLUIR** para liberar a
+exclusao em massa - sao os dois cadastros que apagam de verdade. FretesInternos ficou de
+fora de proposito: ali a acao e "cancelar", nao apagar.
+
+Efeito no negocio: um "sim/nao" distraido nao mais apaga uma carteira inteira de clientes.
+
+**052 (implementada agora).** Novo `src/components/common/BulkActions.test.tsx`, sem
+dependencia nova - `@testing-library/user-event` nao esta instalado e o AGENTS.md so
+permite dependencia nova se indispensavel, entao o teste usa `fireEvent` da
+`@testing-library/react`, que ja esta na base.
+
+Tres casos: acao destrutiva nao executa ao clicar (so abre a confirmacao); o confirmar
+fica bloqueado ate a palavra ser digitada; acao nao destrutiva executa direto.
+
+**O teste prova a regressao:** com o `BulkActions.tsx` da `main` (sem o repasse do
+`requireTyping`) o caso do bloqueio falha - 1 falha de 3. Com a mudanca, 3 de 3 passam.
+
+**Verificacao**
+- `npx tsc --noEmit` -> 0 erros
+- `npx eslint <os quatro arquivos>` -> 0 erros, 4 avisos (baseline)
+- `npm run lint:budget` -> 77/86
+- `npx vitest run src/components/common/BulkActions.test.tsx` -> 3 testes
+- Diff: 8 linhas em tres arquivos existentes, mais um arquivo de teste novo
 
 Uma linha por etapa concluída. A coluna **Evidência** é o que diferencia etapa concluída de etapa
 "deveria funcionar": cole o comando e o resultado, ou a consulta e o retorno.

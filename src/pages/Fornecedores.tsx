@@ -601,6 +601,7 @@ export default function Fornecedores() {
                 confirmTitle: "Excluir fornecedores selecionados?",
                 confirmDescription: (count) =>
                   `Você está prestes a excluir ${count} fornecedor(es). Esta ação não pode ser desfeita.`,
+                confirmTyping: "EXCLUIR",
               },
             ]}
           />
