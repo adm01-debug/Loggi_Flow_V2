@@ -99,7 +99,7 @@
 - [~] **056** — Aplicar a migration de `deleted_at` e sincronizar os tipos — onda 1 — Alta · **aguarda o dono**
 - [ ] **057** — `FretesInternos`: exclusão lógica e filtro em todas as leituras da tabela — onda 1 — Alta
 - [~] **058** — Transformar a política de exclusão lógica em gate automático — onda 1 — Média · **aguarda o dono**
-- [ ] **059** — Pedir confirmação ao cancelar uma logística reversa — onda 1 — Média
+- [x] **059** — Pedir confirmação ao cancelar uma logística reversa — onda 1 — Média
 
 ### Onda 8
 
@@ -434,6 +434,29 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapa 059 (2026-11-24)
+
+Cancelar uma logistica reversa era um `DropdownMenuItem` igual aos outros, so com
+`text-red-500`: a devolucao do cliente era cancelada por engano em um clique, sem aviso.
+
+Aplicado o desenho de `Despachos.tsx`, que e o padrao da casa para acao irreversivel
+em linha de tabela:
+
+- `cancelItem` guarda o item pendente (`src/pages/LogisticaReversa.tsx:72`)
+- o item de menu so seleciona (`:659-662`), nao chama mais `updateStatus.mutate`
+- `ConfirmDialog` renderizado **fora** do `DropdownMenuContent`, no fim do componente
+  (`:663-681`), com `type="danger"` e descricao nomeando o codigo de rastreio reverso
+- `isLoading={updateStatus.isPending}` e `onSettled` limpando o estado
+
+Os outros itens do menu (Recebido, Em Transito) seguem sem confirmacao de proposito:
+sao transicoes normais, e atrito indiscriminado faz o operador parar de ler.
+
+**Verificacao**
+- `npx tsc --noEmit` -> 0 erros
+- `npx eslint src/pages/LogisticaReversa.tsx` -> 0 erros, 0 avisos
+- `grep` confirma `ConfirmDialog` importado (`:4`) e o menu sem `updateStatus.mutate`
+- `git diff --numstat` == `git diff -w --numstat` (23/6, sem churn)
 
 ### Registro - etapas 097-098 (2026-11-23) - achado R-01
 
