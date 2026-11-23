@@ -3,10 +3,19 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.7'
 import { getCorsHeaders, corsResponse } from "../_shared/cors.ts"
 import { withCircuitBreaker } from "../_shared/circuitBreaker.ts"
 import { log } from "../_shared/logger.ts"
-import { sanitizeInput } from "../_shared/security.ts"
+import { requireUser } from "../_shared/auth.ts"
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') return corsResponse(req)
+
+  // Etapa 013: health-check expõe métricas internas; exige usuário autenticado
+  const auth = await requireUser(req)
+  if (!auth.ok) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
+    })
+  }
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
   const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
@@ -15,18 +24,28 @@ serve(async (req) => {
   try {
     const results = await withCircuitBreaker('system-health-check', async () => {
       // 1. DB Heartbeat
-      const { data: dbCheck, error: dbError } = await supabase.from('profiles').select('id').limit(1).maybeSingle()
+      const { error: dbError } = await supabase.from('profiles').select('id').limit(1).maybeSingle()
       
       // 2. Storage Check
-      const { data: storageCheck, error: storageError } = await supabase.storage.listBuckets()
+      const { error: storageError } = await supabase.storage.listBuckets()
 
-      // 3. Auth Service Check (MFA as proxy)
-      const { error: authError } = await supabase.auth.admin.listUsers({ perPage: 1 })
+      // 3. Auth Service Check via /auth/v1/health (não usa admin API)
+      const authHealthUrl = `${supabaseUrl}/auth/v1/health`
+      let authOk = false
+      try {
+        const authRes = await fetch(authHealthUrl, {
+          headers: { apikey: Deno.env.get('SUPABASE_ANON_KEY') ?? '' },
+          signal: AbortSignal.timeout(5000),
+        })
+        authOk = authRes.ok
+      } catch {
+        authOk = false
+      }
 
       return {
         database: !dbError,
         storage: !storageError,
-        auth: !authError,
+        auth: authOk,
         timestamp: new Date().toISOString()
       }
     })

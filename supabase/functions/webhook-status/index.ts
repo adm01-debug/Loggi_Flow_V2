@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import { log } from "../_shared/logger.ts";
 import { safeFetch } from "../_shared/safeFetch.ts";
+import { requireInternalSecret, requireRole } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -25,24 +26,18 @@ serve(async (req) => {
     )!;
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    // Require a valid service-role bearer or authenticated user
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
+    // Aceita chamadas internas (x-internal-secret) ou usuários admin
+    const isInternal = requireInternalSecret(req);
+    const roleAuth = isInternal ? null : await requireRole(req, ["admin"]);
+    if (!isInternal && (!roleAuth || !roleAuth.ok)) {
+      const status = roleAuth && !roleAuth.ok ? roleAuth.status : 401;
+      return new Response(JSON.stringify({ error: status === 403 ? "Forbidden" : "Unauthorized" }), {
+        status,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser(authHeader.replace("Bearer ", ""));
-    if (authError || !user) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
+    // sub do usuário autenticado (nulo para chamadas internas)
+    const callerSub = (!isInternal && roleAuth?.ok) ? roleAuth.claims.sub : undefined;
 
     const { action, data } = await req.json();
 
@@ -158,6 +153,15 @@ serve(async (req) => {
           }
         }
 
+        // Auditoria: registrar quem disparou notificação e para quantos webhooks
+        await supabase.from("audit_logs").insert({
+          action: "webhook_notify_status_change",
+          table_name: "client_webhooks",
+          record_id: data.entrega_id ?? "unknown",
+          user_id: callerSub ?? null,
+          new_data: { processed: relevantWebhooks.length, new_status: data.new_status },
+        }).then(() => {/* best-effort */});
+
         return new Response(
           JSON.stringify({
             success: true,
@@ -172,10 +176,14 @@ serve(async (req) => {
       }
 
       case "list_webhooks": {
-        const { data: webhooks, error } = await supabase
+        // Filtrar por dono quando chamado por usuário autenticado (não chamada interna)
+        const whQuery = supabase
           .from("client_webhooks")
           .select("id, url, events, active, created_at")
           .order("created_at", { ascending: false });
+        const { data: webhooks, error } = callerSub
+          ? await whQuery.eq("created_by", callerSub)
+          : await whQuery;
 
         if (error) throw error;
         return new Response(JSON.stringify({ success: true, data: webhooks }), {
