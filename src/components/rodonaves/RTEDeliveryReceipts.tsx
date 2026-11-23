@@ -45,7 +45,7 @@ export function RTEDeliveryReceipts() {
     if (inner?.Url || inner?.url) {
       return (
         <div className="mt-4 p-3 border rounded-lg bg-card">
-          <a href={String(inner.Url || inner.url)} target="_blank" rel="noreferrer" className="text-primary underline text-sm">📥 Baixar Comprovante</a>
+          <a href={String(inner.Url || inner.url)} target="_blank" rel="noopener noreferrer" className="text-primary underline text-sm">📥 Baixar Comprovante</a>
         </div>
       );
     }

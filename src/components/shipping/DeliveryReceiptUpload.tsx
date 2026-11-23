@@ -176,7 +176,7 @@ export function DeliveryReceiptUpload({
                 className="rounded-xl font-black text-[10px] uppercase tracking-widest gap-2"
                 asChild
               >
-                <a href={preview} target="_blank" rel="noreferrer">
+                <a href={preview} target="_blank" rel="noopener noreferrer">
                   <Eye className="w-3.5 h-3.5" /> Visualizar
                 </a>
               </Button>
@@ -190,7 +190,7 @@ export function DeliveryReceiptUpload({
                   href={preview}
                   download={`comprovante_${entregaId}`}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                 >
                   <Download className="w-3.5 h-3.5" /> Salvar
                 </a>

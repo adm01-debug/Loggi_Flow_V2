@@ -7,6 +7,21 @@ import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CENTRO_DISTRIBUICAO } from "@/lib/centroDistribuicao";
 
+/** Escapa caracteres especiais HTML para evitar XSS em conteúdo interpolado. */
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+/** Valida cor hexadecimal; retorna fallback se não casar (#3b82f6). */
+function safeColor(value: string | undefined | null, fallback = "#3b82f6"): string {
+  return /^#[0-9a-f]{3,8}$/i.test(value ?? "") ? (value as string) : fallback;
+}
+
 export interface MapMarker {
   id: string;
   lat: number;
@@ -444,7 +459,7 @@ export function MapboxMap({
         .setLngLat([originMarker.lng, originMarker.lat])
         .setPopup(
           new maplibregl.Popup({ offset: 25 }).setHTML(
-            `<div style="padding:8px;font-size:12px;font-weight:900;color:#111;text-transform:uppercase;letter-spacing:1px">${originMarker.label || "Nexus CD Central"}</div>`,
+            `<div style="padding:8px;font-size:12px;font-weight:900;color:#111;text-transform:uppercase;letter-spacing:1px">${escapeHtml(originMarker.label || "Nexus CD Central")}</div>`,
           ),
         )
         .addTo(map.current);
@@ -461,12 +476,19 @@ export function MapboxMap({
           "mapbox-truck-marker",
           mk.isAnomaly && "nexus-anomaly-glitch",
         );
-        el.style.cssText = `width:30px;height:30px;background:white;border-radius:50%;display:flex;align-items:center;justify-center;box-shadow:0 0 15px ${color};border:2px solid ${color};cursor:pointer;transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);z-index:10;`;
+        const markerColor = safeColor(mk.isAnomaly ? "#ef4444" : color);
+        el.style.cssText = `width:30px;height:30px;background:white;border-radius:50%;display:flex;align-items:center;justify-center;box-shadow:0 0 15px ${markerColor};border:2px solid ${markerColor};cursor:pointer;transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);z-index:10;`;
         if (mk.isAnomaly) {
           el.style.boxShadow = `0 0 30px #ef4444, inset 0 0 10px #ef4444`;
           el.style.borderColor = "#ef4444";
         }
-        el.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${mk.isAnomaly ? "#ef4444" : color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(${mk.heading || 0}deg)"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-5l-4-4h-3v10a1 1 0 0 0 1 1Z"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>`;
+        // SVG literal sem interpolação (etapa 291); stroke e transform aplicados por setAttribute
+        el.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-5l-4-4h-3v10a1 1 0 0 0 1 1Z"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>';
+        const svgEl = el.querySelector("svg");
+        if (svgEl) {
+          svgEl.setAttribute("stroke", markerColor);
+          svgEl.style.transform = `rotate(${Number(mk.heading) || 0}deg)`;
+        }
       } else {
         el.className = mk.isAnomaly ? "nexus-anomaly-pulse" : "";
         el.style.cssText = `width:16px;height:16px;border-radius:50%;background:${mk.isAnomaly ? "#ef4444" : color};border:2px solid #fff;box-shadow:0 0 10px ${mk.isAnomaly ? "#ef4444" : color}66;cursor:pointer;transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1);`;
@@ -481,6 +503,8 @@ export function MapboxMap({
         el.style.zIndex = mk.type === "truck" ? "10" : "1";
       });
 
+      // Validação de cor para evitar XSS via atributo de estilo (etapa 292)
+      const safePopupColor = safeColor(color);
       const popup = new maplibregl.Popup({
         offset: mk.type === "truck" ? 35 : 20,
         closeButton: false,
@@ -489,15 +513,15 @@ export function MapboxMap({
         mk.popupHTML ||
           `
           <div style="padding:16px;background:#000;border-radius:24px;border:1px solid rgba(255,255,255,0.1);box-shadow:0 20px 40px rgba(0,0,0,0.8);max-width:240px;overflow:hidden;position:relative;">
-            <div style="position:absolute;top:0;left:0;width:100%;height:4px;background:${color}"></div>
+            <div style="position:absolute;top:0;left:0;width:100%;height:4px;background:${safePopupColor}"></div>
             <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-              <div style="width:32px;height:32px;border-radius:8px;background:${color}22;display:flex;align-items:center;justify-content:center;border:1px solid ${color}44">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              <div style="width:32px;height:32px;border-radius:8px;background:${safePopupColor}22;display:flex;align-items:center;justify-content:center;border:1px solid ${safePopupColor}44">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${safePopupColor}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
               </div>
               <strong style="font-size:14px;color:#fff;font-family:system-ui, -apple-system, sans-serif;font-weight:900;letter-spacing:-0.5px">DESTINO_UNIT</strong>
             </div>
-            <p style="font-size:11px;color:rgba(255,255,255,0.6);font-weight:700;line-height:1.4;margin:0 0 12px 0;text-transform:uppercase;letter-spacing:0.5px">${mk.label || mk.id}</p>
-            <div style="display:inline-flex;padding:4px 12px;border-radius:999px;font-size:9px;font-weight:900;color:${color};background:${color}15;border:1px solid ${color}33;text-transform:uppercase;letter-spacing:1px">
+            <p style="font-size:11px;color:rgba(255,255,255,0.6);font-weight:700;line-height:1.4;margin:0 0 12px 0;text-transform:uppercase;letter-spacing:0.5px">${escapeHtml(mk.label || mk.id)}</p>
+            <div style="display:inline-flex;padding:4px 12px;border-radius:999px;font-size:9px;font-weight:900;color:${safePopupColor};background:${safePopupColor}15;border:1px solid ${safePopupColor}33;text-transform:uppercase;letter-spacing:1px">
               LIVE_STATUS: NOMINAL
             </div>
           </div>
