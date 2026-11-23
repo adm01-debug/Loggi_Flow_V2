@@ -181,11 +181,11 @@
 - [x] **112** — Rodonaves: atualizar também as ocorrências criadas pela sincronização — onda 4 — Média
 - [x] **113** — Alertas de SLA: avisar quando a gravação da notificação falha — onda 4 — Alta
 - [x] **114** — Alertas de SLA: fazer o sino acender sem recarregar — onda 4 — Alta
-- [ ] **115** — Nexus Blast: contar só as cotações que voltaram — onda 4 — Média
-- [ ] **116** — Nexus Blast: dizer **quais** transportadoras falharam — onda 4 — Média
-- [ ] **117** — Importação em massa: guardar a mensagem de erro de cada lote — onda 4 — Média
-- [ ] **118** — Importação em massa: parar de condenar o lote inteiro por causa de uma linha — onda 4 — Média
-- [ ] **119** — Importação em massa: mostrar e exportar as linhas que falharam — onda 4 — Média
+- [x] **115** — Nexus Blast: contar só as cotações que voltaram — onda 4 — Média
+- [x] **116** — Nexus Blast: dizer **quais** transportadoras falharam — onda 4 — Média
+- [x] **117** — Importação em massa: guardar a mensagem de erro de cada lote — onda 4 — Média
+- [x] **118** — Importação em massa: parar de condenar o lote inteiro por causa de uma linha — onda 4 — Média
+- [x] **119** — Importação em massa: mostrar e exportar as linhas que falharam — onda 4 — Média
 - [~] **120** — Importação em massa: decidir se o histórico deve sobreviver à tela — onda 4 — Média · **aguarda o dono**
 - [ ] **121** — VERIFICAR se o duplo clique cria registro duplicado (o achado é hipótese) — onda 4 — Média
 - [ ] **122** — Fechar os formulários que a etapa 121 encontrou desprotegidos — onda 4 — Média
@@ -434,6 +434,48 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapas 115 a 119 (2026-11-23) - achado R-07
+
+**115/116 - Nexus Blast parou de contar sucesso como andamento.** O laço em
+`src/pages/CotacaoMultiCanal.tsx` usava um contador único (`completed`) que subia mesmo quando o
+`catch` engolia o erro: a barra chegava a 100% e o toast dizia "concluído" com zero cotações
+obtidas. Agora `completed` continua alimentando a barra e `succeeded` (`:355`) conta só o que voltou; a
+falha é empilhada com transportadora e mensagem (`:361`) e o desfecho virou `success`/`error`/`warning`
+sempre dizendo "N de M responderam" (`notificarFimDoBlast`, `:56`, chamada em `:373`). A lista das que
+falharam aparece na tela logo depois de `CotacaoResultsTable` (`:959`). Nada foi persistido: a tela não
+grava falha no banco (achado C-02). As três ramificações de canal saíram para
+`registrarCotacaoPendente`/`cotarOuRegistrar` (`:308`) para o `handleNexusBlast` voltar ao limite de
+complexidade cognitiva do lint.
+
+**117/118/119 - Importação em massa parou de condenar 50 linhas por causa de 1.** Em
+`src/pages/ImportacaoMassa.tsx` o `if (error)` somava `errorCount += batch.length` e descartava o motivo.
+Agora o lote que falha é reprocessado linha a linha (`inserirLoteIndividualmente`, `:147`, chamada em
+`:207`), porque o Postgres aborta a instrução inteira na primeira violação — nenhuma
+linha do lote entrou, então reprocessar é seguro. O caminho feliz continua um `insert` de 50 e o
+`batchSize = 50` não mudou. Cada falha guarda posição e motivo (`:161`), e o motivo é só
+o `message` do PostgREST (`motivoDoErro`, `:137`) — nunca o `details`, que carrega os valores da linha
+(LGPD); violação de unicidade (`23505`) vira texto legível. O resultado aparece na tela (50
+primeiras) com o botão "Baixar CSV das falhas" (`:502`), usando o `exportToCSV` que já existia em
+`src/hooks/common/useExport.tsx` — nenhum `Blob` novo foi escrito.
+
+**Achado C-03 (limitação registrada, não corrigida).** O número exibido é a
+posição do registro entre os **válidos** enviados, não a linha da planilha.
+`ImportResult.success` (`src/lib/csvImporter.ts:8-27`, `src/components/common/CSVImporter.tsx:34-52`) já
+descarta as linhas que não passam no zod e não preserva o `row`; como a etapa proíbe tocar nesses
+arquivos e proíbe guardar o conteúdo das linhas (LGPD), a linha exata do arquivo só volta se uma
+etapa futura propagar `row` até `onImport`. A tela diz isso em texto, para não entregar um
+número errado ao usuário.
+
+**Verificação**
+- `npx tsc --noEmit` → 0
+- `npx eslint src/pages/ImportacaoMassa.tsx src/pages/CotacaoMultiCanal.tsx` → 0 erros, 0 avisos
+- `npx prettier --check` nos dois arquivos → limpo
+- `npx vitest run --coverage` → 41 arquivos, 326 testes, `71.65 st / 67.41 br / 75.29 fn / 73.67 li`,
+  igual à baseline da `main`, sem `ERROR` de threshold
+- NÃO VERIFICADO: teste real de importação com planilha de 10 linhas boas + 1 ruim (o plano pede)
+  — exige dado em produção e não há staging; a lógica de reprocessamento foi lida
+  e tipada, mas não executada contra o banco
 
 ### Registro - etapas 104 a 114 (2026-11-23) - achados R-06 e R-02
 

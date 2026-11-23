@@ -29,6 +29,7 @@ import {
   Timer,
   Award,
   Map,
+  AlertTriangle,
 } from "lucide-react";
 import { useTransportadoraRotas } from "@/hooks/logistics/useTransportadoraRotas";
 import { useRodonavesTracking } from "@/hooks/logistics/useRodonavesTracking";
@@ -51,6 +52,22 @@ import type {
 } from "./cotacao-multicanal/types";
 
 import { NexusCoverageMap } from "@/components/freight/NexusCoverageMap";
+
+function notificarFimDoBlast(succeeded: number, total: number, falhas: number) {
+  if (falhas === 0) {
+    toast.success(
+      `Nexus Blast concluído! ${succeeded} de ${total} transportadora(s) responderam. Aguardando respostas das sem API.`,
+    );
+  } else if (succeeded === 0) {
+    toast.error(
+      `Nexus Blast sem nenhuma cotação obtida: ${falhas} de ${total} transportadora(s) falharam.`,
+    );
+  } else {
+    toast.warning(
+      `Nexus Blast concluído com falhas: ${succeeded} de ${total} responderam, ${falhas} falharam.`,
+    );
+  }
+}
 
 export default function CotacaoMultiCanal() {
   const { searchRoutes } = useTransportadoraRotas();
@@ -81,6 +98,9 @@ export default function CotacaoMultiCanal() {
   const [manualPrazo, setManualPrazo] = useState("");
   const [manualObs, setManualObs] = useState("");
   const [cotacoes, setCotacoes] = useState<CotacaoManual[]>([]);
+  const [blastFalhas, setBlastFalhas] = useState<
+    { transportadora: string; mensagem: string }[]
+  >([]);
   const [nexusStrategy, setNexusStrategy] = useState("Normal");
 
   // 3.19 - pesos reais da tabela freight_selection_rules (evita UI divergente
@@ -258,6 +278,59 @@ export default function CotacaoMultiCanal() {
     }
   };
 
+  const registrarCotacaoPendente = (
+    carrier: TransportadoraComCanal,
+    canal: "whatsapp" | "email",
+    pesoKgValue: number | undefined,
+    observacoes: string,
+  ) => {
+    createCotacao.mutate({
+      transportadora_id: carrier.transportadora_id,
+      canal,
+      origem_estado: origemEstado,
+      destino_estado: destinoEstado,
+      peso_kg: pesoKgValue,
+      volumes: parseInt(volumes),
+    });
+    addCotacao({
+      id: crypto.randomUUID(),
+      transportadora_id: carrier.transportadora_id,
+      transportadora_nome: carrier.transportadora?.nome_fantasia || "N/A",
+      canal,
+      valor: null,
+      prazo_dias: null,
+      status: "pendente",
+      observacoes,
+      created_at: new Date().toISOString(),
+    });
+  };
+
+  const cotarOuRegistrar = async (carrier: TransportadoraComCanal) => {
+    if (carrier.canal_cotacao === "api") {
+      await handleCotarAPI(carrier);
+      return;
+    }
+
+    if (carrier.canal_cotacao === "whatsapp") {
+      // Registro honesto: sem instancia configurada no front para o Evolution,
+      // a cotacao fica pendente aguardando resposta manual da transportadora.
+      registrarCotacaoPendente(
+        carrier,
+        "whatsapp",
+        pesoKg ? parseFloat(pesoKg) : undefined,
+        "Nexus Blast: Aguardando RPA/WhatsApp",
+      );
+      return;
+    }
+
+    registrarCotacaoPendente(
+      carrier,
+      "email",
+      pesoKg ? parseFloat(pesoKg) : undefined,
+      "Nexus Blast: Email Automático Enviado",
+    );
+  };
+
   const handleNexusBlast = async () => {
     if (carriers.length === 0) {
       toast.error("Busque transportadoras primeiro");
@@ -266,72 +339,38 @@ export default function CotacaoMultiCanal() {
 
     setIsBlasting(true);
     setBlastProgress(0);
+    setBlastFalhas([]);
     toast.info("Iniciando Nexus Blast: Cotação Automatizada em Massa");
 
+    // `completed` mede andamento (a barra precisa chegar a 100%); `succeeded`
+    // mede quantas realmente voltaram. São números diferentes.
     let completed = 0;
+    let succeeded = 0;
+    const falhas: { transportadora: string; mensagem: string }[] = [];
     const total = carriers.length;
 
     for (const carrier of carriers) {
       try {
-        if (carrier.canal_cotacao === "api") {
-          await handleCotarAPI(carrier);
-        } else if (carrier.canal_cotacao === "whatsapp") {
-          // Registro honesto: sem instancia configurada no front para o Evolution,
-          // a cotacao fica pendente aguardando resposta manual da transportadora.
-          createCotacao.mutate({
-            transportadora_id: carrier.transportadora_id,
-            canal: "whatsapp",
-            origem_estado: origemEstado,
-            destino_estado: destinoEstado,
-            peso_kg: pesoKg ? parseFloat(pesoKg) : undefined,
-            volumes: parseInt(volumes),
-          });
-          addCotacao({
-            id: crypto.randomUUID(),
-            transportadora_id: carrier.transportadora_id,
-            transportadora_nome: carrier.transportadora?.nome_fantasia || "N/A",
-            canal: "whatsapp",
-            valor: null,
-            prazo_dias: null,
-            status: "pendente",
-            observacoes: "Nexus Blast: Aguardando RPA/WhatsApp",
-            created_at: new Date().toISOString(),
-          });
-        } else {
-          createCotacao.mutate({
-            transportadora_id: carrier.transportadora_id,
-            canal: "email",
-            origem_estado: origemEstado,
-            destino_estado: destinoEstado,
-            peso_kg: pesoKg ? parseFloat(pesoKg) : undefined,
-            volumes: parseInt(volumes),
-          });
-          addCotacao({
-            id: crypto.randomUUID(),
-            transportadora_id: carrier.transportadora_id,
-            transportadora_nome: carrier.transportadora?.nome_fantasia || "N/A",
-            canal: "email",
-            valor: null,
-            prazo_dias: null,
-            status: "pendente",
-            observacoes: "Nexus Blast: Email Automático Enviado",
-            created_at: new Date().toISOString(),
-          });
-        }
+        await cotarOuRegistrar(carrier);
+        succeeded++;
       } catch (e) {
         console.error(
           `Erro ao cotar com ${carrier.transportadora?.nome_fantasia}:`,
           e,
         );
+        falhas.push({
+          transportadora: carrier.transportadora?.nome_fantasia || "N/A",
+          mensagem: e instanceof Error ? e.message : String(e),
+        });
       }
       completed++;
       setBlastProgress(Math.round((completed / total) * 100));
     }
 
     setIsBlasting(false);
-    toast.success(
-      "Nexus Blast concluído! Aguardando respostas das transportadoras sem API.",
-    );
+    setBlastFalhas(falhas);
+
+    notificarFimDoBlast(succeeded, total, falhas.length);
   };
 
   const addCotacao = (c: CotacaoManual) =>
@@ -917,6 +956,33 @@ export default function CotacaoMultiCanal() {
                       }
                     }}
                   />
+                  {blastFalhas.length > 0 && (
+                    <Card className="border-destructive/40 bg-destructive/5">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="flex items-center gap-2 text-sm text-destructive">
+                          <AlertTriangle className="h-4 w-4" />
+                          {blastFalhas.length} transportadora(s) falharam no
+                          Nexus Blast
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-1">
+                        {blastFalhas.map((f) => (
+                          <p
+                            key={`${f.transportadora}-${f.mensagem}`}
+                            className="text-xs"
+                          >
+                            <span className="font-medium">
+                              {f.transportadora}
+                            </span>
+                            <span className="text-muted-foreground">
+                              {" — "}
+                              {f.mensagem}
+                            </span>
+                          </p>
+                        ))}
+                      </CardContent>
+                    </Card>
+                  )}
                 </motion.div>
               )}
             </AnimatePresence>
