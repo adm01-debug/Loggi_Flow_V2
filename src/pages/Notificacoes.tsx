@@ -79,7 +79,8 @@ export default function Notificacoes() {
         .from("notifications")
         .select("*")
         .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .limit(200);
       if (error) throw error;
       return data as Notification[];
     },
