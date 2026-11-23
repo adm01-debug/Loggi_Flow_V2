@@ -204,12 +204,12 @@
 
 ### Onda 3
 
-- [ ] **132** — Confirmar no banco ao vivo que a unicidade da tabela de marcador existe — onda 3 — Crítica
-- [ ] **133** — `lalamove-webhook`: trocar "consulta e depois grava" por "grava primeiro e trata o conflito" — onda 3 — Crítica
-- [ ] **134** — `lalamove-webhook`: remover a gravação tardia do marcador — onda 3 — Alta
-- [ ] **135** — `rodonaves-webhook`: trocar "consulta e depois grava" por "grava primeiro e trata o conflito" — onda 3 — Crítica
-- [ ] **136** — `rodonaves-webhook`: remover a gravação tardia do marcador — onda 3 — Alta
-- [ ] **137** — Teste automatizado: o mesmo evento enviado duas vezes grava o dado de negócio uma vez — onda 3 — Alta
+- [x] **132** — Confirmar no banco ao vivo que a unicidade da tabela de marcador existe — onda 3 — Crítica
+- [x] **133** — `lalamove-webhook`: trocar "consulta e depois grava" por "grava primeiro e trata o conflito" — onda 3 — Crítica
+- [x] **134** — `lalamove-webhook`: remover a gravação tardia do marcador — onda 3 — Alta
+- [x] **135** — `rodonaves-webhook`: trocar "consulta e depois grava" por "grava primeiro e trata o conflito" — onda 3 — Crítica
+- [x] **136** — `rodonaves-webhook`: remover a gravação tardia do marcador — onda 3 — Alta
+- [x] **137** — Teste automatizado: o mesmo evento enviado duas vezes grava o dado de negócio uma vez — onda 3 — Alta
 - [ ] **138** — Criar `buildEventKey` em `_shared/idempotency.ts`, copiando a chave da Rodonaves — onda 3 — Alta
 - [ ] **139** — `lalamove-webhook`: eliminar o `crypto.randomUUID()` da chave de dedupe — onda 3 — Alta
 - [ ] **140** — `nexus-webhook-receiver`: eliminar o `Date.now()` da chave de dedupe — onda 3 — Alta
@@ -434,6 +434,67 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapas 132 a 137 (2026-11-23) - achado B-01
+
+**132 - a unicidade existe no banco ao vivo.** Sem MCP do Supabase nesta sessão, a prova veio do próprio
+repositório: a run `45189263904` do `types-sync` executou o job "Ler banco oficial e gerar candidatos"
+contra a produção em 2026-11-23T14:07Z, e o `schema-manifest.json` gerado nessa run saiu **idêntico byte a
+byte** ao commitado - sha256 `5575176495c7d31a7ed5277ea9e80ea16840fe679af86041dc5d3cc557103a8c` (o
+`schema-catalog.json` também: `fef0bfe4baba70df133966e3063675edf9ab24a519c461b5f62ea98a0d9b1527`). Nomes
+reais das restrições de unicidade, lidos de `constraints` **e** `indexes` do manifesto:
+
+| tabela | restrição | colunas |
+|---|---|---|
+| `webhook_events_processed` | `webhook_events_processed_event_id_provider_key` | `(event_id, provider)` |
+| `idempotency_keys` | `idempotency_keys_idempotency_key_key` | `(idempotency_key)` |
+
+As duas tabelas têm também a `_pkey` respectiva, e `service_role` tem `DELETE` concedido em
+`webhook_events_processed` (`relation_grants`), então o código das etapas 133-136 não precisa de DDL.
+
+**133 e 134 - `lalamove-webhook` (`supabase/functions/lalamove-webhook/index.ts`).** A consulta prévia
+(`select ... maybeSingle()`) deu lugar ao insert do marcador em `:105-124`, antes do `switch` (`:126`), com
+`23505` devolvendo `{ success: true, duplicate: true }` (`:114`) e qualquer outro erro virando log e
+seguindo (`:120-123`), igual a `_shared/idempotency.ts:30`. O bloco "Mark as processed" do fim foi apagado;
+o `webhook_events_processed` aparece **uma vez** no arquivo. Resposta de sucesso em `:198` inalterada.
+
+**135 e 136 - `rodonaves-webhook` (`supabase/functions/rodonaves-webhook/index.ts`).** A consulta prévia
+saiu; o insert do marcador ficou em `:172-200`, com `23505` em `:181`. **Desvio consciente do texto da
+etapa 135:** o plano manda gravar no lugar da consulta (`:128-135` antigos), mas ali o marcador passaria a
+engolir dois caminhos que hoje não gravam nada e continuam reprocessáveis - `Entrega não encontrada`
+(`:144`, 404) e `Status code não mapeado` (`:160`). Gravar antes deles transformaria um evento sem entrega
+ainda cadastrada em "Already processed" para sempre. O marcador ficou imediatamente antes do primeiro write
+de negócio (`Update entrega`, `:201`; `.update(updateData)` em `:210`; insert em `ocorrencias` em `:217`),
+que fecha a janela TOCTOU do mesmo jeito e preserva as duas saídas. O teste da etapa 137 trava essa ordem.
+Bloco "Mark as processed" apagado; `webhook_events_processed` aparece **uma vez**; `event_id` continua na
+resposta de sucesso (`:233`).
+
+**137 - `tests/contracts/webhook-idempotencia.spec.ts` (novo).** As duas edges chamam `serve()` no topo do
+módulo e não exportam handler, então importar o `index.ts` num teste não é viável sem refatorar - o plano
+manda não refatorar nessa etapa e entregar o alcançável. O teste verifica a fonte, que é exatamente o que a
+regressão mudaria: (a) o marcador aparece antes do primeiro write de negócio; (b) `23505` e
+`duplicate: true` existem; (c) não há consulta prévia (`existingEvent`, `.maybeSingle()`) nem gravação
+tardia (`Mark as processed`), e o marcador é gravado uma única vez; (d) no `rodonaves-webhook` o marcador
+fica depois da saída `Entrega não encontrada`. 7 testes. **Prova de que o teste pega a regressão:** com as
+duas edges revertidas para o `main` (`git checkout origin/main -- ...`) ele falha 5 de 7.
+
+**Verificação executada:** `deno check` nas duas edges, 0 erros; `deno lint` nas duas, 6 problemas - os
+mesmos 6 do `main` (conferido revertendo os arquivos); `tsc --noEmit -p tsconfig.app.json`, 0;
+`eslint` nos arquivos tocados, 0 erros (`supabase/functions` é ignorado pelo eslint do repo, por isso o
+`deno check`); `npm run lint:budget` OK (77/86 avisos, 0/0 erros); `vitest run --coverage` 42 arquivos /
+333 testes passando (eram 41/326), cobertura 71.65 / 67.41 / 75.29 / 73.67, idêntica a baseline.
+
+**NÃO VERIFICADO:** entrega real de webhook em produção depois do deploy - a confirmação de deploy e de
+comportamento fica para depois do merge. Não houve teste contra o banco ao vivo.
+
+**Achados novos (não corrigidos):**
+
+- `src/integrations/supabase/types.ts` está atrás do banco: a run 45189263904 do `types-sync` acusa
+  `user_panel_preferences` (metas de SLA da #248) presente em produção e ausente no arquivo commitado, o
+  que derruba o gate de TypeScript do próprio `types-sync` desde 2026-11-23. Drift de tipos, não de
+  restrições.
+- O teste da 137 depende de `serve()` continuar inline nas duas edges; se alguém exportar o handler, o
+  teste vira redundante e deve ser trocado por teste de unidade com cliente simulado.
 
 ### Registro - etapas 128 a 131 (2026-11-23) - achado R-09
 
