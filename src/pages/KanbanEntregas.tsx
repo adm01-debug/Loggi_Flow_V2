@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { TRANSICOES_ENTREGA } from "@/lib/statusTransitions";
 import { EmptyState } from "@/components/common/EmptyState";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Badge } from "@/components/ui/badge";
@@ -288,12 +289,23 @@ export default function KanbanEntregas() {
     mutationFn: async ({
       id,
       status,
+      statusAtual,
       version,
     }: {
       id: string;
       status: EntregaStatus;
+      statusAtual: EntregaStatus;
       version: number;
     }) => {
+      if (!TRANSICOES_ENTREGA[statusAtual].includes(status)) {
+        throw new Error(
+          `${statusAtual} -> ${status}: transicao invalida. Destinos validos a partir de ${statusAtual}: ${
+            TRANSICOES_ENTREGA[statusAtual].join(", ") ||
+            "nenhum (estado final)"
+          }.`,
+        );
+      }
+
       const { error, count } = await supabase
         .from("entregas")
         .update(
@@ -344,6 +356,7 @@ export default function KanbanEntregas() {
     updateStatus.mutate({
       id: draggableId,
       status: destination.droppableId as EntregaStatus,
+      statusAtual: item.status as EntregaStatus,
       version: item.version,
     });
   };
