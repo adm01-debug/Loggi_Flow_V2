@@ -1,5 +1,11 @@
 # EVIDÊNCIAS — Auditoria de Estado do LogiFlow
 
+> **ATENCAO - DOCUMENTO HISTORICO**: as evidencias deste anexo foram colhidas no banco
+> `hgicfqjayrjurivtygqf` (Lovable Cloud), onde **agentes nao podem escrever**; o banco oficial e
+> `jvfhclubfpxrtrrazrgr`. A medicao e de **16/08/2026**, sobre o commit `513ab5a`, e **nao descreve o
+> estado atual**. Para o retrato mais recente use `docs/prod-readiness.md`; para a auditoria que
+> levantou estes achados, `docs/qa/03-ACHADOS.md`.
+
 > Anexo de detalhe de [`ESTADO_ATUAL.md`](./ESTADO_ATUAL.md).
 > Executado em 16/08/2026 · commit `513ab5a` · branch `main` · projeto Supabase `hgicfqjayrjurivtygqf`.
 > Contém os comandos, respostas e contagens que sustentam cada afirmação do documento executivo.
@@ -14,7 +20,7 @@ Contagem feita sobre a árvore real, não sobre autodeclaração.
 | ------------------------------------------------- | --------: | ------: |
 | `src/**/*.{ts,tsx}`                               |       646 | 115.417 |
 | `supabase/functions/**/*.ts`                      |       109 |  11.520 |
-| `supabase/migrations/*.sql`                       |       230 |  13.454 |
+| `supabase/migrations/*.sql`                       |       230 |  13.454 | (em 16/08/2026; **250** em 2026-11-23 — etapa 243) |
 | `tests/**`                                        |        11 |       — |
 | `.github/**`                                      |         4 |       — |
 | `scripts/*.mjs`                                   |         5 |       — |
