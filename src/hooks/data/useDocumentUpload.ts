@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { matchesMagicBytes } from "@/lib/fileSignature";
 import { toast } from "sonner";
@@ -22,6 +22,14 @@ export function useDocumentUpload(options: UseDocumentUploadOptions = {}) {
 
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(0);
+  const progressResetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Cancela o reset de progresso pendente ao desmontar
+  useEffect(() => {
+    return () => {
+      if (progressResetTimerRef.current) clearTimeout(progressResetTimerRef.current);
+    };
+  }, []);
 
   // Magic byte validation for basic types
   const validateMagicBytes = async (file: File): Promise<boolean> => {
@@ -98,7 +106,8 @@ export function useDocumentUpload(options: UseDocumentUploadOptions = {}) {
         return null;
       } finally {
         setIsUploading(false);
-        setTimeout(() => setProgress(0), 1000);
+        if (progressResetTimerRef.current) clearTimeout(progressResetTimerRef.current);
+        progressResetTimerRef.current = setTimeout(() => setProgress(0), 1000);
       }
     },
     [bucket, maxSizeMB, allowedTypes]

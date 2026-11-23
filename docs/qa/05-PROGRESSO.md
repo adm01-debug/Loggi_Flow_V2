@@ -192,11 +192,11 @@
 
 ### Onda 5
 
-- [ ] **123** — `useSLANotifications`: cancelar os cinco temporizadores de aviso e de som — onda 5 — Baixa
-- [ ] **124** — `useOnboarding`: cancelar o temporizador da notificação de conquista — onda 5 — Baixa
-- [ ] **125** — `useAchievementNotifications`: cancelar o auto-descarte da notificação — onda 5 — Baixa
-- [ ] **126** — `useImportData`: cancelar o reset de dois segundos — onda 5 — Baixa
-- [ ] **127** — `useDocumentUpload` e `useSecurityPushNotifications`: os dois últimos temporizadores — onda 5 — Baixa
+- [x] **123** — `useSLANotifications`: cancelar os cinco temporizadores de aviso e de som — onda 5 — Baixa
+- [x] **124** — `useOnboarding`: cancelar o temporizador da notificação de conquista — onda 5 — Baixa
+- [x] **125** — `useAchievementNotifications`: cancelar o auto-descarte da notificação — onda 5 — Baixa
+- [x] **126** — `useImportData`: cancelar o reset de dois segundos — onda 5 — Baixa
+- [x] **127** — `useDocumentUpload` e `useSecurityPushNotifications`: os dois últimos temporizadores — onda 5 — Baixa
 - [ ] **128** — `useBoxManagement`: canal de tempo real com nome único — onda 5 — Média
 - [ ] **129** — `useMapWeatherSync`: canal de zonas de risco com nome único — onda 5 — Média
 - [ ] **130** — `useSmartAlerts`: canal de alertas táticos com nome único — onda 5 — Média
@@ -434,6 +434,82 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapas 123 a 127 (2026-11-23) - achado R-08
+
+**123 - `useSLANotifications` (`src/hooks/logistics/useSLANotifications.tsx`).** As duas funções
+de módulo passaram a devolver o cancelamento em vez de deixar o temporizador solto:
+`showBrowserNotification` (`:42`) devolve `() => { clearTimeout(autoCloseTimer); notification.close(); }`
+e `playAlertSound` (`:83`) devolve `cancelar`, que limpa os temporizadores e chama `encerrarSom()`.
+`encerrarSom` (`:99`) **fecha o `AudioContext`** - é a armadilha que o plano aponta: cancelar só o
+timeout que fecharia o contexto o deixaria aberto; e é idempotente (flag `encerrado`), então
+cancelar no desmonte não estoura quando o som já terminou. O hook guarda cada cancelamento em
+`cancelamentosRef` (`:161`) e o `useEffect` de `:164-170` cancela tudo no desmonte.
+Frequência, ganho e durações do oscilador (880/660/880, ganho 0,3 / 523, ganho 0,2; 150, 300,
+450 e 200 ms) estão **inalterados**.
+
+**124 - `useOnboarding` (`src/hooks/ui/useOnboarding.tsx`).** `achievementTimerRef` (`:84`),
+cancelado antes de reagendar (`:198`) e no cleanup do `useEffect` (`:87-91`). O atraso de 2 s
+continua lá - ele existe para a conquista não competir com o `toast.success` de XP.
+
+**125 - `useAchievementNotifications` (`src/hooks/gamification/useAchievementNotifications.tsx`).**
+Lista `dismissTimersRef` (`:29`) com cleanup no desmonte (`:32-38`): lista, e não um timer só,
+porque cada conquista agenda o seu próprio descarte. `dismissNotification` continua removendo por
+`id` (`:59`) e o timer por `timestamp` (`:54`) - os dois critérios **não foram unificados**, como o
+plano manda; a divergência fica registrada abaixo.
+
+**126 - `useImportData` (`src/hooks/common/useImportData.ts`).** `resetTimerRef` (`:52`), cancelado
+antes de reagendar (`:197`) - duas importações seguidas não zeram mais o progresso da segunda - e
+no cleanup (`:55-59`). **Dependência que o plano mandou conferir:** o
+`grep -rn "useImportData" src/` dá **uma única ocorrência, o reexport em `src/hooks/index.ts:18`**.
+Nenhuma tela usa este hook hoje, então não existe teste real possível em tela - o hook está morto
+na árvore (achado abaixo).
+
+**127 - `useDocumentUpload` e `useSecurityPushNotifications`.** `progressResetTimerRef`
+(`src/hooks/data/useDocumentUpload.ts:25`) cancelado antes de reagendar (`:109`) e no cleanup
+(`:28-32`); `autoCloseTimersRef` (`src/hooks/notifications/useSecurityPushNotifications.tsx:21`) em
+lista, com cleanup (`:24-30`). O `catch` de `useSecurityPushNotifications.tsx:123` e a condição
+`event.severity !== 'critical'` de `:120` ficaram **intactos**: aviso crítico continua sem fechar
+sozinho.
+
+#### Varredura de fechamento do R-08 (exigida pela etapa 127)
+
+`grep -rn "setTimeout(" src/ --include=*.ts --include=*.tsx`, sem `*.test.*`: **49 arquivos e 66
+chamadas**. Os 10 do R-08 são 10 dessas 66, e agora estão cancelados.
+
+| Grupo | Arquivos | Chamadas | Situação |
+| --- | --- | --- | --- |
+| Os 10 timers do R-08 (cancelados neste lote) | 6 | 10 | `[x]` |
+| Hooks com `clearTimeout` + `use-toast.ts` (timer no `Map toastTimeouts`) | 8 | 11 | corretos |
+| Legítimos do A-08 em hooks (`useDeliveryRoutes.tsx:256`, `useGeocoding.tsx:75`) | 2 | 2 | legítimos |
+| `useQRScanner.tsx` | 1 | 2 | `:136` benigno (só ref) · `:213` → R-08b |
+| **Total em `src/hooks/`** | **17** | **25** | conferido |
+| **Fora de `src/hooks/`** (30 componentes/telas + `main.tsx` + `CircuitBreaker.ts` + `systemTester.ts`) | **32** | **41** | só `CircuitBreaker.ts:39` e `BiometricConsentModal.tsx:66` são legítimos do A-08; o resto → R-08b |
+
+O achado R-08, que é **de hooks**, fecha aqui: nenhum hook de `src/hooks/` cria `setTimeout`
+em callback sem referência e sem `clearTimeout`, exceto os dois legítimos que o A-08 nomeia.
+
+**Achados novos (não corrigidos, fora do escopo do R-08):**
+
+- **R-08b** - fora de `src/hooks/` sobraram **39 chamadas em 30 arquivos** de componentes e telas com
+  o mesmo formato do R-08 (timeout criado dentro de callback, sem referência). Muitas são
+  inofensivas (`setCopied(false)`, esconder confete), mas mexem em estado de tela depois de a tela
+  sair: `src/pages/Envios.tsx:454` e `:551`, `src/pages/ImportacaoMassa.tsx:243` (`setCurrentStep(0)`),
+  `src/pages/Clientes.tsx:295` e `src/main.tsx:59`/`:63` (splash). Mais `useQRScanner.tsx:213` (`setTimeout(startScanning, 100)` dentro de
+  `switchCamera`, que chama `getUserMedia` se a tela saiu no meio).
+- **Hook morto** - `useImportData` não é consumido por nenhuma tela (só reexport em
+  `src/hooks/index.ts:18`). O bug que a etapa 126 corrige não tem como aparecer hoje.
+- **Critério divergente em `useAchievementNotifications`** - descarte automático por `timestamp`
+  (`:54`) e `dismissNotification` por `id` (`:59`). Não unificado por decisão do plano.
+
+**Validação:** `tsc --noEmit` 0 erros; `eslint` nos 6 arquivos 0 erros e **2 avisos herdados**
+(`react-hooks/set-state-in-effect` em `useSLANotifications` e `useSecurityPushNotifications` - as
+mesmas duas ocorrências já existem em `origin/main`, só mudaram de linha); `vitest run
+--coverage` 41 arquivos / 326 testes passando, cobertura 71,65 st / 67,41 br / 75,29 fn / 73,67 li,
+idêntica à linha de base. **NÃO VERIFICADO** o comportamento em runtime: os 6 arquivos estavam
+fora do padrão do `prettier` já em `origin/main` (`prettier --check` reprova os 6 na main), por isso
+não rodei `--write` - não haveria como separar reformatação de mudança no diff; e som de alerta
+de SLA e notificação de conquista exigem browser com permissão de notificação e áudio.
 
 ### Registro - etapas 121 e 122 (2026-11-23) - achado R-05
 
