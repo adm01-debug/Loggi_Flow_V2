@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { toast } from "sonner";
@@ -19,6 +19,7 @@ export interface SLAAlertItem {
 
 export const useSLAAlerts = () => {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   
 
   const { data: entregas, isLoading } = useQuery({
@@ -116,6 +117,9 @@ export const useSLAAlerts = () => {
       });
       if (error) throw error;
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications", user?.id] });
+    },
   });
 
   // Send alerts for critical items (once per session)
@@ -123,6 +127,8 @@ export const useSLAAlerts = () => {
     if (criticos.length === 0) return;
     const notified = sessionStorage.getItem("sla-notified") || "";
     const notifiedIds = new Set(notified.split(","));
+
+    const pendentes: SLAAlertItem[] = [];
 
     criticos.forEach((alert) => {
       if (!notifiedIds.has(alert.id)) {
@@ -133,12 +139,23 @@ export const useSLAAlerts = () => {
             duration: 10000,
           },
         );
-        createNotification.mutate(alert);
+        pendentes.push(alert);
         notifiedIds.add(alert.id);
       }
     });
 
     sessionStorage.setItem("sla-notified", Array.from(notifiedIds).join(","));
+
+    if (pendentes.length === 0) return;
+
+    // Um aviso para o lote inteiro: o efeito dispara sozinho, toast por item entupiria a tela.
+    void Promise.allSettled(pendentes.map((alert) => createNotification.mutateAsync(alert))).then(
+      (resultados) => {
+        if (resultados.some((r) => r.status === "rejected")) {
+          toast.error("Não foi possível registrar os alertas de SLA");
+        }
+      },
+    );
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [criticos]);
 
