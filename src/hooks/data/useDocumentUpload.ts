@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { matchesMagicBytes } from "@/lib/fileSignature";
 import { toast } from "sonner";
 
 interface UseDocumentUploadOptions {
@@ -37,18 +38,7 @@ export function useDocumentUpload(options: UseDocumentUploadOptions = {}) {
       reader.readAsArrayBuffer(file.slice(0, 4));
     });
 
-    // Signatures: PDF: 25504446, PNG: 89504E47, JPEG: FFD8FF, WEBP: 52494646
-    const signatures: Record<string, string[]> = {
-      "application/pdf": ["25504446"],
-      "image/png": ["89504E47"],
-      "image/jpeg": ["FFD8FF", "FFD8FFE0", "FFD8FFE1"],
-      "image/webp": ["52494646"],
-    };
-
-    const type = file.type;
-    if (!signatures[type]) return false; // Tipo sem assinatura conhecida é recusado
-
-    return signatures[type].some(sig => header.startsWith(sig));
+    return matchesMagicBytes(header, file.type);
   };
 
   const upload = useCallback(
