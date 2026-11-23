@@ -108,8 +108,8 @@
 
 ### Onda 2
 
-- [ ] **062** — Abrir o diálogo de edição de coleta a partir do cartão — onda 2 — Alta
-- [ ] **063** — Ação "Editar" dentro do diálogo de detalhes da coleta — onda 2 — Média
+- [x] **062** — Abrir o diálogo de edição de coleta a partir do cartão — onda 2 — Alta
+- [x] **063** — Ação "Editar" dentro do diálogo de detalhes da coleta — onda 2 — Média
 - [ ] **064** — Resincronizar "reversa" e "urgente" quando o diálogo recebe uma coleta — onda 2 — Alta
 - [ ] **065** — Criar a mutation de exclusão lógica de coleta — onda 2 — Alta
 - [ ] **066** — Ligar a exclusão de coleta na interface, com confirmação — onda 2 — Alta
@@ -434,6 +434,31 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapas 062 e 063 (2026-11-24) - ja estavam na main
+
+As duas estavam implementadas e nao marcadas. A marcacao faltando fazia o caminho
+parecer trabalho perdido de outro agente.
+
+**062 - abrir a edicao pelo cartao.** `src/pages/Coletas.tsx:851-864`: botao `Pencil`
+com `e.stopPropagation()` (necessario, porque o `onClick` do `Card` em `:752-756` abre
+os detalhes), chamando `setSelectedPickup(c)` e depois `setIsDialogOpen(true)`. O
+`<PickupDialog>` em `:938-943` ja recebia `pickup={selectedPickup}` - essa linha nao
+faltava. O `onClick` do cartao continua abrindo **detalhes**, como a etapa exige: as
+duas portas existem.
+
+**063 - editar de dentro dos detalhes.** `src/pages/Coletas.tsx:951-955`: o
+`PickupDetailsDialog` recebe `onEdit`, que fecha os detalhes, seleciona o item e abre o
+dialogo de edicao.
+
+Nenhuma alteracao de codigo nas duas.
+
+**Verificacao**
+- `grep -n 'setSelectedPickup(c)' -A2 src/pages/Coletas.tsx` -> os tres pontos
+  (`:754` detalhes, `:860` edicao, `:953` onEdit) chamam `setSelectedPickup` antes de
+  abrir o dialogo correspondente
+- `grep -n 'pickup={selectedPickup}' src/pages/Coletas.tsx` -> `:942` (PickupDialog) e
+  `:948` (PickupDetailsDialog)
 
 ### Registro - etapa 061 (2026-11-24)
 
