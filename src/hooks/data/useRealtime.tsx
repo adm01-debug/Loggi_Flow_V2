@@ -93,6 +93,14 @@ export function useRealtime<T = Record<string, unknown>>({
   // no mesmo canal do supabase-js (que reusa canal por topic).
   const topicRef = useRef(hookInstanceId());
 
+  // Estabiliza os valores que chegam inline (callbacks e queryKey).
+  // Atualizado sem deps → sempre reflete o valor do render atual,
+  // sem incluir onInsert/onUpdate/onDelete/queryKey nas deps do useCallback.
+  const cbRef = useRef({ onInsert, onUpdate, onDelete, queryKey });
+  useEffect(() => {
+    cbRef.current = { onInsert, onUpdate, onDelete, queryKey };
+  });
+
   // Optimized invalidation with debounce to prevent rapid-fire refetches
   const debouncedInvalidate = useRef(
     debounce((keys: string[]) => {
@@ -126,8 +134,10 @@ export function useRealtime<T = Record<string, unknown>>({
       // Avoid processing identical sequential payloads (e.g., from multiple subscriptions)
       if (isDuplicatePayload(table, payload.new || payload.old)) return;
 
-      if (queryKey) {
-        queryClient.invalidateQueries({ queryKey });
+      const { onInsert: cb_onInsert, onUpdate: cb_onUpdate, onDelete: cb_onDelete, queryKey: cb_queryKey } = cbRef.current;
+
+      if (cb_queryKey) {
+        queryClient.invalidateQueries({ queryKey: cb_queryKey });
 
         // Specifically invalidate dashboard metrics if related tables change
         if (
@@ -144,18 +154,17 @@ export function useRealtime<T = Record<string, unknown>>({
 
       switch (payload.eventType) {
         case "INSERT":
-          onInsert?.(payload.new as T);
+          cb_onInsert?.(payload.new as T);
           break;
         case "UPDATE":
-          onUpdate?.({ old: payload.old as T, new: payload.new as T });
+          cb_onUpdate?.({ old: payload.old as T, new: payload.new as T });
           break;
         case "DELETE":
-          onDelete?.(payload.old as T);
+          cb_onDelete?.(payload.old as T);
           break;
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [queryKey, queryClient, onInsert, onUpdate, onDelete, table],
+    [queryClient, table, debouncedInvalidate],
   );
 
   useEffect(() => {
