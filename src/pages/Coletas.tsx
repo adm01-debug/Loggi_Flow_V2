@@ -143,7 +143,14 @@ export default function Coletas() {
       const { data, error } = await supabase
         .from("coletas")
         .select(
-          "*, fornecedores!fk_coletas_fornecedor(razao_social, nome_fantasia), transportadoras!fk_coletas_transportadora(nome_fantasia)",
+          `id, numero_coleta, endereco_coleta, contato_coleta, tipo_coleta,
+           fornecedor_id, transportadora_id, data_prevista_coleta,
+           data_efetiva_coleta, data_recebimento, qtd_volumes, qtd_recebida,
+           peso_estimado_kg, peso_efetivo, codigo_rastreamento, status,
+           observacoes, is_reverse, is_urgent, custo_estimado, custo_real,
+           created_at,
+           fornecedores!fk_coletas_fornecedor(razao_social, nome_fantasia),
+           transportadoras!fk_coletas_transportadora(nome_fantasia)`,
         )
         .is("deleted_at", null)
         .order("created_at", { ascending: false })
@@ -917,7 +924,9 @@ export default function Coletas() {
         description={`Mover a coleta ${pickupToDelete?.numero_coleta ?? ""} para a lixeira? A exclusão é lógica e pode ser desfeita pelo banco de dados.`}
         confirmText="Excluir"
         type="danger"
-        onConfirm={() => { if (pickupToDelete) deleteColetaMut.mutate(pickupToDelete.id); }}
+        onConfirm={() => {
+          if (pickupToDelete) deleteColetaMut.mutate(pickupToDelete.id);
+        }}
         isLoading={deleteColetaMut.isPending}
       />
 

@@ -72,7 +72,7 @@
 - [~] **032** — Testar função, triggers e regra da NF num Postgres descartável, antes de produção — onda 3 — Crítica · **aguarda o dono**
 - [~] **033** — Aplicar as migrações da máquina de estados no banco, com o dono presente — onda 3 — Crítica · **aguarda o dono**
 - [ ] **034** — Extrair o mapa de transições para um módulo compartilhado, completo e testado — onda 3 — Alta
-- [ ] **035** — `Despachos` passa a usar o mapa compartilhado — onda 3 — Alta
+- [x] **035** — `Despachos` passa a usar o mapa compartilhado — onda 3 — Alta
 - [ ] **036** — `KanbanEntregas` valida a transição antes de gravar — onda 3 — Alta
 - [ ] **037** — Traduzir a recusa do banco em mensagem que o operador entende — onda 3 — Média
 - [ ] **038** — `CotacaoMultiCanal`: a tabela da tela passa a ler do banco, não do `useState` — onda 3 — Crítica
@@ -302,10 +302,10 @@
 - [ ] **221** — `useExecutiveMetrics`: mesma consolidação de 18 consultas para 3 — onda 6 — Baixa
 - [~] **222** — Conferir `types.ts` contra o banco ao vivo e regenerar se houver divergência — onda 6 — Média · **aguarda o dono**
 - [ ] **223** — `Envios.tsx`: trocar `select("*")` por colunas explícitas em `entregas` — onda 6 — Média
-- [ ] **224** — `Coletas.tsx`: trocar `select("*")` por colunas explícitas em `coletas` — onda 6 — Média
-- [x] **225** — `useDrillDown`: colunas explícitas nas duas leituras — onda 6 — Baixa
-- [x] **226** — `useSLANotifications`: colunas explícitas nas duas verificações de SLA — onda 6 — Baixa
-- [x] **227** — `RelatorioPDF`, `LogisticsService` e `useCotacoesMulticanal`: os três `select("*")` restantes — onda 6 — Baixa
+- [x] **224** — `Coletas.tsx`: trocar `select("*")` por colunas explícitas em `coletas` — onda 6 — Média
+- [ ] **225** — `useDrillDown`: colunas explícitas nas duas leituras — onda 6 — Baixa
+- [ ] **226** — `useSLANotifications`: colunas explícitas nas duas verificações de SLA — onda 6 — Baixa
+- [ ] **227** — `RelatorioPDF`, `LogisticsService` e `useCotacoesMulticanal`: os três `select("*")` restantes — onda 6 — Baixa
 - [~] **228** — Censo dos índices reais de `entregas`, `coletas` e `telemetry_logs` no banco ao vivo — onda 6 — Alta · **aguarda o dono**
 - [~] **229** — Provar a hipótese: `EXPLAIN (ANALYZE, BUFFERS)` da consulta do Painel SLA — onda 6 — Alta · **aguarda o dono**
 - [ ] **230** — Índice para o Painel SLA: `entregas (status, previsao_entrega)` — onda 6 — Alta
@@ -325,10 +325,10 @@
 - [ ] **241** — Pôr aviso de obsolescência no alto de `ESTADO_ATUAL.md`, dizendo qual banco ele descreve — onda 8 — Crítica
 - [ ] **242** — Corrigir no corpo de `ESTADO_ATUAL.md` as três afirmações refutadas por medição — onda 8 — Crítica
 - [ ] **243** — Avisar e corrigir `ESTADO_ATUAL_EVIDENCIAS.md`: banco medido e contagem de migrations — onda 8 — Alta
-- [ ] **244** — Pôr aviso de obsolescência e nota de método no alto de `DOCUMENTATION.md` — onda 8 — Alta
-- [ ] **245** — Corrigir os 29 caminhos de hook citados em `DOCUMENTATION.md` — onda 8 — Alta
-- [ ] **246** — Marcar em `DOCUMENTATION.md` os 10 componentes que não existem — onda 8 — Alta
-- [ ] **247** — Corrigir a seção de internacionalização de `DOCUMENTATION.md` — onda 8 — Média
+- [x] **244** — Pôr aviso de obsolescência e nota de método no alto de `DOCUMENTATION.md` — onda 8 — Alta
+- [x] **245** — Corrigir os 29 caminhos de hook citados em `DOCUMENTATION.md` — onda 8 — Alta
+- [x] **246** — Marcar em `DOCUMENTATION.md` os 10 componentes que não existem — onda 8 — Alta
+- [x] **247** — Corrigir a seção de internacionalização de `DOCUMENTATION.md` — onda 8 — Média
 - [~] **248** — Criar verificação automática dos caminhos citados na documentação — onda 8 — Média · **aguarda o dono**
 
 ### Onda 0
@@ -387,10 +387,10 @@
 
 ### Onda 7
 
-- [ ] **291** — `MapboxMap`: parar de interpolar dado de rastreamento dentro de `innerHTML` — onda 7 — Média
-- [ ] **292** — `MapboxMap`: escapar o texto dos balões do mapa — onda 7 — Média
-- [ ] **293** — Pôr `rel="noopener noreferrer"` nos quatro links externos que só têm `noreferrer` — onda 7 — Baixa
-- [~] **294** — Fazer o lint cobrar link externo e `innerHTML` interpolado — onda 7 — Baixa · **aguarda o dono**
+- [x] **291** — `MapboxMap`: parar de interpolar dado de rastreamento dentro de `innerHTML` — onda 7 — Média
+- [x] **292** — `MapboxMap`: escapar o texto dos balões do mapa — onda 7 — Média
+- [x] **293** — Pôr `rel="noopener noreferrer"` nos quatro links externos que só têm `noreferrer` — onda 7 — Baixa
+- [x] **294** — Fazer o lint cobrar link externo e `innerHTML` interpolado — onda 7 — Baixa
 
 ### Onda 8
 
