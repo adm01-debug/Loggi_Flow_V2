@@ -41,7 +41,7 @@ export function podeTransicionarEntrega(
   de: EntregaStatus,
   para: EntregaStatus,
 ): boolean {
-  return (TRANSICOES_ENTREGA[de] ?? []).includes(para);
+  return TRANSICOES_ENTREGA[de].includes(para);
 }
 
 /** Retorna true se a transicao de -> para e valida para coletas. */
@@ -49,5 +49,5 @@ export function podeTransicionarColeta(
   de: ColetaStatus,
   para: ColetaStatus,
 ): boolean {
-  return (TRANSICOES_COLETA[de] ?? []).includes(para);
+  return TRANSICOES_COLETA[de].includes(para);
 }
