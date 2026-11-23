@@ -1,5 +1,5 @@
 /* eslint-disable max-lines */
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { motion } from "framer-motion";
 import { EmptyState } from "@/components/common/EmptyState";
 import { MainLayout } from "@/components/layout/MainLayout";
@@ -74,7 +74,12 @@ export default function Ranking() {
     },
   });
 
-  useRealtime({ table: "user_levels", onUpdate: () => refetch() });
+  // Referencia estavel (contrato em src/hooks/data/useRealtime.tsx).
+  const onLevelChange = useCallback(() => {
+    refetch();
+  }, [refetch]);
+
+  useRealtime({ table: "user_levels", onUpdate: onLevelChange });
 
   interface LeaderboardEntry {
     user_id: string;

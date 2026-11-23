@@ -1,5 +1,5 @@
 /* eslint-disable max-lines */
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { SortIcon } from "@/components/common/SortIcon";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -416,12 +416,17 @@ export default function Envios() {
   const { selectedIds, toggle, selectAll, clearSelection, isSelected } =
     useSelection(pagination.paginatedData);
 
-  // Realtime
+  // Realtime — referencias estaveis: arrow inline reassina o canal a cada render
+  // (contrato em src/hooks/data/useRealtime.tsx).
+  const onEntregaRealtime = useCallback(() => {
+    refetch();
+  }, [refetch]);
+
   useRealtime({
     table: "entregas",
-    onInsert: () => refetch(),
-    onUpdate: () => refetch(),
-    onDelete: () => refetch(),
+    onInsert: onEntregaRealtime,
+    onUpdate: onEntregaRealtime,
+    onDelete: onEntregaRealtime,
   });
 
   const createMut = useMutation({

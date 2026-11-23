@@ -104,6 +104,10 @@ const statusConfig: Record<
   },
 };
 
+// Constante de modulo pela mesma razao do Index: array literal como queryKey
+// reassina o canal a cada render (contrato em src/hooks/data/useRealtime.tsx).
+const COLETAS_QUERY_KEY = ["coletas-list"];
+
 export default function Coletas() {
   const { exportToCSV } = useExport();
 
@@ -155,7 +159,8 @@ export default function Coletas() {
     staleTime: QUERY_STALE_TIME.DYNAMIC,
   });
 
-  useRealtime({ table: "coletas", queryKey: ["coletas-list"] });
+  // Constante de modulo pela mesma razao do Index (contrato no hook).
+  useRealtime({ table: "coletas", queryKey: COLETAS_QUERY_KEY });
 
   const filterConfig: FilterConfig<Coleta> = {
     search: {
@@ -917,7 +922,9 @@ export default function Coletas() {
         description={`Mover a coleta ${pickupToDelete?.numero_coleta ?? ""} para a lixeira? A exclusão é lógica e pode ser desfeita pelo banco de dados.`}
         confirmText="Excluir"
         type="danger"
-        onConfirm={() => { if (pickupToDelete) deleteColetaMut.mutate(pickupToDelete.id); }}
+        onConfirm={() => {
+          if (pickupToDelete) deleteColetaMut.mutate(pickupToDelete.id);
+        }}
         isLoading={deleteColetaMut.isPending}
       />
 

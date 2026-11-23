@@ -1,5 +1,5 @@
 /* eslint-disable max-lines */
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -246,14 +246,16 @@ export default function KanbanEntregas() {
   const { playSuccess, playError } = useAudioFeedback();
   const { onStatusChange } = useRuleTriggers();
 
+  // Referencias estaveis (contrato em src/hooks/data/useRealtime.tsx).
+  const onEntregaKanban = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ["kanban-entregas"] });
+  }, [queryClient]);
+
   useRealtime({
     table: "entregas",
-    onUpdate: () =>
-      queryClient.invalidateQueries({ queryKey: ["kanban-entregas"] }),
-    onInsert: () =>
-      queryClient.invalidateQueries({ queryKey: ["kanban-entregas"] }),
-    onDelete: () =>
-      queryClient.invalidateQueries({ queryKey: ["kanban-entregas"] }),
+    onUpdate: onEntregaKanban,
+    onInsert: onEntregaKanban,
+    onDelete: onEntregaKanban,
   });
 
   const {
