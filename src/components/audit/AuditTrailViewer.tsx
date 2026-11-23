@@ -1,5 +1,6 @@
 /* eslint-disable max-lines */
 import { useState } from "react";
+import { SortIcon } from "@/components/common/SortIcon";
 import {
   History,
   Plus,
@@ -16,7 +17,6 @@ import {
   Users,
   AlertTriangle,
   Loader2,
-  ArrowUpDown,
   RotateCcw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -158,15 +158,6 @@ export function AuditTrailViewer({
     }
   };
 
-  const SortIcon = ({ field }: { field: string }) => {
-    const dir = getSortDirection(field as keyof AuditLog);
-    if (!dir) return <ArrowUpDown className="w-4 h-4 text-muted-foreground" />;
-    return dir === "asc" ? (
-      <ChevronUp className="w-4 h-4" />
-    ) : (
-      <ChevronDown className="w-4 h-4" />
-    );
-  };
 
   if (isLoading)
     return (
@@ -223,7 +214,7 @@ export function AuditTrailViewer({
               onClick={() => toggleSort("created_at")}
               className="gap-1"
             >
-              Data <SortIcon field="created_at" />
+              Data <SortIcon dir={getSortDirection("created_at")} />
             </Button>
             <Button
               variant="ghost"
@@ -231,7 +222,7 @@ export function AuditTrailViewer({
               onClick={() => toggleSort("action")}
               className="gap-1"
             >
-              Ação <SortIcon field="action" />
+              Ação <SortIcon dir={getSortDirection("action")} />
             </Button>
             <Button
               variant="outline"
