@@ -15,6 +15,7 @@ import {
 import { EmptyState } from "@/components/common/EmptyState";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/auth/useAuth";
+import { useSLAMetas, type SLAMetas } from "@/hooks/sla/useSLAMetas";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -56,32 +57,6 @@ interface SLAItem {
   referencia: string;
 }
 
-interface SLAMetas {
-  criticoHoras: number;
-  altoHoras: number;
-  medioHoras: number;
-  metaOnTimePct: number;
-}
-
-const DEFAULT_METAS: SLAMetas = {
-  criticoHoras: 4,
-  altoHoras: 12,
-  medioHoras: 24,
-  metaOnTimePct: 95,
-};
-
-const METAS_STORAGE_KEY = "sla-panel-metas";
-
-function loadMetas(): SLAMetas {
-  try {
-    const raw = localStorage.getItem(METAS_STORAGE_KEY);
-    if (!raw) return DEFAULT_METAS;
-    return { ...DEFAULT_METAS, ...JSON.parse(raw) };
-  } catch {
-    return DEFAULT_METAS;
-  }
-}
-
 function classificar(horas: number, atrasado: boolean, metas: SLAMetas): Risco {
   if (atrasado) return "critico";
   if (horas <= metas.criticoHoras) return "critico";
@@ -118,7 +93,7 @@ const RISCO_STYLES: Record<
 
 export default function PainelSLA() {
   const { user } = useAuth();
-  const [metas, setMetas] = useState<SLAMetas>(() => loadMetas());
+  const { metas, saveMetas, isSaving } = useSLAMetas();
   const [draftMetas, setDraftMetas] = useState<SLAMetas>(metas);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [aba, setAba] = useState<"todos" | "entregas" | "coletas">("todos");
@@ -264,8 +239,7 @@ export default function PainelSLA() {
   }, [items]);
 
   const salvarMetas = () => {
-    localStorage.setItem(METAS_STORAGE_KEY, JSON.stringify(draftMetas));
-    setMetas(draftMetas);
+    saveMetas(draftMetas);
     setDialogOpen(false);
     toast.success("Metas de SLA atualizadas");
   };
@@ -386,7 +360,9 @@ export default function PainelSLA() {
               <Button variant="ghost" onClick={() => setDialogOpen(false)}>
                 Cancelar
               </Button>
-              <Button onClick={salvarMetas}>Salvar metas</Button>
+              <Button onClick={salvarMetas} disabled={isSaving}>
+                {isSaving ? "Salvando…" : "Salvar metas"}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
