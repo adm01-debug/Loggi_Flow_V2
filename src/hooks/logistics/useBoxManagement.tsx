@@ -136,22 +136,27 @@ export function useBoxManagement() {
         .eq("id", deliveryId)
         .single();
 
-      const { error } = await supabase
+      const { error, count } = await supabase
         .from("entregas")
-        .update({ box_alocado: boxId })
+        .update({ box_alocado: boxId }, { count: "exact" })
         .eq("id", deliveryId)
         .eq("version", version);
 
       if (error) throw error;
+      if (count === 0)
+        throw new Error(
+          "Conflito de versão — registro alterado por outro usuário, por favor recarregue",
+        );
 
       // Record history
-      await supabase.from("kanban_history").insert({
+      const { error: histError } = await supabase.from("kanban_history").insert({
         delivery_id: deliveryId,
         from_status: currentDelivery?.status || null,
         to_status: currentDelivery?.status || "desconhecido",
         action_by: user?.id,
         notes: `Alocado ao BOX ${boxId}`,
       });
+      if (histError) console.warn("kanban_history insert:", histError.message);
     },
     onSuccess: (_, { boxNumber }) => {
       queryClient.invalidateQueries({ queryKey: ["box-deliveries"] });
@@ -159,8 +164,10 @@ export function useBoxManagement() {
         `Entrega alocada no BOX ${boxNumber.toString().padStart(2, "0")}`,
       );
     },
-    onError: () => {
-      toast.error("Erro ao alocar entrega no box");
+    onError: (err: Error) => {
+      toast.error("Erro ao alocar entrega no box", {
+        description: err.message,
+      });
     },
   });
 
