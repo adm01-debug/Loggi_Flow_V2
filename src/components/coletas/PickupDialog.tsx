@@ -98,6 +98,9 @@ export function PickupDialog({
           ? new Date(pickup.data_prevista_coleta).toISOString().split("T")[0]
           : "";
         reset({ ...pickup, data_prevista_coleta: date });
+        // Etapa 064: resincroniza estados fora do react-hook-form ao trocar de coleta
+        setIsReverse(pickup.is_reverse ?? false);
+        setIsUrgent(pickup.is_urgent ?? false);
       } else {
         const randomId =
           window.crypto.getRandomValues(new Uint32Array(1))[0] % 100000;
@@ -113,6 +116,8 @@ export function PickupDialog({
           status: "aguardando_liberacao",
           observacoes: "",
         });
+        setIsReverse(false);
+        setIsUrgent(false);
       }
     }
   }, [open, pickup, reset]);
