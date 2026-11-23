@@ -1,5 +1,6 @@
 /* eslint-disable max-lines */
 import { useState, useMemo } from "react";
+import { SortIcon } from "@/components/common/SortIcon";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { EmptyState } from "@/components/common/EmptyState";
@@ -28,9 +29,6 @@ import {
   Package,
   Loader2,
   Sparkles,
-  ArrowUpDown,
-  ChevronUp,
-  ChevronDown,
   LucideIcon,
   History,
 } from "lucide-react";
@@ -183,17 +181,6 @@ export default function LojaRecompensas() {
     setSelectedReward(reward);
     setConfirmDialog(true);
   };
-  const SortIcon = ({ field }: { field: keyof RewardItem }) => {
-    const dir = getSortDirection(field);
-    if (!dir) {
-      return <ArrowUpDown className="w-4 h-4 text-muted-foreground" />;
-    }
-    return dir === "asc" ? (
-      <ChevronUp className="w-4 h-4" />
-    ) : (
-      <ChevronDown className="w-4 h-4" />
-    );
-  };
 
   const handleClearFilters = () => {
     clearFilters();
@@ -322,7 +309,7 @@ export default function LojaRecompensas() {
             onClick={() => toggleSort("coins_cost")}
             className="gap-1"
           >
-            Preço <SortIcon field="coins_cost" />
+            Preço <SortIcon dir={getSortDirection("coins_cost")} />
           </Button>
           <Button
             variant="ghost"
@@ -330,7 +317,7 @@ export default function LojaRecompensas() {
             onClick={() => toggleSort("rarity")}
             className="gap-1"
           >
-            Raridade <SortIcon field="rarity" />
+            Raridade <SortIcon dir={getSortDirection("rarity")} />
           </Button>
         </div>
 

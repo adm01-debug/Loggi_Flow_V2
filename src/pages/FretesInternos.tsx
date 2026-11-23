@@ -1,5 +1,6 @@
 /* eslint-disable max-lines */
 import { useState } from "react";
+import { SortIcon } from "@/components/common/SortIcon";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
@@ -18,9 +19,6 @@ import {
   Loader2,
   AlertCircle,
   Star,
-  ArrowUpDown,
-  ChevronUp,
-  ChevronDown,
 } from "lucide-react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
@@ -318,17 +316,6 @@ export default function FretesInternos() {
     transito: fretes.filter((f) => f.status === "em_transito").length,
     entregues: fretes.filter((f) => f.status === "entregue").length,
   };
-  const SortIcon = ({ field }: { field: keyof FreteInterno }) => {
-    const dir = getSortDirection(field);
-    if (!dir) {
-      return <ArrowUpDown className="w-4 h-4 text-muted-foreground" />;
-    }
-    return dir === "asc" ? (
-      <ChevronUp className="w-4 h-4" />
-    ) : (
-      <ChevronDown className="w-4 h-4" />
-    );
-  };
 
   if (error)
     return (
@@ -495,7 +482,7 @@ export default function FretesInternos() {
               onClick={() => toggleSort("created_at")}
               className="gap-1"
             >
-              Data <SortIcon field="created_at" />
+              Data <SortIcon dir={getSortDirection("created_at")} />
             </Button>
             <Button
               variant="ghost"
@@ -503,7 +490,7 @@ export default function FretesInternos() {
               onClick={() => toggleSort("origem")}
               className="gap-1"
             >
-              Origem <SortIcon field="origem" />
+              Origem <SortIcon dir={getSortDirection("origem")} />
             </Button>
             <Button
               variant="ghost"
@@ -511,7 +498,7 @@ export default function FretesInternos() {
               onClick={() => toggleSort("status")}
               className="gap-1"
             >
-              Status <SortIcon field="status" />
+              Status <SortIcon dir={getSortDirection("status")} />
             </Button>
           </div>
 

@@ -1,5 +1,6 @@
 /* eslint-disable max-lines */
 import { useState } from "react";
+import { SortIcon } from "@/components/common/SortIcon";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -18,9 +19,6 @@ import {
   User,
   FileText,
   Calendar,
-  ArrowUpDown,
-  ChevronUp,
-  ChevronDown,
   Upload,
   Copy,
 } from "lucide-react";
@@ -395,15 +393,6 @@ export default function Clientes() {
       : c;
   };
 
-  const SortIcon = ({ field }: { field: keyof Cliente }) => {
-    const dir = getSortDirection(field);
-    if (!dir) return <ArrowUpDown className="w-4 h-4 text-muted-foreground" />;
-    return dir === "asc" ? (
-      <ChevronUp className="w-4 h-4" />
-    ) : (
-      <ChevronDown className="w-4 h-4" />
-    );
-  };
 
   if (error)
     return (
@@ -693,7 +682,7 @@ export default function Clientes() {
             onClick={() => toggleSort("razao_social")}
             className="gap-1"
           >
-            Nome <SortIcon field="razao_social" />
+            Nome <SortIcon dir={getSortDirection("razao_social")} />
           </Button>
           <Button
             variant="ghost"
@@ -701,7 +690,7 @@ export default function Clientes() {
             onClick={() => toggleSort("cidade")}
             className="gap-1"
           >
-            Cidade <SortIcon field="cidade" />
+            Cidade <SortIcon dir={getSortDirection("cidade")} />
           </Button>
           <Button
             variant="ghost"
@@ -709,7 +698,7 @@ export default function Clientes() {
             onClick={() => toggleSort("total_entregas")}
             className="gap-1"
           >
-            Entregas <SortIcon field="total_entregas" />
+            Entregas <SortIcon dir={getSortDirection("total_entregas")} />
           </Button>
         </div>
 

@@ -1,5 +1,6 @@
 /* eslint-disable max-lines */
 import { useState, useMemo } from "react";
+import { SortIcon } from "@/components/common/SortIcon";
 import { EmptyState } from "@/components/common/EmptyState";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
@@ -33,9 +34,6 @@ import {
   CheckCircle2,
   XCircle,
   RefreshCw,
-  ArrowUpDown,
-  ChevronUp,
-  ChevronDown,
   Loader2,
 } from "lucide-react";
 import { useCostAlerts } from "@/hooks/logistics/useCostAlerts";
@@ -216,15 +214,6 @@ export default function AlertasCusto() {
     notificacoes: notificacoes?.length || 0,
   };
 
-  const SortIcon = ({ field }: { field: string }) => {
-    const dir = getSortDirection(field as keyof Alerta);
-    if (!dir) return <ArrowUpDown className="w-4 h-4 text-muted-foreground" />;
-    return dir === "asc" ? (
-      <ChevronUp className="w-4 h-4" />
-    ) : (
-      <ChevronDown className="w-4 h-4" />
-    );
-  };
 
   return (
     <MainLayout>
@@ -426,7 +415,7 @@ export default function AlertasCusto() {
             onClick={() => toggleSort("valor_limite")}
             className="gap-1"
           >
-            Valor <SortIcon field="valor_limite" />
+            Valor <SortIcon dir={getSortDirection("valor_limite")} />
           </Button>
           <Button
             variant="ghost"
@@ -434,7 +423,7 @@ export default function AlertasCusto() {
             onClick={() => toggleSort("created_at")}
             className="gap-1"
           >
-            Data <SortIcon field="created_at" />
+            Data <SortIcon dir={getSortDirection("created_at")} />
           </Button>
         </div>
 

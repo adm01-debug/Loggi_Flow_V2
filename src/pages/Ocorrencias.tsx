@@ -1,5 +1,6 @@
 /* eslint-disable max-lines */
 import { useState } from "react";
+import { SortIcon } from "@/components/common/SortIcon";
 import { motion } from "framer-motion";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,9 +19,6 @@ import {
   Send,
   Calendar,
   MessageSquare,
-  ArrowUpDown,
-  ChevronUp,
-  ChevronDown,
   Camera,
 } from "lucide-react";
 import { MainLayout } from "@/components/layout/MainLayout";
@@ -320,17 +318,6 @@ export default function Ocorrencias() {
   };
   const getTipoInfo = (tipo: string) =>
     TIPOS.find((t) => t.value === tipo) || { label: tipo, icon: AlertTriangle };
-  const SortIcon = ({ field }: { field: keyof Ocorrencia }) => {
-    const dir = getSortDirection(field);
-    if (!dir) {
-      return <ArrowUpDown className="w-4 h-4 text-muted-foreground" />;
-    }
-    return dir === "asc" ? (
-      <ChevronUp className="w-4 h-4" />
-    ) : (
-      <ChevronDown className="w-4 h-4" />
-    );
-  };
 
   if (error)
     return (
@@ -508,7 +495,7 @@ export default function Ocorrencias() {
             onClick={() => toggleSort("created_at")}
             className="gap-1"
           >
-            Data <SortIcon field="created_at" />
+            Data <SortIcon dir={getSortDirection("created_at")} />
           </Button>
           <Button
             variant="ghost"
@@ -516,7 +503,7 @@ export default function Ocorrencias() {
             onClick={() => toggleSort("tipo_ocorrencia")}
             className="gap-1"
           >
-            Tipo <SortIcon field="tipo_ocorrencia" />
+            Tipo <SortIcon dir={getSortDirection("tipo_ocorrencia")} />
           </Button>
         </div>
 

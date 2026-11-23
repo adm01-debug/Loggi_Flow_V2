@@ -1,5 +1,6 @@
 /* eslint-disable max-lines */
 import { useState } from "react";
+import { SortIcon } from "@/components/common/SortIcon";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -20,9 +21,6 @@ import {
   DollarSign,
   Calendar,
   Loader2,
-  ArrowUpDown,
-  ChevronUp,
-  ChevronDown,
   LucideIcon,
   FileDown,
   RefreshCw,
@@ -554,17 +552,6 @@ export default function Envios() {
     entregues: list.filter((e) => e.status === "entregue").length,
     ocorrencias: list.filter((e) => e.status === "ocorrencia").length,
   };
-  const SortIcon = ({ field }: { field: keyof Entrega }) => {
-    const dir = getSortDirection(field);
-    if (!dir) {
-      return <ArrowUpDown className="w-4 h-4 text-muted-foreground" />;
-    }
-    return dir === "asc" ? (
-      <ChevronUp className="w-4 h-4" />
-    ) : (
-      <ChevronDown className="w-4 h-4" />
-    );
-  };
 
   if (error)
     return (
@@ -741,7 +728,7 @@ export default function Envios() {
             onClick={() => toggleSort("created_at")}
             className="gap-1 shrink-0"
           >
-            Data <SortIcon field="created_at" />
+            Data <SortIcon dir={getSortDirection("created_at")} />
           </Button>
           <Button
             variant="ghost"
@@ -749,7 +736,7 @@ export default function Envios() {
             onClick={() => toggleSort("status")}
             className="gap-1 shrink-0"
           >
-            Status <SortIcon field="status" />
+            Status <SortIcon dir={getSortDirection("status")} />
           </Button>
         </div>
 

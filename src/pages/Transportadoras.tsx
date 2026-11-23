@@ -1,5 +1,6 @@
 /* eslint-disable max-lines */
 import { useState, useMemo } from "react";
+import { SortIcon } from "@/components/common/SortIcon";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { EmptyState } from "@/components/common/EmptyState";
 import { MainLayout } from "@/components/layout/MainLayout";
@@ -21,9 +22,6 @@ import {
   Trash2,
   TrendingUp,
   Download,
-  ArrowUpDown,
-  ChevronUp,
-  ChevronDown,
   Loader2,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -416,17 +414,6 @@ export default function Transportadoras() {
     total: list.length,
     ativas: list.filter((t) => t.homologada).length,
     entregas: list.reduce((a, t) => a + (t.total_entregas || 0), 0),
-  };
-  const SortIcon = ({ field }: { field: keyof Transportadora }) => {
-    const dir = getSortDirection(field);
-    if (!dir) {
-      return <ArrowUpDown className="w-4 h-4 text-muted-foreground" />;
-    }
-    return dir === "asc" ? (
-      <ChevronUp className="w-4 h-4" />
-    ) : (
-      <ChevronDown className="w-4 h-4" />
-    );
   };
 
   const FormFields = () => (
@@ -982,7 +969,7 @@ export default function Transportadoras() {
               onClick={() => toggleSort("nome_fantasia")}
               className="gap-1 shrink-0"
             >
-              Nome <SortIcon field="nome_fantasia" />
+              Nome <SortIcon dir={getSortDirection("nome_fantasia")} />
             </Button>
             <Button
               variant="ghost"
@@ -990,7 +977,7 @@ export default function Transportadoras() {
               onClick={() => toggleSort("score_performance")}
               className="gap-1 shrink-0"
             >
-              Score <SortIcon field="score_performance" />
+              Score <SortIcon dir={getSortDirection("score_performance")} />
             </Button>
           </div>
 

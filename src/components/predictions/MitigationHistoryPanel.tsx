@@ -44,6 +44,11 @@ function getDeltaIcon(delta: number | null) {
   return delta > 0 ? TrendingUp : TrendingDown;
 }
 
+function DeltaIconDisplay({ delta, className }: { delta: number | null; className?: string }) {
+  if (delta == null || delta === 0) return <Minus className={className} />;
+  return delta > 0 ? <TrendingUp className={className} /> : <TrendingDown className={className} />;
+}
+
 function getDeltaTone(delta: number | null) {
   if (delta == null || delta === 0) return "text-muted-foreground";
   return delta > 0 ? "text-success" : "text-destructive";
@@ -139,7 +144,6 @@ function MitigationRow({ row, currentOtif, onMeasure, onDelete }: RowProps) {
   const [notes, setNotes] = useState(row.notes ?? "");
 
   const delta = row.otif_delta;
-  const DeltaIcon = getDeltaIcon(delta);
   const deltaTone = getDeltaTone(delta);
 
   return (
@@ -173,7 +177,7 @@ function MitigationRow({ row, currentOtif, onMeasure, onDelete }: RowProps) {
               deltaTone,
             )}
           >
-            <DeltaIcon className="h-4 w-4" />
+            <DeltaIconDisplay delta={delta} className="h-4 w-4" />
             {delta == null ? "—" : `${delta.toFixed(2)}%`}
           </p>
         </div>

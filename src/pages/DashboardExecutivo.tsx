@@ -186,6 +186,60 @@ function AIAssistantToggle({
   );
 }
 
+function GrowthIndicator({
+  value,
+  suffix = "%",
+}: {
+  value: number;
+  suffix?: string;
+}) {
+  if (value === 0)
+    return (
+      <span className="text-muted-foreground flex items-center gap-1 text-xs">
+        <Minus className="w-3 h-3" />0{suffix}
+      </span>
+    );
+  if (value > 0)
+    return (
+      <span className="text-success flex items-center gap-1 text-xs">
+        <ArrowUpRight className="w-3 h-3" />+{value.toFixed(1)}
+        {suffix}
+      </span>
+    );
+  return (
+    <span className="text-destructive flex items-center gap-1 text-xs">
+      <ArrowDownRight className="w-3 h-3" />
+      {value.toFixed(1)}
+      {suffix}
+    </span>
+  );
+}
+
+function KPIStatus({
+  value,
+  target,
+  inverted = false,
+}: {
+  value: number;
+  target: number;
+  inverted?: boolean;
+}) {
+  const isGood = inverted ? value <= target : value >= target;
+  return (
+    <Badge
+      variant="secondary"
+      className={cn(
+        "text-xs",
+        isGood
+          ? "bg-success/20 text-success"
+          : "bg-destructive/20 text-destructive",
+      )}
+    >
+      {isGood ? "✓ Na meta" : "✗ Abaixo"}
+    </Badge>
+  );
+}
+
 export default function DashboardExecutivo() {
   const [showAI, setShowAI] = useState(false);
   const { trends, carrierOtif, avgCollectionTime } = useExecutiveMetrics();
@@ -351,59 +405,7 @@ export default function DashboardExecutivo() {
     "hsl(var(--muted))",
   ];
 
-  const GrowthIndicator = ({
-    value,
-    suffix = "%",
-  }: {
-    value: number;
-    suffix?: string;
-  }) => {
-    if (value === 0)
-      return (
-        <span className="text-muted-foreground flex items-center gap-1 text-xs">
-          <Minus className="w-3 h-3" />0{suffix}
-        </span>
-      );
-    if (value > 0)
-      return (
-        <span className="text-success flex items-center gap-1 text-xs">
-          <ArrowUpRight className="w-3 h-3" />+{value.toFixed(1)}
-          {suffix}
-        </span>
-      );
-    return (
-      <span className="text-destructive flex items-center gap-1 text-xs">
-        <ArrowDownRight className="w-3 h-3" />
-        {value.toFixed(1)}
-        {suffix}
-      </span>
-    );
-  };
 
-  const KPIStatus = ({
-    value,
-    target,
-    inverted = false,
-  }: {
-    value: number;
-    target: number;
-    inverted?: boolean;
-  }) => {
-    const isGood = inverted ? value <= target : value >= target;
-    return (
-      <Badge
-        variant="secondary"
-        className={cn(
-          "text-xs",
-          isGood
-            ? "bg-success/20 text-success"
-            : "bg-destructive/20 text-destructive",
-        )}
-      >
-        {isGood ? "✓ Na meta" : "✗ Abaixo"}
-      </Badge>
-    );
-  };
 
   const trendData = trends.data || [];
   const carrierData = carrierOtif.data || [];

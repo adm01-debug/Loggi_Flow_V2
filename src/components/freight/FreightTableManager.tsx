@@ -1,5 +1,6 @@
 /* eslint-disable max-lines */
 import { useState, useMemo, useCallback, useRef } from "react";
+import { SortIcon } from "@/components/common/SortIcon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,9 +25,6 @@ import {
   Trash2,
   MapPin,
   Loader2,
-  ArrowUpDown,
-  ChevronUp,
-  ChevronDown,
   Download,
   Upload,
 } from "lucide-react";
@@ -257,15 +255,6 @@ export function FreightTableManager({
     }
   }, [bulkDeleteIds, onDelete, clearSelection]);
 
-  const SortIcon = ({ field }: { field: string }) => {
-    const dir = getSortDirection(field as keyof TabelaFreteLocal);
-    if (!dir) return <ArrowUpDown className="w-4 h-4 text-muted-foreground" />;
-    return dir === "asc" ? (
-      <ChevronUp className="w-4 h-4" />
-    ) : (
-      <ChevronDown className="w-4 h-4" />
-    );
-  };
 
   return (
     <div className="space-y-4">
@@ -486,7 +475,7 @@ export function FreightTableManager({
           onClick={() => toggleSort("valor_kg")}
           className="gap-1"
         >
-          Valor <SortIcon field="valor_kg" />
+          Valor <SortIcon dir={getSortDirection("valor_kg")} />
         </Button>
         <Button
           variant="ghost"
@@ -494,7 +483,7 @@ export function FreightTableManager({
           onClick={() => toggleSort("prazo_dias")}
           className="gap-1"
         >
-          Prazo <SortIcon field="prazo_dias" />
+          Prazo <SortIcon dir={getSortDirection("prazo_dias")} />
         </Button>
       </div>
 
