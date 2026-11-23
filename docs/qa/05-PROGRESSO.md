@@ -108,12 +108,12 @@
 
 ### Onda 2
 
-- [ ] **062** — Abrir o diálogo de edição de coleta a partir do cartão — onda 2 — Alta
-- [ ] **063** — Ação "Editar" dentro do diálogo de detalhes da coleta — onda 2 — Média
-- [ ] **064** — Resincronizar "reversa" e "urgente" quando o diálogo recebe uma coleta — onda 2 — Alta
-- [ ] **065** — Criar a mutation de exclusão lógica de coleta — onda 2 — Alta
-- [ ] **066** — Ligar a exclusão de coleta na interface, com confirmação — onda 2 — Alta
-- [ ] **067** — Conferir que toda consulta de Coletas ignora registro excluído — onda 2 — Alta
+- [x] **062** — Abrir o diálogo de edição de coleta a partir do cartão — onda 2 — Alta
+- [x] **063** — Ação "Editar" dentro do diálogo de detalhes da coleta — onda 2 — Média
+- [x] **064** — Resincronizar "reversa" e "urgente" quando o diálogo recebe uma coleta — onda 2 — Alta
+- [x] **065** — Criar a mutation de exclusão lógica de coleta — onda 2 — Alta
+- [x] **066** — Ligar a exclusão de coleta na interface, com confirmação — onda 2 — Alta
+- [x] **067** — Conferir que toda consulta de Coletas ignora registro excluído — onda 2 — Alta
 
 ### Onda 4
 
@@ -434,6 +434,30 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapas 062-067 (2026-11-23) - edicao e exclusao de coleta
+
+Estas seis etapas vieram implementadas de sessao anterior e ficaram sem marcacao. Conferi
+cada uma contra o codigo real antes de marcar, em vez de confiar no registro:
+
+| Etapa | Onde esta a prova |
+| --- | --- |
+| 062 | `Coletas.tsx:853-866` - botao `Pencil` no cartao com `e.stopPropagation()`, `setSelectedPickup(c)` e `setIsDialogOpen(true)` |
+| 063 | `Coletas.tsx:951-955` - `onEdit` no `PickupDetailsDialog` fechando detalhes antes de abrir edicao |
+| 064 | `PickupDialog.tsx:102-103` - `setIsReverse`/`setIsUrgent` dentro do `useEffect`, e `:119-120` zerando no ramo de criacao |
+| 065 | `Coletas.tsx:122-136` - `deleteColetaMut` com `.update({ deleted_at })`, nunca `.delete()` |
+| 066 | `Coletas.tsx:867-879` (botao `Trash2` com `stopPropagation`) e `:925-937` (`ConfirmDialog` com `isLoading`) |
+| 067 | `Coletas.tsx:159` - `.is("deleted_at", null)` na consulta da lista; a exportacao CSV de `:364` usa o array `coletas` ja filtrado, nao consulta de novo |
+
+**Ponto verificado na 067:** `PickupConference.tsx:73` faz `.update()`, nao `.select()`, e
+`PickupDetailsDialog.tsx:115` idem - nenhum dos dois lista coletas, entao nao precisam do
+filtro. As consultas a `coletas` fora deste escopo (`Relatorios`, `PainelSLA`,
+`DashboardExecutivo`, `RastreamentoMotorista`, `Ocorrencias`, `Fornecedores` e os hooks de
+analytics) tem filtro proprio em 15 dos casos; as que faltam sao do achado D-02 e ficam
+registradas para a etapa do proprio achado, como o plano manda - nao mexi em hook
+compartilhado aqui.
+
+Nenhuma alteracao de codigo nesta rodada: as seis ja estavam na `main`.
 
 Uma linha por etapa concluída. A coluna **Evidência** é o que diferencia etapa concluída de etapa
 "deveria funcionar": cole o comando e o resultado, ou a consulta e o retorno.
