@@ -104,7 +104,7 @@
 ### Onda 8
 
 - [~] **060** — Tirar os dois SQL históricos do lugar onde parecem tarefa pendente — onda 8 — Média · **aguarda o dono**
-- [ ] **061** — Registrar, em um lugar só, qual SQL avulso já foi aplicado e onde — onda 8 — Média
+- [x] **061** — Registrar, em um lugar só, qual SQL avulso já foi aplicado e onde — onda 8 — Média
 
 ### Onda 2
 
@@ -434,6 +434,29 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapa 061 (2026-11-24)
+
+Depois da 060 os dois SQL historicos estao no lugar certo, mas a informacao de **o que foi
+aplicado, quando e em qual projeto** continuava dispersa entre o cabecalho de cada arquivo,
+uma linha de `banco.md` e uma de `scripts/audit/README.md`. Sem um lugar unico, um agente
+encontra "remediacao" e conclui que e pendente.
+
+Acrescentada a `docs/agentes/banco.md` - o documento que o `AGENTS.md` manda ler antes de
+qualquer SQL, migration ou deploy - uma secao "SQL avulso ja aplicado", com tabela de
+caminho, data, projeto e situacao, mais a frase que fecha a duvida para o futuro: DDL novo
+vai para `supabase/migrations/`, nunca como script avulso.
+
+Nao foi criado documento novo de proposito: o repositorio ja tem documentacao que contradiz
+documentacao, e a informacao tem de entrar onde o protocolo ja obriga a olhar.
+
+As linhas de `banco.md:32-41` sobre os projetos que nao sao o destino ficaram intactas - sao
+a protecao contra escrever no banco errado.
+
+**Verificacao**
+- `node scripts/ci/check-claude-md-integrity.mjs` -> exit 0
+- `grep -n 'historico/\|nao reexecutar' -i docs/agentes/banco.md` -> os dois arquivos listados
+  (`:50-51`) com data, projeto e marca de nao reexecutar
 
 ### Registro - etapa 060 (2026-11-24) - implementada, aguarda aprovacao (Regra 8)
 

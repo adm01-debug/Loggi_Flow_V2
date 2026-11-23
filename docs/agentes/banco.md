@@ -40,6 +40,23 @@ testar tela e nunca rode script de escrita "só para ver".
 - Há vários Supabase quase homônimos na conta do dono (Zapp Web V2, Gestão de Clientes, Gestão de Produtos).
   **Confirme qual MCP carregou antes de rodar SQL.**
 
+### SQL avulso já aplicado (fora do ledger de migrations)
+
+**Não há DDL avulso pendente.** Os dois scripts abaixo já rodaram e estão guardados em
+`scripts/historico/` apenas como registro. Nenhum deles se reexecuta.
+
+| Caminho | Aplicado em | Projeto | Situação |
+| --- | --- | --- | --- |
+| `scripts/historico/origem_remediacao_2026-08-31.sql` | 2026-08-31 | `hgicfqjayrjurivtygqf` (origem, somente leitura desde o cutover) | Já aplicado — **não reexecutar** |
+| `scripts/historico/cleanup_triggers_source.sql` | 2026-08-31 (blocos 1-2) | `hgicfqjayrjurivtygqf` (origem, somente leitura desde o cutover) | Já aplicado — **não reexecutar**; o bloco 3 foi substituído por `cron.unschedule` na origem |
+
+Um agente que encontre um `.sql` chamado "remediação" ou "cleanup" e conclua que é
+tarefa pendente está errado: o registro está aqui, com data e projeto.
+
+**DDL novo não vira script avulso.** Vai para `supabase/migrations/` e segue a ordem
+da primeira regra abaixo (arquivo → PR → merge → deploy do código → apply). Não existe
+workflow que aplique DDL: quem aplica é o dono, pelo MCP.
+
 ## Regras de migration
 
 1. **Ordem obrigatória: arquivo → PR → merge em `main` → deploy do código → apply no banco.** Nunca DDL a
