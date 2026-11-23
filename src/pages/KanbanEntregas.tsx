@@ -300,7 +300,6 @@ export default function KanbanEntregas() {
           {
             status,
             updated_at: new Date().toISOString(),
-            version: version + 1,
             ...(status === "entregue"
               ? { data_entrega_efetiva: new Date().toISOString() }
               : {}),
