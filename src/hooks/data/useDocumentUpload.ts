@@ -46,7 +46,7 @@ export function useDocumentUpload(options: UseDocumentUploadOptions = {}) {
     };
 
     const type = file.type;
-    if (!signatures[type]) return true; // Fallback if type not in list
+    if (!signatures[type]) return false; // Tipo sem assinatura conhecida é recusado
 
     return signatures[type].some(sig => header.startsWith(sig));
   };
