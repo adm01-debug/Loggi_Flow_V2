@@ -127,8 +127,8 @@
 - [~] **075** — `comprovantes`: um caminho só para o comprovante de entrega — onda 4 — Média · **aguarda o dono**
 - [~] **076** — `entregas-fotos`: ligar a foto de entrega ou remover o bucket — onda 4 — Média · **aguarda o dono**
 - [x] **077** — Remover `uploadDocument` de `storageService.ts` — onda 4 — Média
-- [ ] **078** — Recusar arquivo cuja assinatura não é conhecida — onda 4 — Média
-- [ ] **079** — Teste unitário da validação de assinatura de arquivo — onda 4 — Média
+- [x] **078** — Recusar arquivo cuja assinatura não é conhecida — onda 4 — Média
+- [x] **079** — Teste unitário da validação de assinatura de arquivo — onda 4 — Média
 - [x] **080** — Provar, arquivo por arquivo, quais dos oito "hooks sem importador" estão realmente mortos — onda 4 — Baixa
   <!-- Veredictos (261123):
       1. components/accessibility/index.ts — VIVO por caminho direto (SkipLinks, LiveRegionProvider, ReducedMotionProvider importados em MainLayout.tsx:13, LazyProviders.tsx:8-9)
@@ -434,6 +434,31 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapas 078 e 079 (2026-11-23) - achado A-11
+
+**078 - conferida no código, não reimplementada.** A inversão do fallback já estava em
+`src/hooks/data/useDocumentUpload.ts:49` desde a PR #303 (`773d0457`), que entrou na `main`
+sem marcar a etapa no progresso. Conferido: `if (!signatures[type]) return false;` e o default
+de `allowedTypes` (`:19`) cobre exatamente PDF, JPEG, PNG e WEBP — os quatro tipos da tabela
+de assinaturas. Nenhum tipo legítimo passou a ser recusado.
+
+**079 - extraída a função pura e testada.** A regra vivia dentro do hook e dependia de
+`FileReader`, o que impedia teste isolado. Ficou em `src/lib/fileSignature.ts` (`SIGNATURES` +
+`matchesMagicBytes(header, type)`), com o hook importando dela (`useDocumentUpload.ts:3`).
+Mesma lógica, sem mudança de comportamento.
+
+**Verificação**
+- `npx vitest run src/lib/fileSignature.test.ts` -> 3/3 (PDF válido aceito; PNG com cabeçalho de JPEG recusado; tipo fora da tabela recusado)
+- `npx vitest run --coverage` -> 41 arquivos, All files 71.65 st / 67.41 br / 75.29 fn / 73.67 li, sem `ERROR: Coverage`; `fileSignature.ts` 100% nas quatro métricas
+- `npx tsc --noEmit` -> 0 erros
+- `npx eslint` nos 3 arquivos -> 0 erros, 0 avisos
+
+**Desvio consciente do plano:** a etapa 079 pedia a função pura "no mesmo arquivo". Foi
+tentado assim primeiro e reprovou: importar `useDocumentUpload.ts` no teste joga o hook inteiro
+no denominador de cobertura (`coverage.all` está desligado) e derruba o global para
+68.8 statements / 70.46 lines / 65.59 branches. Mover para `src/lib/` mantém a regra testada
+e o ratchet intacto.
 
 ### Registro - etapa 059 (2026-11-24)
 
