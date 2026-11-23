@@ -29,21 +29,21 @@
 
 ### Onda 1
 
-- [ ] **001** — Remover a condicional que desliga a verificação de assinatura do webhook do Nexus — onda 1 — Crítica
+- [x] **001** — Remover a condicional que desliga a verificação de assinatura do webhook do Nexus — onda 1 — Crítica
 - [~] **002** — Confirmar com o dono se `NEXUS_WEBHOOK_SECRET` está configurado em produção — onda 1 — Crítica · **aguarda o dono**
-- [ ] **003** — Criar `requireRole` em `_shared/auth.ts` — onda 1 — Crítica
-- [ ] **004** — `webhook-status`: exigir chamador interno ou papel de admin — onda 1 — Crítica
-- [ ] **005** — `webhook-status`: filtrar `client_webhooks` por dono e registrar quem disparou — onda 1 — Alta
+- [x] **003** — Criar `requireRole` em `_shared/auth.ts` — onda 1 — Crítica
+- [x] **004** — `webhook-status`: exigir chamador interno ou papel de admin — onda 1 — Crítica
+- [x] **005** — `webhook-status`: filtrar `client_webhooks` por dono e registrar quem disparou — onda 1 — Alta
 - [~] **006** — `evolution-whatsapp`: exigir papel para enviar mensagem — onda 1 — Alta · **aguarda o dono**
-- [ ] **007** — `evolution-whatsapp`: registrar quem enviou cada mensagem — onda 1 — Média
+- [x] **007** — `evolution-whatsapp`: registrar quem enviou cada mensagem — onda 1 — Média
 - [~] **008** — `melhor-envio-api`: o ambiente (produção/teste) passa a ser decidido pelo servidor — onda 1 — Alta · **aguarda o dono**
 - [~] **009** — `melhor-envio-api`: exigir papel para cotar — onda 1 — Alta · **aguarda o dono**
 - [~] **010** — Confirmar com o dono que `ALLOW_TEST_MODE` não está ligado em produção — onda 1 — Crítica (se ligado) · **aguarda o dono**
 - [~] **011** — Fazer o modo de teste dos webhooks impossível de ligar por engano em produção — onda 1 — Média · **aguarda o dono**
-- [ ] **012** — `health`: trocar `service_role` por uma verificação sem privilégio — onda 1 — Média
-- [ ] **013** — `health-check`: parar de chamar a API administrativa de usuários e exigir sessão — onda 1 — Média
+- [x] **012** — `health`: trocar `service_role` por uma verificação sem privilégio — onda 1 — Média
+- [x] **013** — `health-check`: parar de chamar a API administrativa de usuários e exigir sessão — onda 1 — Média
 - [~] **014** — Decidir com o dono qual dos dois endpoints de saúde fica aberto e fechar o outro no `config.toml` — onda 1 — Média · **aguarda o dono**
-- [ ] **015** — Tirar o `.env` do controle de versão, sem reescrever histórico — onda 1 — Alta
+- [x] **015** — Tirar o `.env` do controle de versão, sem reescrever histórico — onda 1 — Alta
 - [~] **016** — Corrigir o `AGENTS.md` e o comentário da CI que afirmam que o repositório é privado — onda 1 — Alta · **aguarda o dono**
 - [~] **017** — Levar ao dono a decisão sobre a visibilidade do repositório — onda 1 — Alta · **aguarda o dono**
 - [~] **018** — Transformar "não commite `.env`" em teste automático — onda 1 — Média · **aguarda o dono**
@@ -89,12 +89,12 @@
 
 ### Onda 1
 
-- [ ] **049** — `BulkActions`: ação destrutiva passa a pedir confirmação — onda 1 — Crítica
-- [ ] **050** — Deixar cada tela escrever o texto da própria confirmação — onda 1 — Alta
-- [ ] **051** — Exigir digitação para confirmar exclusão em massa de cadastro — onda 1 — Alta
-- [ ] **052** — Teste do `BulkActions`: ação destrutiva não executa sem confirmação — onda 1 — Média
-- [ ] **053** — `Transportadoras`: trocar exclusão real por exclusão lógica — onda 1 — Alta
-- [ ] **054** — Filtrar `deleted_at IS NULL` em todas as leituras de `transportadoras` — onda 1 — Alta
+- [x] **049** — `BulkActions`: ação destrutiva passa a pedir confirmação — onda 1 — Crítica
+- [x] **050** — Deixar cada tela escrever o texto da própria confirmação — onda 1 — Alta
+- [x] **051** — Exigir digitação para confirmar exclusão em massa de cadastro — onda 1 — Alta
+- [x] **052** — Teste do `BulkActions`: ação destrutiva não executa sem confirmação — onda 1 — Média
+- [x] **053** — `Transportadoras`: trocar exclusão real por exclusão lógica — onda 1 — Alta
+- [x] **054** — Filtrar `deleted_at IS NULL` em todas as leituras de `transportadoras` — onda 1 — Alta
 - [~] **055** — Migration: acrescentar `deleted_at` a `fretes_internos` — onda 1 — Alta · **aguarda o dono**
 - [~] **056** — Aplicar a migration de `deleted_at` e sincronizar os tipos — onda 1 — Alta · **aguarda o dono**
 - [ ] **057** — `FretesInternos`: exclusão lógica e filtro em todas as leituras da tabela — onda 1 — Alta
@@ -108,12 +108,12 @@
 
 ### Onda 2
 
-- [ ] **062** — Abrir o diálogo de edição de coleta a partir do cartão — onda 2 — Alta
-- [ ] **063** — Ação "Editar" dentro do diálogo de detalhes da coleta — onda 2 — Média
-- [ ] **064** — Resincronizar "reversa" e "urgente" quando o diálogo recebe uma coleta — onda 2 — Alta
-- [ ] **065** — Criar a mutation de exclusão lógica de coleta — onda 2 — Alta
-- [ ] **066** — Ligar a exclusão de coleta na interface, com confirmação — onda 2 — Alta
-- [ ] **067** — Conferir que toda consulta de Coletas ignora registro excluído — onda 2 — Alta
+- [x] **062** — Abrir o diálogo de edição de coleta a partir do cartão — onda 2 — Alta
+- [x] **063** — Ação "Editar" dentro do diálogo de detalhes da coleta — onda 2 — Média
+- [x] **064** — Resincronizar "reversa" e "urgente" quando o diálogo recebe uma coleta — onda 2 — Alta
+- [x] **065** — Criar a mutation de exclusão lógica de coleta — onda 2 — Alta
+- [x] **066** — Ligar a exclusão de coleta na interface, com confirmação — onda 2 — Alta
+- [x] **067** — Conferir que toda consulta de Coletas ignora registro excluído — onda 2 — Alta
 
 ### Onda 4
 
@@ -160,13 +160,13 @@
 - [x] **094** — `Despachos`: callbacks de tempo real estáveis — onda 2 — Crítica
 - [x] **095** — `CustosDashboard`: estabilizar `handleRefetch` — onda 2 — Média
 - [x] **096** — Escrever o contrato no alto de `useRealtime` e varrer os chamadores — onda 2 — Crítica
-- [ ] **097** — `Despachos`: ler o erro da consulta — onda 2 — Alta
-- [ ] **098** — `Despachos`: parar de dizer "Fila Limpa" quando a consulta falhou — onda 2 — Crítica
-- [ ] **099** — `Envios`: erro com componente e botão de tentar de novo — onda 2 — Alta
-- [ ] **100** — `Clientes`: erro com componente e botão de tentar de novo — onda 2 — Alta
-- [ ] **101** — `Fornecedores`: erro com componente e botão de tentar de novo — onda 2 — Alta
-- [ ] **102** — `FretesInternos`: erro com componente e botão de tentar de novo — onda 2 — Alta
-- [ ] **103** — `Ocorrencias`: erro com componente e botão de tentar de novo — onda 2 — Alta
+- [x] **097** — `Despachos`: ler o erro da consulta — onda 2 — Alta
+- [x] **098** — `Despachos`: parar de dizer "Fila Limpa" quando a consulta falhou — onda 2 — Crítica
+- [x] **099** — `Envios`: erro com componente e botão de tentar de novo — onda 2 — Alta
+- [x] **100** — `Clientes`: erro com componente e botão de tentar de novo — onda 2 — Alta
+- [x] **101** — `Fornecedores`: erro com componente e botão de tentar de novo — onda 2 — Alta
+- [x] **102** — `FretesInternos`: erro com componente e botão de tentar de novo — onda 2 — Alta
+- [x] **103** — `Ocorrencias`: erro com componente e botão de tentar de novo — onda 2 — Alta
 
 ### Onda 4
 
@@ -434,6 +434,170 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapas 097-098 (2026-11-23) - achado R-01
+
+`src/pages/Despachos.tsx` desestruturava so `data`, `isLoading` e `refetch` do
+`useQuery`; o `error` e o `isError` eram descartados, entao a tela nao tinha como saber
+que a consulta falhou e caia no bloco `items.length === 0`, exibindo **"Fila Limpa"**
+mesmo com a malha quebrada.
+
+- **097** - `isError` e `error` acrescentados a desestruturacao
+- **098** - `if (isError)` com `EmptyState variant="error"` e botao "Tentar novamente"
+  chamando `refetch()`, colocado antes do `return` principal; o import do `EmptyState`
+  foi acrescentado. O "Fila Limpa" continua existindo para fila realmente vazia, que
+  segue sendo informacao util. O ternario `isLoading` nao foi tocado.
+
+Feitas juntas, como o plano manda: 097 sozinha deixaria `isError` e `error` declarados e
+nao usados, o que o ESLint reprova. A primeira tentativa foi um ternario encadeado
+(`isLoading ? ... : isError ? ... : ...`), que gerou um aviso novo de
+`sonarjs/no-nested-conditional` (78/86) - por isso a versao final usa if-chain.
+
+**Verificacao**
+- `npx tsc --noEmit` -> 0 erros
+- `npx eslint src/pages/Despachos.tsx` -> 0 erros, 0 avisos
+- `npm run lint:budget` -> 77/86 avisos (sem aviso novo)
+- `npx vitest run src/pages/ src/lib/` -> 239 testes passando
+- Diff: 18 linhas em um arquivo, nenhuma linha de churn
+
+### Registro - etapas 099-103 (2026-11-23) - achado R-01
+
+As cinco telas ja tinham um bloco `if (error)`, mas todas com o mesmo desenho ruim:
+um `AlertCircle` solto e `<p className="text-destructive">Erro: {error.message}</p>`, sem
+contexto e **sem botao de tentar de novo**. Quem batia em erro so podia recarregar a
+pagina inteira, o que perde filtro e estado da tela.
+
+Trocado pelo desenho de `Coletas.tsx:288-303`: `EmptyState variant="error"` com titulo
+especifico de cada tela e `action={{ label: "Tentar novamente", onClick: () => refetch() }}`.
+
+| Etapa | Tela | Titulo | `refetch` |
+| --- | --- | --- | --- |
+| 099 | Envios | Erro ao carregar entregas | ja existia |
+| 100 | Clientes | Erro ao carregar clientes | acrescentado |
+| 101 | Fornecedores | Erro ao carregar fornecedores | acrescentado |
+| 102 | FretesInternos | Erro ao carregar fretes internos | acrescentado |
+| 103 | Ocorrencias | Erro ao carregar ocorrencias | acrescentado |
+
+Quatro das cinco nao desestruturavam `refetch`, que e o que o botao precisa - por isso o
+botao nao podia ter sido ligado antes. O `AlertCircle` ficou orfao em quatro arquivos
+assim que o paragrafo saiu; removido do import do `lucide-react` para nao gastar o
+orcamento de avisos. Em `Ocorrencias` o icone continua em uso na lista de tipos de
+ocorrencia, entao o import ficou.
+
+Nada de `window.location.reload()` no botao, como o plano alerta: recarrega a aplicacao
+inteira e esconde que a falha era de uma consulta so.
+
+**Verificacao**
+- `npx tsc --noEmit` -> 0 erros
+- `npx eslint <as cinco>` -> 0 erros, 6 avisos (exatamente o baseline da main)
+- `npm run lint:budget` -> 77/86
+- `grep 'text-destructive">Erro'` nas cinco telas -> 0. Os 22 restantes estao em
+  `src/features/db-observability/` e no `ErrorBoundary`, contexto diferente, fora do escopo
+- Diff: 59 insercoes, 19 remocoes, sem churn (`--numstat` igual a `-w --numstat`)
+
+### Registro - etapas 062-067 (2026-11-23) - edicao e exclusao de coleta
+
+Estas seis etapas vieram implementadas de sessao anterior e ficaram sem marcacao. Conferi
+cada uma contra o codigo real antes de marcar, em vez de confiar no registro:
+
+| Etapa | Onde esta a prova |
+| --- | --- |
+| 062 | `Coletas.tsx:853-866` - botao `Pencil` no cartao com `e.stopPropagation()`, `setSelectedPickup(c)` e `setIsDialogOpen(true)` |
+| 063 | `Coletas.tsx:951-955` - `onEdit` no `PickupDetailsDialog` fechando detalhes antes de abrir edicao |
+| 064 | `PickupDialog.tsx:102-103` - `setIsReverse`/`setIsUrgent` dentro do `useEffect`, e `:119-120` zerando no ramo de criacao |
+| 065 | `Coletas.tsx:122-136` - `deleteColetaMut` com `.update({ deleted_at })`, nunca `.delete()` |
+| 066 | `Coletas.tsx:867-879` (botao `Trash2` com `stopPropagation`) e `:925-937` (`ConfirmDialog` com `isLoading`) |
+| 067 | `Coletas.tsx:159` - `.is("deleted_at", null)` na consulta da lista; a exportacao CSV de `:364` usa o array `coletas` ja filtrado, nao consulta de novo |
+
+**Ponto verificado na 067:** `PickupConference.tsx:73` faz `.update()`, nao `.select()`, e
+`PickupDetailsDialog.tsx:115` idem - nenhum dos dois lista coletas, entao nao precisam do
+filtro. As consultas a `coletas` fora deste escopo (`Relatorios`, `PainelSLA`,
+`DashboardExecutivo`, `RastreamentoMotorista`, `Ocorrencias`, `Fornecedores` e os hooks de
+analytics) tem filtro proprio em 15 dos casos; as que faltam sao do achado D-02 e ficam
+registradas para a etapa do proprio achado, como o plano manda - nao mexi em hook
+compartilhado aqui.
+
+Nenhuma alteracao de codigo nesta rodada: as seis ja estavam na `main`.
+
+### Registro - etapas 001, 003, 004, 005, 007, 012 e 013 (2026-11-23) - onda 1 de seguranca
+
+Sete etapas da onda 1 de seguranca ja estavam implementadas e sem marcacao. Conferi uma a
+uma contra o codigo antes de marcar:
+
+| Etapa | Prova no codigo |
+| --- | --- |
+| 001 | `nexus-webhook-receiver/index.ts:36-37` - o HMAC e sempre exigido e `verifyWebhookHmac` devolve `false` quando o segredo nao existe (fail-closed). Nao ha condicional desligando a verificacao |
+| 003 | `_shared/auth.ts:69` - `export async function requireRole(` |
+| 004 | `webhook-status/index.ts:29-31` - aceita `x-internal-secret` ou papel `admin`, e recusa o resto |
+| 005 | `webhook-status/index.ts:184-185` - o dispatch consulta `client_webhooks` filtrando por `created_by` do chamador quando ele e usuario; `:161` grava `user_id` em auditoria |
+| 007 | `evolution-whatsapp/index.ts:118` - `user_id: auth.claims.sub` na mensagem enviada |
+| 012 | `health/index.ts:22` - usa `anon_key` de proposito, porque `health` e publica (`verify_jwt=false`); nao expoe `service_role` |
+| 013 | `health-check/index.ts:32` - checa o Auth por `/auth/v1/health`, nao pela API administrativa de usuarios |
+
+**Observacao da 005:** quando o chamador e interno (`x-internal-secret`), `callerSub` e
+`undefined` e a consulta nao filtra por dono - o que e o comportamento correto para o
+disparo feito pelo proprio banco, que precisa alcancar os webhooks de todos os clientes.
+O filtro existe para a leitura feita por usuario.
+
+Nenhuma alteracao de codigo nesta rodada: as sete ja estavam na `main`.
+
+### Registro - etapas 049-053 (2026-11-23) - exclusao em massa pede confirmacao
+
+049, 050 e 053 ja estavam na `main`. Faltava ligar o que ja existia:
+
+**051 (implementada agora).** `ConfirmDialog` ja tinha a prop `requireTyping`, mas o
+`BulkActions` nao repassava e nenhuma tela pedia digitacao. Acrescentei o campo
+`confirmTyping` a interface `BulkAction` e a passagem `requireTyping={pendingAction?.confirmTyping}`
+no dialogo. Clientes e Fornecedores passam a exigir digitar **EXCLUIR** para liberar a
+exclusao em massa - sao os dois cadastros que apagam de verdade. FretesInternos ficou de
+fora de proposito: ali a acao e "cancelar", nao apagar.
+
+Efeito no negocio: um "sim/nao" distraido nao mais apaga uma carteira inteira de clientes.
+
+**052 (implementada agora).** Novo `src/components/common/BulkActions.test.tsx`, sem
+dependencia nova - `@testing-library/user-event` nao esta instalado e o AGENTS.md so
+permite dependencia nova se indispensavel, entao o teste usa `fireEvent` da
+`@testing-library/react`, que ja esta na base.
+
+Tres casos: acao destrutiva nao executa ao clicar (so abre a confirmacao); o confirmar
+fica bloqueado ate a palavra ser digitada; acao nao destrutiva executa direto.
+
+**O teste prova a regressao:** com o `BulkActions.tsx` da `main` (sem o repasse do
+`requireTyping`) o caso do bloqueio falha - 1 falha de 3. Com a mudanca, 3 de 3 passam.
+
+**Verificacao**
+- `npx tsc --noEmit` -> 0 erros
+- `npx eslint <os quatro arquivos>` -> 0 erros, 4 avisos (baseline)
+- `npm run lint:budget` -> 77/86
+- `npx vitest run src/components/common/BulkActions.test.tsx` -> 3 testes
+- Diff: 8 linhas em tres arquivos existentes, mais um arquivo de teste novo
+
+### Registro - etapas 015 e 054 (2026-11-24)
+
+**015 - `.env` fora do controle de versao.** Ja estava correto: `git ls-files` lista
+apenas `.env.example`; `.env`, `.env.local` e `.env.*.local` estao no `.gitignore`.
+Nenhum arquivo alterado, historico nao reescrito.
+
+**054 - filtro `deleted_at` nas leituras de `transportadoras`.** Auditado consulta por
+consulta, nao por contagem de linha. Todas as leituras filtram:
+
+| Arquivo | Onde |
+| --- | --- |
+| `Transportadoras.tsx` | `:206-208` |
+| `ConfiguracoesFrete.tsx` | `:171-173` |
+| `ExportacaoDados.tsx` | `:86-88` |
+| `Envios.tsx` | `:386-388` |
+| `usePrefetch.ts` | `:60-62` |
+| `useDashboardMetrics.tsx` | `:331-335` |
+| `useExecutiveMetrics.tsx` | `:111-113` |
+| `useGlobalSearch.tsx` | `:129-131` |
+| `PickupDialog.tsx` | `:132-134` |
+
+As consultas sem o filtro sao `.insert()` e `.update()` (`Transportadoras.tsx:269`,
+`:303`, `:337`, `:366`; `ConfiguracoesFrete.tsx:187`) - ali o filtro nao se aplica,
+porque escrever precisa achar o registro pelo `id`, inclusive para desfaze-lo.
+
+Nenhuma alteracao de codigo: as duas etapas ja estavam atendidas.
 
 Uma linha por etapa concluída. A coluna **Evidência** é o que diferencia etapa concluída de etapa
 "deveria funcionar": cole o comando e o resultado, ou a consulta e o retorno.

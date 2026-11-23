@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { useRealtime } from "@/hooks/data/useRealtime";
 import { FilterBar } from "@/components/common/FilterBar";
+import { EmptyState } from "@/components/common/EmptyState";
 import { useFilters, FilterConfig } from "@/hooks/common/useFilters";
 import { cn } from "@/lib/utils";
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -115,6 +116,8 @@ export default function Despachos() {
   const {
     data: despachos = [],
     isLoading,
+    isError,
+    error,
     refetch,
   } = useQuery({
     queryKey: ["despachos"],
@@ -312,6 +315,27 @@ export default function Despachos() {
     if (!confirmItem) return;
     confirmDispatchMutation.mutate(confirmItem);
   };
+
+  if (isError) {
+    return (
+      <MainLayout>
+        <div className="flex min-h-[60vh] items-center justify-center">
+          <EmptyState
+            variant="error"
+            title="Erro ao carregar despachos"
+            description={
+              error?.message ||
+              "Nao foi possivel carregar a fila de despacho. Tente novamente."
+            }
+            action={{
+              label: "Tentar novamente",
+              onClick: () => refetch(),
+            }}
+          />
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>

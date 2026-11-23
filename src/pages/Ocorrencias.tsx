@@ -1,5 +1,6 @@
 /* eslint-disable max-lines */
 import { useState } from "react";
+import { EmptyState } from "@/components/common/EmptyState";
 import { SortIcon } from "@/components/common/SortIcon";
 import { motion } from "framer-motion";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -128,6 +129,7 @@ export default function Ocorrencias() {
     data: list = [],
     isLoading,
     error,
+    refetch,
   } = useQuery({
     queryKey: ["ocorrencias"],
     queryFn: async () => {
@@ -322,9 +324,16 @@ export default function Ocorrencias() {
   if (error)
     return (
       <MainLayout>
-        <div className="flex flex-col items-center py-12">
-          <AlertCircle className="w-12 h-12 text-destructive mb-4" />
-          <p className="text-destructive">Erro: {error.message}</p>
+        <div className="flex min-h-[60vh] items-center justify-center">
+          <EmptyState
+            variant="error"
+            title="Erro ao carregar ocorrências"
+            description={
+              error?.message ||
+              "Não foi possível carregar ocorrências. Tente novamente."
+            }
+            action={{ label: "Tentar novamente", onClick: () => refetch() }}
+          />
         </div>
       </MainLayout>
     );
