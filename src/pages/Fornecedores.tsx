@@ -598,6 +598,9 @@ export default function Fornecedores() {
                 icon: Trash2,
                 variant: "destructive",
                 onClick: (ids) => bulkDeleteMut.mutate(ids),
+                confirmTitle: "Excluir fornecedores selecionados?",
+                confirmDescription: (count) =>
+                  `Você está prestes a excluir ${count} fornecedor(es). Esta ação não pode ser desfeita.`,
               },
             ]}
           />

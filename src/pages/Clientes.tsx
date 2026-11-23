@@ -716,6 +716,9 @@ export default function Clientes() {
                 icon: Trash2,
                 variant: "destructive",
                 onClick: (ids) => bulkDeleteMut.mutate(ids),
+                confirmTitle: "Excluir clientes selecionados?",
+                confirmDescription: (count) =>
+                  `Você está prestes a excluir ${count} cliente(s). Esta ação não pode ser desfeita.`,
               },
             ]}
           />

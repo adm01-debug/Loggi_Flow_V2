@@ -521,6 +521,9 @@ export default function FretesInternos() {
                   icon: XCircle,
                   variant: "destructive",
                   onClick: (ids) => bulkUpdateStatus(ids, "cancelado"),
+                  confirmTitle: "Cancelar fretes selecionados?",
+                  confirmDescription: (count) =>
+                    `Você está prestes a cancelar ${count} frete(s). Os fretes cancelados não podem ser retomados.`,
                 },
               ]}
             />
