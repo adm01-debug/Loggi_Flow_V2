@@ -73,7 +73,7 @@
 - [~] **033** — Aplicar as migrações da máquina de estados no banco, com o dono presente — onda 3 — Crítica · **aguarda o dono**
 - [ ] **034** — Extrair o mapa de transições para um módulo compartilhado, completo e testado — onda 3 — Alta
 - [x] **035** — `Despachos` passa a usar o mapa compartilhado — onda 3 — Alta
-- [ ] **036** — `KanbanEntregas` valida a transição antes de gravar — onda 3 — Alta
+- [x] **036** — `KanbanEntregas` valida a transição antes de gravar — onda 3 — Alta
 - [ ] **037** — Traduzir a recusa do banco em mensagem que o operador entende — onda 3 — Média
 - [ ] **038** — `CotacaoMultiCanal`: a tabela da tela passa a ler do banco, não do `useState` — onda 3 — Crítica
 - [ ] **039** — Registrar a resposta da transportadora no banco, não na memória — onda 3 — Crítica
