@@ -335,7 +335,7 @@ export default function Transportadoras() {
     mutationFn: async (id: string) => {
       const { error } = await supabase
         .from("transportadoras")
-        .delete()
+        .update({ deleted_at: new Date().toISOString() })
         .eq("id", id);
       if (error) throw error;
     },

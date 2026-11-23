@@ -99,6 +99,7 @@ export const useCostAlerts = () => {
       const { data, error } = await supabase
         .from("transportadoras")
         .select("id, nome_fantasia")
+        .is("deleted_at", null)
         .eq("homologada", true)
         .order("nome_fantasia");
 
