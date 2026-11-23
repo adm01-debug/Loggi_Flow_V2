@@ -7,6 +7,7 @@ Regra: regressão = item que deixou de ser OK. Toda prova é de comando/query/re
 ## 1. Inventário e cobertura
 
 ### Front (rotas/telas) — 61 rotas · 60 páginas (`src/App.tsx`)
+
 Rotas: /auth / /fretes-internos /fornecedores /clientes /ocorrencias /envios /coletas
 /transportadoras /despachos /relatorios /conquistas /ranking /configuracoes /perfil
 /gestao-box /sla-dashboard /calendario /cotacao-frete /custos /alertas-custo
@@ -22,16 +23,25 @@ Rotas: /auth / /fretes-internos /fornecedores /clientes /ocorrencias /envios /co
 front deployado responde 200 (`https://loggi-flow-v2.vercel.app/`, domínio verificado).
 
 ### Edge Functions — 43 deployadas + `_shared`
-**OK** `GET /functions` → 43 ACTIVE; local 44 dirs; diff API↔local = 0.
+
+**CADUCO (2026-11-23)** — em 2026-11-14 dizia `GET /functions` → 43 ACTIVE; local 44 dirs; diff API↔local = 0.
+Hoje o lado **local** mede `ls -d supabase/functions/*/ | wc -l` = **45** (são **44** funções + `_shared`),
+porque `push-send/` entrou em 2026-11-22 (`d37ba30`). O número de funções ACTIVE **em produção**
+não foi medido nesta etapa (só o painel do Supabase ou a Management API informa) — a paridade API↔local
+está **não verificada**, ver etapa 257.
 Revalidado 2026-11-14 pós-#144: 43/43 ACTIVE (0 erro), crons `predict-delays-every-30min` (job 99)
 e `cleanup-old-delay-predictions` (job 63) ACTIVE sem 401.
 
 ### Banco — 135 objetos public (129 tabelas + 2 particionadas + 4 views)
+
 **OK** RLS: 0 sem RLS, 0 com RLS sem policy, 315 policies, 0 grants a PUBLIC, 2 sequences.
-**OK** migrations banco 243 = repo 243 (0 de diferença por timestamp).
+**CADUCO (2026-11-23)** — em 2026-11-14 dizia migrations banco 243 = repo 243 (0 de diferença por timestamp).
+Hoje o **repo** mede `ls supabase/migrations/*.sql | wc -l` = **250**. O número do lado do banco não
+foi remedido nesta etapa; o diff banco↔repo está **não verificado**, ver etapa 257.
 Prova: queries Management API (counts acima).
 
 ### Workflows — 16 ativos
+
 auto-update-pr-branch, automation-local, branch-hygiene-audit, ci-nexus, ci, codeql,
 contexto-ia, deploy-functions, e2e, inventario-estado-semanal, notifica-falha-main,
 scripts-tests, security, settings-guard, sync-internal-secret, types-sync.
@@ -40,17 +50,21 @@ sync-internal-secret, types-sync, codeql (último run success) — conferência 
 **BLOQUEADO/fila** deploy edge functions (43511750479) — fila de runners; workflow do main já contém `--yes` (causa das 3 falhas pré-#144).
 
 ### Integrações/crons — 28 crons ativos
+
 **OK** 0 execuções com erro em 7 dias (`cron.job_run_details`).
 
 ## 2. Qualidade (main fee186d3, local)
+
 **OK** exit 0: typecheck, lint (102≤105), lint:budget, test:coverage (257 testes/30 arquivos),
 build (32.41s, PWA 253 entries), validate:no-console. Nenhum teste removido/pulado.
 
 ## 3. Produção no ar
+
 **OK** health + health-check → 200 healthy (db/auth/storage true). Front 200. Crons sem erro 7d.
 Job 99 (`predict-delays`) revalidado: 5 runs seguidos `succeeded` (2026-11-14 11:00–13:00 UTC).
 
 ## 4. Sem "pela metade"
+
 **OK** zero TODO/FIXME/WIP/HACK/XXX em produção.
 **BLOQUEADO (decisão dono)** mocks reais de UI: `src/components/freight/AIFreightForecasting.tsx:12`
 (gráfico+insights fake) e `src/components/map/MapIntelligenceOverlay.tsx:14` (overlay fake).
@@ -66,6 +80,7 @@ retornam 404 se não acham o registro — não inserem. Nenhuma edge function de
 tabelas. Requer cadastro real via UI ou sincronização automática de transportes (decisão de negócio).
 
 ## 5. Aguardando / a decidir
+
 - Deploy edge functions: success (run 43511750479, main com --yes do #144) — 43 functions ACTIVE.
 - Re-disparados em main atual: inventário semanal (43512924603) = success; branch-hygiene
   (43512924390) = success; settings-guard (43512924384) = failure por 403 (monitoramento agendado,

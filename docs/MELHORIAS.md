@@ -4,15 +4,15 @@
 
 ## 📊 RESUMO EXECUTIVO FINAL
 
-| Categoria             | Total      | Status  |
-| --------------------- | ---------- | ------- |
-| Páginas atualizadas   | 30/30      | 🟢 100% |
-| Hooks CRUD            | 20+        | 🟢 100% |
-| Hooks Real (Produção) | 15+        | 🟢 100% |
-| Components CRUD       | 18+        | 🟢 100% |
-| Migrations SQL        | 8          | 🟢 100% |
-| Edge Functions        | 1          | 🟢      |
-| Documentação          | 7 arquivos | 🟢      |
+| Categoria             | Total      | Status                                                                      |
+| --------------------- | ---------- | --------------------------------------------------------------------------- |
+| Páginas atualizadas   | 30/30      | 🟢 100%                                                                     |
+| Hooks CRUD            | 20+        | 🟢 100%                                                                     |
+| Hooks Real (Produção) | 15+        | 🟢 100%                                                                     |
+| Components CRUD       | 18+        | 🟢 100%                                                                     |
+| Migrations SQL        | 8          | 🟢 100%                                                                     |
+| Edge Functions        | 44         | 🟢 (corrigido 2026-11-23: dizia 1; mede-se com `ls -d supabase/functions/*/ | wc -l`= 45, menos`_shared`) |
+| Documentação          | 7 arquivos | 🟢                                                                          |
 
 ---
 
@@ -20,19 +20,23 @@
 
 ### Hooks Reais Implementados
 
-| Hook Mock           | Hook Real               | Fonte de Dados |
-| ------------------- | ----------------------- | -------------- |
-| useAnalytics        | useAnalyticsReal        | Supabase       |
-| useDashboardMetrics | useDashboardMetricsReal | Supabase       |
-| useSLAMetrics       | useSLAMetricsReal       | Supabase       |
-| useLogisticsCosts   | useLogisticsCostsReal   | Supabase       |
-| useGamification     | useGamificationReal     | Supabase       |
-| useLalamoveTracking | useLalamoveTrackingReal | API Lalamove   |
-| useBitrix24         | useBitrix24Real         | API Bitrix24   |
-| useN8n              | useN8nReal              | Webhooks n8n   |
-| -                   | useEntregasReal         | Supabase       |
-| -                   | useColetasReal          | Supabase       |
-| -                   | useTransportadorasReal  | Supabase       |
+Nenhum hook `*Real` existe: os 11 nomes desta tabela foram checados com `find src -name "<Nome>*"`
+em 2026-11-23 e voltaram vazios. Os hooks que existem usam o nome sem sufixo, organizados por domínio
+(ADR 0008). Corrigido 2026-11-23.
+
+| Hook Mock           | Hook Real                                                                   | Fonte de Dados |
+| ------------------- | --------------------------------------------------------------------------- | -------------- |
+| useAnalytics        | `src/hooks/analytics/useAnalytics.tsx`                                      | Supabase       |
+| useDashboardMetrics | `src/hooks/analytics/useDashboardMetrics.tsx`                               | Supabase       |
+| useSLAMetrics       | `src/hooks/logistics/useSLAMetrics.tsx`                                     | Supabase       |
+| useLogisticsCosts   | `src/hooks/logistics/useLogisticsCosts.tsx`                                 | Supabase       |
+| useGamification     | `src/hooks/gamification/useGamification.tsx`                                | Supabase       |
+| useLalamoveTracking | `src/hooks/logistics/useLalamoveTracking.tsx`                               | API Lalamove   |
+| useBitrix24         | ❌ nunca existiu (verificado 2026-11-23)                                    | API Bitrix24   |
+| useN8n              | ❌ nunca existiu (verificado 2026-11-23)                                    | Webhooks n8n   |
+| —                   | ❌ nunca existiu (verificado 2026-11-23)                                    | Supabase       |
+| —                   | ❌ nunca existiu (verificado 2026-11-23)                                    | Supabase       |
+| —                   | ❌ nunca existiu; o real e `src/hooks/logistics/useTransportadoraRotas.tsx` | Supabase       |
 
 ### Migrations SQL Adicionadas
 
@@ -47,6 +51,17 @@
 ---
 
 ## 📁 ESTRUTURA COMPLETA
+
+> **ATENCAO — ARVORE ASPIRACIONAL, NAO A ARVORE REAL**. Medido com `find src -name "<nome>*"` em
+> 2026-11-23, **nao existem** nesta arvore: `useSavedFilters`, `useAnalyticsReal`,
+> `useDashboardMetricsReal`, `useSLAMetricsReal`, `useLogisticsCostsReal`,
+> `useGamificationReal`, `useLalamoveTrackingReal`, `useBitrix24Real`, `useN8nReal`,
+> `useEntregasReal`, `useColetasReal`, `useTransportadorasReal`, `useVersions`,
+> `useDuplicate`, `useInfiniteScroll`, `useFulltextSearch`, `useActivityLog`, e as migrations
+> `saved_filters.sql`, `entity_versions.sql` e `activity_logs.sql`. Os que existem estao por dominio
+> (ADR 0008): `src/hooks/common/useBulkActions.ts`, `src/hooks/data/useSoftDelete.ts`, e os hooks de
+> analytics/logistics/gamification sem o sufixo `Real`. Arvore real: `ls -R src/hooks`. A secao de
+> Edge Functions acima lista 1 porque o documento é de quando havia 1; hoje sao 44.
 
 ```
 src/
