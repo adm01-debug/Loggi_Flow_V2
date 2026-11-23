@@ -29,19 +29,19 @@
 
 ### Onda 1
 
-- [ ] **001** — Remover a condicional que desliga a verificação de assinatura do webhook do Nexus — onda 1 — Crítica
+- [x] **001** — Remover a condicional que desliga a verificação de assinatura do webhook do Nexus — onda 1 — Crítica
 - [~] **002** — Confirmar com o dono se `NEXUS_WEBHOOK_SECRET` está configurado em produção — onda 1 — Crítica · **aguarda o dono**
-- [ ] **003** — Criar `requireRole` em `_shared/auth.ts` — onda 1 — Crítica
-- [ ] **004** — `webhook-status`: exigir chamador interno ou papel de admin — onda 1 — Crítica
-- [ ] **005** — `webhook-status`: filtrar `client_webhooks` por dono e registrar quem disparou — onda 1 — Alta
+- [x] **003** — Criar `requireRole` em `_shared/auth.ts` — onda 1 — Crítica
+- [x] **004** — `webhook-status`: exigir chamador interno ou papel de admin — onda 1 — Crítica
+- [x] **005** — `webhook-status`: filtrar `client_webhooks` por dono e registrar quem disparou — onda 1 — Alta
 - [~] **006** — `evolution-whatsapp`: exigir papel para enviar mensagem — onda 1 — Alta · **aguarda o dono**
-- [ ] **007** — `evolution-whatsapp`: registrar quem enviou cada mensagem — onda 1 — Média
+- [x] **007** — `evolution-whatsapp`: registrar quem enviou cada mensagem — onda 1 — Média
 - [~] **008** — `melhor-envio-api`: o ambiente (produção/teste) passa a ser decidido pelo servidor — onda 1 — Alta · **aguarda o dono**
 - [~] **009** — `melhor-envio-api`: exigir papel para cotar — onda 1 — Alta · **aguarda o dono**
 - [~] **010** — Confirmar com o dono que `ALLOW_TEST_MODE` não está ligado em produção — onda 1 — Crítica (se ligado) · **aguarda o dono**
 - [~] **011** — Fazer o modo de teste dos webhooks impossível de ligar por engano em produção — onda 1 — Média · **aguarda o dono**
-- [ ] **012** — `health`: trocar `service_role` por uma verificação sem privilégio — onda 1 — Média
-- [ ] **013** — `health-check`: parar de chamar a API administrativa de usuários e exigir sessão — onda 1 — Média
+- [x] **012** — `health`: trocar `service_role` por uma verificação sem privilégio — onda 1 — Média
+- [x] **013** — `health-check`: parar de chamar a API administrativa de usuários e exigir sessão — onda 1 — Média
 - [~] **014** — Decidir com o dono qual dos dois endpoints de saúde fica aberto e fechar o outro no `config.toml` — onda 1 — Média · **aguarda o dono**
 - [ ] **015** — Tirar o `.env` do controle de versão, sem reescrever histórico — onda 1 — Alta
 - [~] **016** — Corrigir o `AGENTS.md` e o comentário da CI que afirmam que o repositório é privado — onda 1 — Alta · **aguarda o dono**
@@ -434,6 +434,28 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapas 001, 003, 004, 005, 007, 012 e 013 (2026-11-23) - onda 1 de seguranca
+
+Sete etapas da onda 1 de seguranca ja estavam implementadas e sem marcacao. Conferi uma a
+uma contra o codigo antes de marcar:
+
+| Etapa | Prova no codigo |
+| --- | --- |
+| 001 | `nexus-webhook-receiver/index.ts:36-37` - o HMAC e sempre exigido e `verifyWebhookHmac` devolve `false` quando o segredo nao existe (fail-closed). Nao ha condicional desligando a verificacao |
+| 003 | `_shared/auth.ts:69` - `export async function requireRole(` |
+| 004 | `webhook-status/index.ts:29-31` - aceita `x-internal-secret` ou papel `admin`, e recusa o resto |
+| 005 | `webhook-status/index.ts:184-185` - o dispatch consulta `client_webhooks` filtrando por `created_by` do chamador quando ele e usuario; `:161` grava `user_id` em auditoria |
+| 007 | `evolution-whatsapp/index.ts:118` - `user_id: auth.claims.sub` na mensagem enviada |
+| 012 | `health/index.ts:22` - usa `anon_key` de proposito, porque `health` e publica (`verify_jwt=false`); nao expoe `service_role` |
+| 013 | `health-check/index.ts:32` - checa o Auth por `/auth/v1/health`, nao pela API administrativa de usuarios |
+
+**Observacao da 005:** quando o chamador e interno (`x-internal-secret`), `callerSub` e
+`undefined` e a consulta nao filtra por dono - o que e o comportamento correto para o
+disparo feito pelo proprio banco, que precisa alcancar os webhooks de todos os clientes.
+O filtro existe para a leitura feita por usuario.
+
+Nenhuma alteracao de codigo nesta rodada: as sete ja estavam na `main`.
 
 Uma linha por etapa concluída. A coluna **Evidência** é o que diferencia etapa concluída de etapa
 "deveria funcionar": cole o comando e o resultado, ou a consulta e o retorno.
