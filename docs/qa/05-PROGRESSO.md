@@ -224,7 +224,7 @@
 - [x] **146** — `smart-carrier-selection`: validar `peso_kg` e os números do cálculo de frete — onda 5 — Alta
 - [x] **147** — `webhook-status`: exigir `data` antes de desestruturar — onda 5 — Alta
 - [x] **148** — `ingest-biosync`: validar `heart_rate` como número antes de comparar com o limite — onda 5 — Alta
-- [ ] **149** — `lalamove-api`: `path` e `method` do corpo decidem o roteamento sem `requireEnum` — onda 5 — Alta
+- [x] **149** — `lalamove-api`: `path` e `method` do corpo decidem o roteamento sem `requireEnum` — onda 5 — Alta
 - [ ] **150** — `resend-email`: validar `to`, `subject` e `html` antes de entregar ao provedor — onda 5 — Alta
 - [ ] **151** — `melhor-envio-api`: validar o corpo da cotação — onda 5 — Média
 - [ ] **152** — `lalamove-tracking`: validar o identificador de rastreio — onda 5 — Média
@@ -434,6 +434,65 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapa 149 (2026-11-24) - achado B-04 (`lalamove-api`)
+
+**Causa:** `index.ts:78-81` montava `routePath`/`routeMethod` do corpo e roteava por **substring**
+(`pathParts.includes('quotations' | 'orders' | 'cancel')`, `:84`, `:131`, `:141`, `:151`). Qualquer corpo que
+contivesse a palavra escolhia o verbo HTTP e o caminho usados na conta Lalamove da empresa, e o caminho chegava
+montado à chamada real (`/v3/orders/${orderId}`, com `orderId` extraído do próprio corpo, `:142`/`:152`) — na
+prática um proxy aberto para a API do parceiro, limitado só pelo que a Lalamove aceitasse. `body.path || ''`
+(`:79`) ainda transformava corpo sem `path` em string vazia, que caía no `404` no fim.
+
+**Correção:** `parse.ts` novo com `parseLalamoveRoute`, que valida `method` com `requireEnum` sobre
+`ALLOWED_METHODS` (`GET`/`POST`/`PUT`) e `path` contra a **lista fechada** `ALLOWED_PATHS`
+(`/quotations`, `/orders`, `/orders/{id}`, `/orders/{id}/cancel`), reconstruindo o caminho de destino no servidor
+(`upstreamPath`) — nada do corpo é concatenado na URL. O identificador do pedido passa por
+`ORDER_ID = /^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/` (`..`, `?`, `%2F`, espaço e id longo são recusados) e o par
+verbo+caminho é conferido (`POST` só em `/quotations` e `/orders`, `GET` em `/orders/{id}`, `PUT` em
+`/orders/{id}/cancel`). `path` precisa começar com `/`; barra final, espaços e prefixo `/v3` são tolerados sem
+abrir caminho novo. O `index.ts` passou a rotear por `parsed.route` (`:84`, `:130`, `:139`, `:148`), a resposta
+`404 Route not found` ficou sem o `path` cru e `ValidationError` devolve **422** no `catch` (`:168-170`).
+
+**Lista de rotas conferida contra o chamador real:** `src/hooks/logistics/useLalamoveOrders.tsx` envia
+exatamente `/quotations`+`POST` (`:29`), `/orders`+`POST` (`:46`), `/orders/{id}`+`GET` (`:63`) e
+`/orders/{id}/cancel`+`PUT` (`:78`). `grep -rn "lalamove-api" src/ supabase/ scripts/` não achou outro chamador
+(`lalamove-tracking/index.ts:104/136` só usa o nome no disjuntor). As quatro rotas estão na lista, então **nenhuma
+tela quebra**.
+
+**Mudança de comportamento:** caminho fora da lista deixou de ser "rota desconhecida" com `404` por substring e
+passou a **422** com o campo nomeado (`path` ou `method`), que é o 400 pedido no plano, no mesmo desvio consciente
+das etapas 146-148 (`validationErrorResponse`). Barra final/espaços/`/v3` seguem aceitos; verbo errado para rota
+válida agora é recusa explícita em vez de cair em outro ramo.
+
+**Desvio consciente (módulo puro `parse.ts`):** `index.ts:1-6` importa de `deno.land` e o vitest não carrega o
+módulo. Mesmo precedente de `external-db-bridge/index.ts:8` (`ALLOWED_ACTIONS`/`ALLOWED_TABLES`, citado no plano),
+`scheduled-reports/fields.ts` (143-145), `smart-carrier-selection/parse.ts` (146), `webhook-status/parse.ts`
+(147) e `ingest-biosync/parse.ts` (148). `_shared/validate.ts` não foi alterado; `safeFetch`/disjuntor
+(`_shared/safeFetch.ts:65`) não foram tocados.
+
+**Fora de escopo (registrado, não tocado):** `details: errorText` (`:53`/`:58`) e `error.message` no `catch`
+(`:170`/`:173`) são B-06/etapa 169; CORS inline é etapa 192.
+
+**Evidência:**
+- `tests/contracts/lalamove-api-route.spec.ts` (novo, 8 casos): as 4 rotas reais com `upstreamPath` montado;
+  tolerância a barra final/espaços/`/v3`; verbo errado em rota válida → campo `method` (4 combinações); verbo fora
+  da lista/ausente (`DELETE`, `get`, `42`) → campo `method`; 15 caminhos fora da lista → campo `path` (inclui
+  `/qualquer`, `/orders/{id}/track`, `/v2/orders`, `?query`, `..`, `quotations` sem barra); 7 identificadores
+  inválidos → campo `path`; lista publicada no módulo; e o contrato da edge (roteia por `route`, sem
+  `pathParts`/`routePath`/`routeMethod`, com `422`).
+- Mutação A — conferência de verbo desativada: **1 de 8** falha. Mutação B — `ORDER_ID` afrouxado para
+  `/.+/`: **1 de 8** falha. Mutação C — edge sem `parseLalamoveRoute`: **1 de 8** falha (contrato). Restaurado:
+  8/8.
+- `npx vitest run --coverage`: **48 arquivos / 381 testes, todos verdes**; `lalamove-api/parse.ts`
+  100/100/100/100; totais 74,28 stmts / 71,49 branch / 77,09 funcs / 76,34 linhas (antes: 73,61/70,57/76,83/75,64).
+- `deno check`: **6 erros, idênticos ao baseline** no mesmo arquivo (mesmos 6 textos, linhas deslocadas +2/+4);
+  `deno lint`: 5 no `index.ts` (= baseline) e **0** no `parse.ts`; `deno fmt` limpo no `parse.ts`;
+  `npx tsc --noEmit` 0; `npx eslint` no teste 0; `npm run lint:budget` OK (77/86 avisos).
+- **NÃO VERIFICADO:** chamada real à Lalamove com `path` fora da lista devolvendo 422 em produção — exige
+  secrets/`LALAMOVE_API_KEY` reais; depois do deploy é só repetir o corpo de teste e registrar a resposta.
+
+---
 
 ### Registro - etapa 148 (2026-11-24) - achado B-04 (`ingest-biosync`)
 

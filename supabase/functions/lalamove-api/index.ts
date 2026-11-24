@@ -4,6 +4,8 @@ import { getCircuitBreaker } from '../_shared/circuitBreaker.ts'
 import { corsHeaders } from '../_shared/cors.ts'
 import { getRedisClient } from '../_shared/redis.ts'
 import { log } from '../_shared/logger.ts'
+import { ValidationError, validationErrorResponse } from '../_shared/validate.ts'
+import { parseLalamoveRoute } from './parse.ts'
 
 const LALAMOVE_API_KEY = Deno.env.get('LALAMOVE_API_KEY') || ''
 const LALAMOVE_API_SECRET = Deno.env.get('LALAMOVE_API_SECRET') || ''
@@ -76,12 +78,12 @@ serve(async (req) => {
     // o roteamento abaixo usa body.method, não req.method — do contrário
     // GET e PUT nunca casam e toda chamada cai no ramo de criar pedido.
     const body = await req.json().catch(() => ({} as Record<string, any>))
-    const routePath: string = body.path || ''
-    const routeMethod: string = body.method || req.method
-    const pathParts = routePath.split('/').filter(Boolean)
+    // `path`/`method` do corpo são roteamento: passam por lista fechada e o
+    // caminho da Lalamove é montado aqui, nunca concatenado do que veio de fora.
+    const { route, upstreamPath } = parseLalamoveRoute(body)
 
     // POST /quotations - Criar cotação
-    if (routeMethod === 'POST' && pathParts.includes('quotations')) {
+    if (route === 'quotation') {
       // Try cache first
       const redis = getRedisClient();
       const cacheKey = `lalamove_quote_${JSON.stringify(body.stops)}`;
@@ -128,7 +130,7 @@ serve(async (req) => {
 
 
     // POST /orders - Criar pedido
-    if (routeMethod === 'POST' && pathParts.includes('orders') && !pathParts.includes('cancel')) {
+    if (route === 'create_order') {
       const { path: _path, method: _method, ...orderPayload } = body
       const result = await lalamoveRequest('POST', '/v3/orders', orderPayload)
 
@@ -138,9 +140,8 @@ serve(async (req) => {
     }
 
     // GET /orders/:id - Buscar pedido
-    if (routeMethod === 'GET' && pathParts.includes('orders')) {
-      const orderId = pathParts[pathParts.indexOf('orders') + 1]
-      const result = await lalamoveRequest('GET', `/v3/orders/${orderId}`)
+    if (route === 'get_order') {
+      const result = await lalamoveRequest('GET', upstreamPath)
 
       return new Response(JSON.stringify(result), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -148,21 +149,24 @@ serve(async (req) => {
     }
 
     // PUT /orders/:id/cancel - Cancelar pedido
-    if (routeMethod === 'PUT' && pathParts.includes('cancel')) {
-      const orderId = pathParts[pathParts.indexOf('orders') + 1]
-      const result = await lalamoveRequest('PUT', `/v3/orders/${orderId}/cancel`)
+    if (route === 'cancel_order') {
+      const result = await lalamoveRequest('PUT', upstreamPath)
 
       return new Response(JSON.stringify(result), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
 
-    return new Response(JSON.stringify({ error: 'Route not found', path: routePath }), {
+    return new Response(JSON.stringify({ error: 'Route not found' }), {
       status: 404,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
     
   } catch (error) {
+    if (error instanceof ValidationError) {
+      return validationErrorResponse(error, corsHeaders)
+    }
+
     const isBreaker = error.message.includes('Circuit Breaker');
     log({ level: 'ERROR', message: `Lalamove function failure`, meta: { error: error.message } });
     
