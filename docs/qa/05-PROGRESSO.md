@@ -227,7 +227,7 @@
 - [x] **149** — `lalamove-api`: `path` e `method` do corpo decidem o roteamento sem `requireEnum` — onda 5 — Alta
 - [x] **150** — `resend-email`: validar `to`, `subject` e `html` antes de entregar ao provedor — onda 5 — Alta
 - [x] **151** — `melhor-envio-api`: validar o corpo da cotação — onda 5 — Média
-- [ ] **152** — `lalamove-tracking`: validar o identificador de rastreio — onda 5 — Média
+- [x] **152** — `lalamove-tracking`: validar o identificador de rastreio — onda 5 — Média
 - [ ] **153** — `ai-logistics-assistant`: validar e limitar o texto que vai para o modelo — onda 5 — Média
 - [ ] **154** — `evolution-whatsapp`: validar `instance`, `phone` e `message` — onda 5 — Alta
 - [ ] **155** — `ocr-receipt-processor`: validar a entrada do comprovante — onda 5 — Média
@@ -435,7 +435,58 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 
 ## Registro de execução
 
-### Registro - etapa 151 (2026-11-24) - achado B-04 (`melhor-envio-api`)
+### Registro - etapa 152 (2026-11-24) - achado B-04 (`lalamove-tracking`)
+
+**Causa:** `index.ts:91` desestruturava `orderId` e `driverId` do corpo e usava os dois **sem tipo nem formato**
+em `:117` (`/v3/orders/${orderId}`) e `:131` (`/v3/orders/${orderId}/drivers/${driverId}`). O `orderId` vem da
+rota do app (`/rastreamento/:id`), ou seja, de entrada do usuário: barra, `?`, espaço ou `../` alteravam o caminho
+assinado enviado à Lalamove. O `driverId` tinha guarda de presença (`:126`, 400), mas nenhuma de formato.
+
+**Correção:** `parse.ts` novo com `parseOrderId`/`parseDriverId` sobre `ID_FORMAT`
+(`^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$`, o mesmo formato que a etapa 149 já adota para o `orderId` do parceiro) via
+`requireString` com `pattern` e `maxLength = 64`, e corpo que não é objeto tratado como identificador ausente.
+A validação acontece **dentro de cada ação** que usa o pedido (`:104`, `:130-131`) — a ação `test`, usada pelo
+healthcheck `useIntegrationValidation.tsx:24`, não pede identificador e continua respondendo `{status:"ok"}`. O
+`catch` devolve **422** com `validationErrorResponse` (`:163-165`). A desestruturação de `:91` perdeu `orderId` e
+`driverId` (agora validados por ação) e o `log.info` de `:95` deixou de registrar o identificador do cliente.
+
+**Mudança de comportamento:** ação de rastreio sem `orderId`, ou com identificador fora do formato/teto, passa a
+receber 422 com o nome do campo em vez de mandar caminho arbitrário ao parceiro; `getDriverLocation` sem
+`driverId` sai de 400 para 422 (padrão das etapas 146-151). Nenhum chamador real quebra: os dois usos em
+`useLalamoveTracking.tsx:267-269` e `:305-311` mandam o `orderId`/`driverId` que vieram da Lalamove, e o
+healthcheck manda só `{action:'test'}`.
+
+**Escopo restrito:** nada foi acrescentado ao `safeFetch` (tempo limite e disjuntor já resolvidos) nem às
+chamadas do parceiro. O atalho "aceitar lista de identificadores" ficou de fora, como o plano manda — é decisão
+do dono e etapa própria.
+
+**Desvio consciente:** 400 do plano → **422** (`validationErrorResponse`), igual às etapas 146-151. Módulo puro
+`parse.ts` porque `index.ts:2` importa `deno.land` e o vitest não carrega o módulo (`external-db-bridge/index.ts:4`
+é o precedente citado no plano). `_shared/validate.ts` não foi alterado.
+
+**Fora de escopo (registrado, não tocado):** `body.action` lido antes de checar o tipo do corpo (`:92`) e
+`error.message` repassado ao cliente no catch (`:169`) são B-06 (etapas 165/172); `useSandbox = true` por padrão
+mantém o rastreio em sandbox (etapa 008, dona).
+
+**Evidência:**
+- `tests/contracts/lalamove-tracking-id.spec.ts` (novo, 9 casos): `orderId` numérico e com hífen/`_` aceitos; sem
+  `orderId` → campo `orderId`; `../orders/1`, `1/2`, `1?x=1`, `1 2`, `.1` → campo `orderId`; 65 caracteres →
+  campo `orderId` (64 aceitos); sem `driverId` → campo `driverId`; `drv/1` e `drv 1` → campo `driverId`; corpo
+  `undefined`/array/string → campo do identificador; e o contrato da edge (as **duas** ações com pedido passam pelo
+  parse, nenhum `body.orderId`, guarda antiga de 400 removida, 422 no catch).
+- Mutação A — `pattern` do identificador removido: 1/9 falha. B — `getOrderDetails` usando `body.orderId` cru:
+  1/9 (o teste conta as duas chamadas do parse). C — `driverId` sem parse: 1/9. Restaurado: 9/9.
+- `npx vitest run --coverage`: **51 arquivos / 408 testes, todos verdes**; `lalamove-tracking/parse.ts`
+  100/100/100/100; totais 75,29 / 72,8 / 77,83 / 77,42 (antes: 75,18/72,67/77,65/77,3).
+- `deno check`: **1 erro = 1 do baseline** (`log("ERROR", ...)` fora do tipo `LogLevel`, linha +1). `deno lint`:
+  3 = baseline 3, **0** no `parse.ts`; `deno fmt --check` limpo no `parse.ts`; `npx tsc --noEmit` 0;
+  `npx eslint` no teste 0; `npm run lint:budget` OK (77/86 avisos).
+- **NÃO VERIFICADO:** rastreio real no parceiro e o 422 em produção — exige `LALAMOVE_API_KEY`/`_SECRET` e conta
+  Lalamove. Depois do deploy: `{"action":"getOrderDetails"}` deve devolver 422 com `field: "orderId"`.
+
+---
+
+### Registro - etapa 151 (2026-11-24) - achado B-04 (`melhor-envio-api`) (2026-11-24) - achado B-04 (`melhor-envio-api`)
 
 **Causa:** `index.ts:59` (`const body = await req.json()`) e `:60` (`const { action, params, useSandbox = true }`)
 entregavam `params` cru ao `case "calcularFrete"` (`:77`), que montava a chave de cache
