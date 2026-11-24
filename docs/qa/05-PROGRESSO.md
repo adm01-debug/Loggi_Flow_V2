@@ -65,16 +65,16 @@
 
 ### Onda 3
 
-- [~] **028** — Criar no banco a função que diz se uma transição de entrega é válida — onda 3 — Crítica · **aguarda o dono**
-- [~] **029** — Trigger `BEFORE UPDATE` em `entregas` recusando transição inválida — onda 3 — Crítica · **aguarda o dono**
-- [~] **030** — Mesma proteção para `coletas`: função de validação e trigger — onda 3 — Crítica · **aguarda o dono**
-- [~] **031** — Levar a regra "não despacha sem nota fiscal" para o banco — onda 3 — Crítica · **aguarda o dono**
-- [~] **032** — Testar função, triggers e regra da NF num Postgres descartável, antes de produção — onda 3 — Crítica · **aguarda o dono**
-- [~] **033** — Aplicar as migrações da máquina de estados no banco, com o dono presente — onda 3 — Crítica · **aguarda o dono**
+- [x] **028** — Criar no banco a função que diz se uma transição de entrega é válida — onda 3 — Crítica · **aplicada** (`20261124090000_fn_valida_transicao_entrega.sql`, run `45382701775`)
+- [x] **029** — Trigger `BEFORE UPDATE` em `entregas` recusando transição inválida — onda 3 — Crítica · **aplicado** (`20261124090100_...`, run `45382772891`; trigger `a_valida_transicao_entregas` no catálogo)
+- [x] **030** — Mesma proteção para `coletas`: função de validação e trigger — onda 3 — Crítica · **aplicado** (`20261124090200_...`, run `45382829524`; trigger `a_valida_transicao_coletas`)
+- [x] **031** — Levar a regra "não despacha sem nota fiscal" para o banco — onda 3 — Crítica · **aplicado** (`20261124090300_trigger_entrega_nf_obrigatoria.sql`, run `45382898191`)
+- [x] **032** — Testar função, triggers e regra da NF num Postgres descartável, antes de produção — onda 3 — Crítica · `node --test scripts/audit/sql.unit.mjs` → **29 testes, 0 falhas, 0 pulados**
+- [x] **033** — Aplicar as migrações da máquina de estados no banco, com o dono presente — onda 3 — Crítica · **4 despachos de `aplicar-migration.yml`, todos `success`**; catálogo do banco regenerado na PR #419
 - [x] **034** — Extrair o mapa de transições para um módulo compartilhado, completo e testado — onda 3 — Alta
 - [x] **035** — `Despachos` passa a usar o mapa compartilhado — onda 3 — Alta
 - [x] **036** — `KanbanEntregas` valida a transição antes de gravar — onda 3 — Alta
-- [~] **037** — Traduzir a recusa do banco em mensagem que o operador entende — onda 3 — Média · **código neste PR; verificação em runtime depende da 033 (dono)**
+- [x] **037** — Traduzir a recusa do banco em mensagem que o operador entende — onda 3 — Média · **fechada depois da 033**: contrato `23514` vivo no banco e `mensagemRecusaTransicao` ligada em `Despachos.tsx:253`, `KanbanEntregas.tsx:344` e `Envios.tsx` (#420); 19 casos em `src/lib/statusTransitions.test.ts`
 - [x] **038** — `CotacaoMultiCanal`: a tabela da tela passa a ler do banco, não do `useState` — onda 3 — Crítica
 - [~] **039** — Registrar a resposta da transportadora no banco, não na memória — onda 3 — Crítica — **código no PR da 038; aguarda verificação em runtime (registrar resposta e conferir `valor_cotado`/`responded_at` no banco)**
 - [x] **040** — Marcar no banco qual cotação foi a escolhida — onda 3 — Alta
@@ -300,7 +300,7 @@
 - [x] **219** — `useKPIBenchmark`: tirar os `await` de dentro do laço — onda 6 — Média
 - [x] **220** — `useKPIBenchmark`: uma consulta por tabela cobrindo todos os períodos — onda 6 — Média
 - [x] **221** — `useExecutiveMetrics`: mesma consolidação de 18 consultas para 3 — onda 6 — Baixa
-- [~] **222** — Conferir `types.ts` contra o banco ao vivo e regenerar se houver divergência — onda 6 — Média · **aguarda o dono** (aplicar a migration `20261121153649_user_panel_preferences` - A-04)
+- [x] **222** — Conferir `types.ts` contra o banco ao vivo e regenerar se houver divergência — onda 6 — Média · migration `20261121153649_user_panel_preferences` aplicada (run `45382402621`) e `types.ts` regenerado pelo `types-sync` (#419) - A-04 fechado
 - [x] **223** — `Envios.tsx`: trocar `select("*")` por colunas explícitas em `entregas` — onda 6 — Média
 - [x] **224** — `Coletas.tsx`: trocar `select("*")` por colunas explícitas em `coletas` — onda 6 — Média
 - [x] **225** — `useDrillDown`: colunas explícitas nas duas leituras — onda 6 — Baixa
@@ -412,19 +412,21 @@ Problema novo **não se corrige na hora** (regra 4). Anote aqui, com `arquivo:li
 | A-01 | **Resolvido na etapa 220**: a consulta de `ocorrencias` do benchmark de KPI nao tinha teto, ao contrario das de `entregas`/`coletas` (`.limit(1000)`); mes com muitas ocorrencias baixava a tabela inteira                                                                                                                                                                                                                                                                       | `src/hooks/analytics/useKPIBenchmark.tsx:67-71`                                                                                          | 219 -> 220          | Baixa              |
 | A-02 | O teto de 6000 do benchmark de KPI e **unico para os seis meses**: se a soma dos seis passar de 6000 linhas, o PostgREST corta sem ordem definida e qualquer mes pode perder registros (antes o corte era de 1000 **por mes**)                                                                                                                                                                                                                                                   | `src/hooks/analytics/useKPIBenchmark.tsx:44,49-71`                                                                                       | 220                 | Media              |
 | A-03 | O teto unico para os seis meses tambem vale para as metricas executivas (6000/6000/3000): se a soma dos seis meses passar disso, o PostgREST corta sem ordem definida e qualquer mes pode perder registros (antes o corte era por mes -- 1000/1000/500)                                                                                                                                                                                                                          | `src/hooks/analytics/useExecutiveMetrics.tsx:55,62,68`                                                                                   | 221                 | Media              |
-| A-04 | **Produção não tem `public.user_panel_preferences`**: a migration `20261121153649` da #248 nunca foi aplicada (último dispatch do `aplicar-migration.yml` é de 20/11, anterior ao arquivo) e o `types.ts` foi editado à mão. Efeito: `useSLAMetas` lança erro ao ler e `PainelSLA.tsx:242-244` mostra `toast.success` incondicional sem persistir nada - o usuário vê "salvo" e as metas de SLA não são gravadas. É também a causa do `types-sync` vermelho desde 23/11 (Gate 1) | `src/hooks/sla/useSLAMetas.ts:31-36`, `src/pages/PainelSLA.tsx:242-244`, `supabase/migrations/20261121153649_user_panel_preferences.sql` | 222                 | **Alta**           |
+| A-04 | **RESOLVIDO na etapa 222**: a migration `20261121153649` da #248 foi aplicada em produção (run `45382402621`) e o `types.ts` deixou de ser editado à mão - passou a ser regenerado pelo `types-sync`, que voltou verde (PR #419). Achado original: **produção não tinha `public.user_panel_preferences`**: a migration `20261121153649` da #248 nunca foi aplicada (último dispatch do `aplicar-migration.yml` é de 20/11, anterior ao arquivo) e o `types.ts` foi editado à mão. Efeito: `useSLAMetas` lança erro ao ler e `PainelSLA.tsx:242-244` mostra `toast.success` incondicional sem persistir nada - o usuário vê "salvo" e as metas de SLA não são gravadas. É também a causa do `types-sync` vermelho desde 23/11 (Gate 1) | `src/hooks/sla/useSLAMetas.ts:31-36`, `src/pages/PainelSLA.tsx:242-244`, `supabase/migrations/20261121153649_user_panel_preferences.sql` | 222                 | **Alta**           |
 | A-05 | `LogisticsService.getDeliveries` (`src/features/logistics/services/LogisticsService.ts:8`) mantém `select('*')` porque **não tem chamador**: a classe não é importada em nenhum arquivo de `src/`. Cortar colunas de código morto não economiza banda; o que resolve é apagar ou usar o serviço                                                                                                                                                                                  | `src/features/logistics/services/LogisticsService.ts:5-14`                                                                               | 227                 | Baixa              |
 
 | A-06 | As mutacoes de status vivem duplicadas por tela (`Despachos.tsx` e `KanbanEntregas.tsx`), sem hook comum: regra nova de transicao precisa ser aplicada duas vezes | `src/pages/Despachos.tsx:216-320`, `src/pages/KanbanEntregas.tsx:328` | 282 | Media |
-| A-07 | `KanbanEntregas.tsx` move entrega para `despachado` sem exigir `nf_remessa` e sem confirmacao; `Despachos.tsx` exige as duas coisas | `src/pages/KanbanEntregas.tsx:328`, `src/pages/Despachos.tsx:256-274` | 282 | **Alta** |
+| A-07 | **Mitigado pelo banco na etapa 031** (a tela continua sem aviso previo): o trigger `a_valida_transicao_entregas` recusa `despachado` sem `nf_remessa`, entao o caminho do Kanban nao grava mais estado invalido - o operador recebe a mensagem do banco pelo `onError` de `KanbanEntregas.tsx:344`. `KanbanEntregas.tsx` move entrega para `despachado` sem exigir `nf_remessa` e sem confirmacao; `Despachos.tsx` exige as duas coisas | `src/pages/KanbanEntregas.tsx:328`, `src/pages/Despachos.tsx:256-274` | 282 | **Alta** |
 | A-08 | O dialogo do despacho final diz "esta acao e irreversivel", mas `despachado` ainda aceita `em_transito`: o texto promete mais do que a maquina de estados permite | `src/lib/statusTransitions.ts:17`, `src/pages/Despachos.tsx:596-607` | 282 | Baixa |
 
-**Consolidacao (2026-11-24).** Fechamento da tabela: **A-01 resolvido** na etapa 220; **A-02, A-03, A-04,
-A-05, A-06, A-07 e A-08 seguem abertos** e sao o insumo da proxima auditoria - nenhum foi corrigido (regra 4).
-Ordem de dano para quem pegar: **A-04** (producao sem `public.user_panel_preferences`: o Painel SLA mostra
-"salvo" e nao grava, e e a causa do `types-sync` vermelho), **A-07** (despacho sem NF pelo Kanban), depois
-**A-08**, **A-02/A-03** (teto unico de 6000 linhas cobrindo seis meses) e **A-05** (servico de logistica sem
-chamador). Notas de etapa que citam "achado novo" sem passar por esta tabela continuam validas no texto
+**Consolidacao (2026-11-24).** Fechamento da tabela: **A-01 resolvido** na etapa 220 e **A-04 resolvido** na
+etapa 222 (migration `20261121153649` aplicada em producao e `types.ts` regenerado pelo `types-sync`, que
+voltou verde); **A-02, A-03, A-05, A-06 e A-08 seguem abertos** e sao o insumo da proxima auditoria -
+nenhum foi corrigido por conta propria (regra 4). **A-07 esta mitigado pelo banco desde a etapa 031** (o
+trigger recusa despacho sem NF, mesmo pelo Kanban), mas a tela ainda nao avisa antes de tentar.
+Ordem de dano para quem pegar: **A-08**, **A-02/A-03** (teto unico de 6000 linhas cobrindo seis meses),
+**A-06** (mutacao de status duplicada por tela) e **A-05** (servico de logistica sem chamador).
+Notas de etapa que citam "achado novo" sem passar por esta tabela continuam validas no texto
 original; esta tabela e a lista canonica.
 
 ## Etapas que não correspondiam mais ao código
@@ -3815,6 +3817,57 @@ e qualquer edicao invalidaria os testes que verificam o conteudo.
 - `npm run automation:test` -> **103 testes, 0 falhas**
 - `node scripts/ci/check-claude-md-integrity.mjs` -> exit 0
 - `grep` nao encontra nenhuma referencia apontando para a raiz de `scripts/`
+
+### Registro - etapas 028-033 e 037 (2026-11-24) - maquina de estados viva no banco (PR #417 e #420)
+
+As etapas 028-031 estavam escritas na tela desde a 034-036 (mapa compartilhado, `Despachos` e
+`KanbanEntregas` validando antes de gravar), mas a camada que ninguem contorna - o banco - continuava
+aceitando qualquer valor do enum em qualquer ordem. Quatro migrations fecham isso, e a 033 as levou para
+producao.
+
+- `20261124090000_fn_valida_transicao_entrega.sql` - funcao pura `fn_valida_transicao_entrega(p_de, p_para)`
+  com o mapa explicito de saltos validos de entrega
+- `20261124090100_trigger_valida_transicao_entrega.sql` - trigger `BEFORE UPDATE OF status` em `entregas`
+- `20261124090200_fn_valida_transicao_coleta.sql` - mesma protecao para `coletas` (funcao + trigger)
+- `20261124090300_trigger_entrega_nf_obrigatoria.sql` - `CREATE OR REPLACE` da funcao de trigger
+  acrescentando a trava de NF
+
+Codigo na PR #417 (squash `dc3aa718`); aplicacao pela etapa 033 em 4 despachos do `aplicar-migration.yml`
+(runs `45382701775`, `45382772891`, `45382829524`, `45382898191`, todos `success`). O workflow exige o
+arquivo dentro de `supabase/migrations/` **presente na main** - por isso a ordem foi mergear e depois
+aplicar.
+
+Por que o trigger se chama `a_valida_transicao_*`: triggers `BEFORE` rodam em ordem alfabetica, e o nome
+ganha de `audit_entregas` e `tr_increment_version_entregas`. Tentativa recusada nao chega a virar linha de
+auditoria nem incrementa `version`. O SQLSTATE e `23514`, com a mensagem
+`Transicao de status invalida: X -> Y` - o contrato que a tela ja sabia traduzir desde a 037.
+
+Risco assumido e registrado: o mapa do front (`TRANSICOES_ENTREGA`) e **mais estreito** que o do banco. O
+banco aceita tambem os saltos que o despacho e o rastreio realmente usam (`despachado`/`em_transito` ->
+`entregue`, `despachado` -> `saiu_entrega`|`ocorrencia`, `saiu_entrega` -> `em_transito`, `ocorrencia` ->
+`em_transito`|`entregue`). Se o banco usasse o mapa do front, "Confirmar Entrega" em `Envios.tsx:954`
+passaria a falhar. O comentario de `src/lib/statusTransitions.ts:8-13` foi corrigido para dizer isso.
+
+A 037 so podia fechar depois da 033: sem o banco emitindo `23514`, a mensagem de recusa nunca aparecia. As
+telas que gravam status e tratam a recusa ficaram `Despachos.tsx:253`, `KanbanEntregas.tsx:344` e
+`Envios.tsx` (menu da linha ganhou `onError` e a acao em massa passou a traduzir a recusa, PR #420). O
+motor de regra de negocio (`useBusinessRuleEngine.tsx:117-131`) passou a registrar `console.warn` quando o
+banco recusa, em vez de engolir o erro - antes uma transicao recusada nao deixava rastro nenhum.
+
+Rollback pronto: `supabase/rollbacks/20261124091000_rollback_maquina_estados.sql` (dropa 2 triggers e 4
+funcoes). Para usar, copiar para `supabase/migrations/` e despachar o mesmo workflow.
+
+**Verificacao**
+- `aplicar-migration.yml` 4x -> os 4 runs `success` (ids acima)
+- catalogo gerado do banco (`supabase/schema-catalog.json`, PR #419) tem as 6 rotinas novas:
+  `fn_valida_transicao_entrega`, `fn_tr_valida_transicao_entrega`, `a_valida_transicao_entregas`,
+  `fn_valida_transicao_coleta`, `fn_tr_valida_transicao_coleta`, `a_valida_transicao_coletas`
+- `node --test scripts/audit/sql.unit.mjs` (com `PG_BINDIR` no Postgres 16) -> **29 testes, 0 falhas,
+  0 pulados**; entre eles "maquina de estados (028-031): transicao valida passa; salto invalido e despacho
+  sem NF sao recusados"
+- `npx vitest run src/lib/statusTransitions.test.ts` -> **19 testes passando**
+- `node scripts/automation.mjs test` -> **103 testes, 0 falhas**
+- `npx tsc --noEmit` -> exit 0 (worktree da PR #420); CI da #420 com 17 checks verdes
 
 Uma linha por etapa concluída. A coluna **Evidência** é o que diferencia etapa concluída de etapa
 "deveria funcionar": cole o comando e o resultado, ou a consulta e o retorno.
