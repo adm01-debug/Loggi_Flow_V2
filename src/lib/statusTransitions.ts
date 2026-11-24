@@ -159,3 +159,19 @@ export function mensagemRecusaTransicao(
     passo
   );
 }
+
+/**
+ * A transicao exige NF de Simples Remessa e o registro nao tem uma?
+ *
+ * Ate a etapa 031 levar a regra para o trigger do banco, este era um `if`
+ * embutido em `Despachos.tsx`: qualquer `PATCH` direto despachava sem nota, e
+ * e essa data que alimenta os paineis de SLA e OTIF.
+ */
+export function faltaNfRemessa(
+  de: EntregaStatus,
+  para: EntregaStatus,
+  nfRemessa: string | null | undefined,
+): boolean {
+  if (!podeTransicionarEntrega(de, para)) return false;
+  return para === "despachado" && !nfRemessa?.trim();
+}
