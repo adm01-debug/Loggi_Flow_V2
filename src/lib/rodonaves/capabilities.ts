@@ -1,10 +1,12 @@
 /**
  * Matriz de capacidades da API Rodonaves para o CNPJ da operação.
  *
- * Baseada na auditoria de 139 endpoints (matriz mestra de permissões):
- * o escopo *consumer* está liberado, enquanto o escopo de *gestão interna*
- * (CRUD de clientes, PIX, ocorrências internas, DataStudio) responde 403.
- * O gateway DNE está offline e possui cadeia de fallback dedicada.
+ * Alinhada à documentação do MCP Rodonaves v6.9.0 (02/05/2026): o escopo
+ * *consumer* está liberado, enquanto o escopo de *gestão interna* (CRUD de
+ * clientes, ocorrências internas, calendário de unidade) responde 403.
+ * Toda rota bloqueada aponta em `fallback` a alternativa liberada que o
+ * gateway `rodonaves-api` usa no lugar dela. O gateway DNE está offline
+ * desde abril/2026 e possui cadeia de fallback dedicada (ViaCEP/IBGE).
  *
  * A UI consulta esta matriz para desabilitar e explicar ações indisponíveis
  * em vez de disparar chamadas que falham em runtime.
@@ -29,6 +31,8 @@ export interface RTECapability {
   readonly status: RTECapabilityStatus;
   /** Explicação exibida ao operador quando a ação não está disponível. */
   readonly note?: string;
+  /** Ação liberada a ser usada no lugar desta (rota alternativa). */
+  readonly fallback?: string;
 }
 
 /** Rótulos de status para exibição. */
@@ -60,7 +64,13 @@ const CAPABILITIES: readonly RTECapability[] = [
   // ---------- tracking ----------
   { action: "track", gateway: "tracking", status: "liberado" },
   { action: "track-batch", gateway: "tracking", status: "liberado" },
-  { action: "track-batch-paginated", gateway: "tracking", status: "liberado" },
+  {
+    action: "track-batch-paginated",
+    gateway: "tracking",
+    status: "bloqueado",
+    note: "batchPagination responde 403 (sem permissão).",
+    fallback: "track-batch",
+  },
   { action: "track-batch-by-params", gateway: "tracking", status: "liberado" },
   {
     action: "track-batch-by-occurrence",
@@ -69,13 +79,33 @@ const CAPABILITIES: readonly RTECapability[] = [
   },
   { action: "tracking-steps", gateway: "tracking", status: "liberado" },
   { action: "delivery-proof", gateway: "tracking", status: "liberado" },
-  { action: "delivery-proof-hq", gateway: "tracking", status: "liberado" },
-  { action: "delivery-info", gateway: "tracking", status: "liberado" },
-  { action: "delivery-receipt-batch", gateway: "tracking", status: "liberado" },
+  {
+    action: "delivery-proof-hq",
+    gateway: "tracking",
+    status: "bloqueado",
+    note: "Comprovante sem compressão responde 403 (sem permissão).",
+    fallback: "delivery-proof",
+  },
+  {
+    action: "delivery-info",
+    gateway: "tracking",
+    status: "bloqueado",
+    note: "deliveryInformation responde 403 (sem permissão).",
+    fallback: "tracking-steps",
+  },
+  {
+    action: "delivery-receipt-batch",
+    gateway: "tracking",
+    status: "bloqueado",
+    note: "receipt-key-list responde 403 (sem permissão).",
+    fallback: "delivery-proof",
+  },
   {
     action: "delivery-receipt-by-protocols",
     gateway: "tracking",
-    status: "liberado",
+    status: "bloqueado",
+    note: "batchdeliveryreceiptsbyprotocols responde 403 (sem permissão).",
+    fallback: "delivery-proof",
   },
   {
     action: "occurrence-receipt",
@@ -93,8 +123,15 @@ const CAPABILITIES: readonly RTECapability[] = [
     gateway: "tracking",
     status: "bloqueado",
   },
-  { action: "orders", gateway: "tracking", status: "nao_testado" },
+  {
+    action: "orders",
+    gateway: "tracking",
+    status: "bloqueado",
+    note: "ordersbydaterangepagination responde 403 (sem permissão).",
+    fallback: "track-batch",
+  },
   { action: "sync-tracking", gateway: "tracking", status: "liberado" },
+  { action: "resolve-address", gateway: "tracking", status: "liberado" },
 
   // ---------- quotation ----------
   { action: "quotation", gateway: "quotation", status: "liberado" },
@@ -125,12 +162,7 @@ const CAPABILITIES: readonly RTECapability[] = [
     gateway: "quotation",
     status: "nao_testado",
   },
-  {
-    action: "cubage-factor",
-    gateway: "quotation",
-    status: "bloqueado",
-    note: "Fator de cubagem exige liberação comercial (peso-cubado / 403).",
-  },
+  { action: "cubage-factor", gateway: "quotation", status: "liberado" },
   { action: "deadline", gateway: "quotation", status: "liberado" },
   {
     action: "validate-customer-quotation",
@@ -145,7 +177,9 @@ const CAPABILITIES: readonly RTECapability[] = [
   {
     action: "pickup-available-dates-by-params",
     gateway: "pickup",
-    status: "liberado",
+    status: "bloqueado",
+    note: "getavaliablepickupdatebyparms responde 403 (sem permissão).",
+    fallback: "pickup-available-dates",
   },
   { action: "pickup-create", gateway: "pickup", status: "nao_testado" },
   {
@@ -177,7 +211,12 @@ const CAPABILITIES: readonly RTECapability[] = [
   },
   { action: "customer-get-by-id", gateway: "customer", status: "bloqueado" },
   { action: "customer-list", gateway: "customer", status: "bloqueado" },
-  { action: "customer-get-by-taxid", gateway: "customer", status: "bloqueado" },
+  {
+    action: "customer-get-by-taxid",
+    gateway: "customer",
+    status: "liberado",
+    note: "Única rota de cliente liberada: consulta por CNPJ/CPF (getbytaxidregistration).",
+  },
   { action: "customer-search", gateway: "customer", status: "bloqueado" },
   { action: "customer-search-full", gateway: "customer", status: "bloqueado" },
   { action: "address-list", gateway: "customer", status: "bloqueado" },
@@ -187,29 +226,48 @@ const CAPABILITIES: readonly RTECapability[] = [
   { action: "person-update", gateway: "customer", status: "bloqueado" },
 
   // ---------- selfattendance ----------
-  { action: "city-search", gateway: "selfattendance", status: "liberado" },
+  {
+    action: "city-search",
+    gateway: "selfattendance",
+    status: "bloqueado",
+    note: "city/description responde 403 (sem permissão).",
+    fallback: "city-by-zipcode",
+  },
   { action: "city-by-zipcode", gateway: "selfattendance", status: "liberado" },
   {
     action: "address-by-zipcode",
     gateway: "selfattendance",
-    status: "liberado",
+    status: "bloqueado",
+    note: "city/zipcodeaddress responde 403 (sem permissão).",
+    fallback: "resolve-address",
   },
   {
     action: "tracking-steps-bot",
     gateway: "selfattendance",
-    status: "liberado",
+    status: "bloqueado",
+    note: "tracking-steps-bot responde 403 (sem permissão).",
+    fallback: "tracking-steps",
   },
   {
     action: "tracking-last-steps-bot",
     gateway: "selfattendance",
-    status: "liberado",
+    status: "bloqueado",
+    note: "tracking-last-steps-bot responde 403 (sem permissão).",
+    fallback: "tracking-steps",
   },
   { action: "unit-data", gateway: "selfattendance", status: "liberado" },
-  { action: "unit-calendar", gateway: "selfattendance", status: "liberado" },
+  {
+    action: "unit-calendar",
+    gateway: "selfattendance",
+    status: "bloqueado",
+    note: "calenderunitbyprotocol responde 403 (sem permissão).",
+  },
   {
     action: "self-attendance-quotation",
     gateway: "selfattendance",
-    status: "liberado",
+    status: "bloqueado",
+    note: "nova-cotacao (SelfAttendance) responde 403 (sem permissão).",
+    fallback: "quotation",
   },
   {
     action: "self-attendance-delivery-time",
