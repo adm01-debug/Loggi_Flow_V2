@@ -25,7 +25,7 @@ describe("rodonaves-webhook: erro generico na resposta ao webhook", () => {
 
   it("o catch usa o helper da etapa 164, mantendo 500 para a Rodonaves reenviar", () => {
     expect(blocoCatch).toContain(
-      'return internalErrorResponse(error, corsHeaders, "rodonaves-webhook");',
+      'return internalErrorResponse(error, headers, "rodonaves-webhook");',
     );
   });
 

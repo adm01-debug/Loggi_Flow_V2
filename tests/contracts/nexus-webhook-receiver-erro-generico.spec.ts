@@ -27,7 +27,7 @@ describe("nexus-webhook-receiver: erro generico na resposta ao webhook", () => {
 
   it("o catch usa o helper da etapa 164, mantendo 500 para haver reenvio", () => {
     expect(blocoCatch).toContain(
-      'return internalErrorResponse(error, corsHeaders, "nexus-webhook-receiver");',
+      'return internalErrorResponse(error, headers, "nexus-webhook-receiver");',
     );
   });
 

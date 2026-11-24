@@ -6,6 +6,7 @@ import { verifyWebhookHmac } from "../_shared/webhookSignature.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
 import { bodyHash, buildEventKey, claimIdempotencyKey } from "../_shared/idempotency.ts";
 import { log, redact } from "../_shared/logger.ts";
+import { getCorsHeaders } from "../_shared/cors.ts";
 
 /**
  * Mapeia status/evento livre de um webhook genérico para o enum entrega_status.
@@ -52,15 +53,10 @@ export function mapCarrierStatus(raw: string): string | null {
   return null;
 }
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
-
 serve(async (req) => {
+  const headers = getCorsHeaders(req);
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+    return new Response("ok", { headers });
   }
 
   try {
@@ -77,7 +73,7 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: "rate_limited" }), {
         status: 429,
         headers: {
-          ...corsHeaders,
+          ...headers,
           "Content-Type": "application/json",
           "Retry-After": "60",
         },
@@ -91,7 +87,7 @@ serve(async (req) => {
     if (!(await verifyWebhookHmac(raw, signature, "CARRIER_WEBHOOK_SECRET"))) {
       return new Response(JSON.stringify({ error: "Invalid signature" }), {
         status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...headers, "Content-Type": "application/json" },
       });
     }
 
@@ -117,7 +113,7 @@ serve(async (req) => {
           nexus_protocol: "SHIELD_GATE_REJECTION",
         }),
         {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...headers, "Content-Type": "application/json" },
           status: 400,
         },
       );
@@ -144,7 +140,7 @@ serve(async (req) => {
       });
       return new Response(
         JSON.stringify({ error: 'Event without stable identifier' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+        { status: 400, headers: { ...headers, 'Content-Type': 'application/json' } },
       );
     }
 
@@ -156,7 +152,7 @@ serve(async (req) => {
           duplicate: true,
           message: "already processed",
         }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        { headers: { ...headers, "Content-Type": "application/json" } },
       );
     }
 
@@ -230,12 +226,12 @@ serve(async (req) => {
         message: "Carrier Webhook processed via Nexus Shield",
         entrega_atualizada: Boolean(trackingCode || numeroEntrega),
       }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      { headers: { ...headers, "Content-Type": "application/json" } },
     );
   } catch (error: any) {
     log.error("[carrier-webhook-receiver] Error:", error.message);
     return new Response(JSON.stringify({ error: "Internal Server Error" }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...headers, "Content-Type": "application/json" },
       status: 500,
     });
   }
