@@ -39,6 +39,10 @@ jobs:
       - name: Validate No Console (edge functions)
         run: npm run validate:no-console
 
+      # 🔒 Consulta de listagem sem teto (.select() sem .limit/.range/.single) reprova a CI
+      - name: Validate Query Limits (listing caps)
+        run: npm run validate:query-limits
+
 
       # 🔒 Dependency audit (high+critical)
       - name: Security Scan (npm audit)
