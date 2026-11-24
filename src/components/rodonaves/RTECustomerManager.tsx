@@ -7,8 +7,20 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Users, MapPin, ListOrdered, Plus, X } from "lucide-react";
+import {
+  Search,
+  Users,
+  MapPin,
+  ListOrdered,
+  Plus,
+  X,
+  AlertTriangle,
+} from "lucide-react";
 import { toast } from "sonner";
+import {
+  capabilityReason,
+  isActionAvailable,
+} from "@/lib/rodonaves/capabilities";
 
 type Row = Record<string, unknown>;
 
@@ -24,6 +36,33 @@ function extractRows(data: { data?: unknown }): Row[] {
 }
 
 const str = (v: unknown) => (v == null ? "" : String(v));
+
+/**
+ * Coleta os endereços dentro de um payload de cliente: a consulta liberada
+ * (`customer-get-by-taxid` / getbytaxidregistration) devolve o cadastro com a
+ * lista de endereços aninhada, sem depender do endpoint `address-list` (403).
+ */
+function extractAddresses(source: unknown, depth = 0): Row[] {
+  if (!source || depth > 4) return [];
+  if (Array.isArray(source)) {
+    return source.flatMap((item) => {
+      if (
+        item &&
+        typeof item === "object" &&
+        ("ZipCode" in item || "Street" in item)
+      ) {
+        return [item as Row];
+      }
+      return extractAddresses(item, depth + 1);
+    });
+  }
+  if (typeof source === "object") {
+    return Object.entries(source as Record<string, unknown>)
+      .filter(([key]) => /address|endereco/i.test(key))
+      .flatMap(([, value]) => extractAddresses(value, depth + 1));
+  }
+  return [];
+}
 
 interface NewAddressFormData {
   street: string;
@@ -154,6 +193,9 @@ export function RTECustomerManager() {
   const [addresses, setAddresses] = useState<Row[]>([]);
   const [loading, setLoading] = useState(false);
 
+  const blocked = (action: string) => !isActionAvailable(action);
+  const reasonOf = (action: string) => capabilityReason(action) ?? undefined;
+
   const invoke = async (action: string, body: Record<string, unknown>) => {
     setLoading(true);
     try {
@@ -232,12 +274,19 @@ export function RTECustomerManager() {
       toast.error("Informe um CNPJ/CPF válido");
       return;
     }
-    const data = await invoke("address-list", { taxIdRegistration: taxId });
-    if (data) {
-      setAddresses(extractRows(data));
-    } else {
+    // `address-list` responde 403 para o escopo do nosso JWT; os endereços
+    // vêm do cadastro do cliente (rota liberada), que já os traz aninhados.
+    const useAddressList = isActionAvailable("address-list");
+    const data = await invoke(
+      useAddressList ? "address-list" : "customer-get-by-taxid",
+      { taxIdRegistration: taxId },
+    );
+    if (!data) {
       setAddresses([]);
+      return;
     }
+    const rows = extractRows(data);
+    setAddresses(useAddressList ? rows : extractAddresses(rows));
   };
 
   const handleSaveAddress = async (address: Omit<NewAddressFormData, "">) => {
@@ -275,6 +324,14 @@ export function RTECustomerManager() {
         </CardTitle>
       </CardHeader>
       <CardContent>
+        <div className="mb-4 flex items-start gap-2 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-xs text-amber-700 dark:text-amber-400">
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+          <span>
+            Consulta por CNPJ/CPF liberada pela RTE. Busca por nome, busca por
+            ID, listagem de clientes e cadastro de endereço respondem 403; os
+            endereços são lidos junto do cadastro do cliente por CNPJ.
+          </span>
+        </div>
         <Tabs defaultValue="search" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="search">
@@ -311,14 +368,22 @@ export function RTECustomerManager() {
               </div>
             </div>
             <div className="flex gap-2 flex-wrap">
-              <Button onClick={handleSearch} disabled={loading}>
+              <Button
+                onClick={handleSearch}
+                disabled={
+                  loading ||
+                  (!searchTaxId.replace(/\D/g, "") && blocked("customer-search"))
+                }
+                title={reasonOf("customer-search")}
+              >
                 <Search className="w-4 h-4 mr-2" />
                 Buscar
               </Button>
               <Button
                 variant="outline"
                 onClick={handleSearchFull}
-                disabled={loading}
+                disabled={loading || blocked("customer-search-full")}
+                title={reasonOf("customer-search-full")}
               >
                 <Users className="w-4 h-4 mr-2" />
                 Busca Completa
@@ -338,7 +403,8 @@ export function RTECustomerManager() {
                 variant="outline"
                 size="sm"
                 onClick={handleSearchById}
-                disabled={loading}
+                disabled={loading || blocked("customer-get-by-id")}
+                title={reasonOf("customer-get-by-id")}
               >
                 <Search className="w-3 h-3 mr-1" />
                 Buscar por ID
@@ -395,10 +461,19 @@ export function RTECustomerManager() {
                 />
               </div>
             </div>
-            <Button onClick={handleList} disabled={loading}>
+            <Button
+              onClick={handleList}
+              disabled={loading || blocked("customer-list")}
+              title={reasonOf("customer-list")}
+            >
               <ListOrdered className="w-4 h-4 mr-2" />
               Listar Clientes
             </Button>
+            {blocked("customer-list") && (
+              <p className="text-xs text-amber-600 dark:text-amber-400">
+                {reasonOf("customer-list")}
+              </p>
+            )}
           </TabsContent>
 
           <TabsContent value="addresses" className="space-y-4">
@@ -418,7 +493,8 @@ export function RTECustomerManager() {
               <Button
                 variant="outline"
                 onClick={() => setShowNewAddress(true)}
-                disabled={loading}
+                disabled={loading || blocked("address-create")}
+                title={reasonOf("address-create")}
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Novo

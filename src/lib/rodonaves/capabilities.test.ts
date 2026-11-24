@@ -42,8 +42,42 @@ describe("disponibilidade", () => {
 
   it("bloqueia o escopo de gestão interna", () => {
     expect(isActionAvailable("customer-list")).toBe(false);
-    expect(isActionAvailable("cubage-factor")).toBe(false);
     expect(isActionAvailable("occurrence-receipt")).toBe(false);
+    expect(isActionAvailable("orders")).toBe(false);
+  });
+
+  it("libera as rotas recuperadas (cliente por CNPJ e fator de cubagem)", () => {
+    expect(isActionAvailable("customer-get-by-taxid")).toBe(true);
+    expect(isActionAvailable("cubage-factor")).toBe(true);
+    expect(capabilityReason("customer-get-by-taxid")).toBeNull();
+  });
+
+  it("mantém bloqueadas as rotas que a RTE responde 403 (doc v6.9.0)", () => {
+    const bloqueadas = [
+      "track-batch-paginated",
+      "delivery-proof-hq",
+      "delivery-info",
+      "delivery-receipt-batch",
+      "delivery-receipt-by-protocols",
+      "pickup-available-dates-by-params",
+      "tracking-steps-bot",
+      "tracking-last-steps-bot",
+      "unit-calendar",
+      "city-search",
+      "address-by-zipcode",
+      "self-attendance-quotation",
+    ];
+    for (const action of bloqueadas) {
+      expect(isActionAvailable(action), action).toBe(false);
+    }
+  });
+
+  it("aponta apenas rotas alternativas liberadas", () => {
+    for (const capability of listCapabilities()) {
+      if (!capability.fallback) continue;
+      expect(getCapability(capability.fallback), capability.action).not.toBeNull();
+      expect(isActionAvailable(capability.fallback), capability.action).toBe(true);
+    }
   });
 
   it("marca endpoints instáveis como indisponíveis", () => {
