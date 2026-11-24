@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { extractFallbackNotice, fallbackNoticeMessage } from '@/lib/rodonaves';
 import { toast } from 'sonner';
 
 // ==========================================
@@ -94,6 +95,17 @@ async function invokeRodonaves(action: string, params: object) {
 
   if (error) throw new Error(error.message);
   if (!data?.success) throw new Error(data?.error || 'Erro na API Rodonaves');
+
+  // 403 da RTE e trocado por rota alternativa no gateway; o operador precisa
+  // saber que o dado veio de outra rota antes de decidir com base nele.
+  const notice = extractFallbackNotice(data);
+  if (notice) {
+    toast.warning('Dado obtido por rota alternativa', {
+      id: `rte-fallback-${notice.route}`,
+      description: fallbackNoticeMessage(notice),
+    });
+  }
+
   return data;
 }
 
