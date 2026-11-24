@@ -242,7 +242,7 @@
 - [x] **164** — Criar `_shared/httpError.ts`: uma resposta de erro que não vaza o detalhe interno — onda 5 — Alta
 - [x] **165** — `ingest-biosync`: parar de devolver o erro do Postgres — onda 5 — Alta
 - [x] **166** — `scheduled-reports`: parar de devolver o erro do Postgres — onda 5 — Alta
-- [ ] **167** — `lgpd-erase-user`: parar de devolver o erro do Postgres — onda 5 — Alta
+- [x] **167** — `lgpd-erase-user`: parar de devolver o erro do Postgres — onda 5 — Alta
 - [ ] **168** — `execute-protocol`: parar de devolver o erro do Postgres — onda 5 — Alta
 - [ ] **169** — `lalamove-api`: parar de repassar a resposta de erro da Lalamove — onda 5 — Alta
 - [ ] **170** — `rodonaves-api`: parar de transformar o erro do **login** da Rodonaves em mensagem — onda 5 — **Crítica**
@@ -434,6 +434,42 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapa 167 (2026-11-25) - achado B-06 (`lgpd-erase-user`)
+
+**Causa:** o `catch` de `:102` devolvia `{ error: error.message }` com 400. Numa rotina de apagamento de dado
+pessoal isso e o pior caso de vazamento: o texto do PostgREST lista a tabela e a chave estrangeira que ainda
+guardam dado do titular — instrucao pronta para quem tentar burlar o apagamento. Pior: o erro vinha com status
+400, entao um erro de servidor parecia culpa de quem chamou.
+
+**Correcao (so o arquivo da etapa):**
+
+- `:63` perfil — `throw profileError` virou `log.error("[lgpd-erase-user] Falha ao apagar perfil:",
+  { step: "profiles.delete", code, message })` + `throw new Error("Falha ao apagar perfil")`.
+- `:68` auth — mesmo padrao com `step: "auth.users.delete"`.
+- `:92` auditoria — mesmo padrao com `step: "audit_logs.insert"`.
+- `:102` `catch` — `return internalErrorResponse(error, corsHeaders, "lgpd-erase-user")`: erro de banco vira 500
+  `{"error":"INTERNAL_ERROR"}`, sem texto do Postgres e sem `stack`.
+- `if (!userId)` — agora responde 400 com `{ "error": "User ID is required" }` explicito. Antes era um `throw`
+  que o `catch` transformava em 400 com a mesma mensagem; mantido o status, sem regressao para o chamador.
+- **Nada da rotina mudou**: ordem `profiles` -> `auth.users` -> `audit_logs`, `.eq("id", userId)`, o insert de
+  auditoria e a politica de `deleted_at` (`docs/SOFT_DELETE_POLICY.md`) ficaram intactos. Nenhum dado pessoal no
+  log: so o passo, o `code` e a `message` do Postgres; nunca `details`/`hint` (que carregam valores de chave).
+
+**Verificado de verdade:** `tests/contracts/lgpd-erase-user-erro-interno.spec.ts` (6 casos) — 6/6. Prova por
+mutacao: A `catch` volta a ecoar `error.message` -> 1 falha; B log sem `step` -> 1; C volta a lancar
+`profileError` cru -> 1; D `.eq("id", "x")` (alvo do titular) -> 1; E `details` no log -> 1; restaurado 6/6.
+`deno check` 0 erro (baseline tinha 1 — o `error.message` do `catch` era o proprio erro de tipo), `deno lint` 2
+= baseline, `deno fmt --check` 1 = baseline; `tsc` 0; `lint:budget` 77/86 com 0 erros; suite 66 arquivos / 505
+testes. Verificacao do plano executada: `grep -n 'error.message|internalErrorResponse'` no arquivo retorna so o
+import (`:4`) e o `return` do helper (`:133`) — nenhum `error.message` em resposta.
+
+**Nao verificado:** apagamento real contra producao (apaga conta de verdade e e irreversivel). Nao ha chamador
+em `src/`, entao o caminho so e exercitado por chamada manual autenticada de admin.
+
+**Fora de escopo (registrado, nao tocado):** contrato `user_id` uuid + `confirm: z.literal(true)` previsto nas
+etapas 072/101 do `PLANO_FRONTEND_CONTRATOS` (a funcao ainda le `userId` do corpo); CORS `*`; falta de log
+estruturado nos passos de sucesso (auditoria 10.9).
 
 ### Registro - etapa 166 (2026-11-25) - achado B-06 (`scheduled-reports`)
 
