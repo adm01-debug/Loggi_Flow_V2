@@ -251,7 +251,7 @@
 - [x] **173** — `db-health-weekly-report`: parar de repassar o erro do terceiro no relatório — onda 5 — Média
 - [x] **174** — `nexus-webhook-receiver`: erro genérico na resposta ao webhook — onda 5 — Média
 - [x] **175** — `lalamove-webhook`: erro genérico na resposta ao webhook — onda 5 — Média
-- [ ] **176** — `rodonaves-webhook`: erro genérico na resposta ao webhook — onda 5 — Média
+- [x] **176** — `rodonaves-webhook`: erro genérico na resposta ao webhook — onda 5 — Média
 - [ ] **177** — `smart-carrier-selection`: erro genérico na resposta da cotação — onda 5 — Média
 - [ ] **178** — Varredura final de `error.message`: as onze funções restantes de B-06 — onda 5 — Média
 - [~] **179** — `secure-store`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — **Crítica** · **aguarda o dono**
@@ -434,6 +434,43 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapa 176 (2026-11-25) - achado B-06 (`rodonaves-webhook`)
+
+**Causa:** duas portas abertas no mesmo arquivo. (1) `:213` fazia `throw updateError`, o erro cru do PostgREST do
+`update` de `entregas` — nome de tabela, de coluna e texto de policy. (2) o `catch` devolvia
+`{"error": error.message}` com 500, entao esse texto e o do `throw findError` de `:140` (select de `entregas`)
+chegavam inteiros para quem chama o webhook da Rodonaves.
+
+**Correcao (so o arquivo da etapa):**
+
+- `:6` — import de `internalErrorResponse` de `_shared/httpError.ts` (etapa 164).
+- `:213-220` — o erro do `update` passou a ser registrado no log
+  (`log.error("[rodonaves-webhook] Falha ao atualizar a entrega:", { entrega_id, code: updateError.code, message: updateError.message })`)
+  e o `throw` virou mensagem fixa `"Falha ao atualizar a entrega"`. Continua **falhando** de proposito: se
+  atualizar a entrega nao funcionou, a Rodonaves precisa reenviar o evento.
+- `:240-245` — o `catch` registra o detalhe so no log e responde
+  `internalErrorResponse(error, corsHeaders, "rodonaves-webhook")`: 500 `{"error":"INTERNAL_ERROR"}`, sem
+  mensagem interna e sem stack.
+- **Nao tocado:** a chave de dedupe e o marcador `:170-198` (etapas 135/136, padrao de referencia de B-02), o
+  HMAC `:63-77` (401), o rate limit `:42-55` (429) e o `insert` em `ocorrencias` de `:217` (achado novo).
+
+**Quem via o detalhe:** o emissor do webhook (Rodonaves) e qualquer um que interceptasse a resposta; nenhuma
+tela do app le esse texto. O detalhe completo agora fica no log da edge.
+
+**Achados novos (anotados, nao corrigidos):** (1) o `insert` em `ocorrencias` de `:217` nao verifica erro;
+(2) `:140` ainda faz `throw findError` cru — sem vazamento depois desta etapa, porque o `catch` e generico.
+
+**Verificado de verdade:** `tests/contracts/rodonaves-webhook-erro-generico.spec.ts` (8 casos) — 8/8. Prova por
+mutacao: A volta a ecoar `error.message` no catch -> 2 falhas; B 500 escrito na mao -> 1; C 200 no catch -> 2;
+D objeto `error` como meta do log -> 1; E `throw updateError` de volta -> 2; F remove o `code` do log -> 1;
+G segredo do HMAC trocado -> 1; H nome do rate limit trocado -> 1; restaurado -> 8/8. `deno check` 0 =
+baseline 0; `deno lint` 3 = baseline 3; `deno fmt --check` 1 = baseline 1 (diff herdado nas linhas 22-30).
+`tsc` 0; `lint:budget` ok; suite 555 testes. Verificacao pedida pelo plano (`grep -n 'error.message\|
+internalErrorResponse\|throw updateError'`): executada — nao ha `throw updateError`, `error.message` aparece so
+dentro das metas de `log.error` e o `internalErrorResponse` esta no `catch`. Webhook real da Rodonaves: NAO
+EXECUTADO (exigiria a origem configurada com o segredo real) — RASTREADO pelo codigo.
+
 
 ### Registro - etapa 175 (2026-11-25) - achado B-06 (`lalamove-webhook`)
 

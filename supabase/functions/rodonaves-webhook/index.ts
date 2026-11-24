@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { validateContract } from "../_shared/contract-validator.ts";
 import { requireString } from "../_shared/validate.ts";
 import { log, redact } from "../_shared/logger.ts";
+import { internalErrorResponse } from "../_shared/httpError.ts";
 import { verifyWebhookHmac } from "../_shared/webhookSignature.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
 
@@ -210,7 +211,14 @@ serve(async (req: Request) => {
       .update(updateData)
       .eq("id", entrega.id);
 
-    if (updateError) throw updateError;
+    if (updateError) {
+      log.error("[rodonaves-webhook] Falha ao atualizar a entrega:", {
+        entrega_id: entrega.id,
+        code: updateError.code,
+        message: updateError.message,
+      });
+      throw new Error("Falha ao atualizar a entrega");
+    }
 
     // Register ocorrencia if status is ocorrencia
     if (newStatus === "ocorrencia") {
@@ -235,10 +243,9 @@ serve(async (req: Request) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (error: any) {
-    log.error("Rodonaves webhook error:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    log.error("[rodonaves-webhook] Webhook error:", {
+      message: error instanceof Error ? error.message : String(error),
     });
+    return internalErrorResponse(error, corsHeaders, "rodonaves-webhook");
   }
 });
