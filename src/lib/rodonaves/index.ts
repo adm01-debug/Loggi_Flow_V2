@@ -5,3 +5,4 @@ export * from "./gatewaySLO";
 export * from "./sloAlerts";
 export * from "./latencyTrend";
 export * from "./sloReport";
+export * from "./taxableWeight";
