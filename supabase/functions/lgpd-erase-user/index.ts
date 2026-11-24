@@ -1,6 +1,8 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
+import { internalErrorResponse } from "../_shared/httpError.ts";
+import { log } from "../_shared/logger.ts";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -52,7 +54,12 @@ serve(async (req) => {
 
     const { userId } = await req.json();
 
-    if (!userId) throw new Error("User ID is required");
+    if (!userId) {
+      return new Response(JSON.stringify({ error: "User ID is required" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
 
     // 1. Apagar dados PII
     const { error: profileError } = await supabaseClient
@@ -60,12 +67,28 @@ serve(async (req) => {
       .delete()
       .eq("id", userId);
 
-    if (profileError) throw profileError;
+    if (profileError) {
+      // O texto do PostgREST (tabela/chave estrangeira que guarda dado do titular) fica no log,
+      // com o passo exato da rotina; a resposta não devolve nada disso.
+      log.error("[lgpd-erase-user] Falha ao apagar perfil:", {
+        step: "profiles.delete",
+        code: profileError.code,
+        message: profileError.message,
+      });
+      throw new Error("Falha ao apagar perfil");
+    }
 
     // 2. Delete the auth user so they can no longer sign in.
     const { error: deleteAuthError } =
       await supabaseClient.auth.admin.deleteUser(userId);
-    if (deleteAuthError) throw deleteAuthError;
+    if (deleteAuthError) {
+      log.error("[lgpd-erase-user] Falha ao apagar usuário de auth:", {
+        step: "auth.users.delete",
+        code: deleteAuthError.code,
+        message: deleteAuthError.message,
+      });
+      throw new Error("Falha ao apagar usuário de auth");
+    }
 
     // 3. Registrar no log de auditoria, conforme o schema real de `audit_logs`
     //    (action/table_name/record_id/...). O UPDATE antigo em `entregas` usava
@@ -89,7 +112,14 @@ serve(async (req) => {
           erased_by: caller.id,
         },
       });
-    if (auditError) throw auditError;
+    if (auditError) {
+      log.error("[lgpd-erase-user] Falha ao registrar auditoria do apagamento:", {
+        step: "audit_logs.insert",
+        code: auditError.code,
+        message: auditError.message,
+      });
+      throw new Error("Falha ao registrar auditoria do apagamento");
+    }
 
     return new Response(
       JSON.stringify({ message: "User data erased/anonymized successfully" }),
@@ -99,9 +129,7 @@ serve(async (req) => {
       },
     );
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 400,
-    });
+    // O erro do Postgres já foi registrado no passo correspondente; aqui só sai a resposta genérica.
+    return internalErrorResponse(error, corsHeaders, "lgpd-erase-user");
   }
 });
