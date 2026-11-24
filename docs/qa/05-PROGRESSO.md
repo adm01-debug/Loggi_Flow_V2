@@ -289,7 +289,7 @@
 - [x] **208** — `useLogisticsCalendar`: pôr teto na leitura de `entregas` — onda 6 — Alta
 - [x] **209** — `useLogisticsCalendar`: filtrar no servidor pelo mês que está na tela — onda 6 — Alta
 - [x] **210** — `useCotacoesMulticanal`: teto no servidor e colunas explícitas — onda 6 — Alta
-- [~] **211** — Guard automatizado: consulta de listagem sem teto reprova a CI — onda 6 — Alta · **aguarda o dono**
+- [~] **211** — Guard automatizado: consulta de listagem sem teto reprova a CI — onda 6 — Alta · **aguarda o dono (PR #398)**
 - [x] **212** — `Notificacoes.tsx`: teto imediato na leitura de `notifications` — onda 6 — Alta
 - [ ] **213** — `Notificacoes.tsx`: adotar `useServerPagination` como primeiro consumidor do contrato — onda 6 — Alta
 - [ ] **214** — `Notificacoes.tsx`: trocar a barra de paginação em memória pela do servidor — onda 6 — Média
@@ -434,6 +434,46 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapa 211 (2026-11-25) - achado P-01 (guard de teto na CI)
+
+**Causa:** as etapas 204 a 210 consertaram cinco consultas sem teto e nada impedia a sexta. A varredura nova
+mostra o tamanho real da divida: **248 consultas de listagem em `src/`, 61 delas sem `.limit`/`.range`** (52
+pares arquivo:tabela). A regra existia so na cabeca de quem revisa.
+
+**Entrega:** `scripts/ci/validate-query-limits.mjs` (Node puro, sem dependencia) percorre `src/`, acha cada
+`.from(<tabela>)` com `.select` e considera **com teto** quem termina em `.limit(`, `.range(`, `.single(` ou
+`.maybeSingle(`, **ou** quando o teto entra depois na variavel da consulta (`let query = supabase.from(...);
+... await query.order(...).limit(500)`). O fim da cadeia e calculado respeitando string, template com `${}` e
+comentario, entao `select("a; b")` nao corta a cadeia no meio. Duas listas de excecao em
+`scripts/ci/query-limits.allowlist.json`: `tabelas` (as 9 tabelas de dominio pequeno que o plano descartou,
+cada uma com o motivo numa linha) e `baseline` (divida congelada por par arquivo:tabela, no formato de
+catraca -- a contagem pode cair, nunca subir). Ligado como `validate:query-limits` no `package.json` e como
+passo `Validate Query Limits (listing caps)` no job `quality-gate` do `ci-nexus.yml`, depois do
+`validate:no-console`. Documentado em `scripts/ci/README.md`.
+
+**Por que catraca e nao "zero de divida":** ligar em modo falha contra as 61 cadeias existentes reprovaria
+toda PR -- exatamente o risco que o plano descreve. A catraca entrega o efeito pretendido hoje (consulta nova
+sem teto reprova) sem travar o repositorio, e cada conserto aperta o baseline com `--update-baseline`.
+
+**Verificacao:** saida limpa na `main` do commit: `643 arquivos, 248 consultas, 61 cadeias sem teto (divida
+congelada 52), 0 nova(s)`, codigo 0. **Zero falso positivo na lista de 16 listagens corretas do plano** --
+duas delas caem no padrao de teto adiado e foram conferidas na pratica: `useSecurityEvents.ts:33-57`
+(`query = query.limit(filters?.limit || 100)`) e `useConciliacao.tsx:123` (`await query.order(...).limit(2000)`),
+igual a `useDrillDown.tsx:67,82`. Teste de sabotagem do plano executado: tirar o `.limit(500)` de
+`Envios.tsx` faz o script reprovar apontando `src/pages/Envios.tsx:351` com codigo 1; `git checkout` devolve
+codigo 0. `node --test scripts/ci/validate-query-limits.unit.mjs` 17/17 (repositorio sintetico em
+`os.tmpdir()`: teto inline, sem teto, `.range`/`.single`/`.maybeSingle`, teto adiado que conta e que nao conta,
+`select` com `;` na string, `Array.from`, arquivo de teste, allowlist de tabela, catraca igual/acima/abaixo,
+`--update-baseline`, `--warn` com saida 0, `src/` ausente, `--json`). `node --test scripts/ci/*.unit.mjs
+scripts/lib/*.unit.mjs` 432/432. `npm run automation:test` 103/103 (contrato exigido por mexer em `scripts/`).
+`actionlint` no workflow 0. `act -j quality-gate -n` simula o job inteiro, incluindo o passo novo.
+
+**Nao verificado:** o passo rodando no runner do GitHub (so a simulacao com `act`); e quais das 61 cadeias
+realmente devolvem volume hoje -- sem credencial de banco nesta sessao. As 61 cadeias sao achado novo em
+relacao ao plano (que falava em 5): ficam como divida congelada e viram etapas futuras da onda 6.
+
+**Aguarda o dono:** muda `.github/workflows/` -- Regra 8, PR #398 aberta, sem merge.
 
 ### Registro - etapa 210 (2026-11-25) - achados P-01 e P-04 (cotacoes multicanal)
 
