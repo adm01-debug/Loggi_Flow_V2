@@ -301,11 +301,11 @@
 - [x] **220** — `useKPIBenchmark`: uma consulta por tabela cobrindo todos os períodos — onda 6 — Média
 - [x] **221** — `useExecutiveMetrics`: mesma consolidação de 18 consultas para 3 — onda 6 — Baixa
 - [~] **222** — Conferir `types.ts` contra o banco ao vivo e regenerar se houver divergência — onda 6 — Média · **aguarda o dono** (aplicar a migration `20261121153649_user_panel_preferences` - A-04)
-- [ ] **223** — `Envios.tsx`: trocar `select("*")` por colunas explícitas em `entregas` — onda 6 — Média
+- [x] **223** — `Envios.tsx`: trocar `select("*")` por colunas explícitas em `entregas` — onda 6 — Média
 - [x] **224** — `Coletas.tsx`: trocar `select("*")` por colunas explícitas em `coletas` — onda 6 — Média
-- [ ] **225** — `useDrillDown`: colunas explícitas nas duas leituras — onda 6 — Baixa
-- [ ] **226** — `useSLANotifications`: colunas explícitas nas duas verificações de SLA — onda 6 — Baixa
-- [ ] **227** — `RelatorioPDF`, `LogisticsService` e `useCotacoesMulticanal`: os três `select("*")` restantes — onda 6 — Baixa
+- [x] **225** — `useDrillDown`: colunas explícitas nas duas leituras — onda 6 — Baixa
+- [x] **226** — `useSLANotifications`: colunas explícitas nas duas verificações de SLA — onda 6 — Baixa
+- [x] **227** — `RelatorioPDF`, `LogisticsService` e `useCotacoesMulticanal`: os três `select("*")` restantes — onda 6 — Baixa · **parcial**: `LogisticsService.getDeliveries` sem chamador, ver A-05
 - [~] **228** — Censo dos índices reais de `entregas`, `coletas` e `telemetry_logs` no banco ao vivo — onda 6 — Alta · **aguarda o dono**
 - [~] **229** — Provar a hipótese: `EXPLAIN (ANALYZE, BUFFERS)` da consulta do Painel SLA — onda 6 — Alta · **aguarda o dono**
 - [ ] **230** — Índice para o Painel SLA: `entregas (status, previsao_entrega)` — onda 6 — Alta
@@ -413,6 +413,7 @@ Problema novo **não se corrige na hora** (regra 4). Anote aqui, com `arquivo:li
 | A-02 | O teto de 6000 do benchmark de KPI e **unico para os seis meses**: se a soma dos seis passar de 6000 linhas, o PostgREST corta sem ordem definida e qualquer mes pode perder registros (antes o corte era de 1000 **por mes**) | `src/hooks/analytics/useKPIBenchmark.tsx:44,49-71` | 220 | Media |
 | A-03 | O teto unico para os seis meses tambem vale para as metricas executivas (6000/6000/3000): se a soma dos seis meses passar disso, o PostgREST corta sem ordem definida e qualquer mes pode perder registros (antes o corte era por mes -- 1000/1000/500) | `src/hooks/analytics/useExecutiveMetrics.tsx:55,62,68` | 221 | Media |
 | A-04 | **Produção não tem `public.user_panel_preferences`**: a migration `20261121153649` da #248 nunca foi aplicada (último dispatch do `aplicar-migration.yml` é de 20/11, anterior ao arquivo) e o `types.ts` foi editado à mão. Efeito: `useSLAMetas` lança erro ao ler e `PainelSLA.tsx:242-244` mostra `toast.success` incondicional sem persistir nada - o usuário vê "salvo" e as metas de SLA não são gravadas. É também a causa do `types-sync` vermelho desde 23/11 (Gate 1) | `src/hooks/sla/useSLAMetas.ts:31-36`, `src/pages/PainelSLA.tsx:242-244`, `supabase/migrations/20261121153649_user_panel_preferences.sql` | 222 | **Alta** |
+| A-05 | `LogisticsService.getDeliveries` (`src/features/logistics/services/LogisticsService.ts:8`) mantém `select('*')` porque **não tem chamador**: a classe não é importada em nenhum arquivo de `src/`. Cortar colunas de código morto não economiza banda; o que resolve é apagar ou usar o serviço | `src/features/logistics/services/LogisticsService.ts:5-14` | 227 | Baixa |
 
 ## Etapas que não correspondiam mais ao código
 
@@ -438,6 +439,29 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 
 ## Registro de execução
 
+
+### Registro - etapas 223 a 227 (2026-11-25) - os cinco pontos de colunas explícitas já estavam no main
+
+As cinco etapas da onda 6 que trocam `select("*")` por colunas explícitas **já estavam implementadas no
+`main`** por PRs anteriores; nenhuma exigiu código novo. O trabalho foi verificar uma por uma contra a lista
+real de colunas de `types.ts` e contra o consumo da tela, e registrar a evidência.
+
+| etapa | arquivo | commit que entregou | verificação feita |
+|---|---|---|---|
+| 223 | `src/pages/Envios.tsx:351-362` | `cb64f276` (#315) | 15 colunas e os dois joins explícitos; `.is("deleted_at")` e `.limit(500)` intactos. Cruzamento das 33 colunas de `entregas` com o arquivo: 18 nomes aparecem, e os 3 que ficam fora do `select` (`cliente_id`, `transportadora_id`, `deleted_at`) são campo do formulário de criação (`:437,441`) e filtro da consulta (`:360`), nunca leitura de linha. **Zero coluna usada e não selecionada.** |
+| 224 | `src/pages/Coletas.tsx:148-161` | `8acf1702` | 22 das 31 colunas; `fornecedores!fk_coletas_fornecedor` e `transportadoras!fk_coletas_transportadora` preservados; `.limit(500)` em `:161`. Único nome fora do `select` é `deleted_at`, usado como filtro em `:159`. |
+| 225 | `src/hooks/analytics/useDrillDown.tsx:69,88,107` | `d199a88c` (#316) | três leituras explícitas (coletas, entregas e fretes_internos) com `.limit(100)` em `:82,101,112`; o mapeamento de `:128-137` lê `numero_coleta`/`numero_entrega`/`destino`, `status`, `created_at` e `endereco_coleta`/`endereco_entrega` - tudo selecionado - e `DrillDownModal.tsx:132-154` renderiza apenas `id`, `numero`, `status`, `created_at` e `endereco`. |
+| 226 | `src/hooks/logistics/useSLANotifications.tsx:313,327` | `786f725e` (#317) | `id, numero_entrega, status, previsao_entrega` e `id, numero_coleta, status, data_prevista_coleta`; cobrem o que `checkEntregaSLA` (`:206-218`) e `checkColetaSLA` (`:232-236`) leem. `setInterval` e `lastCheckedAt` intocados. |
+| 227 | `src/pages/RelatorioPDF.tsx:92-97`, `src/hooks/logistics/useCotacoesMulticanal.tsx:53-66` | `de6487e4`, `45be2b3d` (#397) | explícitos, com `.limit(2000)` (`:100`) e `.is("deleted_at")` intactos. |
+
+**O único ponto que sobrou é justamente o que o plano manda não mexer:** `src/features/logistics/services/LogisticsService.ts:8`
+continua com `select('*')`, mas `getDeliveries` **não tem chamador** - a classe inteira não é importada em
+nenhum ponto de `src/` (`grep -rn 'LogisticsService' src/` só acha a própria definição). O plano diz, nesse
+caso, não inventar lista de colunas e anotar o código morto: registrado como **A-05**.
+
+**NÃO VERIFICADO:** o tamanho em KB das respostas antes/depois (exige `/envios` e `/coletas` em produção com
+a aba Rede), a geração de um PDF real e o disparo de um alerta de SLA com previsão no passado. Sem essas
+medições a evidência é de código, não de comportamento - nada foi deployado nesta sessão.
 
 ### Registro - etapa 222 (2026-11-25) - types.ts contra o banco: a drift é de UMA tabela que não existe em produção
 
