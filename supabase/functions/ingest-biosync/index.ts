@@ -2,7 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
 import { log } from "../_shared/logger.ts";
 import { invokeFunction } from "../_shared/invokeFunction.ts";
-import { ValidationError, validationErrorResponse } from "../_shared/validate.ts";
+import { internalErrorResponse } from "../_shared/httpError.ts";
 import { parseBioSyncInput } from "./parse.ts";
 
 const corsHeaders = {
@@ -52,7 +52,14 @@ serve(async (req) => {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      // O detalhe do Postgres (tabela, coluna, restrição) fica no log; a resposta ao chamador é genérica.
+      log.error("[ingest-biosync] Falha ao gravar telemetria:", {
+        code: error.code,
+        message: error.message,
+      });
+      throw new Error("Falha ao gravar telemetria");
+    }
 
     // 3. Proactive Tactical Log
     if (severity !== "info") {
@@ -86,12 +93,6 @@ serve(async (req) => {
       status: 200,
     });
   } catch (error) {
-    if (error instanceof ValidationError) {
-      return validationErrorResponse(error, corsHeaders);
-    }
-    return new Response(JSON.stringify({ error: error.message }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 400,
-    });
+    return internalErrorResponse(error, corsHeaders, "ingest-biosync");
   }
 });
