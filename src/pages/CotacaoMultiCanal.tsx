@@ -46,6 +46,8 @@ import { CotacaoCarrierList } from "./cotacao-multicanal/CotacaoCarrierList";
 import { CotacaoResultsTable } from "./cotacao-multicanal/CotacaoResultsTable";
 import { NegotiationAssistant } from "@/components/freight";
 import { Progress } from "@/components/ui/progress";
+import { SkeletonTable } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/common/EmptyState";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -81,9 +83,12 @@ export default function CotacaoMultiCanal() {
   const { searchRoutes } = useTransportadoraRotas();
   const {
     cotacoes,
+    isLoading,
+    error,
     refetch: refetchCotacoes,
     createCotacao,
     updateCotacao,
+    selectCotacao,
   } = useCotacoesMulticanal();
   const rodonaves = useRodonavesTracking();
   const melhorEnvio = useMelhorEnvio();
@@ -508,10 +513,23 @@ export default function CotacaoMultiCanal() {
     setManualCotacaoId(null);
   };
 
+  /**
+   * Escolha explicita do operador (etapa 040): grava status=selecionado na linha.
+   * A de menor valor continua sendo sugestao, nao decisao automatica.
+   */
+  const handleEscolherCotacao = (cotacaoId: string) => {
+    selectCotacao.mutate(cotacaoId);
+  };
+
+  // "respondido" + "selecionado": ao escolher, a linha muda de status na
+  // invalidacao da query e, sem isso, melhor cotacao/economia/passo voltariam
+  // para o estado anterior logo apos a escolha.
   const respondidas = useMemo(
     () =>
       cotacoes.filter(
-        (c) => c.status === "respondido" && c.valor_cotado !== null,
+        (c) =>
+          (c.status === "respondido" || c.status === "selecionado") &&
+          c.valor_cotado !== null,
       ),
     [cotacoes],
   );
@@ -925,6 +943,37 @@ export default function CotacaoMultiCanal() {
               )}
             </AnimatePresence>
 
+            {isLoading && cotacoes.length === 0 && (
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm">Carregando cotações…</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <SkeletonTable rows={4} cols={5} />
+                </CardContent>
+              </Card>
+            )}
+
+            {!isLoading && error && (
+              <Card className="border-destructive/40 bg-destructive/5">
+                <CardContent className="p-4 space-y-3">
+                  <p className="text-sm font-medium text-destructive">
+                    Não foi possível carregar as cotações registradas.
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {error.message}
+                  </p>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => void refetchCotacoes()}
+                  >
+                    Tentar novamente
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+
             <AnimatePresence>
               {hasSearched && (
                 <motion.div
@@ -963,9 +1012,18 @@ export default function CotacaoMultiCanal() {
                       setManualDialog(true);
                     }}
                   />
+                  {!isLoading && !error && cotacoes.length === 0 && (
+                    <EmptyState
+                      variant="inbox"
+                      size="sm"
+                      title="Nenhuma cotação registrada ainda"
+                      description="Busque rotas e dispare uma cotação para uma transportadora desta busca — a resposta da transportadora aparece aqui."
+                    />
+                  )}
                   <CotacaoResultsTable
                     cotacoes={cotacoes}
                     melhorCotacao={melhorCotacao}
+                    onEscolher={handleEscolherCotacao}
                     onRegistrar={(cotacaoId) => {
                       const cot = cotacoes.find((x) => x.id === cotacaoId);
                       const c = cot

@@ -28,6 +28,7 @@ interface CotacaoResultsTableProps {
   cotacoes: CotacaoMulticanal[];
   melhorCotacao: CotacaoMulticanal | null;
   onRegistrar: (cotacaoId: string) => void;
+  onEscolher: (cotacaoId: string) => void;
 }
 
 function nomeTransportadora(cotacao: CotacaoMulticanal) {
@@ -38,7 +39,7 @@ function nomeTransportadora(cotacao: CotacaoMulticanal) {
   );
 }
 
-export function CotacaoResultsTable({ cotacoes, melhorCotacao, onRegistrar }: CotacaoResultsTableProps) {
+export function CotacaoResultsTable({ cotacoes, melhorCotacao, onRegistrar, onEscolher }: CotacaoResultsTableProps) {
   if (cotacoes.length === 0) return null;
 
   return (
@@ -90,6 +91,11 @@ export function CotacaoResultsTable({ cotacoes, melhorCotacao, onRegistrar }: Co
                   {cot.status === 'pendente' && (
                     <Button size="sm" variant="outline" onClick={() => onRegistrar(cot.id)}>
                       Registrar
+                    </Button>
+                  )}
+                  {cot.status === 'respondido' && (
+                    <Button size="sm" onClick={() => onEscolher(cot.id)}>
+                      Escolher
                     </Button>
                   )}
                 </TableCell>

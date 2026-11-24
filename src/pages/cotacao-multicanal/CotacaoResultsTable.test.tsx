@@ -50,6 +50,7 @@ describe("CotacaoResultsTable", () => {
         cotacoes={[cotacao({ status: "respondido", valor_cotado: 120 })]}
         melhorCotacao={null}
         onRegistrar={() => {}}
+        onEscolher={() => {}}
       />,
     );
     expect(screen.getByText("Transp A")).toBeTruthy();
@@ -63,6 +64,7 @@ describe("CotacaoResultsTable", () => {
         cotacoes={[cotacao({ id: "c-abc", transportadora_id: "t-xyz" })]}
         melhorCotacao={null}
         onRegistrar={onRegistrar}
+        onEscolher={() => {}}
       />,
     );
     fireEvent.click(screen.getByRole("button", { name: "Registrar" }));
@@ -75,9 +77,39 @@ describe("CotacaoResultsTable", () => {
         cotacoes={[cotacao({ status: "respondido", valor_cotado: 90 })]}
         melhorCotacao={null}
         onRegistrar={() => {}}
+        onEscolher={() => {}}
       />,
     );
     expect(screen.queryByRole("button", { name: "Registrar" })).toBeNull();
+  });
+
+  it("escolhe a cotacao respondida pelo id da linha", () => {
+    const onEscolher = vi.fn();
+    render(
+      <CotacaoResultsTable
+        cotacoes={[cotacao({ id: "c-esc", status: "respondido", valor_cotado: 75 })]}
+        melhorCotacao={null}
+        onRegistrar={() => {}}
+        onEscolher={onEscolher}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Escolher" }));
+    expect(onEscolher).toHaveBeenCalledWith("c-esc");
+  });
+
+  it("nao oferece Escolher para pendente nem para a ja escolhida", () => {
+    render(
+      <CotacaoResultsTable
+        cotacoes={[
+          cotacao({ id: "c-p", status: "pendente" }),
+          cotacao({ id: "c-s", status: "selecionado", valor_cotado: 70 }),
+        ]}
+        melhorCotacao={null}
+        onRegistrar={() => {}}
+        onEscolher={() => {}}
+      />,
+    );
+    expect(screen.queryByRole("button", { name: "Escolher" })).toBeNull();
   });
 
   it("mostra a cotacao marcada como selecionada", () => {
@@ -86,6 +118,7 @@ describe("CotacaoResultsTable", () => {
         cotacoes={[cotacao({ status: "selecionado", valor_cotado: 80 })]}
         melhorCotacao={null}
         onRegistrar={() => {}}
+        onEscolher={() => {}}
       />,
     );
     expect(screen.getByText("Selecionada")).toBeTruthy();
