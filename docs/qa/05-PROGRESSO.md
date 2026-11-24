@@ -225,7 +225,7 @@
 - [x] **147** — `webhook-status`: exigir `data` antes de desestruturar — onda 5 — Alta
 - [x] **148** — `ingest-biosync`: validar `heart_rate` como número antes de comparar com o limite — onda 5 — Alta
 - [x] **149** — `lalamove-api`: `path` e `method` do corpo decidem o roteamento sem `requireEnum` — onda 5 — Alta
-- [ ] **150** — `resend-email`: validar `to`, `subject` e `html` antes de entregar ao provedor — onda 5 — Alta
+- [x] **150** — `resend-email`: validar `to`, `subject` e `html` antes de entregar ao provedor — onda 5 — Alta
 - [ ] **151** — `melhor-envio-api`: validar o corpo da cotação — onda 5 — Média
 - [ ] **152** — `lalamove-tracking`: validar o identificador de rastreio — onda 5 — Média
 - [ ] **153** — `ai-logistics-assistant`: validar e limitar o texto que vai para o modelo — onda 5 — Média
@@ -434,6 +434,57 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapa 150 (2026-11-24) - achado B-04 (`resend-email`)
+
+**Causa:** `index.ts:43` lia o corpo e `:45-57` mandava `to`, `subject` e `html` ao provedor **sem formato nem
+teto de tamanho**. Endereço malformado virava erro do Resend (requisição já paga) devolvido ao cliente como
+`data.error.message` (`:60-61`), e corpo/subject sem limite virava cobrança e risco de bloqueio da conta. O
+`from` opcional ia cru para o JSON do provedor (`:52`), aceitando quebra de linha.
+
+**Correção:** `parse.ts` novo com `parseEmailRequest`: `to` aceita string **ou lista** (o tipo antigo
+`string | string[]` foi preservado — os três chamadores mandam string) e cada destinatário passa pelo formato
+`EMAIL` com teto de 320 caracteres e limite de `MAX_RECIPIENTS = 50` por chamada; `subject` até
+`MAX_SUBJECT_LENGTH = 200`; `html` até `MAX_HTML_LENGTH = 100_000` (teto escolhido aqui, ~100 KB — o maior
+e-mail real do repositório é o digest semanal da `accuracy-weekly-digest`, poucos KB); `from` opcional passa a
+exigir "Nome <email>" ou e-mail puro, sem `\r`/`\n` (injeção de cabeçalho). O `index.ts` chama o parse em
+`:38-40` **antes** do `safeFetch` (`:42`), manda `to` já normalizado (`:50`) e devolve **422** no `catch`
+(`:65-67`), antes do 500 genérico. O bloco de auth `:25-36` (`requireInternalSecret`/`service_role`, padrão
+correto citado na etapa 004) e o `safeFetch` não foram tocados.
+
+**Mudança de comportamento:** e-mail malformado, assunto/corpo vazio ou acima do teto passa a ser recusado com
+422 **sem** gastar requisição no Resend. Nenhum chamador real quebra: `accuracy-weekly-digest:178-183`,
+`send-password-reset:150-160` e `accuracy-meta-monitor:196-203` mandam string em `to`, assunto fixo/título e
+HTML de até alguns KB, sem `from` (`grep` em `supabase/functions/*/index.ts`). `Array.isArray(to) ? to : [to]`
+saiu do corpo do envio porque o parse já devolve lista.
+
+**Desvio consciente (módulo puro `parse.ts`):** `index.ts:1` importa de `deno.land` e o vitest não carrega o
+módulo. Mesmo precedente de `external-db-bridge/index.ts:4` (citado no plano) e das etapas 143-149.
+`_shared/validate.ts` não foi alterado. 400 do plano → **422** (`validationErrorResponse`), igual às etapas
+146-149.
+
+**Fora de escopo (registrado, não tocado):** repasse de `data.error.message` (`:59-60`) e `error.message` no
+catch (`:73`) são B-06/etapa 172; CORS `*` é a etapa 181.
+
+**Evidência:**
+- `tests/contracts/resend-email-contrato.spec.ts` (novo, 7 casos): os três campos como os chamadores enviam;
+  lista preservada; 15 entradas inválidas em `to` (sem arroba, `a@b`, espaço, `@b.com`, `a@.com`, número,
+  lista com item ruim, lista vazia, 51 destinatários) → campo `to`; assunto vazio/201 caracteres → campo
+  `subject` (200 aceitos); corpo vazio/100.001 caracteres → campo `html` (100.000 aceitos); `from` com nome ok,
+  e-mail puro ok, inválido e com `\r\n` → campo `from`; e o contrato da edge (parse antes do `safeFetch`, sem
+  `Array.isArray(to)`, bloco de auth intacto, `422`).
+- Mutação A — formato de e-mail não conferido: 1/7 falha. B — teto do assunto removido: 1/7. C — teto do corpo
+  removido: 1/7. D — padrão do remetente removido: 1/7. E — edge sem `parseEmailRequest`: 1/7. Restaurado: 7/7.
+- `npx vitest run --coverage`: **49 arquivos / 388 testes, todos verdes**; `resend-email/parse.ts`
+  100/100/100/100; totais 74,69 stmts / 72,02 branch / 77,28 funcs / 76,77 linhas (antes: 74,28/71,49/77,09/76,34).
+- `deno check`: **0 erros** (arquivo já era limpo no baseline — 0 antes, 0 depois); `deno lint`: 1 no `index.ts`
+  (= baseline) e **0** no `parse.ts`; `deno fmt` limpo no `parse.ts`; `npx tsc --noEmit` 0; `npx eslint` no teste
+  0; `npm run lint:budget` OK (77/86 avisos).
+- **NÃO VERIFICADO:** envio real e ausência de requisição ao Resend com `to` inválido — exige `RESEND_API_KEY`
+  real e conta no provedor. Depois do deploy: mandar `{"to":"semarroba"}` e conferir 422 + nenhuma linha nova no
+  painel do Resend.
+
+---
 
 ### Registro - etapa 149 (2026-11-24) - achado B-04 (`lalamove-api`)
 

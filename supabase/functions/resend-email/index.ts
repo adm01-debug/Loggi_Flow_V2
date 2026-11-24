@@ -1,19 +1,14 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { requireInternalSecret, requireUser } from "../_shared/auth.ts";
 import { safeFetch } from "../_shared/safeFetch.ts";
+import { ValidationError, validationErrorResponse } from "../_shared/validate.ts";
+import { parseEmailRequest } from "./parse.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
 };
-
-interface EmailRequest {
-  to: string | string[];
-  subject: string;
-  html: string;
-  from?: string;
-}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -40,7 +35,9 @@ serve(async (req) => {
       throw new Error("RESEND_API_KEY not configured");
     }
 
-    const { to, subject, html, from }: EmailRequest = await req.json();
+    const { to, subject, html, from } = parseEmailRequest(
+      (await req.json()) as Record<string, unknown>,
+    );
 
     const response = await safeFetch("https://api.resend.com/emails", {
       method: "POST",
@@ -50,7 +47,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         from: from || "LogiFlow <notificacoes@promobrindes.com.br>",
-        to: Array.isArray(to) ? to : [to],
+        to,
         subject,
         html,
       }),
@@ -65,6 +62,10 @@ serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
+    if (error instanceof ValidationError) {
+      return validationErrorResponse(error, corsHeaders);
+    }
+
     return new Response(
       JSON.stringify({ success: false, error: error.message }),
       {
