@@ -243,7 +243,7 @@
 - [x] **165** — `ingest-biosync`: parar de devolver o erro do Postgres — onda 5 — Alta
 - [x] **166** — `scheduled-reports`: parar de devolver o erro do Postgres — onda 5 — Alta
 - [x] **167** — `lgpd-erase-user`: parar de devolver o erro do Postgres — onda 5 — Alta
-- [ ] **168** — `execute-protocol`: parar de devolver o erro do Postgres — onda 5 — Alta
+- [x] **168** — `execute-protocol`: parar de devolver o erro do Postgres — onda 5 — Alta
 - [ ] **169** — `lalamove-api`: parar de repassar a resposta de erro da Lalamove — onda 5 — Alta
 - [ ] **170** — `rodonaves-api`: parar de transformar o erro do **login** da Rodonaves em mensagem — onda 5 — **Crítica**
 - [ ] **171** — `rodonaves-api`: erro genérico na resposta e detalhe só no log — onda 5 — Alta
@@ -434,6 +434,42 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapa 168 (2026-11-25) - achado B-06 (`execute-protocol`)
+
+**Causa:** o `catch` de `:59` devolvia `{ error: error.message }` com 400 e o `:53` fazia `throw error` do
+PostgREST. A funcao executa protocolo de automacao sobre tabelas internas, entao o texto do erro descrevia o
+modelo de dados interno (tabela, coluna, restricao) para quem chamasse — o oposto do que a etapa pede.
+
+**Correcao (so o arquivo da etapa):**
+
+- `:53` — `if (error) throw error;` virou `log.error("[execute-protocol] Falha ao executar protocolo:",
+  { protocol_name, code: error.code, message: error.message })` + `throw new Error("Falha ao executar
+  protocolo")`. O log carrega o **nome do protocolo**, que e o que o chamador usa para corrigir; a tabela
+  interna nao vaza.
+- `:59` `catch` — `return internalErrorResponse(error, corsHeaders, "execute-protocol")`: erro de banco vira 500
+  `{"error":"INTERNAL_ERROR"}`, sem texto do Postgres e sem `stack`.
+- `if (!vehicle_id || !protocol_name)` — responde 400 explicito com
+  `{ "error": "vehicle_id and protocol_name are required" }`. Antes era `throw` que o `catch` convertia em 400
+  com a mesma mensagem; status preservado, sem regressao.
+- **Nao tocado:** `auth.getUser` + 401/403, `supabase.rpc("execute_nexus_protocol", ...)`, a resposta de sucesso
+  e o CORS `*` de `:5` (etapa 191). Nada do comportamento de execucao do protocolo mudou (A-08 "Nexus
+  Self-Healing").
+
+**Verificado de verdade:** `tests/contracts/execute-protocol-erro-interno.spec.ts` (5 casos) — 5/5. Prova por
+mutacao: A `catch` volta a ecoar `error.message` -> 1 falha; B log sem `protocol_name` -> 1; C volta a lancar o
+erro cru -> 1; D volta ao `throw` no payload obrigatorio -> 1; E `details` no log -> 2; restaurado 5/5.
+`deno check` 0 erro (baseline 1), `deno lint` 2 = baseline, `deno fmt --check` 0 = baseline; `tsc` 0;
+`lint:budget` 77/86 com 0 erros; suite 67 arquivos / 510 testes. Verificacao do plano:
+`grep -n 'error.message|internalErrorResponse'` retorna o import (`:3`), a linha do log (`:66`) e o `return` do
+helper (`:76`) — nenhuma resposta com texto do Postgres.
+
+**Nao verificado:** chamada real com protocolo inexistente contra producao (exige JWT valido e usuario
+autenticado); a resposta generica e o log sao o mesmo caminho ja verificado nas etapas 164-167.
+
+**Fora de escopo (registrado, nao tocado):** CORS `*` (`:5`, etapa 191); contrato `protocol_id` +
+`confirm: z.literal(true)` das etapas 072/101; ausencia de log estruturado nos caminhos de sucesso (auditoria
+10.9).
 
 ### Registro - etapa 167 (2026-11-25) - achado B-06 (`lgpd-erase-user`)
 
