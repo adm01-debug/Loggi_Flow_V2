@@ -226,7 +226,7 @@
 - [x] **148** — `ingest-biosync`: validar `heart_rate` como número antes de comparar com o limite — onda 5 — Alta
 - [x] **149** — `lalamove-api`: `path` e `method` do corpo decidem o roteamento sem `requireEnum` — onda 5 — Alta
 - [x] **150** — `resend-email`: validar `to`, `subject` e `html` antes de entregar ao provedor — onda 5 — Alta
-- [ ] **151** — `melhor-envio-api`: validar o corpo da cotação — onda 5 — Média
+- [x] **151** — `melhor-envio-api`: validar o corpo da cotação — onda 5 — Média
 - [ ] **152** — `lalamove-tracking`: validar o identificador de rastreio — onda 5 — Média
 - [ ] **153** — `ai-logistics-assistant`: validar e limitar o texto que vai para o modelo — onda 5 — Média
 - [ ] **154** — `evolution-whatsapp`: validar `instance`, `phone` e `message` — onda 5 — Alta
@@ -435,7 +435,69 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 
 ## Registro de execução
 
-### Registro - etapa 150 (2026-11-24) - achado B-04 (`resend-email`)
+### Registro - etapa 151 (2026-11-24) - achado B-04 (`melhor-envio-api`)
+
+**Causa:** `index.ts:59` (`const body = await req.json()`) e `:60` (`const { action, params, useSandbox = true }`)
+entregavam `params` cru ao `case "calcularFrete"` (`:77`), que montava a chave de cache
+(`me_quote_${btoa(JSON.stringify(params))}`, `:79`) e o corpo enviado a `/me/shipment/calculate` (`:96`) **sem
+validar CEP, peso, dimensões e valor declarado**. `requireString`/`requireNumber` não existiam no arquivo: CEP
+fora do formato, peso ausente ou `NaN` viravam requisição inválida à conta Melhor Envio da empresa (erro do
+parceiro repassado ao painel) e a chave de cache aceitava qualquer corpo, inclusive lixo.
+
+**Correção:** `parse.ts` novo com `parseMelhorEnvioQuote`, chamado **só** no `case "calcularFrete"` (`:79`):
+`requireString` com `pattern` de 8 dígitos sobre os CEPs **normalizados** (`"20040-020"` e número viram
+`"20040020"`) e erro nomeando o campo (`from.postal_code`/`to.postal_code`); `requireNumber` com `min`/`max`
+para as dimensões (1-500 cm), o peso (0,001-1000 kg), o valor declarado (0-1.000.000) e a quantidade (1-999);
+`products` (ou o alias `volumes`) obrigatório, não vazio e com no máximo 50 itens; erro de item nomeia o índice
+(`products[0].weight`); campos extras do volume (por exemplo `id`) são preservados. O corpo enviado (`:96`) e a
+chave de cache (`:79`) passaram a usar o objeto normalizado, e `ValidationError` devolve **422** com
+`validationErrorResponse` no topo do `catch` (`:347-349`), antes do 500 genérico.
+
+**Escopo restrito (como o plano pede):** validação **por caminho**, só no `case` da cotação. Validar tudo de uma
+vez no alto do arquivo exigiria campo que os outros `case` não usam (o atalho que o plano marca como "tentador a
+evitar"). `useSandbox` (`:60`) e o bloco de auth (`:43-49`) **não foram tocados** — etapas 008/009 aguardam o dono.
+Os demais `case` (carrinho, etiquetas, lojas) seguem como estavam.
+
+**Mudança de comportamento:** cotação sem CEP, com CEP que não tem 8 dígitos, sem volumes, com lista vazia, com
+mais de 50 volumes ou com peso/dimensão fora da faixa passa a receber 422 com o nome do campo, **sem** gastar
+requisição no parceiro. Nenhum caminho do app quebra: o único chamador é `MECotacaoPanel.tsx:95-101` (via
+`useMelhorEnvio.tsx:123-132`), que já limpa o CEP (`:92-93`), desabilita o botão fora de 8 dígitos (`:242-244`) e
+manda `products` com `width`/`height`/`length`/`weight`/`insurance_value`/`quantity` (`:51-59`). Remover todos os
+volumes (possível em `:83-84`) passa a devolver 422 em vez do erro do parceiro — o painel já exibe "Erro na
+cotação" nos dois casos.
+
+**Desvio consciente:** 400 do plano → **422** (`validationErrorResponse`), igual às etapas 146-150. Módulo puro
+`parse.ts` porque `index.ts:1-6` importa `esm.sh`/`deno.land` e o vitest não carrega o módulo — mesmo precedente
+citado no plano (`external-db-bridge/index.ts:4`). `_shared/validate.ts` não foi alterado.
+
+**Fora de escopo (registrado, não tocado):** `catch (e) {}` vazio (`:109`), `no-case-declarations` (`:174`,
+`:182`), `data.error`/`details` repassados ao cliente (`:340-341`) e `error.message` no catch (`:350`) são B-06
+(etapas 165/172); o alias `volumes` é validado mas continua indo com o nome antigo ao parceiro; `useSandbox = true`
+por padrão mantém a cotação em sandbox (etapa 008, dona).
+
+**Evidência:**
+- `tests/contracts/melhor-envio-cotacao.spec.ts` (novo, 11 casos): payload real do painel normaliza
+  `"20040-020"` → `"20040020"` e preserva `options`; sem CEP de destino → campo `to.postal_code`; CEP de 7 dígitos
+  → campo `from.postal_code`; sem volumes → campo `volumes` (alias de `useMelhorEnvio.tsx:128`); lista vazia e
+  lista com 51 volumes → campo `products`; produto sem peso → `products[0].weight`; `width: 0` →
+  `products[0].width`; `insurance_value`/`quantity` ausentes assumem 0 e 1; `params` não-objeto → campo `params`;
+  e o contrato da edge (parse no `case`, corpo do `/me/shipment/calculate` vindo do objeto validado, 422 no catch).
+- Mutação A — `pattern` do CEP trocado por `/^\d*$/`: 1/11 falha. B — peso sem `requireNumber`: 1/11. C — edge
+  usando `params` cru no lugar do parse: 1/11. Restaurado: 11/11.
+- `npx vitest run --coverage`: **50 arquivos / 399 testes, todos verdes**; `melhor-envio-api/parse.ts`
+  97,14 stmts / 96,55 branch / 100 funcs (linha 67 = `throw error` do rethrow, inalcançável porque os helpers só
+  lançam `ValidationError`); totais 75,18 / 72,67 / 77,65 / 77,3 (antes: 74,69/72,02/77,28/76,77).
+- `deno check`: **4 erros = 4 do baseline** (mesmos textos: `level: 'WARN'`/`'ERROR'` fora do tipo `LogLevel` e
+  `e.message` em `unknown`; linhas +3 pelo import novo). `deno lint`: 6 = baseline 6, **0** no `parse.ts`;
+  `deno fmt --check` limpo no `parse.ts`; `npx tsc --noEmit` 0; `npx eslint` no teste 0; `npm run lint:budget` OK
+  (77/86 avisos).
+- **NÃO VERIFICADO:** cotação real no parceiro e o 422 em produção — exige `MELHOR_ENVIO_TOKEN` e conta Melhor
+  Envio. Depois do deploy: `{"action":"calcularFrete","params":{"from":{"postal_code":"01310100"}}}` deve
+  devolver 422 com `field: "to.postal_code"`.
+
+---
+
+### Registro - etapa 150 (2026-11-24) - achado B-04 (`resend-email`) (2026-11-24) - achado B-04 (`resend-email`)
 
 **Causa:** `index.ts:43` lia o corpo e `:45-57` mandava `to`, `subject` e `html` ao provedor **sem formato nem
 teto de tamanho**. Endereço malformado virava erro do Resend (requisição já paga) devolvido ao cliente como
