@@ -236,7 +236,7 @@
 - [x] **158** — `ingest-biosync`: trocar o `fetch` nu para `bitrix24-integration` — onda 5 — Média
 - [x] **159** — `nexus-webhook-receiver`: tempo limite nas duas chamadas internas dentro do webhook — onda 5 — **Crítica**
 - [x] **160** — `send-password-reset`: tempo limite na chamada interna — onda 5 — Alta
-- [ ] **161** — `predict-delays` e `predict-delays-scheduled`: tempo limite nas chamadas internas — onda 5 — Média
+- [x] **161** — `predict-delays` e `predict-delays-scheduled`: tempo limite nas chamadas internas — onda 5 — Média
 - [ ] **162** — `accuracy-meta-monitor`: tempo limite nas duas chamadas internas — onda 5 — Média
 - [ ] **163** — `accuracy-weekly-digest`: tempo limite na chamada interna — onda 5 — Média
 - [ ] **164** — Criar `_shared/httpError.ts`: uma resposta de erro que não vaza o detalhe interno — onda 5 — Alta
@@ -435,6 +435,49 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 
 ## Registro de execução
 
+### Registro - etapa 161 (2026-11-25) - achado B-05 (`predict-delays` e `predict-delays-scheduled`)
+
+**Causa:** duas chamadas internas sem tempo limite.
+
+- `predict-delays/index.ts:354` — `supabase.functions.invoke("whatsapp-notification", ...)` **dentro de dois laços**
+  (uma chamada por previsão crítica x destinatário). Sem tempo limite, um `whatsapp-notification` lento segurava a
+  resposta do `predict-delays` inteiro, e esse aviso é o que leva à operação a entrega em atraso.
+- `predict-delays-scheduled/index.ts:70` — `supabase.functions.invoke("predict-delays", { body: {} })`, disparado
+  pelo cron `predict-delays-every-30min` (`*/30 * * * *`). O `throw predErr` (`:75`) estourava o handler: a execução
+  morria em 500 sem deixar no log o motivo nem a quantidade de falhas.
+
+**Correção:**
+
+- `predict-delays`: `invokeFunction("whatsapp-notification", { action: "send_delay_alert", phone, entrega_id,
+  coleta_id, variables })` com o tempo limite **padrão do helper (10 s)** e corpo idêntico ao anterior. Como são N x M
+  envios, cada falha soma em `falhasAlerta` (`:370`) e, no fim, um único `log("WARN", "Delay alerts not delivered", {
+  falhas: falhasAlerta })` (`:375`) resume — sem um log por destinatário e sem `throw` novo.
+- `predict-delays-scheduled`: `invokeFunction("predict-delays", {}, { timeoutMs: PREDICT_TIMEOUT_MS })` com **30 s**
+  (`:11`) — folgado porque ninguém espera a resposta (é cron a cada 30 min), mas finito, e menor que o intervalo do
+  cron, então uma execução travada não se empilha com a próxima. Quando `!predResp.ok` (`:81`), `log("ERROR", ...,
+  { reason, status, falhas: 1 })` e resposta **500 estruturada** `{ success: false, reason }` — a falha passa a ficar
+  registrada, que era justamente o que o `throw` cru perdia.
+
+**Mudança de comportamento:** `predict-delays` continua respondendo 200 mesmo se nenhum aviso sair (`falhas > 0` fica
+só no log) — as previsões são o produto da função e o aviso é efeito colateral. A resposta da `predict-delays-scheduled`
+em falha passa a ser `{ success: false, reason }` em vez do erro cru do `functions.invoke`; o corpo de sucesso não mudou.
+
+**Auth intocada:** o bloco `requireInternalSecret`/`requireUser` (`predict-delays-scheduled/index.ts:24-35`) é o padrão
+correto do projeto e não foi alterado.
+
+**Evidência:** `grep -n 'functions\.invoke' supabase/functions/predict-delays/index.ts
+supabase/functions/predict-delays-scheduled/index.ts` -> nenhum resultado; `invokeFunction` importado em `:9` e `:7`
+e usado em `:357` e `:75`, este com `timeoutMs`. Teste `tests/contracts/predict-delays-timeout.spec.ts` (5 casos);
+mutações A-E (voltar o `functions.invoke`, tirar `falhas: 1`, tirar o `timeoutMs`, `if (false)` no contador, remover o
+`log("WARN")`) quebram de 1 a 2 testes cada e restauram 5/5. `deno check` 2 e 1, `deno lint` 21 e 2 — iguais ao
+baseline; `deno fmt --check` limpo nos dois arquivos; `tsc --noEmit` 0; `lint:budget` 77/86 avisos, 0 erros.
+
+**NAO VERIFICADO:** execução real do cron com o `whatsapp-notification` lento (exige o gateway EVO e um alerta crítico
+de verdade em produção).
+
+**Fora de escopo (registrado, não tocado):** `error.message` cru (`predict-delays:389`, etapa 178); a janela de
+idempotência de 2 min e a leitura de `prevKeys` da agendada; CORS `*`.
+
 ### Registro - etapa 160 (2026-11-25) - achado B-05 (`send-password-reset`)
 
 **Causa:** `index.ts:151` chamava `supabaseAdmin.functions.invoke("resend-email", ...)` **dentro do caminho da
@@ -462,8 +505,7 @@ nenhum `functions.invoke`; `invokeFunction` importado em `:4`, usado em `:155` c
 segredo/ambiente reais).
 
 **Fora de escopo (registrado, nao tocado):** CORS `*` (`:6`, etapa 185); geracao do link via
-`auth.admin.generateLink`; atualizacao de `password_reset_requests`.
-### Registro - etapa 159 (2026-11-25) - achado B-05 (`nexus-webhook-receiver`)
+`auth.admin.generateLink`; atualizacao de `password_reset_requests`.### Registro - etapa 159 (2026-11-25) - achado B-05 (`nexus-webhook-receiver`)
 
 **Causa:** `index.ts:141` e `:154` chamavam `supabaseClient.functions.invoke('normalize-freight-response', ...)`
 **dentro do caminho do webhook**, e o resultado ia na resposta à transportadora. `functions.invoke` não aceita tempo
