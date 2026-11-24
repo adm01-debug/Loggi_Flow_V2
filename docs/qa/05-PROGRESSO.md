@@ -4464,3 +4464,37 @@ versão em `supabase_migrations.schema_migrations` dentro da mesma transação (
 `--single-transaction`), então ou tudo entrou ou nada entrou.
 
 **Estado:** PR #428 mergeada com o DDL já aplicado. Reverter = rodar o arquivo de `supabase/rollbacks/`.
+## Registro da etapa 058 - gate de exclusão lógica (2026-11-25)
+
+A etapa 057 corrigiu a tela, mas a política continuava valendo por convenção: nada no código impedia o
+próximo `.delete()` numa tabela com `deleted_at`. O gate `scripts/ci/check-soft-delete.mjs` fecha isso.
+Ele deriva a lista de tabelas de `src/integrations/supabase/types.ts` (bloco `Tables:`, coluna `deleted_at`
+presente na `Row`) em vez de fixá-la: hoje são **clientes, coletas, entregas, fornecedores,
+fretes_internos e transportadoras**, e a próxima tabela que ganhar a coluna entra sem editar o script.
+Escopo é só `src/`: `supabase/functions/` usa `service_role` e tem `.delete()` legítimo (limpeza,
+idempotência de webhook), então não entra.
+
+Só reprova a cadeia `supabase.from("<tabela>").delete()` da mesma instrução, com o corte de instrução feito
+por `;` no nível zero (ignora string, template e comentário). `deleted_at` só no `Insert` não define
+política; view com a coluna também não, porque o parser lê apenas a seção `Tables:`.
+
+Amarração: `npm run validate:soft-delete` em `package.json`, passo *Validate Soft Delete (exclusão lógica)*
+em `.github/workflows/ci-nexus.yml` (junto de `validate:csp`, `validate:no-console`,
+`validate:query-limits`) e dois registros `legacy` em `scripts/automation.config.json`
+(`legacy-d42815dba2b77deb` para o gate, `legacy-98cbfd78afa441f8` para o teste). O teste unitário é
+coletado sozinho por `scripts-tests.yml` (`find scripts -name '*.unit.mjs'`).
+
+`docs/SOFT_DELETE_POLICY.md` listava `cotacoes` e `perfis`, que **não** têm a coluna, e omitia `clientes`,
+`coletas`, `fornecedores` e `fretes_internos`: a tabela foi corrigida e agora aponta para o gate.
+
+**Evidência**
+- `node scripts/ci/check-soft-delete.mjs` -> `[soft-delete] OK: nenhum .delete() em tabela com deleted_at
+  (6 tabelas verificadas).` / `exit=0`
+- `npm run validate:soft-delete` -> mesma saída, `npm_exit=0`
+- prova negativa: `.delete()` reintroduzido em `src/pages/Transportadoras.tsx:337` ->
+  `[soft-delete] 1 exclusão(ões) física(s) em tabela com exclusão lógica: src/pages/Transportadoras.tsx:337
+  — .from("transportadoras").delete()` / `exit=1`; `git checkout --` e o gate volta a `exit=0`
+- prova negativa em cadeia multilinha (`FretesInternos.tsx`) -> `exit=1` apontando `:257`
+- `node --test scripts/ci/check-soft-delete.unit.mjs` -> **9 testes, 13 asserções, 0 falhas**
+- `npm run automation:test` -> **103 testes, 0 falhas**
+- `actionlint .github/workflows/ci-nexus.yml` -> `exit=0`
