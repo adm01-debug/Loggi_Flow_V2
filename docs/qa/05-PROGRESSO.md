@@ -246,7 +246,7 @@
 - [x] **168** — `execute-protocol`: parar de devolver o erro do Postgres — onda 5 — Alta
 - [x] **169** — `lalamove-api`: parar de repassar a resposta de erro da Lalamove — onda 5 — Alta
 - [x] **170** — `rodonaves-api`: parar de transformar o erro do **login** da Rodonaves em mensagem — onda 5 — **Crítica**
-- [ ] **171** — `rodonaves-api`: erro genérico na resposta e detalhe só no log — onda 5 — Alta
+- [x] **171** — `rodonaves-api`: erro genérico na resposta e detalhe só no log — onda 5 — Alta
 - [ ] **172** — `resend-email`: parar de repassar o erro do provedor de e-mail — onda 5 — Alta
 - [ ] **173** — `db-health-weekly-report`: parar de repassar o erro do terceiro no relatório — onda 5 — Média
 - [ ] **174** — `nexus-webhook-receiver`: erro genérico na resposta ao webhook — onda 5 — Média
@@ -434,6 +434,44 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapa 171 (2026-11-25) - achado B-06 (`rodonaves-api`, demais pontos)
+
+**Causa:** a mesma da etapa 170 nos outros pontos do arquivo: `apiGet` (`:193-200`), `apiMutate` (`:226-233`) e
+`getDeliveryReceiptByProtocols` (`:641-644`) transformavam o corpo de erro da Rodonaves em mensagem de
+excecao, e o handler (`:1715-1726`) devolvia essa mensagem em `error`. Somando o `catch` generico, o corpo cru
+do parceiro saia na resposta HTTP das acoes de rastreio, cotacao, comprovantes e cliente.
+
+**Correcao (so o arquivo da etapa):**
+
+- `apiGet`/`apiMutate` — o corpo virou `body` local e vai **apenas** para o log, com `gateway`, `path`, o metodo
+  (`method` no `apiMutate`), o status do parceiro e corte de 500 chars; o `RTEError` lancado usa mensagem fixa
+  (`GET <path> failed` / `<method> <path> failed`), sem status nem corpo do parceiro. `classifyStatus` decidia o
+  codigo; o mapeamento para o status HTTP do front (`403`/`504`/`422`/`502`) ficou igual.
+- `getDeliveryReceiptByProtocols` — o corpo tambem foi para o log e o erro virou
+  `throw new Error("Falha ao buscar comprovantes por protocolos")`.
+- Handler — a resposta do tipo `RTEError` passou a usar o mapa `MENSAGEM_POR_CODIGO` (texto em portugues
+  escolhido pelo **codigo que nos lancamos**: `RTE_AUTH_FAILED`, `RTE_SCOPE_BLOCKED`, `RTE_TIMEOUT`,
+  `RTE_BAD_REQUEST`, `RTE_UPSTREAM_ERROR`), em vez de `error.message`. O `catch` inesperado passou a devolver
+  `internalErrorResponse(error, corsHeaders, "rodonaves-api")` (etapa 164) — some o `error.message` e o corpo de
+  500.
+- **Nao tocado:** fluxo de token/cache, disjuntor, `buildQS`, o roteamento por `action`, o ramo
+  `ValidationError` -> 422 e a tela de sincronizacao da Rodonaves (R-04 tem etapa propria).
+
+**Efeito no front:** `grep -rn 'rodonaves-api' src/` encontra 4 chamadores
+(`useRodonavesTracking.tsx:96`, `RTECustomerManager.tsx:165`, `useGatewayHealth.ts:154`,
+`useIntegrationValidation.tsx:80`). Os tres primeiros mostram `data.error` em `toast.error`/mensagem de erro:
+antes aparecia o texto do parceiro, agora aparece o texto generico em portugues. `code` e `gateway` continuam
+na resposta, entao quem quiser detalhe tem o codigo; o detalhe completo esta no log da edge.
+
+**Verificado de verdade:** `tests/contracts/rodonaves-api-erro-generico.spec.ts` (7 casos) — 7/7; o spec da
+etapa 170 continua 5/5 (12/12 juntos). Prova por mutacao: A/B/C voltam a interpolar o corpo do parceiro -> 2
+falhas cada; D volta a devolver `error.message` -> 1; E volta ao corpo de erro cru no `catch` -> 1; F troca um
+texto do mapa -> 1; restaurado -> 7/7. `deno check` 4 (baseline 6: os dois `log.error` com string melhoraram);
+`deno lint` 2 = baseline 2; `deno fmt --check` = baseline 1 (diffs herdados, nenhum nas linhas novas). `tsc` 0;
+`lint:budget` 77/86; suite 70 arquivos / 527 testes. Verificacao pedida pelo plano (`grep -rn 'rodonaves-api'
+src/` + `sed -n '1705,1720p'`): executada — a resposta de erro nao carrega texto do parceiro. Erro de cotacao
+forcado em runtime: NAO EXECUTADO (exigiria chamada real ao parceiro) — RASTREADO pelo codigo.
 
 ### Registro - etapa 170 (2026-11-25) - achado B-06 (`rodonaves-api`, login)
 
