@@ -34,6 +34,7 @@ import {
   type LabelData,
 } from "@/components/labels";
 import { useRodonavesTracking } from "@/hooks/logistics/useRodonavesTracking";
+import { mensagemRecusaTransicao } from "@/lib/statusTransitions";
 import { ScannerButton } from "@/components/scanner/ScannerButton";
 import { DocumentUploadField } from "@/components/common/DocumentUploadField";
 import { ScanResult } from "@/hooks/ui/useQRScanner";
@@ -486,6 +487,10 @@ export default function Envios() {
       playSuccess();
       toast.success("Status atualizado!");
     },
+    onError: (e) => {
+      playError();
+      toast.error(mensagemRecusaTransicao(e, "entrega") ?? "Erro: " + e.message);
+    },
   });
 
   const deleteMut = useMutation({
@@ -509,7 +514,8 @@ export default function Envios() {
       .from("entregas")
       .update({ status })
       .in("id", ids);
-    if (error) toast.error("Erro: " + error.message);
+    if (error)
+      toast.error(mensagemRecusaTransicao(error, "entrega") ?? "Erro: " + error.message);
     else {
       qc.invalidateQueries({ queryKey: ["entregas"] });
       clearSelection();
