@@ -26,6 +26,8 @@ jobs:
           fetch-depth: 0 # gitleaks precisa do commit base do push (shallow quebra o range)
       - name: Audit Dependencies
         run: node scripts/audit-gate.mjs
+      - name: Arquivo de ambiente fora do indice do git
+        run: node scripts/ci/check-env-not-tracked.mjs
       - name: Gitleaks Scan
         uses: gitleaks/gitleaks-action@v3
         env:

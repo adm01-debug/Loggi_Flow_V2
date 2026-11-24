@@ -80,6 +80,38 @@ sugestão registrada em `docs/qa/05-PROGRESSO.md` é ligá-lo a um job, como `va
   nome** com `idempot`/`event_key` no meio; renomeie a variável ou abra discussão no PR em vez de afrouxar
   o padrão.
 
+## `check-env-not-tracked.mjs` — arquivo de ambiente fora do git
+
+Impede que o `.env` volte para o índice do git (etapa 018 do plano QA, achado **S-07**). O `gitleaks` procura
+*padrão de segredo* no diff: um `.env` só com a chave `anon` passa limpo — foi assim que o arquivo ficou
+meses no repositório. Este gate olha o **nome**: reprova qualquer caminho de `git ls-files` cujo nome comece
+com `.env` e não seja `.env.example`. Olha o índice, não o disco: `.env` na máquina de quem desenvolve,
+ignorado pelo git, não reprova.
+
+Sem dependências (Node puro). No CI roda no job `Security Scan` do `.github/workflows/ci.yml`, ao lado do
+`audit-gate.mjs` e do gitleaks.
+
+### Como rodar
+
+```sh
+node scripts/ci/check-env-not-tracked.mjs             # confere o repositório em que o script está
+node scripts/ci/check-env-not-tracked.mjs --root .    # mesmo efeito, raiz explícita
+node --test scripts/ci/check-env-not-tracked.unit.mjs
+```
+
+Exit: `0` limpo (imprime quantos caminhos conferiu); `1` com uma linha `::error::` por arquivo rastreado;
+`2` quando não conseguiu ler o índice (fora de um repositório git, `git` fora do PATH) — falha do próprio
+gate, não verde falso.
+
+### Quando ele falha
+
+- Alguém rodou `git add -A`, `git add -f .env` ou o arquivo entrou por engano → `git rm --cached .env`,
+  confirme o `.gitignore` e mande o segredo para o painel de variáveis (Supabase/Vercel). **Se o arquivo
+  chegou a ser commitado, o valor dentro dele está comprometido: rotacione a chave** — tirar do índice não
+  apaga o histórico.
+- Arquivo novo legítimo chamado `.env.algo` → não existe exceção por nome além de `.env.example`; use outro
+  nome (`env.algo`, `*.example`) em vez de afrouxar o gate.
+
 ## `github-settings-guard.mjs` — perímetro do GitHub contra o baseline
 
 Compara branch protection da `main`, visibilidade e opções de merge do repo, permissões do Actions, rulesets e
