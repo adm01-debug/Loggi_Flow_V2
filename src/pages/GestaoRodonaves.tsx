@@ -11,6 +11,7 @@ import { RTEAdvancedPickup } from "@/components/rodonaves/RTEAdvancedPickup";
 import { RTESelfAttendance } from "@/components/rodonaves/RTESelfAttendance";
 import { RTEAdvancedQuotation } from "@/components/rodonaves/RTEAdvancedQuotation";
 import { RTEGatewayHealthPanel } from "@/components/rodonaves/RTEGatewayHealthPanel";
+import { RTEFreightAnomalies } from "@/components/rodonaves/RTEFreightAnomalies";
 import {
   Activity,
   Truck,
@@ -21,6 +22,7 @@ import {
   Users,
   Calculator,
   Building,
+  AlertTriangle,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
@@ -163,6 +165,10 @@ export default function GestaoRodonaves() {
               <Building className="w-3 h-3" />
               Autoatendimento
             </TabsTrigger>
+            <TabsTrigger value="anomalies" className="gap-1">
+              <AlertTriangle className="w-3 h-3" />
+              Anomalias
+            </TabsTrigger>
             <TabsTrigger value="health" className="gap-1">
               <Activity className="w-3 h-3" />
               Saúde
@@ -190,6 +196,9 @@ export default function GestaoRodonaves() {
             </TabsContent>
             <TabsContent value="selfservice">
               <RTESelfAttendance />
+            </TabsContent>
+            <TabsContent value="anomalies">
+              <RTEFreightAnomalies />
             </TabsContent>
             <TabsContent value="health">
               <RTEGatewayHealthPanel />
