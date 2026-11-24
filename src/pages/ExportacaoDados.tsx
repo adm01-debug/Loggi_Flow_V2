@@ -175,12 +175,13 @@ export default function ExportacaoDados() {
         });
       }
 
-      // fretes_internos (não possui transportadora)
+      // fretes_internos (não possui transportadora); excluídos não entram no extrato
       const { data, error } = await supabase
         .from("fretes_internos")
         .select(
           "id, origem, destino, motorista, status, previsao_entrega, created_at, quantidade_itens",
         )
+        .is("deleted_at", null)
         .gte("created_at", inicioIso)
         .lte("created_at", fimIso)
         .order("created_at", { ascending: false })

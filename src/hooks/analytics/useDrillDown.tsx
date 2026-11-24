@@ -104,7 +104,8 @@ export function useDrillDown() {
       } else {
         let query = supabase
           .from("fretes_internos")
-          .select("id, destino, status, created_at");
+          .select("id, destino, status, created_at")
+          .is("deleted_at", null);
         if (dateStart) query = query.gte("created_at", dateStart);
         if (dateEnd) query = query.lte("created_at", dateEnd);
         const { data: result, error } = await query
