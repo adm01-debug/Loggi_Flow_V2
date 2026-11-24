@@ -277,6 +277,7 @@ const CAPABILITIES: readonly RTECapability[] = [
 
   // ---------- unittocity ----------
   { action: "unit-to-city", gateway: "unittocity", status: "liberado" },
+  { action: "check-coverage", gateway: "unittocity", status: "liberado" },
 
   // ---------- meta ----------
   { action: "health-all", gateway: "tracking", status: "liberado" },
