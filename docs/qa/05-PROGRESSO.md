@@ -250,7 +250,7 @@
 - [x] **172** — `resend-email`: parar de repassar o erro do provedor de e-mail — onda 5 — Alta
 - [x] **173** — `db-health-weekly-report`: parar de repassar o erro do terceiro no relatório — onda 5 — Média
 - [x] **174** — `nexus-webhook-receiver`: erro genérico na resposta ao webhook — onda 5 — Média
-- [ ] **175** — `lalamove-webhook`: erro genérico na resposta ao webhook — onda 5 — Média
+- [x] **175** — `lalamove-webhook`: erro genérico na resposta ao webhook — onda 5 — Média
 - [ ] **176** — `rodonaves-webhook`: erro genérico na resposta ao webhook — onda 5 — Média
 - [ ] **177** — `smart-carrier-selection`: erro genérico na resposta da cotação — onda 5 — Média
 - [ ] **178** — Varredura final de `error.message`: as onze funções restantes de B-06 — onda 5 — Média
@@ -434,6 +434,41 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapa 175 (2026-11-25) - achado B-06 (`lalamove-webhook`)
+
+**Causa:** o `catch` de `lalamove-webhook` devolvia `{"error": error.message}` com status 500. A funcao grava
+em `webhook_events_processed` e `rastreamento_historico`, entao o erro do Postgres descrevia **essas tabelas**
+(nome de coluna, texto de policy, dica de SQL) para quem conseguisse chamar o webhook.
+
+**Correcao (so o arquivo da etapa):**
+
+- `:5` — import de `internalErrorResponse` de `_shared/httpError.ts` (etapa 164).
+- `:229-233` — o `catch` registra o detalhe so no log
+  (`log.error('[lalamove-webhook] Webhook processing error:', { message: error instanceof Error ? error.message : String(error) })`)
+  e responde `internalErrorResponse(error, corsHeaders, 'lalamove-webhook')`: 500 com
+  `{"error":"INTERNAL_ERROR"}`, sem mensagem interna e sem stack. O 500 se mantem de proposito — a Lalamove
+  reenvia o evento em falha; 2xx perderia a atualizacao de rastreio.
+- **Nao tocado:** o rate limit `:41-48` (429), o HMAC `:64-73` (401, etapa 009), o contrato `:76-93`
+  (etapa 009), o marcador de idempotencia `:124-151` (etapas 133/134) e a chave `:101-121` (etapa 139).
+
+**Quem via o detalhe:** o emissor do webhook (Lalamove) e qualquer um que interceptasse a resposta; nenhuma
+tela do app le esse texto. O detalhe completo agora fica no log da edge.
+
+**Achado novo (anotado, nao corrigido):** os `insert` de negocio em `:156-201` (`rastreamento_historico`,
+`coletas`, `rastreamento_alertas`) nao verificam erro — so o primeiro loga (`:166`). Etapa futura: tratar falha
+de gravacao como falha.
+
+**Verificado de verdade:** `tests/contracts/lalamove-webhook-erro-generico.spec.ts` (7 casos) — 7/7. Prova por
+mutacao: A volta a ecoar `error.message` -> 2 falhas; B 500 escrito na mao no lugar de `internalErrorResponse`
+-> 1; C 200 no catch -> 2; D objeto `error` como meta do log -> 1; E segredo do HMAC trocado -> 1; F chave de
+idempotencia nao-deterministica -> 1; G limite de rate limit elevado -> 1; restaurado -> 7/7. `deno check` 0 =
+baseline 0; `deno lint` 3 = baseline 3; `deno fmt --check` 1 = baseline 1 (diff herdado nas linhas 12-20).
+`tsc` 0; `lint:budget` ok; suite 547 testes. Verificacao pedida pelo plano (`grep -n 'error.message\|
+internalErrorResponse'`): executada — a unica ocorrencia de `error.message` e `:231`, dentro da meta do
+`log.error`; a resposta de erro nao carrega nada das tabelas. Webhook real com payload invalido: NAO EXECUTADO
+(exigiria a origem Lalamove configurada) — RASTREADO pelo codigo.
+
 
 ### Registro - etapa 174 (2026-11-25) - achado B-06 (`nexus-webhook-receiver`)
 

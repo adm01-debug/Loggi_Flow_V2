@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { log, redact } from "../_shared/logger.ts";
 import { corsHeaders } from "../_shared/cors.ts";
+import { internalErrorResponse } from "../_shared/httpError.ts";
 import { validateContract } from "../_shared/contract-validator.ts";
 import { verifyWebhookHmac } from "../_shared/webhookSignature.ts";
 import { requireString } from "../_shared/validate.ts";
@@ -226,10 +227,9 @@ serve(async (req) => {
     });
 
   } catch (error: any) {
-    log.error('Webhook processing error', { error: error.message });
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    log.error('[lalamove-webhook] Webhook processing error:', {
+      message: error instanceof Error ? error.message : String(error),
     });
+    return internalErrorResponse(error, corsHeaders, 'lalamove-webhook');
   }
 });
