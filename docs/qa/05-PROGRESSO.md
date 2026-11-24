@@ -233,7 +233,7 @@
 - [x] **155** — `ocr-receipt-processor`: validar a entrada do comprovante — onda 5 — Média
 - [x] **156** — Criar `_shared/invokeFunction.ts`: chamada entre funções com tempo limite — onda 5 — Alta
 - [x] **157** — `normalize-freight-response`: trocar o `fetch` nu para `whatsapp-notification` — onda 5 — Alta
-- [ ] **158** — `ingest-biosync`: trocar o `fetch` nu para `bitrix24-integration` — onda 5 — Média
+- [x] **158** — `ingest-biosync`: trocar o `fetch` nu para `bitrix24-integration` — onda 5 — Média
 - [ ] **159** — `nexus-webhook-receiver`: tempo limite nas duas chamadas internas dentro do webhook — onda 5 — **Crítica**
 - [ ] **160** — `send-password-reset`: tempo limite na chamada interna — onda 5 — Alta
 - [ ] **161** — `predict-delays` e `predict-delays-scheduled`: tempo limite nas chamadas internas — onda 5 — Média
@@ -434,6 +434,30 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapa 158 (2026-11-25) - achado B-05 (`ingest-biosync`)
+
+**Causa:** `index.ts:65` chamava `${SUPABASE_URL}/functions/v1/bitrix24-integration` com `fetch` **nu**, dentro do
+caminho do alerta **critico** de batimento (`if (severity === "crit")`, `:63`). Em Deno, `fetch` sem sinal nao tem
+tempo limite: com o Bitrix lento, o alerta critico (e a resposta inteira da funcao) ficava preso esperando o CRM.
+
+**Correcao:** o aviso passou a usar `invokeFunction("bitrix24-integration", { action: "notify_alert", deal_data:
+{ ... } })` (etapa 156), com o **mesmo corpo**. O resultado e tratado sem alterar a resposta: se `!aviso.ok`, um
+`log.error` registra `aviso.reason` e a funcao segue — a telemetria e o log tatico (`:38-48`, `:55`) ja foram
+gravados antes e o alerta ao motorista **nao** depende do CRM. Nenhum `throw` novo; o `try/catch` que ja existia
+continua envolvendo a chamada.
+
+**Mudanca de comportamento:** o envio ao CRM e abandonado em **10 s** em caso de travamento, contado em log, em
+vez de prender o caminho critico.
+
+**Evidencia:** `grep -n 'fetch(\|invokeFunction' supabase/functions/ingest-biosync/index.ts` -> nenhum `fetch(`
+nu; `invokeFunction` importado em `:4` e usado em `:68`; `aviso.reason` em `:78-79` (`index.ts:65` antes).
+
+**NAO VERIFICADO:** o comportamento em runtime com um payload `crit` real e o Bitrix lento (exige segredo de
+producao; so o contrato foi exercitado por teste).
+
+**Fora de escopo (registrado, nao tocado):** `error.message` cru (`:92`, etapa 165), CORS `*` (`:6`, etapa 192),
+dedupe (`:38-48`, etapa 199).
 
 ### Registro - etapa 157 (2026-11-25) - achado B-05 (`normalize-freight-response`)
 
