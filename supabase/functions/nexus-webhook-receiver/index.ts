@@ -7,6 +7,7 @@ import { checkRateLimit } from "../_shared/rateLimiter.ts";
 import { buildEventKey, claimIdempotencyKey } from "../_shared/idempotency.ts";
 import { log, redact } from "../_shared/logger.ts";
 import { invokeFunction } from "../_shared/invokeFunction.ts";
+import { internalErrorResponse } from "../_shared/httpError.ts";
 
 const NORMALIZE_TIMEOUT_MS = 5_000;
 
@@ -197,10 +198,9 @@ serve(async (req) => {
     return new Response(JSON.stringify({ success: true, message: 'Webhook ignored or not handled' }), { headers: corsHeaders });
 
   } catch (error: any) {
-    log.error('Webhook processing error:', error);
-    return new Response(
-      JSON.stringify({ success: false, error: error.message }),
-      { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    log.error('[nexus-webhook-receiver] Webhook processing error:', {
+      message: error instanceof Error ? error.message : String(error),
+    });
+    return internalErrorResponse(error, corsHeaders, "nexus-webhook-receiver");
   }
 });
