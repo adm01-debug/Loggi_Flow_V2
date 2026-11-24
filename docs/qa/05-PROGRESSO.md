@@ -223,7 +223,7 @@
 
 - [x] **146** — `smart-carrier-selection`: validar `peso_kg` e os números do cálculo de frete — onda 5 — Alta
 - [x] **147** — `webhook-status`: exigir `data` antes de desestruturar — onda 5 — Alta
-- [ ] **148** — `ingest-biosync`: validar `heart_rate` como número antes de comparar com o limite — onda 5 — Alta
+- [x] **148** — `ingest-biosync`: validar `heart_rate` como número antes de comparar com o limite — onda 5 — Alta
 - [ ] **149** — `lalamove-api`: `path` e `method` do corpo decidem o roteamento sem `requireEnum` — onda 5 — Alta
 - [ ] **150** — `resend-email`: validar `to`, `subject` e `html` antes de entregar ao provedor — onda 5 — Alta
 - [ ] **151** — `melhor-envio-api`: validar o corpo da cotação — onda 5 — Média
@@ -434,6 +434,59 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapa 148 (2026-11-24) - achado B-04 (`ingest-biosync`)
+
+**Causa:** `index.ts:21` desestruturava o corpo cru e `:33-35` comparava `heart_rate` com os limiares que decidem
+o alerta de emergência do motorista. Em JS a comparação aceita **texto**: `"200" >= 120` é `true` (alerta com
+tipo errado) e `"abc" >= 120` é `false` — o alerta crítico ficava **silenciado** por um batimento inválido, e
+`Number("")` é `0`, então campo vazio também não alertava. O valor cru seguia para o `insert` (`:43`) como
+`heart_rate ?? null`.
+
+**Correção:** o corpo passa a ser interpretado por `parseBioSyncInput` (`parse.ts:19`): `driver_id` e `vehicle_id`
+obrigatórios (`requireString`), `heart_rate` por `requireNumber(..., { min: 20, max: 300 })` — a faixa recusa
+`""`/`true`/`[]`/`null`/`19`/`301`, que a coerção de `Number()` transformaria em 0/1 — e `fatigue_index`
+opcional com padrão `"LOW"` (`optionalString`). O `insert` (`:46-47`) grava os valores **validados** e o
+`catch` devolve **422** via `validationErrorResponse` (`:94-96`) antes do 500 genérico. As comparações de
+severidade (`:37-38`) não foram tocadas: agora recebem sempre número.
+
+**Mudança de comportamento:** `driver_id` e `heart_rate` passaram de "aceita qualquer coisa" para obrigatórios.
+Justificativa no schema: `bio_sync_telemetry` declara `driver_id`, `vehicle_id` e `heart_rate` como **NOT NULL**
+(`src/integrations/supabase/types.ts:1014-1016`), então payload sem eles já falhava no banco — agora falha antes,
+com 422 e o campo nomeado, em vez de 500. O comentário antigo `// sem leitura = null` (`:43`) descrevia um
+caminho que o schema nunca permitiu persistir.
+
+**Desvio consciente (módulo puro `parse.ts`):** `index.ts:1` importa de `deno.land` e o vitest não carrega o
+módulo; sem extrair o parse não haveria teste executável. Mesmo precedente de `scheduled-reports/fields.ts`
+(143-145), `smart-carrier-selection/parse.ts` (146) e `webhook-status/parse.ts` (147). `_shared/validate.ts` não
+foi alterado.
+
+**LGPD:** o batimento **não** foi adicionado a nenhum log novo — `log.info`/`log.error` existentes ficaram como
+estavam. Fora de escopo (registrado): `:94` ainda devolve `error.message` cru (etapa 165), o `fetch` para Bitrix24
+(`:65` e `:80`) segue sem timeout (etapa 158) e o CORS é o cabeçalho inline (etapa 192).
+
+**Quem chama, conferido:** nenhum chamador em `src/`, `supabase/functions/` ou `scripts/` (achado A-09 já
+registrava a função como publicada e sem uso), então não há chamada legítima que passe a ser recusada.
+
+**Evidência:**
+- `tests/contracts/ingest-biosync-input.spec.ts` (novo, 8 casos): leitura válida preservada; limites 20 e 300
+  aceitos; `"abc"` → campo `heart_rate`; ausente/`null`/`""`/espaços/`true`/`[]`/`{}`/`19`/`301`/`-5` → campo
+  `heart_rate`; `"150"` (texto numérico) vira `150`; `driver_id`/`vehicle_id` ausentes/vazios/número/lista →
+  campo nomeado; `fatigue_index` ausente/vazio → `"LOW"` e `7` → erro; e o contrato da edge (parse antes da
+  comparação, sem `?? null`/`|| "LOW"`, com `validationErrorResponse`).
+- Mutação 1 — `requireNumber(...)` trocado por `Number(body.heart_rate)`: **2 de 8** casos falham (o de texto e o
+  de faixa). Mutação 2 — `index.ts` voltando a desestruturar `await req.json()`: **1 de 8** falha (contrato).
+  Restaurado: 8/8.
+- `npx vitest run --coverage`: **46 arquivos / 363 testes, todos verdes**; `ingest-biosync/parse.ts`
+  100/100/100/100; totais 73,61 stmts / 70,57 branch / 76,83 funcs / 75,64 linhas (antes: 73,59/70,51/76,77/75,62).
+- `deno check supabase/functions/ingest-biosync/index.ts`: **2 erros, idênticos ao baseline** (`log.error(..., e)`
+  em `:84` e `error.message` em `:98`); `deno lint`: 2 no `index.ts` (= baseline, `no-import-prefix`) e **0** no
+  `parse.ts`; `deno fmt --check parse.ts` limpo; `npx tsc --noEmit` 0 erros; `npx eslint` no teste 0 erros;
+  `npm run lint:budget` OK.
+- **NÃO VERIFICADO:** requisição real contra a função publicada e linha gravada em `bio_sync_telemetry` — exige
+  secrets/projeto remoto, fora desta sessão (código e teste cobrem o caminho até o `insert`).
+
+---
 
 ### Registro - etapa 147 (2026-11-23) - achado B-04 (`webhook-status`)
 

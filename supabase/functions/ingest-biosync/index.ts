@@ -1,6 +1,8 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
 import { log } from "../_shared/logger.ts";
+import { ValidationError, validationErrorResponse } from "../_shared/validate.ts";
+import { parseBioSyncInput } from "./parse.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -18,7 +20,8 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    const { driver_id, vehicle_id, heart_rate, fatigue_index } = await req.json();
+    const { driver_id, vehicle_id, heart_rate, fatigue_index } =
+      parseBioSyncInput((await req.json()) as Record<string, unknown>);
 
     // 1. Fetch Alert Rules
     const { data: rules } = await supabaseClient
@@ -40,8 +43,8 @@ serve(async (req) => {
       .insert({
         driver_id,
         vehicle_id,
-        heart_rate: heart_rate ?? null, // sem leitura = null (antes: valor aleatório 60-90)
-        fatigue_index: fatigue_index || "LOW",
+        heart_rate, // validado: número na faixa fisiológica (20-300)
+        fatigue_index, // validado: "LOW" quando ausente
         severity,
         timestamp: new Date().toISOString()
       })
@@ -89,6 +92,9 @@ serve(async (req) => {
       status: 200,
     });
   } catch (error) {
+    if (error instanceof ValidationError) {
+      return validationErrorResponse(error, corsHeaders);
+    }
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 400,
