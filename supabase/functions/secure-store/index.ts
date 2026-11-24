@@ -5,16 +5,12 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 import { encryptField, decryptField } from "../_shared/crypto.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
 import { log } from "../_shared/logger.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
+import { getCorsHeaders } from "../_shared/cors.ts";
 
 serve(async (req) => {
+  const headers = getCorsHeaders(req);
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+    return new Response("ok", { headers });
   }
   try {
     const rl = await checkRateLimit(req, "secure-store", {
@@ -25,7 +21,7 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: "rate_limited" }), {
         status: 429,
         headers: {
-          ...corsHeaders,
+          ...headers,
           "Content-Type": "application/json",
           "Retry-After": String(rl.retryAfter ?? 60),
         },
@@ -36,7 +32,7 @@ serve(async (req) => {
     if (!authHeader.startsWith("Bearer ")) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...headers, "Content-Type": "application/json" },
       });
     }
     const supabase = createClient(
@@ -50,7 +46,7 @@ serve(async (req) => {
     if (authErr || !claims?.claims?.sub) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...headers, "Content-Type": "application/json" },
       });
     }
 
@@ -59,38 +55,38 @@ serve(async (req) => {
     if (typeof value !== "string" || value.length === 0 || value.length > 8192) {
       return new Response(JSON.stringify({ error: "invalid_value" }), {
         status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...headers, "Content-Type": "application/json" },
       });
     }
 
     if (action === "encrypt") {
       const ciphertext = await encryptField(value);
       return new Response(JSON.stringify({ ciphertext }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...headers, "Content-Type": "application/json" },
       });
     }
     if (action === "decrypt") {
       try {
         const plaintext = await decryptField(value);
         return new Response(JSON.stringify({ plaintext }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...headers, "Content-Type": "application/json" },
         });
       } catch {
         return new Response(JSON.stringify({ error: "decrypt_failed" }), {
           status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...headers, "Content-Type": "application/json" },
         });
       }
     }
     return new Response(JSON.stringify({ error: "invalid_action" }), {
       status: 400,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...headers, "Content-Type": "application/json" },
     });
   } catch (e) {
     log.error("secure-store error", { error: (e as Error).message });
     return new Response(JSON.stringify({ error: "internal_error" }), {
       status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...headers, "Content-Type": "application/json" },
     });
   }
 });
