@@ -235,7 +235,7 @@
 - [x] **157** — `normalize-freight-response`: trocar o `fetch` nu para `whatsapp-notification` — onda 5 — Alta
 - [x] **158** — `ingest-biosync`: trocar o `fetch` nu para `bitrix24-integration` — onda 5 — Média
 - [x] **159** — `nexus-webhook-receiver`: tempo limite nas duas chamadas internas dentro do webhook — onda 5 — **Crítica**
-- [ ] **160** — `send-password-reset`: tempo limite na chamada interna — onda 5 — Alta
+- [x] **160** — `send-password-reset`: tempo limite na chamada interna — onda 5 — Alta
 - [ ] **161** — `predict-delays` e `predict-delays-scheduled`: tempo limite nas chamadas internas — onda 5 — Média
 - [ ] **162** — `accuracy-meta-monitor`: tempo limite nas duas chamadas internas — onda 5 — Média
 - [ ] **163** — `accuracy-weekly-digest`: tempo limite na chamada interna — onda 5 — Média
@@ -435,6 +435,34 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 
 ## Registro de execução
 
+### Registro - etapa 160 (2026-11-25) - achado B-05 (`send-password-reset`)
+
+**Causa:** `index.ts:151` chamava `supabaseAdmin.functions.invoke("resend-email", ...)` **dentro do caminho da
+tela**: `functions.invoke` nao aceita tempo limite e, se o envio travasse, a funcao esperava, devolvia 500 e o admin
+(quem aprova na tela `AprovacaoResetSenha.tsx`) ficava preso na tela com erro.
+
+**Correcao:** o envio passou a usar `invokeFunction` (etapa 156) com `timeoutMs: SEND_EMAIL_TIMEOUT_MS` (5 s, `:7`),
+com o **mesmo corpo** (`to`, `subject`, `html` — o `body:` de dentro do `{ }` era so o formato do
+`functions.invoke`, o payload continua identico). Quando o envio falha (`!envio.ok`, `:169`), um
+`log.error` registra `{ reason }` e o fluxo **segue**: a tela recebe a resposta generica de sucesso
+(`{ success: true, message: "Password reset email sent" }`, inalterada) e nenhum `throw` novo e lancado.
+
+**Mudanca de comportamento:** falha ou demora no envio nao bloqueia mais a aprovacao — a solicitacao passa para
+`approved` (`:174-183`) e o admin ve o mesmo toast de sucesso. O motivo fica so no log (`Error sending reset
+email: { reason }`). A tela nao revela se o e-mail existe nem se o envio funcionou.
+
+**Trade-off registrado:** o admin perde o sinal visual de falha do envio. Nao ha coluna de status do envio na
+tabela `password_reset_requests`; enquanto isso existir so no log, uma falha de e-mail e silenciosa para quem
+aprova. Melhoria fora do escopo desta etapa.
+
+**Evidencia:** `grep -n 'functions.invoke|invokeFunction' supabase/functions/send-password-reset/index.ts` ->
+nenhum `functions.invoke`; `invokeFunction` importado em `:4`, usado em `:155` com `timeoutMs` em `:164`.
+
+**NAO VERIFICADO:** tempo real de resposta da tela e a linha de log em producao (exige pedir uma redefinicao com
+segredo/ambiente reais).
+
+**Fora de escopo (registrado, nao tocado):** CORS `*` (`:6`, etapa 185); geracao do link via
+`auth.admin.generateLink`; atualizacao de `password_reset_requests`.
 ### Registro - etapa 159 (2026-11-25) - achado B-05 (`nexus-webhook-receiver`)
 
 **Causa:** `index.ts:141` e `:154` chamavam `supabaseClient.functions.invoke('normalize-freight-response', ...)`
