@@ -291,9 +291,9 @@
 - [x] **210** — `useCotacoesMulticanal`: teto no servidor e colunas explícitas — onda 6 — Alta
 - [~] **211** — Guard automatizado: consulta de listagem sem teto reprova a CI — onda 6 — Alta · **aguarda o dono**
 - [x] **212** — `Notificacoes.tsx`: teto imediato na leitura de `notifications` — onda 6 — Alta
-- [ ] **213** — `Notificacoes.tsx`: adotar `useServerPagination` como primeiro consumidor do contrato — onda 6 — Alta
-- [ ] **214** — `Notificacoes.tsx`: trocar a barra de paginação em memória pela do servidor — onda 6 — Média
-- [ ] **215** — `Notificacoes.tsx`: levar os filtros e a busca para o servidor — onda 6 — Alta
+- [x] **213** — `Notificacoes.tsx`: adotar `useServerPagination` como primeiro consumidor do contrato — onda 6 — Alta
+- [x] **214** — `Notificacoes.tsx`: trocar a barra de paginação em memória pela do servidor — onda 6 — Média
+- [x] **215** — `Notificacoes.tsx`: levar os filtros e a busca para o servidor — onda 6 — Alta
 - [ ] **216** — `Notificacoes.tsx`: o tempo real deixa de rebaixar a lista inteira a cada aviso — onda 6 — Alta
 - [ ] **217** — `useAccuracyMetaCycle`: uma única consulta a `notifications` para todas as linhas — onda 6 — Média
 - [ ] **218** — `count_prediction_breach_days`: variante que responde todas as transportadoras numa chamada — onda 6 — Média
@@ -434,6 +434,52 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapas 213, 214 e 215 (2026-11-25) - paginacao, filtro e busca no servidor (notificacoes)
+
+**Causa:** `Notificacoes.tsx` baixava ate 200 notificacoes (o `.limit(200)` da etapa 212) e resolvia o resto no
+cliente: `useFilters` varria titulo e mensagem em memoria a cada tecla, `usePagination` recortava 15 por pagina e
+`stats` contava `list.length`. Tres consequencias: (a) `useServerPagination`, o contrato da onda 6, estava escrito
+e **sem nenhum consumidor** -- nada provava que ele funciona; (b) "X de Y" mentia para quem tem mais de 200
+notificacoes, porque Y travava em 200 e as paginas seguintes vinham do array ja baixado; (c) busca e filtro eram
+O(n) no cliente.
+
+**Entrega (as tres etapas em uma PR):** as tres mexem no mesmo arquivo, entao separa-las deixaria a tela num
+estado intermediario inconsistente (pagina do servidor com filtro em memoria). A consulta saiu da tela para
+`src/hooks/data/useNotificacoesPage.ts` (novo): `.select(<7 colunas>, { count: "exact" })` -> `.eq("user_id")` ->
+`eq("type")` / `eq("read")` quando o filtro nao e `all` -> `.or(title.ilike.%x%,message.ilike.%x%)` ->
+`.order("created_at", desc)` -> `.order("id", desc)` -> `.range(from, to)`. Sem `.limit()`: junto de `.range()`
+ele corta a faixa e a ultima pagina vem vazia. O desempate por `id` e obrigatorio -- `created_at` repete em
+disparo em lote e ordem instavel faz o `.range()` repetir ou pular linha entre paginas. O termo digitado passa por
+`replace(/[%,()]/g, "")` antes de entrar no `or`, porque esses caracteres sao sintaxe do PostgREST. Os filtros
+entraram na `queryKey` (`["notifications", userId, { tipo, leitura, busca }]`), entao trocar filtro volta para a
+pagina 1 -- regra 3 do contrato, sem codigo extra. Busca com `useDebounce(..., 350)`. `stats` deixou de derivar da
+lista: sao duas consultas `head: true` (contagem exata, sem trazer linha). A `Pagination` recebe
+`totalItems={pagination.total}` e a faixa exibida e calculada do total do servidor.
+
+**Corrigido de passagem (a mudanca obrigou):** o seletor "Tipo" oferecia `coleta` e `entrega`, chaves de
+`typeConfig` que **nao existem** no enum `notification_type` do banco (`info|success|warning|error|achievement`,
+conferido em `types.ts` -- o tsc acusou TS2345). Com o filtro em memoria isso devolvia lista vazia; mandado ao
+PostgREST viraria **400 e tela de erro**. As opcoes passaram a vir de `TIPOS_NOTIFICACAO` (o enum). `typeConfig`
+ficou intacto para os icones.
+
+**Verificacao:** spec novo `tests/contracts/notificacoes-paginacao-servidor.spec.ts`, 17 casos: count exato;
+`.range` presente e `.limit` ausente no hook inteiro; os dois `.order` na ordem certa e antes do recorte; os tres
+filtros na cadeia; `ilike` em `title`/`message`; limpeza do termo; filtros na `queryKey`; `enabled: !!userId`;
+duas consultas `head: true`; tela sem `usePagination`/`useFilters`/`filteredData`; debounce alimentando a
+consulta; `useSelection(rows)`; `totalItems` do servidor (e nunca `rows.length`); faixa calculada; vazio e
+paginacao so depois de `isLoading` cair; limpar filtros zerando a busca; opcoes do seletor vindas do enum.
+**10 mutacoes** -- sem `count`, sem desempate por `id`, `.limit(200)` de volta, filtro de tipo fora da cadeia,
+filtros fora da `queryKey`, busca sem debounce, `totalItems={rows.length}`, `useSelection` com outro conjunto,
+paginacao visivel antes de `isLoading` cair e termo sem limpeza -- falham **1 caso cada**; versao correta 17/17.
+Suite completa **776/776** (92 arquivos), `tsc --noEmit` 0, `eslint .` **77 avisos / 0 erros** (orcamento 86; a
+tela caiu de 399 para 370 linhas e saiu do aviso `max-lines`), `validate:query-limits` **0 nova(s)** -- as duas
+consultas de contagem so passam porque o guard da etapa 211 reconhece `head: true` como nao-listagem (ajuste
+incluido na PR #398).
+
+**Nao verificado:** comportamento visual da paginacao depois do deploy e quantas notificacoes os usuarios reais
+tem no banco (sem credencial nesta sessao). `read_at`, `action_url` e `metadata` seguem sem uso na tela -- fora do
+escopo destas etapas.
 
 ### Registro - etapa 210 (2026-11-25) - achados P-01 e P-04 (cotacoes multicanal)
 
