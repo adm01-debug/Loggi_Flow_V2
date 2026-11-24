@@ -230,7 +230,7 @@
 - [x] **152** — `lalamove-tracking`: validar o identificador de rastreio — onda 5 — Média
 - [x] **153** — `ai-logistics-assistant`: validar e limitar o texto que vai para o modelo — onda 5 — Média
 - [x] **154** — `evolution-whatsapp`: validar `instance`, `phone` e `message` — onda 5 — Alta
-- [ ] **155** — `ocr-receipt-processor`: validar a entrada do comprovante — onda 5 — Média
+- [x] **155** — `ocr-receipt-processor`: validar a entrada do comprovante — onda 5 — Média
 - [ ] **156** — Criar `_shared/invokeFunction.ts`: chamada entre funções com tempo limite — onda 5 — Alta
 - [ ] **157** — `normalize-freight-response`: trocar o `fetch` nu para `whatsapp-notification` — onda 5 — Alta
 - [ ] **158** — `ingest-biosync`: trocar o `fetch` nu para `bitrix24-integration` — onda 5 — Média
@@ -434,6 +434,53 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapa 155 (2026-11-24) - achado B-04 (`ocr-receipt-processor`)
+
+**Causa:** `index.ts:23` (`const body = await req.json()`) alimentava `validateContract` (`:26`), que validava
+`storage_path`/`delivery_id` apenas como *texto com tamanho mínimo*, e desestruturava o mesmo corpo **cru** para
+`:48` (`supabaseAdmin.storage.from("documents").download(storage_path)`) e para os filtros `:73-74`
+(`.eq("delivery_id", ...)` / `.eq("storage_path", ...)`). Resultado: um chamador autenticado conseguia baixar
+**qualquer objeto do bucket `documents`** (contratos, anexos de outra entrega) só enviando outro caminho, e ler o
+registro de `delivery_receipts` de entrega alheia. O `minLength` não impedia travessia (`receipts/../x`) nem
+caminho absoluto.
+
+**Correção:** `parse.ts` novo com `parseReceiptRequest`, chamado no `index.ts` antes de qualquer leitura:
+`STORAGE_PATH_PATTERN` (`^receipts/[A-Za-z0-9][A-Za-z0-9._-]{0,200}$`, fecha `../`, subpasta e qualquer prefixo
+externo — o único chamador grava em `receipts/<entrega>_<timestamp>.<ext>`) com `MAX_STORAGE_PATH_LENGTH = 300`, e
+`DELIVERY_ID_PATTERN` (`^[A-Za-z0-9][A-Za-z0-9_-]{9,63}$`, formato do uuid usado no app) com teto próprio. O
+validador passado ao `validateContract` chama o mesmo parse, então o contrato registrado e a execução usam a mesma
+regra; `download`, log e os dois `.eq()` passam a usar `storagePath`/`deliveryId` validados. O `catch` devolve
+**422** via `validationErrorResponse` antes do 400 genérico de `error.message`.
+
+**Mudança de comportamento:** caminho fora de `receipts/`, com travessia, subpasta, absoluto ou acima de 300
+caracteres → **422** `{ error, field: "storage_path" }`; `delivery_id` vazio/curto/fora do formato → **422**
+`field: "delivery_id"`. Chamador conferido: `DeliveryReceiptUpload.tsx:53-54` monta
+`receipts/${entregaId}_${Date.now()}.${ext}` (uuid + timestamp) e envia em `:110-113` — continua aceito, nenhuma
+extensão é restringida (`heic`, `jpeg`, `png`, `webp`, `pdf` passam).
+
+**Fora de escopo (registrado, não tocado):** `error.message` cru na resposta (`:81-82`, B-06/etapa 178); CORS `*`
+(`:8`, etapa 193); unificação dos dois caminhos de upload (A-11); o OCR em si continua não implementado (a função
+só registra o upload e marca para revisão manual).
+
+**Evidência:**
+- `tests/contracts/ocr-receipt-entrada.spec.ts` (novo, 10 casos): caminho real do componente aceito; `heic`/`jpeg`/
+  `png`/`webp` aceitos; `../fora.pdf`, `documents/outro.pdf`, `/etc/passwd`, `receipts`, vazio e só espaços
+  recusados; `receipts/../secret.pdf`, `receipts/sub/arquivo.pdf` e `receipts/<uuid>/x.pdf` recusados; caminho acima
+  do teto recusado citando `300`; `delivery_id` nulo/vazio/curto/com espaço/numérico recusado e uuid/texto longo
+  aceitos; corpo não-objeto recusado; e o contrato da edge (usa `parseReceiptRequest(body)`, não desestrutura o corpo
+  cru, `download` recebe `storagePath`, `catch` responde 422 antes do `error.message`).
+- Mutação A — sem `pattern` no `storage_path`: 2/10 falham. B — sem `pattern` no `delivery_id`: 1/10. C — edge usa o
+  corpo cru em vez do parse: 1/10. D — `catch` sem o ramo 422: 1/10. Restaurado: 10/10.
+- `npx vitest run --coverage`: **53 arquivos / 431 testes, todos verdes**; `ocr-receipt-processor/parse.ts`
+  **100/100/100/100**; totais 75,82 / 73,45 / 78,3 / 77,96 (antes: 76/73,59/78,47/78,15).
+- `deno check` 0 = baseline 0; `deno lint` 6 = baseline 6 (4 `no-import-prefix`, `any` em `:81`, `fileData` não
+  usado), **0** no `parse.ts`; `deno fmt --check` limpo no `parse.ts`; `npx tsc --noEmit` 0; `npm run lint:budget`
+  OK (77/86).
+- **NÃO VERIFICADO:** upload + OCR reais (exigem sessão autenticada e o bucket `documents` populado) e o 422 em
+  produção. Depois do deploy, `POST /functions/v1/ocr-receipt-processor` com
+  `{"storage_path":"receipts/../x.pdf","delivery_id":"8f14e45f-ceea-467a-9c1e-1c2b3d4e5f60"}` deve devolver 422
+  com `field: "storage_path"` e **nenhum** `storage.objects` baixado no log.
 
 ### Registro - etapa 154 (2026-11-25) - achado B-04 (`evolution-whatsapp`)
 
