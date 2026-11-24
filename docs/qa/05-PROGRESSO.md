@@ -352,7 +352,7 @@
 - [x] **262** — `PLANO_FRONTEND_CONTRATOS_190_ETAPAS.md`: corrigir "43 edge functions" para 44 — onda 8 — Baixa
 - [~] **263** — Pedir ao dono o secret `SUPABASE_DB_URL`, sem o qual a fonte de contexto do banco nunca é gerada — onda 8 — Alta · **aguarda o dono**
 - [x] **264** — Rodar o produtor do contexto de banco e confirmar que `docs/contexto/supabase/` foi publicado — onda 8 — Alta · **553 arquivos publicados**
-- [~] **265** — Dizer ao agente o que fazer quando a fonte do banco não existir — onda 8 — Alta · **aguarda o dono**
+- [~] **265** — Dizer ao agente o que fazer quando a fonte do banco não existir — onda 8 — Alta · **plano B escrito nos 3 arquivos; altera protocolo, aguarda o dono**
 - [~] **266** — Fazer a ausência do snapshot do banco parar de sair verde em silêncio — onda 8 — Média · **aguarda o dono**
 
 ### Onda 0
@@ -4171,3 +4171,33 @@ teto de 86 para 80.
 
 **Ressalva para a etapa 284:** `functions` está em 73,55 contra piso 73 — 0,55 ponto de folga. Subir esse piso
 exige folga maior, senão qualquer arquivo novo sem teste derruba a suíte.
+
+## Registro da etapa 265 - plano B da fonte do banco (2026-11-25)
+
+`AGENTS.md` manda ler `docs/contexto/supabase/` como item 2, mas não dizia o que fazer quando a pasta não
+está lá. O caminho que sobrava era `docs/contexto/codigo/banco.json`, que é a origem do falso positivo de
+F-01 ("36 tabelas sem RLS" quando ao menos 32 têm, por DDL dinâmico): o produtor de código varre o código
+que fala de banco, não o banco, e não modela índice, trigger criado fora do repo nem DDL dinâmico.
+
+Os três arquivos do protocolo agora trazem o fallback explícito:
+
+- `AGENTS.md` (seção `## Banco`): plano B no MCP `SUPABASE - LOGGI FLOW V2 - MCP`, só leitura, e a ressalva
+  de que `codigo/banco.json` não serve como fonte de RLS nem de existência de objeto; a idade de cada fonte
+  no `00-INDEX.md` diz se dá para confiar nela.
+- `docs/agentes/banco.md`: seção nova `## Fonte de contexto do banco (branch contexto)`, com o plano B, a
+  regra de prevalência (MCP > retrato versionado > nada) e o aviso do `banco.json`.
+- `docs/agentes/contexto-ia.md`: o mesmo no bloco "Enquanto isso: o banco real pelo MCP".
+
+Correção de fato encontrada no caminho, no mesmo arquivo: `docs/agentes/banco.md` dizia **duas vezes** que
+"não existe workflow de apply" de DDL. Existe e é o usado nesta sessão — `.github/workflows/aplicar-migration.yml`
+(`workflow_dispatch`, inputs `arquivo` + `confirmacao=APLICAR`, `--single-transaction`, registro no ledger).
+As duas linhas foram corrigidas, com a nota de que `CONCURRENTLY` não roda dentro da transação do workflow.
+Um agente que acreditasse na versão antiga aplicaria DDL à mão pelo MCP, que é exatamente o que a regra 1 da
+ordem de migration proíbe.
+
+**Evidência**
+- `node scripts/ci/check-claude-md-integrity.mjs` -> `AGENTS.md OK: 8 secoes presentes; conjunto com
+  docs/agentes/: 73305 bytes (base HEAD: 70840 bytes em 10 arquivos, cada um >= 50% do tamanho na base)` /
+  `exit=0`
+- `grep -n "banco.json" AGENTS.md docs/agentes/banco.md docs/agentes/contexto-ia.md` -> 5 ocorrências, todas
+  com a ressalva (AGENTS.md:97, banco.md:93, contexto-ia.md:66,69,71)

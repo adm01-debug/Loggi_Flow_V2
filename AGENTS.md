@@ -89,9 +89,14 @@ divergiu da realidade → corrija no mesmo PR do fix. Responda sempre em PT-BR.
   `uwbpzfcysppwikfpnzok` é ref morto ainda citado em `index.html` e em
   `supabase/functions/send-password-reset/index.ts` — dívida, não destino.
 - As migrations do repo (hoje **250** em 2026-11-23; confira com `ls supabase/migrations/*.sql | wc -l`) são
-  histórico; o estado real é o banco ao vivo (e a fonte `supabase/` da branch
+  histórico; o estado real é o banco ao vivo (e, quando ela existir, a fonte `supabase/` da branch
   `contexto`). RLS segue o padrão `SECURITY DEFINER` (`docs/adr/0014-security-definer-rls-pattern.md`);
   exclusão é lógica, por `deleted_at` (`docs/SOFT_DELETE_POLICY.md`).
+- **Plano B da fonte do banco:** se `docs/contexto/supabase/` não existir ou o `manifest.json` dela acusar
+  erro, consulte o banco pelo MCP `SUPABASE - LOGGI FLOW V2 - MCP` (só leitura) — e **não** use
+  `docs/contexto/codigo/banco.json` como fonte de RLS nem de existência de objeto: ele não modela índice nem
+  DDL dinâmico e foi dele o falso positivo "36 tabelas sem RLS". O índice da branch (`00-INDEX.md`) publica a
+  idade de cada fonte; fonte velha se trata como ausente.
 
 ## Serviços
 

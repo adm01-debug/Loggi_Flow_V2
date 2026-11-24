@@ -9,7 +9,7 @@ duplicados, policies fora de paridade).
 | Situação | Banco | Como |
 |---|---|---|
 | Diagnóstico | **produção, só leitura** | `SELECT` pelo MCP `SUPABASE - LOGGI FLOW V2 - MCP`; nunca escrita para "testar" |
-| Migration nova | arquivo em `supabase/migrations/` | PR com o `.sql` → **chame o dono** para aplicar; não existe workflow de apply |
+| Migration nova | arquivo em `supabase/migrations/` | PR com o `.sql` → merge → **chame o dono** para disparar `aplicar-migration.yml` (`workflow_dispatch`, inputs `arquivo` + `confirmacao=APLICAR`) |
 | Teste de comportamento | suíte do repo | `npm run test:rls` / `npm run test:security` batem no PostgREST de produção com a **anon key** (sem privilégio) |
 | Migration destrutiva, segredos, rotação de chaves | **só com o dono do projeto** | — |
 
@@ -62,8 +62,10 @@ workflow que aplique DDL: quem aplica é o dono, pelo MCP.
 1. **Ordem obrigatória: arquivo → PR → merge em `main` → deploy do código → apply no banco.** Nunca DDL a
    partir de branch aberta. `REVOKE`, `DROP`, rename ou mudança de contrato de função usada pelo front/edges
    só depois do deploy do código correspondente.
-2. **Quem aplica é o dono.** Não existe workflow de apply (`deploy-functions.yml` publica edge function, não
-   DDL) nem registro automático no ledger. Abra a PR com o `.sql` e chame.
+2. **Quem autoriza é o dono.** O apply passa por `.github/workflows/aplicar-migration.yml` (`workflow_dispatch`,
+   inputs `arquivo` — já presente na `main` — e `confirmacao=APLICAR`), que roda em `--single-transaction` com
+   `ON_ERROR_STOP=1` e registra no ledger; `deploy-functions.yml` publica edge function, não DDL. Por rodar em
+   transação, `CONCURRENTLY` não funciona ali: índice assim vai por outro caminho.
 3. **Nomes de arquivo:** o histórico tem dois padrões — `<timestamp>_<uuid>.sql` (gerado pelo Lovable) e
    `<timestamp>_<slug>.sql` (escrito à mão, ex. `20260901000000_cron_jobs_canonical.sql`). Para arquivo novo
    use **slug**; nunca reaproveite um timestamp já existente e nunca renomeie migration antiga "para
@@ -79,6 +81,20 @@ workflow que aplique DDL: quem aplica é o dono, pelo MCP.
 7. Toda mudança de DDL vem com: o `.sql` versionado, o efeito em RLS declarado na PR e, se mexer em tabela
    consumida pelo front, a regeneração de `src/integrations/supabase/types.ts` (**arquivo gerado — não
    editar à mão**).
+
+## Fonte de contexto do banco (branch `contexto`)
+
+O retrato versionado do banco oficial é `docs/contexto/supabase/` na branch `contexto`, publicado por
+`.github/workflows/contexto-ia.yml` (`scripts/supabase_snapshot/`). Ele é gerado: **não edite essa branch nem
+abra PR dela**.
+
+- **Plano B:** se a pasta não existir ou o `manifest.json` acusar erro (`supabase/errors.md` traz o erro do
+  produtor para uma seção), consulte o banco pelo MCP `SUPABASE - LOGGI FLOW V2 - MCP`, só leitura.
+- **`docs/contexto/codigo/banco.json` não é fonte de banco.** Ele descreve o código que fala de banco; não
+  modela índice, trigger criado fora do repo nem DDL dinâmico — foi dele o falso positivo "36 tabelas sem
+  RLS" (ao menos 32 têm, criadas por DDL dinâmico). Para RLS, table/coluna e existência de objeto valem o
+  MCP (agora) e `docs/contexto/supabase/` (histórico); quando os dois discordarem, vale o MCP.
+- A idade de cada fonte está no `00-INDEX.md` da branch: fonte `desatualizada` se trata como ausente.
 
 ## RLS, exclusão e versionamento
 

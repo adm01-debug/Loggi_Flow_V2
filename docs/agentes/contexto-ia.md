@@ -63,6 +63,12 @@ Esse MCP conecta como **`postgres` com service_role e aceita DDL** — ele ignor
 - **DDL/migration em produção é decisão do dono** — abra PR com a migration e chame, não aplique.
 - O que o MCP responde é o estado de **agora**; o snapshot em `docs/contexto/supabase/` é o retrato
   versionado, com histórico e `CHANGELOG.md`. Quando as duas discordarem, vale o MCP (é o banco ao vivo).
+- **`docs/contexto/codigo/banco.json` não é fonte de banco.** Ele sai de `scripts/ai-context/gerar.mjs`
+  varrendo o código: não modela índice, trigger criado fora do repo nem DDL dinâmico, e foi dele o falso
+  positivo "36 tabelas sem RLS" (ao menos 32 têm policy). Existência de tabela/coluna/policy e leitura de RLS
+  saem do MCP ou de `docs/contexto/supabase/` — nunca de `codigo/banco.json`.
+- Enquanto `supabase/` estiver vazia na branch (o `00-INDEX.md` diz na linha do banco se está `ok` ou
+  `desatualizada`), o caminho é este: MCP para consultar, e nada de tirar conclusão de RLS do `banco.json`.
 
 ## Regras que só o negócio sabe
 
