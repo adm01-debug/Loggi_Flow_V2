@@ -295,7 +295,7 @@
 - [x] **214** — `Notificacoes.tsx`: trocar a barra de paginação em memória pela do servidor — onda 6 — Média
 - [x] **215** — `Notificacoes.tsx`: levar os filtros e a busca para o servidor — onda 6 — Alta
 - [ ] **216** — `Notificacoes.tsx`: o tempo real deixa de rebaixar a lista inteira a cada aviso — onda 6 — Alta
-- [ ] **217** — `useAccuracyMetaCycle`: uma única consulta a `notifications` para todas as linhas — onda 6 — Média
+- [x] **217** — `useAccuracyMetaCycle`: uma única consulta a `notifications` para todas as linhas — onda 6 — Média
 - [ ] **218** — `count_prediction_breach_days`: variante que responde todas as transportadoras numa chamada — onda 6 — Média
 - [ ] **219** — `useKPIBenchmark`: tirar os `await` de dentro do laço — onda 6 — Média
 - [ ] **220** — `useKPIBenchmark`: uma consulta por tabela cobrindo todos os períodos — onda 6 — Média
@@ -434,6 +434,48 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapa 217 (2026-11-25) - uma consulta a `notifications` (achado P-03)
+
+**Causa:** `useAccuracyMetaCycle` montava `Promise.all(rows.map(...))` e dentro do laco consultava
+`notifications` **uma vez por transportadora configurada** (`.eq("user_id")` + `.gte("created_at")` +
+`.contains("metadata", { source, carrier })` + `.limit(1)`). Com 10 transportadoras, 10 consultas quase
+identicas, diferindo so no `carrier` -- que vive dentro de um `jsonb`, e por isso o autor pediu um valor por vez.
+
+**Entrega:** antes do laco, **uma** consulta a `notifications` com so a parte comum do filtro
+(`.select("metadata")`, `.eq("user_id", uid)`, `.gte("created_at", dayAgoIso)`,
+`.contains("metadata", { source: "accuracy-meta-monitor" })`, `.order("created_at", desc)`, `.limit(500)`); o
+`carrier` de cada linha vira um `Set` em memoria e o laco passou a fazer `carriersNotificados.has(...)`. O
+`.limit(1)` do laco saiu e o teto passou a ser do conjunto -- com ordem, porque teto sobre conjunto sem ordem
+corta de forma nao deterministica. **Atalho evitado:** um `.or(...)` com um `contains` por transportadora
+estouraria o limite de tamanho de URL do PostgREST (414) justamente para quem tem muitas configuracoes.
+
+**Semantica preservada:** a chave do `Set` e o `carrier` gravado pelo monitor (`?? null` quando ausente) e a
+consulta usa `s.transportadora ?? "__all__"` -- exatamente o que o `.contains({ carrier })` antigo comparava, dos
+dois lados. So o `select` mudou de `id` para `metadata` (a linha inteira era payload morto: so o `carrier` e
+usado). A logica de `status` (`ok`/`warming`/`pending`/`notified`), a janela de 24 h, a chamada
+`supabase.rpc("count_prediction_breach_days", ...)` (etapa 218, DDL) e o `staleTime`/`refetchInterval` de 60 s
+ficaram intactos.
+
+**Verificacao:** spec de contrato novo `tests/contracts/accuracy-meta-consulta-unica.spec.ts` (9 casos): zero
+`from("notifications")` e zero `.limit(1)` dentro do `rows.map`; a consulta agregada antes do laco com os tres
+filtros e o teto **depois** da ordem; continuam duas consultas no arquivo (a agregada e a do ultimo alerta, com
+`maybeSingle`); o `Set` montado com `meta?.carrier ?? null` e consultado com `s.transportadora ?? "__all__"`;
+nenhum `contains` com `carrier`; a `rpc` intacta (`_target`/`_carrier`); o bloco de `status` comparado **byte a
+byte**. **8 mutacoes** -- consulta de volta dentro do laco, sem teto, teto sem ordem, `select("id")`, chave nula
+virando `"__all__"` na leitura, chave de busca sem o mapeamento, `>=` virando `>` no status e `_carrier: null` na
+rpc -- falham **2/1/1/1/1/1/1/1**; versao correta 9/9. Suite completa **768/768** (92 arquivos), `tsc --noEmit` 0,
+`eslint .` **77 avisos / 0 erros** (orcamento 86).
+
+**Achado nao corrigido aqui (fora do escopo):** o monitor grava o alerta "todas as transportadoras" ora como
+`carrier: "__all__"`, ora como `carrier: null` (ver `accuracy-meta-monitor/index.ts:93-95` e
+`escalation.ts:58`, que tratam os dois como variantes da mesma coisa). O hook compara so com `"__all__"`, entao
+uma notificacao gravada com `carrier: null` nao conta como "ja notificado" nesta tela. Isso **e** o comportamento
+anterior -- foi preservado de proposito, porque mexer nele muda o `status` que decide se o usuario recebe alerta
+-- e virou item de proximos passos.
+
+**Nao verificado:** o numero de consultas no navegador real e a contagem de linhas em 24 h por usuario (sem
+credencial nesta sessao). A aba Rede com o hook ativo deve mostrar 1 requisicao a `notifications`, nao N.
 
 ### Registro - etapas 213, 214 e 215 (2026-11-25) - paginacao, filtro e busca no servidor (notificacoes)
 
