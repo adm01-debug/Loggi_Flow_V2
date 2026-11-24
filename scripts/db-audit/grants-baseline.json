@@ -3,9 +3,13 @@
     "anon_execute": [
         "alert_slow_queries(threshold_ms numeric)",
         "count_prediction_breach_days(_target numeric, _carrier text)",
+        "fn_tr_valida_transicao_coleta()",
+        "fn_tr_valida_transicao_entrega()",
+        "fn_valida_transicao_coleta(p_de coleta_status, p_para coleta_status)",
+        "fn_valida_transicao_entrega(p_de entrega_status, p_para entrega_status)",
         "get_public_tracking(p_code text)"
     ],
-    "generated_at": "2026-11-20",
+    "generated_at": "2026-11-24",
     "anon_table_select": [
         "account_lockouts",
         "achievements",
@@ -125,6 +129,7 @@
         "user_levels",
         "user_notification_preferences",
         "user_onboarding",
+        "user_panel_preferences",
         "user_ranks",
         "user_roles",
         "user_sessions",
@@ -138,6 +143,6 @@
         "webhook_events_processed"
     ],
     "how_to_regenerate": "scripts/db-audit/grants-baseline.sql (E26)",
-    "service_role_execute_count": 113,
-    "authenticated_execute_count": 59
+    "service_role_execute_count": 117,
+    "authenticated_execute_count": 63
 }
