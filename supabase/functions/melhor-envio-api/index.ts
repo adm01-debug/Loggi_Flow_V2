@@ -5,6 +5,8 @@ import { getRedisClient } from "../_shared/redis.ts";
 import { log } from "../_shared/logger.ts";
 import { requireUser } from "../_shared/auth.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
+import { ValidationError, validationErrorResponse } from "../_shared/validate.ts";
+import { parseMelhorEnvioQuote } from "./parse.ts";
 
 const SANDBOX_URL = "https://sandbox.melhorenvio.com.br/api/v2";
 const PRODUCTION_URL = "https://melhorenvio.com.br/api/v2";
@@ -74,8 +76,9 @@ Deno.serve(async (req) => {
     switch (action) {
       // === COTAÇÃO ===
       case "calcularFrete": {
+        const quote = parseMelhorEnvioQuote(params);
         const redis = getRedisClient();
-        const cacheKey = `me_quote_${btoa(JSON.stringify(params))}`;
+        const cacheKey = `me_quote_${btoa(JSON.stringify(quote))}`;
         if (redis) {
           try {
             const cached = await redis.get(cacheKey);
@@ -91,7 +94,7 @@ Deno.serve(async (req) => {
 
         url = `${baseUrl}/me/shipment/calculate`;
         method = "POST";
-        fetchBody = JSON.stringify(params);
+        fetchBody = JSON.stringify(quote);
 
         const response = await meBreaker.execute(async () => {
           const res = await safeFetch(url, { method, headers, body: fetchBody });
@@ -341,6 +344,10 @@ Deno.serve(async (req) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
+    if (error instanceof ValidationError) {
+      return validationErrorResponse(error, corsHeaders);
+    }
+
     const isBreaker = (error as Error).message.includes('Circuit Breaker');
     log({ level: 'ERROR', message: `Melhor Envio function failure`, meta: { error: (error as Error).message } });
     
