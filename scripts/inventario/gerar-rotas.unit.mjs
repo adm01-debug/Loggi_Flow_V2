@@ -472,7 +472,8 @@ test('repo real: o parser enxerga todas as <Route> de src/App.tsx e todos os ite
   assert.ok(inv.urls.some((u) => !u.protegida) && inv.urls.some((u) => u.protegida));
 
   const menu = fs.readFileSync(path.join(REPO, 'src/components/layout/AppSidebar.tsx'), 'utf8');
-  const itens = menu.split('\n').filter((l) => /^\s*\{\s*title:\s*["'].*\burl:\s*["']/.test(l)).length;
+  // Titulo longo quebra o item em varias linhas: conta ocorrencias de `url: "..."`, nao linhas.
+  const itens = [...menu.matchAll(/\burl:\s*["'`]/g)].length;
   const fixos = new Set([...menu.matchAll(/\bto="(\/[^"]*)"/g)].map((m) => m[1]));
   assert.ok(itens > 0);
   assert.ok(inv.resumo.itens_de_menu >= itens && inv.resumo.itens_de_menu <= itens + fixos.size);
