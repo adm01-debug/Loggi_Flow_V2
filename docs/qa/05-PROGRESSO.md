@@ -289,7 +289,7 @@
 - [x] **208** — `useLogisticsCalendar`: pôr teto na leitura de `entregas` — onda 6 — Alta
 - [x] **209** — `useLogisticsCalendar`: filtrar no servidor pelo mês que está na tela — onda 6 — Alta
 - [x] **210** — `useCotacoesMulticanal`: teto no servidor e colunas explícitas — onda 6 — Alta
-- [~] **211** — Guard automatizado: consulta de listagem sem teto reprova a CI — onda 6 — Alta · **aguarda o dono**
+- [x] **211** — Guard automatizado: consulta de listagem sem teto reprova a CI — onda 6 — Alta
 - [x] **212** — `Notificacoes.tsx`: teto imediato na leitura de `notifications` — onda 6 — Alta
 - [x] **213** — `Notificacoes.tsx`: adotar `useServerPagination` como primeiro consumidor do contrato — onda 6 — Alta
 - [x] **214** — `Notificacoes.tsx`: trocar a barra de paginação em memória pela do servidor — onda 6 — Média
@@ -3824,3 +3824,5 @@ Uma linha por etapa concluída. A coluna **Evidência** é o que diferencia etap
 |       |     |           |                    |                          |
 
 ---
+
+

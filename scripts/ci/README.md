@@ -192,6 +192,51 @@ lança quando o caminho — seguidos os links, inclusive link cujo alvo ainda n�
 do diretório temporário; `executadoDiretamente(import.meta.url)` diz se o módulo é o ponto de entrada (vale
 com checkout atrás de link simbólico e em caminho com espaço ou acento).
 
+## `validate-query-limits.mjs` — teto nas consultas de listagem
+
+Impede que volte o achado **P-01** do plano QA: uma listagem que busca a tabela inteira
+(`supabase.from(<tabela>).select(...)` sem teto). O repositório já tem 16 listagens certas com tetos entre 1
+e 5000 e ainda 61 cadeias sem teto nenhum — a regra existia só na cabeça de quem revisa.
+
+Varre `src/` (ignora `*.test.*`, `*.spec.*`, `*.d.ts`), encontra cada `.from(<tabela>)` cuja cadeia tem
+`.select` e considera **com teto** quando a cadeia termina em `.limit(`, `.range(`, `.single(` ou
+`.maybeSingle(`, quando a consulta so pede contagem (`head: true`, o servidor nao devolve linha), **ou** quando o teto entra depois na variável que recebeu a consulta
+(`let query = supabase.from(...); ... await query.order(...).limit(500)`), padrão legítimo de
+`useSecurityEvents.ts` e `useConciliacao.tsx`. A busca do teto adiado é sintática, com janela de 2000
+caracteres: um `.limit()` de outro fluxo, mais adiante no arquivo, não conta.
+
+Duas listas de exceção ficam em `scripts/ci/query-limits.allowlist.json`:
+
+- `tabelas` — domínio pequeno, sem teto **de propósito**, cada uma com o motivo numa linha
+  (`transportadoras`, `clientes`, `fornecedores`, `permissions`, `achievements`, `reward_items`,
+  `feature_flags`, `tabelas_frete`, `transportadora_rotas`).
+- `baseline` — dívida congelada por par `arquivo:tabela`, no formato da catraca de avisos e da catraca de
+  tipos: a contagem pode ficar igual ou cair, nunca subir. Consulta nova sem teto em arquivo já listado
+  reprova, porque a contagem do par sobe.
+
+### Como rodar
+
+```sh
+npm run validate:query-limits              # falha (saída 1) se aparecer dívida nova
+npm run validate:query-limits -- --warn     # mesmo relatório, saída 0 (primeiro ciclo, sem bloquear PR)
+npm run validate:query-limits -- --json     # relatório estruturado
+npm run validate:query-limits -- --update-baseline   # regrava a dívida congelada (catraca)
+node --test scripts/ci/validate-query-limits.unit.mjs
+```
+
+`--root <raiz>` e `--allowlist <arquivo>` trocam o repositório e a allowlist (usados pelos testes com
+repositório sintético). Sem `src/` o script reprova em vez de dar verde falso.
+
+### Quando ele falha
+
+- Você escreveu listagem nova sem teto → acrescente `.limit(<n>)` **depois** do `.order()` (ordering antes do
+  corte; cortar sem ordenar devolve linhas arbitrárias) ou pagine com `.range()`.
+- A tabela é de domínio pequeno e o teto não faz sentido → declare em `tabelas`, com o motivo.
+- Você **consertou** uma dívida congelada → rode `--update-baseline` no mesmo commit para apertar a catraca; a
+  saída normal já avisa quando uma entrada do baseline deixou de existir.
+
+No CI roda no job `quality-gate` do `.github/workflows/ci-nexus.yml`, logo depois de `validate:no-console`.
+
 ## Testes
 
 `node:test`, offline, sem credencial: `gh` falso no PATH, `fetch` trocado via `--import`, servidor HTTP local,
