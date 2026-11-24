@@ -398,7 +398,7 @@
 - [x] **296** — Regerar a branch `contexto` para que as fontes reflitam o código corrigido — onda 8 — Média · **regerada em 2026-11-24** (run `45410194923`)
 - [x] **297** — Atualizar `03-ACHADOS.md` e `05-PROGRESSO.md` com o estado final de cada achado — onda 8 — Alta
 - [x] **298** — Reler o plano inteiro e registrar o que ficou sem etapa executada — onda 8 — Alta
-- [~] **299** — Rodar a bateria completa de gates e comparar com os números do começo — onda 8 — Alta · **aguarda o dono**
+- [~] **299** — Rodar a bateria completa de gates e comparar com os números do começo — onda 8 — Alta · **bateria inteira rodada em 2026-11-24 sobre a `main` (`e42bbf85`); nada piorou, lint caiu de 105 para 80; falta o `lint:budget:ratchet`, que a própria etapa proíbe com PR pendente de merge**
 - [x] **300** — Relatório final de uma página para o dono — onda 8 — Alta
 
 ---
@@ -4128,3 +4128,46 @@ Consultas feitas em **2026-11-24** contra o projeto `jvfhclubfpxrtrrazrgr` pela 
   Supabase; a etapa 010 já pede a mesma confirmação.
 - **S-08 — SEGUE ABERTO (dono).** Restrição de URL do token `VITE_MAPBOX_TOKEN` só existe no painel do Mapbox;
   a etapa 019 já pede a mesma confirmação.
+
+
+## Registro da etapa 299 — bateria completa de gates: início × fim
+
+Medido em **2026-11-24** sobre a `main` (`e42bbf85`), em worktree limpo com `node_modules` do checkout. A coluna
+"início" é a `02-CENARIOS.md` §0 (E1–E11).
+
+| # | Gate | Início (02-CENARIOS §0) | Fim (medido hoje) | Diferença |
+| --- | --- | --- | --- | --- |
+| E1 | `npx tsc --noEmit` | 0 erros | **0 erros**, exit 0 | igual |
+| E2 | `npx eslint .` | 105 avisos, 0 erros | **80 avisos, 0 erros** | **−25 avisos** |
+| E3 | `npm run lint:budget` | 105/105 (no teto exato) | **80 / 86**, 0/0 erros | −25 avisos + 6 de margem |
+| E4 | `npm run validate:csp` | OK | **OK** | igual |
+| E5 | `npm run validate:no-console` | OK, 107 arquivos | **OK, 120 arquivos** | +13 arquivos cobertos |
+| E6 | `npm run security-scan` | OK + aviso de allowlist (`xlsx`, `vite`, `picomatch`) | **OK + o mesmo aviso** | igual — etapa 270 pendente |
+| E7 | `npm audit --json` | 0 em todas as severidades | **0** (critical 0, high 0, moderate 0, low 0) | igual |
+| E8 | `git ls-files .env` / `check-ignore` | rastreado e fora do `.gitignore` | **não rastreado e ignorado** | **corrigido** |
+| E9 | chaves em arquivo versionado | todas `"role":"anon"` | `docs/ops/cron_jobs_origem.json` **não contém chave nenhuma** | não se aplica mais |
+| E10 | visibilidade do repositório | `public` | **`public`** | igual — etapas 016/017 aguardam o dono |
+| E11 | funções SQL | 119 nas migrations: 83 definer com `search_path`, 2 sem, 34 não-definer | **117 no catálogo: 102 definer, 102 com `search_path`, 0 sem**, 15 invoker | **0 definer sem `search_path`** |
+
+Gates que o plano acrescentou depois da linha de base:
+
+| Gate | Resultado |
+| --- | --- |
+| `npm run test:rls` | 19 testes, 2 arquivos, todos passando |
+| `npm run test:security` | 19 testes, 2 arquivos, todos passando |
+| `npx vitest run` | **101 arquivos, 852 testes, 0 falha** (28 s) |
+| `npx vitest run --coverage` | statements **75,9** · branches **69,93** · functions **73,55** · lines **78,05** contra os pisos 70/67/73/72 |
+
+**Nenhuma linha piorou.** Duas não chegaram ao esperado, e não por regressão: E6 continua com o aviso de
+allowlist sem efeito porque a etapa 270 (que remove as três entradas) ainda não foi executada; E10 continua
+público porque a visibilidade é decisão do dono (etapas 016/017). Na E11 a contagem caiu de 119 para 117 porque
+o número de partida saiu das migrations (última definição de cada nome) e o de hoje sai do catálogo vivo — o dado
+que importa é que **não sobrou nenhuma `SECURITY DEFINER` sem `search_path`**.
+
+**`lint:budget:ratchet` NÃO foi rodado, de propósito.** A etapa manda rodar só quando nenhuma etapa estiver
+pendente de merge, e hoje há cinco PRs abertas (#428, #430, #431, #433, #434). Cravar o teto em 80 agora faria a
+próxima PR do plano reprovar por um aviso novo — é exatamente o H-10. Quando o lote mergear, o ratchet leva o
+teto de 86 para 80.
+
+**Ressalva para a etapa 284:** `functions` está em 73,55 contra piso 73 — 0,55 ponto de folga. Subir esse piso
+exige folga maior, senão qualquer arquivo novo sem teste derruba a suíte.
