@@ -234,7 +234,7 @@
 - [x] **156** — Criar `_shared/invokeFunction.ts`: chamada entre funções com tempo limite — onda 5 — Alta
 - [x] **157** — `normalize-freight-response`: trocar o `fetch` nu para `whatsapp-notification` — onda 5 — Alta
 - [x] **158** — `ingest-biosync`: trocar o `fetch` nu para `bitrix24-integration` — onda 5 — Média
-- [ ] **159** — `nexus-webhook-receiver`: tempo limite nas duas chamadas internas dentro do webhook — onda 5 — **Crítica**
+- [x] **159** — `nexus-webhook-receiver`: tempo limite nas duas chamadas internas dentro do webhook — onda 5 — **Crítica**
 - [ ] **160** — `send-password-reset`: tempo limite na chamada interna — onda 5 — Alta
 - [ ] **161** — `predict-delays` e `predict-delays-scheduled`: tempo limite nas chamadas internas — onda 5 — Média
 - [ ] **162** — `accuracy-meta-monitor`: tempo limite nas duas chamadas internas — onda 5 — Média
@@ -434,6 +434,35 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapa 159 (2026-11-25) - achado B-05 (`nexus-webhook-receiver`)
+
+**Causa:** `index.ts:141` e `:154` chamavam `supabaseClient.functions.invoke('normalize-freight-response', ...)`
+**dentro do caminho do webhook**, e o resultado ia na resposta à transportadora. `functions.invoke` não aceita tempo
+limite: se a normalização travasse, a resposta demorava, a transportadora reenviava — e o reenvio caía em B-01/B-02,
+duplicando dado.
+
+**Correção:** as duas chamadas passaram a usar `invokeFunction` (etapa 156) com `timeoutMs: NORMALIZE_TIMEOUT_MS`
+(5 s, `:11`) — 5 s porque do outro lado está a transportadora esperando. O corpo enviado é o mesmo
+(`{ text, transportadora_id, cotacao_id }`). Quando a chamada falha (`!normalizacao.ok`, `:171` e `:190`), um
+`log.warn` registra `{ reason }` e a resposta segue **200** com o campo nulo: `normalization: null` no evento do
+WhatsApp (`:176`) e `data: null` no webhook genérico (`:194`). Nenhum `throw` novo.
+
+**Pré-requisito confirmado:** a idempotência das etapas 138-140 está aplicada — `claimIdempotencyKey` em `:105`,
+**antes** das chamadas internas (há teste guardando essa ordem). Responder rápido só é seguro porque o evento já foi
+reivindicado.
+
+**Mudança de comportamento:** a resposta ao Nexus pode vir sem o resultado da normalização (campo nulo) quando o
+gateway demora mais de 5 s. A normalização continua acontecendo do outro lado, de forma assíncrona; quem consome a
+resposta precisa tolerar `null` nesse campo.
+
+**Evidência:** `grep -n 'functions.invoke|invokeFunction' supabase/functions/nexus-webhook-receiver/index.ts` ->
+nenhum `functions.invoke`; `invokeFunction` importado em `:9` e usado em `:165` e `:184`, ambos com `timeoutMs`.
+
+**NAO VERIFICADO:** latência real de ponta a ponta com um evento do Nexus em produção (exige o segredo do webhook).
+
+**Fora de escopo (registrado, não tocado):** `error.message` cru (`:202`, etapa 174); HMAC (`:36-44`, etapa 001);
+chave determinística (`:80`/`:105`, etapa 140); CORS `*` (é webhook servidor-a-servidor).
 
 ### Registro - etapa 158 (2026-11-25) - achado B-05 (`ingest-biosync`)
 
