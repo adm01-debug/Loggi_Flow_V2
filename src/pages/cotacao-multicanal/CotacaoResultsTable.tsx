@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { CheckCircle2, Clock, AlertCircle, DollarSign, Globe, MessageCircle, Mail, Star } from "lucide-react";
-import type { CotacaoManual } from "./types";
+import type { CotacaoMulticanal } from "@/hooks/logistics/useCotacoesMulticanal";
 
 function canalBadge(canal: string) {
   switch (canal) {
@@ -19,17 +19,27 @@ function statusBadge(status: string) {
     case 'respondido': return <Badge variant="default" className="bg-success"><CheckCircle2 className="w-3 h-3 mr-1" />Respondido</Badge>;
     case 'pendente': return <Badge variant="secondary"><Clock className="w-3 h-3 mr-1" />Pendente</Badge>;
     case 'expirado': return <Badge variant="destructive"><AlertCircle className="w-3 h-3 mr-1" />Expirado</Badge>;
+    case 'selecionado': return <Badge className="bg-primary/10 text-primary border-primary/20"><Star className="w-3 h-3 mr-1" />Selecionada</Badge>;
     default: return null;
   }
 }
 
 interface CotacaoResultsTableProps {
-  cotacoes: CotacaoManual[];
-  melhorCotacao: CotacaoManual | null;
-  onRegistrar: (transportadoraId: string) => void;
+  cotacoes: CotacaoMulticanal[];
+  melhorCotacao: CotacaoMulticanal | null;
+  onRegistrar: (cotacaoId: string) => void;
+  onEscolher: (cotacaoId: string) => void;
 }
 
-export function CotacaoResultsTable({ cotacoes, melhorCotacao, onRegistrar }: CotacaoResultsTableProps) {
+function nomeTransportadora(cotacao: CotacaoMulticanal) {
+  return (
+    cotacao.transportadora?.nome_fantasia ||
+    cotacao.transportadora?.razao_social ||
+    "Transportadora não identificada"
+  );
+}
+
+export function CotacaoResultsTable({ cotacoes, melhorCotacao, onRegistrar, onEscolher }: CotacaoResultsTableProps) {
   if (cotacoes.length === 0) return null;
 
   return (
@@ -41,7 +51,8 @@ export function CotacaoResultsTable({ cotacoes, melhorCotacao, onRegistrar }: Co
         </CardTitle>
         {melhorCotacao && (
           <CardDescription>
-            🏆 Melhor cotação: <strong>{melhorCotacao.transportadora_nome}</strong> — R$ {melhorCotacao.valor?.toFixed(2)}
+            🏆 Melhor cotação: <strong>{nomeTransportadora(melhorCotacao)}</strong> — R${" "}
+            {melhorCotacao.valor_cotado?.toFixed(2)}
           </CardDescription>
         )}
       </CardHeader>
@@ -60,26 +71,31 @@ export function CotacaoResultsTable({ cotacoes, melhorCotacao, onRegistrar }: Co
           </TableHeader>
           <TableBody>
             {[...cotacoes].sort((a, b) => {
-              if (a.valor === null) return 1;
-              if (b.valor === null) return -1;
-              return a.valor - b.valor;
+              if (a.valor_cotado === null) return 1;
+              if (b.valor_cotado === null) return -1;
+              return a.valor_cotado - b.valor_cotado;
             }).map((cot) => (
               <TableRow key={cot.id} className={melhorCotacao?.id === cot.id ? 'bg-success/5' : ''}>
                 <TableCell className="font-medium">
                   {melhorCotacao?.id === cot.id && <Star className="w-4 h-4 text-warning inline mr-1" />}
-                  {cot.transportadora_nome}
+                  {nomeTransportadora(cot)}
                 </TableCell>
                 <TableCell>{canalBadge(cot.canal)}</TableCell>
                 <TableCell className="font-semibold">
-                  {cot.valor !== null ? `R$ ${cot.valor.toFixed(2)}` : '-'}
+                  {cot.valor_cotado !== null ? `R$ ${cot.valor_cotado.toFixed(2)}` : '-'}
                 </TableCell>
                 <TableCell>{cot.prazo_dias !== null ? `${cot.prazo_dias} dias` : '-'}</TableCell>
                 <TableCell>{statusBadge(cot.status)}</TableCell>
-                <TableCell className="text-xs text-muted-foreground max-w-[200px] truncate">{cot.observacoes}</TableCell>
+                <TableCell className="text-xs text-muted-foreground max-w-[200px] truncate">{cot.observacoes ?? ""}</TableCell>
                 <TableCell>
                   {cot.status === 'pendente' && (
-                    <Button size="sm" variant="outline" onClick={() => onRegistrar(cot.transportadora_id)}>
+                    <Button size="sm" variant="outline" onClick={() => onRegistrar(cot.id)}>
                       Registrar
+                    </Button>
+                  )}
+                  {cot.status === 'respondido' && (
+                    <Button size="sm" onClick={() => onEscolher(cot.id)}>
+                      Escolher
                     </Button>
                   )}
                 </TableCell>

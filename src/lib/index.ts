@@ -3,12 +3,11 @@
 // ============================================
 
 // Core Utilities
-export { cn } from './utils';
-
+export { cn } from "./utils";
 
 // Import/Export
-export { importCSV, generateCSVTemplate, downloadCSV } from './csvImporter';
-export { importExcel, exportToExcel } from './excelImporter';
+export { importCSV, generateCSVTemplate, downloadCSV } from "./csvImporter";
+export { importExcel, exportToExcel } from "./excelImporter";
 
 // Formatters
 export {
@@ -28,7 +27,7 @@ export {
   formatFileSize,
   formatDuration,
   formatHours,
-} from './formatters';
+} from "./formatters";
 
 // Validations
 export {
@@ -51,7 +50,7 @@ export {
   type EntregaForm,
   type OcorrenciaForm,
   type FreteInternoForm,
-} from './validations';
+} from "./validations";
 
 // Constants
 export {
@@ -69,10 +68,10 @@ export {
   API_ENDPOINTS,
   CHART_COLORS,
   KEYBOARD_SHORTCUTS,
-} from './constants';
+} from "./constants";
 
 // Query Configuration
-export { QUERY_STALE_TIME, QUERY_REFETCH_INTERVAL } from './queryConfig';
+export { QUERY_STALE_TIME, QUERY_REFETCH_INTERVAL } from "./queryConfig";
 
 // Status Transitions
 export {
@@ -82,3 +81,6 @@ export {
   podeTransicionarColeta,
 } from "./statusTransitions";
 export type { EntregaStatus, ColetaStatus } from "./statusTransitions";
+
+// Travamento otimista (conflito de versao)
+export { assertAtualizou, MENSAGEM_CONFLITO_VERSAO } from "./conflitoVersao";

@@ -811,6 +811,22 @@
       "manual": ["node", "scripts/validate-no-console.mjs"],
       "triggers": ["manual"],
       "reason": "Legado mantido no fluxo existente; referências literais: package.json:scripts, .github/workflows/scripts-tests.yml. O dispatcher não executa esta operação."
+    },
+    {
+      "id": "legacy-59ef5bf6d0ba84fc",
+      "kind": "legacy",
+      "files": ["scripts/ci/validate-query-limits.mjs"],
+      "manual": ["node", "scripts/ci/validate-query-limits.mjs"],
+      "triggers": ["manual"],
+      "reason": "Legado mantido no fluxo existente; referencias literais: package.json:scripts, .github/workflows/ci-nexus.yml. O dispatcher nao executa esta operacao."
+    },
+    {
+      "id": "legacy-fa69b0ca78ff6444",
+      "kind": "legacy",
+      "files": ["scripts/ci/validate-query-limits.unit.mjs"],
+      "manual": ["node", "--test", "scripts/ci/validate-query-limits.unit.mjs"],
+      "triggers": ["manual"],
+      "reason": "Legado sem chamador literal no inventario; execucao manual controlada. O runner de scripts-tests.yml o coleta por padrao (*.unit.mjs). O dispatcher nao executa esta operacao."
     }
   ],
   "ci": [

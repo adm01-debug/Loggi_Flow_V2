@@ -51,9 +51,9 @@
 
 ### Onda 0
 
-- [ ] **020** — Gerador de contexto: parar de afirmar "sem RLS" quando o arquivo tem DDL dinâmico — onda 0 — Alta
-- [ ] **021** — Separar, nos resumos gerados, "tabela sem RLS" de "não deu para saber" — onda 0 — Alta
-- [ ] **022** — Teste de regressão: partição protegida por `DO $$` não pode aparecer como "sem RLS" — onda 0 — Média
+- [x] **020** — Gerador de contexto: parar de afirmar "sem RLS" quando o arquivo tem DDL dinâmico — onda 0 — Alta
+- [x] **021** — Separar, nos resumos gerados, "tabela sem RLS" de "não deu para saber" — onda 0 — Alta
+- [x] **022** — Teste de regressão: partição protegida por `DO $$` não pode aparecer como "sem RLS" — onda 0 — Média
 
 ### Onda 1
 
@@ -71,21 +71,21 @@
 - [~] **031** — Levar a regra "não despacha sem nota fiscal" para o banco — onda 3 — Crítica · **aguarda o dono**
 - [~] **032** — Testar função, triggers e regra da NF num Postgres descartável, antes de produção — onda 3 — Crítica · **aguarda o dono**
 - [~] **033** — Aplicar as migrações da máquina de estados no banco, com o dono presente — onda 3 — Crítica · **aguarda o dono**
-- [ ] **034** — Extrair o mapa de transições para um módulo compartilhado, completo e testado — onda 3 — Alta
+- [x] **034** — Extrair o mapa de transições para um módulo compartilhado, completo e testado — onda 3 — Alta
 - [x] **035** — `Despachos` passa a usar o mapa compartilhado — onda 3 — Alta
 - [x] **036** — `KanbanEntregas` valida a transição antes de gravar — onda 3 — Alta
-- [ ] **037** — Traduzir a recusa do banco em mensagem que o operador entende — onda 3 — Média
-- [ ] **038** — `CotacaoMultiCanal`: a tabela da tela passa a ler do banco, não do `useState` — onda 3 — Crítica
-- [ ] **039** — Registrar a resposta da transportadora no banco, não na memória — onda 3 — Crítica
-- [ ] **040** — Marcar no banco qual cotação foi a escolhida — onda 3 — Alta
-- [ ] **041** — "Nexus Blast" e o envio por e-mail passam a criar a cotação no banco — onda 3 — Alta
-- [ ] **042** — Mostrar carregando, erro e vazio na tela de cotação multicanal — onda 3 — Média
+- [~] **037** — Traduzir a recusa do banco em mensagem que o operador entende — onda 3 — Média · **código neste PR; verificação em runtime depende da 033 (dono)**
+- [x] **038** — `CotacaoMultiCanal`: a tabela da tela passa a ler do banco, não do `useState` — onda 3 — Crítica
+- [~] **039** — Registrar a resposta da transportadora no banco, não na memória — onda 3 — Crítica — **código no PR da 038; aguarda verificação em runtime (registrar resposta e conferir `valor_cotado`/`responded_at` no banco)**
+- [x] **040** — Marcar no banco qual cotação foi a escolhida — onda 3 — Alta
+- [~] **041** — "Nexus Blast" e o envio por e-mail passam a criar a cotação no banco — onda 3 — Alta — **código já entregue na 038; verificação em runtime depende de credencial de transportadora (dono)**
+- [x] **042** — Mostrar carregando, erro e vazio na tela de cotação multicanal — onda 3 — Média
 - [~] **043** — Decidir com o dono o que fazer com as duas telas de cotação — onda 3 — Alta · **aguarda o dono**
-- [ ] **044** — `Despachos`: avisar quando o avanço de status não gravou — onda 3 — Alta
-- [ ] **045** — `Despachos`: avisar quando a autorização de despacho final não gravou — onda 3 — Alta
-- [ ] **046** — BOX: não registrar alocação no histórico quando a alocação não aconteceu — onda 3 — Alta
-- [ ] **047** — Parar de mandar `version + 1` do navegador no Kanban — onda 3 — Média
-- [ ] **048** — Extrair a checagem de conflito para um utilitário, com teste — onda 3 — Média
+- [x] **044** — `Despachos`: avisar quando o avanço de status não gravou — onda 3 — Alta
+- [x] **045** — `Despachos`: avisar quando a autorização de despacho final não gravou — onda 3 — Alta
+- [x] **046** — BOX: não registrar alocação no histórico quando a alocação não aconteceu — onda 3 — Alta
+- [x] **047** — Parar de mandar `version + 1` do navegador no Kanban — onda 3 — Média
+- [x] **048** — Extrair a checagem de conflito para um utilitário, com teste — onda 3 — Média
 
 ### Onda 1
 
@@ -131,15 +131,15 @@
 - [x] **079** — Teste unitário da validação de assinatura de arquivo — onda 4 — Média
 - [x] **080** — Provar, arquivo por arquivo, quais dos oito "hooks sem importador" estão realmente mortos — onda 4 — Baixa
   <!-- Veredictos (261123):
-      1. components/accessibility/index.ts — VIVO por caminho direto (SkipLinks, LiveRegionProvider, ReducedMotionProvider importados em MainLayout.tsx:13, LazyProviders.tsx:8-9)
-      2. components/common/index.ts — VIVO (barril; exports EmptyState, ConfirmDialog, Pagination… em uso por caminhos diretos)
-      3. components/pwa/index.ts — VIVO por caminho direto (OfflineBanner, InstallPrompt, UpdatePrompt em MainLayout.tsx:14,47,52)
-      4. hooks/gamification/useGamification.ts — VIVO (importado por GamificationPanel, LevelUpModal, AppSidebar, Header, FavoriteMetricsBar via caminho sem extensão)
-         hooks/gamification/useGamification.tsx — INDEFINIDO: 349 linhas vs .ts 259, implementações divergem; comentário P18 em authService.ts:43 indica .tsx como schema em uso; aguarda decisão do dono
-      5. hooks/rodonaves/index.ts — VIVO por caminho direto (useSLOTargets, useSLOSnapshots, useGatewayHealth importados em RTEGateway* panels)
-      6. hooks/ai/useNexusSimulator.ts — REMOVIDO em etapa 069 (PR #300)
-      7. hooks/security/useSelfHealing.ts — REMOVIDO em etapa 068 (PR #300)
-      8. utils/performance.ts — MORTO: useRenderingMonitor e measureAction sem nenhum importador (grep -rn "useRenderingMonitor\|measureAction" src/ → vazio) -->
+                      1. components/accessibility/index.ts — VIVO por caminho direto (SkipLinks, LiveRegionProvider, ReducedMotionProvider importados em MainLayout.tsx:13, LazyProviders.tsx:8-9)
+                      2. components/common/index.ts — VIVO (barril; exports EmptyState, ConfirmDialog, Pagination… em uso por caminhos diretos)
+                      3. components/pwa/index.ts — VIVO por caminho direto (OfflineBanner, InstallPrompt, UpdatePrompt em MainLayout.tsx:14,47,52)
+                      4. hooks/gamification/useGamification.ts — VIVO (importado por GamificationPanel, LevelUpModal, AppSidebar, Header, FavoriteMetricsBar via caminho sem extensão)
+                         hooks/gamification/useGamification.tsx — INDEFINIDO: 349 linhas vs .ts 259, implementações divergem; comentário P18 em authService.ts:43 indica .tsx como schema em uso; aguarda decisão do dono
+                      5. hooks/rodonaves/index.ts — VIVO por caminho direto (useSLOTargets, useSLOSnapshots, useGatewayHealth importados em RTEGateway* panels)
+                      6. hooks/ai/useNexusSimulator.ts — REMOVIDO em etapa 069 (PR #300)
+                      7. hooks/security/useSelfHealing.ts — REMOVIDO em etapa 068 (PR #300)
+                      8. utils/performance.ts — MORTO: useRenderingMonitor e measureAction sem nenhum importador (grep -rn "useRenderingMonitor\|measureAction" src/ → vazio) -->
 - [x] **081** — Remover só o que a etapa 080 provou morto — onda 4 — Baixa
   <!-- Removido: src/utils/performance.ts (useRenderingMonitor + measureAction, zero importadores) -->
 - [x] **082** — Remover `_shared/service-wrapper.ts`, que nenhuma função usa — onda 4 — Baixa
@@ -289,23 +289,23 @@
 - [x] **208** — `useLogisticsCalendar`: pôr teto na leitura de `entregas` — onda 6 — Alta
 - [x] **209** — `useLogisticsCalendar`: filtrar no servidor pelo mês que está na tela — onda 6 — Alta
 - [x] **210** — `useCotacoesMulticanal`: teto no servidor e colunas explícitas — onda 6 — Alta
-- [~] **211** — Guard automatizado: consulta de listagem sem teto reprova a CI — onda 6 — Alta · **aguarda o dono (PR #398)**
+- [x] **211** — Guard automatizado: consulta de listagem sem teto reprova a CI — onda 6 — Alta
 - [x] **212** — `Notificacoes.tsx`: teto imediato na leitura de `notifications` — onda 6 — Alta
-- [ ] **213** — `Notificacoes.tsx`: adotar `useServerPagination` como primeiro consumidor do contrato — onda 6 — Alta
-- [ ] **214** — `Notificacoes.tsx`: trocar a barra de paginação em memória pela do servidor — onda 6 — Média
-- [ ] **215** — `Notificacoes.tsx`: levar os filtros e a busca para o servidor — onda 6 — Alta
-- [ ] **216** — `Notificacoes.tsx`: o tempo real deixa de rebaixar a lista inteira a cada aviso — onda 6 — Alta
-- [ ] **217** — `useAccuracyMetaCycle`: uma única consulta a `notifications` para todas as linhas — onda 6 — Média
+- [x] **213** — `Notificacoes.tsx`: adotar `useServerPagination` como primeiro consumidor do contrato — onda 6 — Alta
+- [x] **214** — `Notificacoes.tsx`: trocar a barra de paginação em memória pela do servidor — onda 6 — Média
+- [x] **215** — `Notificacoes.tsx`: levar os filtros e a busca para o servidor — onda 6 — Alta
+- [x] **216** — `Notificacoes.tsx`: o tempo real deixa de rebaixar a lista inteira a cada aviso — onda 6 — Alta
+- [x] **217** — `useAccuracyMetaCycle`: uma única consulta a `notifications` para todas as linhas — onda 6 — Média
 - [ ] **218** — `count_prediction_breach_days`: variante que responde todas as transportadoras numa chamada — onda 6 — Média
-- [ ] **219** — `useKPIBenchmark`: tirar os `await` de dentro do laço — onda 6 — Média
-- [ ] **220** — `useKPIBenchmark`: uma consulta por tabela cobrindo todos os períodos — onda 6 — Média
-- [ ] **221** — `useExecutiveMetrics`: mesma consolidação de 18 consultas para 3 — onda 6 — Baixa
-- [~] **222** — Conferir `types.ts` contra o banco ao vivo e regenerar se houver divergência — onda 6 — Média · **aguarda o dono**
-- [ ] **223** — `Envios.tsx`: trocar `select("*")` por colunas explícitas em `entregas` — onda 6 — Média
+- [x] **219** — `useKPIBenchmark`: tirar os `await` de dentro do laço — onda 6 — Média
+- [x] **220** — `useKPIBenchmark`: uma consulta por tabela cobrindo todos os períodos — onda 6 — Média
+- [x] **221** — `useExecutiveMetrics`: mesma consolidação de 18 consultas para 3 — onda 6 — Baixa
+- [~] **222** — Conferir `types.ts` contra o banco ao vivo e regenerar se houver divergência — onda 6 — Média · **aguarda o dono** (aplicar a migration `20261121153649_user_panel_preferences` - A-04)
+- [x] **223** — `Envios.tsx`: trocar `select("*")` por colunas explícitas em `entregas` — onda 6 — Média
 - [x] **224** — `Coletas.tsx`: trocar `select("*")` por colunas explícitas em `coletas` — onda 6 — Média
-- [ ] **225** — `useDrillDown`: colunas explícitas nas duas leituras — onda 6 — Baixa
-- [ ] **226** — `useSLANotifications`: colunas explícitas nas duas verificações de SLA — onda 6 — Baixa
-- [ ] **227** — `RelatorioPDF`, `LogisticsService` e `useCotacoesMulticanal`: os três `select("*")` restantes — onda 6 — Baixa
+- [x] **225** — `useDrillDown`: colunas explícitas nas duas leituras — onda 6 — Baixa
+- [x] **226** — `useSLANotifications`: colunas explícitas nas duas verificações de SLA — onda 6 — Baixa
+- [x] **227** — `RelatorioPDF`, `LogisticsService` e `useCotacoesMulticanal`: os três `select("*")` restantes — onda 6 — Baixa · **parcial**: `LogisticsService.getDeliveries` sem chamador, ver A-05
 - [~] **228** — Censo dos índices reais de `entregas`, `coletas` e `telemetry_logs` no banco ao vivo — onda 6 — Alta · **aguarda o dono**
 - [~] **229** — Provar a hipótese: `EXPLAIN (ANALYZE, BUFFERS)` da consulta do Painel SLA — onda 6 — Alta · **aguarda o dono**
 - [ ] **230** — Índice para o Painel SLA: `entregas (status, previsao_entrega)` — onda 6 — Alta
@@ -333,15 +333,15 @@
 
 ### Onda 0
 
-- [~] **249** — `AGENTS.md`: corrigir a regra de merge para 10 required checks e nomear o décimo — onda 0 — Alta · **aguarda o dono**
-- [~] **250** — `AGENTS.md`: dizer que o repositório é público — onda 0 — Alta · **aguarda o dono**
-- [~] **251** — `AGENTS.md`: o deploy de edge function é automático em merge para `main` — onda 0 — Alta · **aguarda o dono**
+- [x] **249** — `AGENTS.md`: corrigir a regra de merge para 10 required checks e nomear o décimo — onda 0 — Alta (Regra 8: merge aguarda o dono — PR #329)
+- [x] **250** — `AGENTS.md`: dizer que o repositório é público — onda 0 — Alta (Regra 8: merge aguarda o dono — PR #329)
+- [x] **251** — `AGENTS.md`: o deploy de edge function é automático em merge para `main` — onda 0 — Alta (Regra 8: merge aguarda o dono — PR #329)
 
 ### Onda 8
 
-- [ ] **252** — `AGENTS.md`: corrigir a contagem de migrations de 244 para a contagem real — onda 8 — Baixa
-- [ ] **253** — `AGENTS.md`: corrigir o nome do workflow de contexto (`contexto.yml` → `contexto-ia.yml`) — onda 8 — Baixa
-- [~] **254** — Propagar as correções de H-03 para `docs/agentes/github-ci.md` e `docs/agentes/deploy.md` — onda 8 — Média · **aguarda o dono**
+- [x] **252** — `AGENTS.md`: corrigir a contagem de migrations de 244 para a contagem real — onda 8 — Baixa
+- [x] **253** — `AGENTS.md`: corrigir o nome do workflow de contexto (`contexto.yml` → `contexto-ia.yml`) — onda 8 — Baixa
+- [x] **254** — Propagar as correções de H-03 para `docs/agentes/github-ci.md` e `docs/agentes/deploy.md` — onda 8 — Média (Regra 8: merge aguarda o dono — PR #329)
 - [~] **255** — Fazer a CI conferir os fatos verificáveis que o `AGENTS.md` afirma — onda 8 — Média · **aguarda o dono**
 - [x] **256** — `docs/prod-readiness.md`: corrigir as duas contagens de paridade que caducaram — onda 8 — Alta
 - [~] **257** — Fazer o inventário semanal recontar a paridade e datar o `prod-readiness` — onda 8 — Média · **aguarda o dono**
@@ -357,9 +357,9 @@
 
 ### Onda 0
 
-- [ ] **267** — **FAÇA ISTO PRIMEIRO (1/3)** — abrir margem no orçamento de lint: `SortIcon` nas três telas de cadastro — onda 0 — Alta (destrava o plano)
-- [ ] **268** — **FAÇA ISTO PRIMEIRO (2/3)** — usar o `SortIcon` compartilhado nas outras sete telas — onda 0 — Alta (destrava o plano)
-- [ ] **269** — **FAÇA ISTO PRIMEIRO (3/3)** — pagar os seis avisos do Dashboard Executivo e registrar a margem reservada — onda 0 — Alta (destrava o plano)
+- [x] **267** — **FAÇA ISTO PRIMEIRO (1/3)** — abrir margem no orçamento de lint: `SortIcon` nas três telas de cadastro — onda 0 — Alta (destrava o plano)
+- [x] **268** — **FAÇA ISTO PRIMEIRO (2/3)** — usar o `SortIcon` compartilhado nas outras sete telas — onda 0 — Alta (destrava o plano)
+- [x] **269** — **FAÇA ISTO PRIMEIRO (3/3)** — pagar os seis avisos do Dashboard Executivo e registrar a margem reservada — onda 0 — Alta (destrava o plano)
 
 ### Onda 8
 
@@ -369,13 +369,13 @@
 - [~] **273** — Barrar arquivo acidental na raiz antes do merge — onda 8 — Baixa · **aguarda o dono**
 - [~] **274** — Tirar do `AGENTS.md` e do `types-sync.yml` a menção aos locks de bun — onda 8 — Baixa · **aguarda o dono**
 - [ ] **275** — Criar a base de teste de hook e de tela que hoje não existe — onda 8 — Alta
-- [ ] **276** — Teste da validação de transição de status (trava a correção de C-01) — onda 8 — Crítica
+- [x] **276** — Teste da validação de transição de status (trava a correção de C-01) — onda 8 — Crítica
 - [ ] **277** — Teste da checagem de `count` no controle de concorrência (trava a correção de C-03) — onda 8 — Alta
-- [ ] **278** — Teste da confirmação em exclusão em massa (trava a correção de D-01) — onda 8 — Crítica
-- [ ] **279** — Teste do fail-closed de assinatura de webhook (trava a correção de S-01) — onda 8 — Crítica
-- [ ] **280** — Teste da idempotência atômica dos webhooks (trava a correção de B-01) — onda 8 — Crítica
-- [ ] **281** — Teste do caminho de criar coleta — onda 8 — Alta
-- [ ] **282** — Teste do caminho de mover entrega de status — onda 8 — Alta
+- [x] **278** — Teste da confirmação em exclusão em massa (trava a correção de D-01) — onda 8 — Crítica
+- [x] **279** — Teste do fail-closed de assinatura de webhook (trava a correção de S-01) — onda 8 — Crítica
+- [x] **280** — Teste da idempotência atômica dos webhooks (trava a correção de B-01) — onda 8 — Crítica
+- [x] **281** — Teste do caminho de criar coleta — onda 8 — Alta
+- [x] **282** — Teste do caminho de mover entrega de status — onda 8 — Alta
 - [~] **283** — Resolver o usuário semeado do `tests/e2e/` e dizer por que ele não roda na CI — onda 8 — Média · **aguarda o dono**
 - [~] **284** — Subir os pisos de cobertura para travar o que as etapas 275-282 conquistaram — onda 8 — Média · **aguarda o dono**
 - [~] **285** — Confirmar com o dono se `VITE_SENTRY_DSN` está configurado no Vercel — onda 8 — Média · **aguarda o dono**
@@ -396,10 +396,10 @@
 
 - [~] **295** — Fechar no banco ao vivo os seis achados marcados HIPÓTESE — onda 8 — Alta · **aguarda o dono**
 - [ ] **296** — Regerar a branch `contexto` para que as fontes reflitam o código corrigido — onda 8 — Média
-- [ ] **297** — Atualizar `03-ACHADOS.md` e `05-PROGRESSO.md` com o estado final de cada achado — onda 8 — Alta
-- [ ] **298** — Reler o plano inteiro e registrar o que ficou sem etapa executada — onda 8 — Alta
+- [x] **297** — Atualizar `03-ACHADOS.md` e `05-PROGRESSO.md` com o estado final de cada achado — onda 8 — Alta
+- [x] **298** — Reler o plano inteiro e registrar o que ficou sem etapa executada — onda 8 — Alta
 - [~] **299** — Rodar a bateria completa de gates e comparar com os números do começo — onda 8 — Alta · **aguarda o dono**
-- [ ] **300** — Relatório final de uma página para o dono — onda 8 — Alta
+- [x] **300** — Relatório final de uma página para o dono — onda 8 — Alta
 
 ---
 
@@ -407,9 +407,25 @@
 
 Problema novo **não se corrige na hora** (regra 4). Anote aqui, com `arquivo:linha`, e siga a etapa em curso.
 
-| #   | Achado | Onde (arquivo:linha) | Encontrado na etapa | Gravidade estimada |
-| --- | ------ | -------------------- | ------------------- | ------------------ |
-|     |        |                      |                     |                    |
+| #    | Achado                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Onde (arquivo:linha)                                                                                                                     | Encontrado na etapa | Gravidade estimada |
+| ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------- | ------------------ |
+| A-01 | **Resolvido na etapa 220**: a consulta de `ocorrencias` do benchmark de KPI nao tinha teto, ao contrario das de `entregas`/`coletas` (`.limit(1000)`); mes com muitas ocorrencias baixava a tabela inteira                                                                                                                                                                                                                                                                       | `src/hooks/analytics/useKPIBenchmark.tsx:67-71`                                                                                          | 219 -> 220          | Baixa              |
+| A-02 | O teto de 6000 do benchmark de KPI e **unico para os seis meses**: se a soma dos seis passar de 6000 linhas, o PostgREST corta sem ordem definida e qualquer mes pode perder registros (antes o corte era de 1000 **por mes**)                                                                                                                                                                                                                                                   | `src/hooks/analytics/useKPIBenchmark.tsx:44,49-71`                                                                                       | 220                 | Media              |
+| A-03 | O teto unico para os seis meses tambem vale para as metricas executivas (6000/6000/3000): se a soma dos seis meses passar disso, o PostgREST corta sem ordem definida e qualquer mes pode perder registros (antes o corte era por mes -- 1000/1000/500)                                                                                                                                                                                                                          | `src/hooks/analytics/useExecutiveMetrics.tsx:55,62,68`                                                                                   | 221                 | Media              |
+| A-04 | **Produção não tem `public.user_panel_preferences`**: a migration `20261121153649` da #248 nunca foi aplicada (último dispatch do `aplicar-migration.yml` é de 20/11, anterior ao arquivo) e o `types.ts` foi editado à mão. Efeito: `useSLAMetas` lança erro ao ler e `PainelSLA.tsx:242-244` mostra `toast.success` incondicional sem persistir nada - o usuário vê "salvo" e as metas de SLA não são gravadas. É também a causa do `types-sync` vermelho desde 23/11 (Gate 1) | `src/hooks/sla/useSLAMetas.ts:31-36`, `src/pages/PainelSLA.tsx:242-244`, `supabase/migrations/20261121153649_user_panel_preferences.sql` | 222                 | **Alta**           |
+| A-05 | `LogisticsService.getDeliveries` (`src/features/logistics/services/LogisticsService.ts:8`) mantém `select('*')` porque **não tem chamador**: a classe não é importada em nenhum arquivo de `src/`. Cortar colunas de código morto não economiza banda; o que resolve é apagar ou usar o serviço                                                                                                                                                                                  | `src/features/logistics/services/LogisticsService.ts:5-14`                                                                               | 227                 | Baixa              |
+
+| A-06 | As mutacoes de status vivem duplicadas por tela (`Despachos.tsx` e `KanbanEntregas.tsx`), sem hook comum: regra nova de transicao precisa ser aplicada duas vezes | `src/pages/Despachos.tsx:216-320`, `src/pages/KanbanEntregas.tsx:328` | 282 | Media |
+| A-07 | `KanbanEntregas.tsx` move entrega para `despachado` sem exigir `nf_remessa` e sem confirmacao; `Despachos.tsx` exige as duas coisas | `src/pages/KanbanEntregas.tsx:328`, `src/pages/Despachos.tsx:256-274` | 282 | **Alta** |
+| A-08 | O dialogo do despacho final diz "esta acao e irreversivel", mas `despachado` ainda aceita `em_transito`: o texto promete mais do que a maquina de estados permite | `src/lib/statusTransitions.ts:17`, `src/pages/Despachos.tsx:596-607` | 282 | Baixa |
+
+**Consolidacao (2026-11-24).** Fechamento da tabela: **A-01 resolvido** na etapa 220; **A-02, A-03, A-04,
+A-05, A-06, A-07 e A-08 seguem abertos** e sao o insumo da proxima auditoria - nenhum foi corrigido (regra 4).
+Ordem de dano para quem pegar: **A-04** (producao sem `public.user_panel_preferences`: o Painel SLA mostra
+"salvo" e nao grava, e e a causa do `types-sync` vermelho), **A-07** (despacho sem NF pelo Kanban), depois
+**A-08**, **A-02/A-03** (teto unico de 6000 linhas cobrindo seis meses) e **A-05** (servico de logistica sem
+chamador). Notas de etapa que citam "achado novo" sem passar por esta tabela continuam validas no texto
+original; esta tabela e a lista canonica.
 
 ## Etapas que não correspondiam mais ao código
 
@@ -435,45 +451,538 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 
 ## Registro de execução
 
-### Registro - etapa 211 (2026-11-25) - achado P-01 (guard de teto na CI)
+### Registro - etapas 279 e 280 (2026-11-26) - os dois caminhos críticos de webhook ganham teste
 
-**Causa:** as etapas 204 a 210 consertaram cinco consultas sem teto e nada impedia a sexta. A varredura nova
-mostra o tamanho real da divida: **248 consultas de listagem em `src/`, 61 delas sem `.limit`/`.range`** (52
-pares arquivo:tabela). A regra existia so na cabeca de quem revisa.
+**Como rodar** (o `vitest.config.ts` cobre `src/**` e `tests/**`; `supabase/functions/**` só roda no `deno test`):
+`deno test -A supabase/functions/_shared/webhookSignature.test.ts supabase/functions/_shared/idempotency.test.ts`.
 
-**Entrega:** `scripts/ci/validate-query-limits.mjs` (Node puro, sem dependencia) percorre `src/`, acha cada
-`.from(<tabela>)` com `.select` e considera **com teto** quem termina em `.limit(`, `.range(`, `.single(` ou
-`.maybeSingle(`, **ou** quando o teto entra depois na variavel da consulta (`let query = supabase.from(...);
-... await query.order(...).limit(500)`). O fim da cadeia e calculado respeitando string, template com `${}` e
-comentario, entao `select("a; b")` nao corta a cadeia no meio. Duas listas de excecao em
-`scripts/ci/query-limits.allowlist.json`: `tabelas` (as 9 tabelas de dominio pequeno que o plano descartou,
-cada uma com o motivo numa linha) e `baseline` (divida congelada por par arquivo:tabela, no formato de
-catraca -- a contagem pode cair, nunca subir). Ligado como `validate:query-limits` no `package.json` e como
-passo `Validate Query Limits (listing caps)` no job `quality-gate` do `ci-nexus.yml`, depois do
-`validate:no-console`. Documentado em `scripts/ci/README.md`.
+| etapa | arquivo novo                                  | o que trava                                                                                                                                                                                                                                                                                                                                                                       |
+| ----- | --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 279   | `_shared/webhookSignature.test.ts` (6 testes) | Segredo ausente → `false` mesmo com assinatura plausível (é o que o `if (Deno.env.get(...))` removido na etapa 001 tornava inútil); assinatura errada/trocada/curta → `false`; assinatura correta → `true`. Mais duas varreduras de fonte: nenhum receptor condiciona `verifyWebhookHmac` à existência do segredo, e o bypass de test-mode exige `ALLOW_TEST_MODE='true'` (S-05). |
+| 280   | `_shared/idempotency.test.ts` (5 testes)      | `insert` bem-sucedido → primeira vez, com POST em `idempotency_keys` (o helper grava, não consulta); `23505` → duplicata sem erro; erro 500 → não é confundido com duplicata e não lança (fail-open); chave sem identificador não ganha valor de reserva (B-02).                                                                                                                  |
 
-**Por que catraca e nao "zero de divida":** ligar em modo falha contra as 61 cadeias existentes reprovaria
-toda PR -- exatamente o risco que o plano descreve. A catraca entrega o efeito pretendido hoje (consulta nova
-sem teto reprova) sem travar o repositorio, e cada conserto aperta o baseline com `--update-baseline`.
+**Verificado.** `deno test -A` nos dois arquivos → **11/11** (saída registrada no corpo da PR). HMAC calculado de
+verdade com `crypto.subtle`, sem mockar `verifyWebhookHmac`; o duplo de banco é um servidor HTTP local que
+responde `23505`/500 — nenhum arquivo de produção foi tocado.
 
-**Verificacao:** saida limpa na `main` do commit: `643 arquivos, 248 consultas, 61 cadeias sem teto (divida
-congelada 52), 0 nova(s)`, codigo 0. **Zero falso positivo na lista de 16 listagens corretas do plano** --
-duas delas caem no padrao de teto adiado e foram conferidas na pratica: `useSecurityEvents.ts:33-57`
-(`query = query.limit(filters?.limit || 100)`) e `useConciliacao.tsx:123` (`await query.order(...).limit(2000)`),
-igual a `useDrillDown.tsx:67,82`. Teste de sabotagem do plano executado: tirar o `.limit(500)` de
-`Envios.tsx` faz o script reprovar apontando `src/pages/Envios.tsx:351` com codigo 1; `git checkout` devolve
-codigo 0. `node --test scripts/ci/validate-query-limits.unit.mjs` 17/17 (repositorio sintetico em
-`os.tmpdir()`: teto inline, sem teto, `.range`/`.single`/`.maybeSingle`, teto adiado que conta e que nao conta,
-`select` com `;` na string, `Array.from`, arquivo de teste, allowlist de tabela, catraca igual/acima/abaixo,
-`--update-baseline`, `--warn` com saida 0, `src/` ausente, `--json`). `node --test scripts/ci/*.unit.mjs
-scripts/lib/*.unit.mjs` 432/432. `npm run automation:test` 103/103 (contrato exigido por mexer em `scripts/`).
-`actionlint` no workflow 0. `act -j quality-gate -n` simula o job inteiro, incluindo o passo novo.
+### Registro - etapas 020, 021 e 022 (2026-11-26) - o gerador de contexto para de afirmar "sem RLS" no que ele não viu
 
-**Nao verificado:** o passo rodando no runner do GitHub (so a simulacao com `act`); e quais das 61 cadeias
-realmente devolvem volume hoje -- sem credencial de banco nesta sessao. As 61 cadeias sao achado novo em
-relacao ao plano (que falava em 5): ficam como divida congelada e viram etapas futuras da onda 6.
+**O defeito.** `scripts/ai-context/gerar.mjs` marcava `sem_rls: true` em toda tabela cujo `CREATE TABLE` não
+trouxesse `ENABLE ROW LEVEL SECURITY` literal. Partição mensal ligada dentro de `DO $$` cai nessa regra — no
+repositório real eram 12 (`audit_logs_y2026m01`…`m12`), e o achado F-01 mostra que o caso já mordeu 32 tabelas.
 
-**Aguarda o dono:** muda `.github/workflows/` -- Regra 8, PR #398 aberta, sem merge.
+| etapa | o que mudou                                                                                                                                                                                                                                                                                                                            |
+| ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 020   | `sem_rls` passa a ter três estados: `true` (nada liga RLS para a tabela), `'desconhecido'` (bloco dinâmico do conjunto liga RLS sobre nome calculado — `public.%I`/`LIKE 'x_y%'` — e alcança a tabela) e `false` (ENABLE literal). Campo irmão `rls_indeterminado: true` para quem filtra por booleano. Parser de statements intocado. |
+| 021   | `ferramentas.json → permissoes` e `baseline.json → alertas` publicam `tabelas_sem_rls` (só confirmadas) **e** `tabelas_rls_indeterminado`, mais `tabelas_rls_indeterminado_como_decidir` com a consulta ao catálogo que resolve no banco vivo. O array `banco.avisos` ganhou a contagem das indeterminadas.                            |
+| 022   | `scripts/ai-context/gerar.unit.mjs`: caso novo com partição protegida por `DO $$` — exige `'desconhecido'` na partição, `true` na tabela comum, e ausência da partição em `tabelas_sem_rls` nos dois resumos.                                                                                                                          |
+
+**Verificado.** `node --test scripts/ai-context/gerar.unit.mjs` → **39/39** (a asserção antiga de
+`payments.sem_rls === true` continua valendo: aquele bloco dinâmico cria policy, não liga RLS). Gerador rodado
+no repositório real: **12 indeterminadas** (`audit_logs_y*`), **0** "sem RLS" confirmadas, 52 blocos de DDL
+dinâmico sinalizados. `npm run automation:test` → **103/103**.
+
+### Registro - etapas 267, 268, 269, 276 e 278 (2026-11-26) - contabilidade do orçamento de lint e dos testes que travam as correções
+
+**267, 268 e 269 já estavam feitas — o checklist é que ficou para trás.** A prova está no próprio
+`.warning-budget.json`, campo `$comment`, com data de **2026-11-23**: "etapas 267-269 de `docs/qa/04-PLANO.md`
+pagaram 29 avisos `react-hooks/static-components` (`SortIcon` extraído para `src/components/common/SortIcon.tsx`
+
+- `GrowthIndicator`/`KPIStatus`/`DeltaIconDisplay` movidos a nível de módulo); teto baixado de 105 para 86,
+  com ~10 de margem reservada".
+
+| etapa | evidência verificada agora                                                                                                                                                                        |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 267   | `src/components/common/SortIcon.tsx` existe; `grep -rn "const SortIcon" src/` só encontra `src/components/ui/table.tsx` e `src/pages/Ranking.tsx` — **nenhuma** das dez telas listadas no plano   |
+| 268   | idem para as sete telas da etapa (Transportadoras, Envios, Ocorrencias, AlertasCusto, LojaRecompensas, AuditTrailViewer, FreightTableManager)                                                     |
+| 269   | `node -e "require('./.warning-budget.json')"` → `lintWarnings 86`, `lintErrors 0`, `tsErrors 0`; contagem real medida por `eslint -f json` = **80 avisos**, ou seja **6 de margem** contra o teto |
+
+**276 fechada.** `npx vitest run src/lib/statusTransitions.test.ts` → **19 testes verdes** (9 do mapa de
+transições + 10 da recusa traduzida, estes da etapa 037). Cobre os saltos válidos, os inválidos e o estado final.
+
+**278 fechada.** `npx vitest run src/components/common/BulkActions.test.tsx` → **3 testes verdes**, incluindo
+"nao executa a acao ao clicar no botao: apenas abre a confirmacao" e "nao confirma enquanto a palavra exigida
+nao for digitada". `src/components/common/BulkActions.tsx` importa `ConfirmDialog` e desvia a ação destrutiva
+por `if (action.variant === "destructive")` antes de chamar `onClick`.
+
+**Ainda pendente neste bloco.** **277** pede um teste de hook provando que `kanban_history` não é gravado
+quando `count === 0`: hoje existe só `src/lib/conflitoVersao.test.ts` (o `throw` da etapa 048), sem o
+mock de Supabase no nível do hook. **275 e 277** seguem abertas (279 e 280
+fecharam na etapa seguinte deste bloco; 281 e 282 fecharam em `Registro - etapas 281 e 282`).
+
+**NÃO VERIFICADO.** Nada aqui depende de sessão autenticada: as cinco etapas foram conferidas por leitura de
+arquivo e por execução de teste local. O que **não** foi feito é o teste de duas abas das etapas 044-048,
+registrado na PR #410.
+
+### Registro - etapas 044 a 048 (2026-11-26) - o "salvou?" do travamento otimista em um lugar só
+
+**044, 045, 046 e 047 já estavam no código, só a contabilidade estava atrasada.** Conferido por leitura do
+`main` em `044af364`:
+
+| etapa | arquivo                                    | evidência                                                                                                                                                                                             |
+| ----- | ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 044   | `src/pages/Despachos.tsx`                  | `:222` `{ count: "exact" }` e `:226` `if (count === 0) throw` **antes** do `onStatusChange` (`:231`) e do insert em `kanban_history`                                                                  |
+| 045   | `src/pages/Despachos.tsx`                  | `:286` `{ count: "exact" }` e `:291` `if (count === 0) throw` antes do histórico do despacho final                                                                                                    |
+| 046   | `src/hooks/logistics/useBoxManagement.tsx` | `{ count: "exact" }` no `.update` e `if (count === 0) throw` **antes** do insert em `kanban_history`, que agora também confere `histError` (`console.warn`), como nos outros pontos                   |
+| 047   | `src/pages/KanbanEntregas.tsx`             | `version` aparece só como parâmetro (`:298`), no `select` (`:278`), no filtro `.eq("version", version)` (`:330`) e em `version: item.version` (`:365`) — **não** há `version: version + 1` no payload |
+
+**045 — decisão sobre o texto.** O plano sugeria uma frase mais específica para o despacho final ("nada foi
+despachado"). Mantida a frase canônica de conflito de versão: o caminho já mostra toast de **erro** (não o de
+sucesso), não grava `kanban_history` e a etapa 048 centraliza exatamente essa mensagem — trocar o texto agora
+e voltar atrás na 048 seria churn.
+
+**048 fechada.** A sequência `{ count: "exact" }` → `if (count === 0)` → `throw` estava copiada em quatro
+pontos e a mensagem em quatro literais. Agora mora em `src/lib/conflitoVersao.ts`:
+
+- `MENSAGEM_CONFLITO_VERSAO` — a mesma frase que já está em produção, sem mudança de texto;
+- `assertAtualizou(count)` — lança quando `count === 0`; `null`/`undefined` (update sem `{ count: "exact" }`)
+  não lança, porque aí a informação não existe;
+- exportado pelo barrel `src/lib/index.ts`;
+- `src/lib/conflitoVersao.test.ts` cobre `0`, `1`, `null` e `undefined`.
+
+As quatro cópias foram substituídas: duas em `src/pages/Despachos.tsx`, uma em `src/pages/KanbanEntregas.tsx`
+e uma em `src/hooks/logistics/useBoxManagement.tsx`. `grep -rn 'count === 0'` nos três arquivos → nenhuma
+ocorrência restante. Nada de wrapper em volta do `supabase.from().update()`: a consulta continua à vista em
+cada chamador.
+
+**NÃO VERIFICADO (runtime).** Os testes de duas abas (avançar a mesma entrega nas duas, alocar o mesmo BOX
+duas vezes) exigem sessão autenticada na aplicação — não foram executados nesta sessão. A evidência desta PR
+é leitura de código, `tsc`, `eslint`, `vitest` do novo teste, `lint:budget` e `build`.
+
+### Registro - etapas 040, 041 e 042 (2026-11-26) - escolher a cotação, gravar o disparo e mostrar carregando/erro/vazio
+
+**040 fechada.** A tabela de resultados ganhou a ação **Escolher** nas linhas `respondido`, ligada a
+`selectCotacao` do hook (`useCotacoesMulticanal`), que grava `status = 'selecionado'` na linha do banco. Antes só
+existia o toast "Cotação selecionada!" no card de recomendação, sem chamada de banco — a escolha se perdia ao
+recarregar. Junto veio a correção que a etapa exigia: a lista `respondidas` filtrava apenas `status === "respondido"`,
+então **no instante em que a linha virava `selecionado` ela saía da lista** e `melhorCotacao`, `savings`,
+`averageValue` e `currentStep` voltavam ao estado anterior (a tela "esquecia" a escolha recém-feita). O filtro passou
+a aceitar `respondido` **ou** `selecionado` (`src/pages/CotacaoMultiCanal.tsx`).
+
+**041 verificada, sem código novo.** A criação no banco já havia sido fechada na 038: `grep -n 'setCotacoes\|addCotacao'`
+em `src/pages/CotacaoMultiCanal.tsx` não retorna nada, e todos os caminhos de criação passam pelo hook —
+`createCotacao.mutate` em `:164`, `:336` (`registrarCotacaoPendente`), `:451`, `:474` e `createCotacao.mutateAsync`
+em `:423` (caminho da API, com `await` dentro do laço do Blast, então falha de criação não derruba o lote).
+O que **não** foi tocado de propósito: a contagem de sucesso do Blast usa `mutate` (sem `await`) nos caminhos de
+WhatsApp/e-mail, então uma falha de insert ali não entra em `falhas` — é o achado **R-03**, com etapa própria.
+
+**042 fechada.** A tela não distinguia "carregando", "falhou" e "não há nada": durante o carregamento inicial a área
+de resultados simplesmente não existia e, com a query em erro, o operador via a tela vazia como se não houvesse
+cotação. Agora: `SkeletonTable` enquanto `isLoading && cotacoes.length === 0`, card de erro com `error.message` e
+botão **Tentar novamente** (`void refetchCotacoes()`) quando a query falha, e `EmptyState` explicando o próximo passo
+("busque rotas e dispare uma cotação") quando a leitura terminou sem nenhuma cotação.
+
+**NÃO VERIFICADO (runtime).** Escolher uma cotação e conferir `status = 'selecionado'` no banco exige sessão
+autenticada com credencial de transportadora; a evidência desta PR é leitura de código, `tsc`, `eslint`, `vitest`
+(6 casos em `CotacaoResultsTable.test.tsx`), `lint:budget` e `build`.
+
+### Registro - etapa 037 (2026-11-26) - a recusa de transição vira frase de operação, e a 034 fecha a contabilidade
+
+**034 marcada como concluída (atraso de checklist).** O módulo `src/lib/statusTransitions.ts`, o teste
+`src/lib/statusTransitions.test.ts` (9 casos) e a exportação pelo barrel `src/lib/index.ts:78-84` entraram no **#311**;
+só a marcação neste arquivo ficou para trás. Nada de código mudou na etapa 034 agora.
+
+**037 (código pronto, verificação de runtime bloqueada).** As telas mostravam o texto cru do `RAISE EXCEPTION` do banco:
+`Despachos.tsx` em duas mutations (`:251` avanço de coluna, `:311` autorização do despacho final) e `KanbanEntregas.tsx`
+(`:341`, no `description` do toast). O operador lia `Transição de status inválida: pronto_despacho -> entregue` e não sabia
+o que fazer.
+
+| ponto          | antes                        | depois                                                                                                                                                                                                                                           |
+| -------------- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| reconhecimento | nenhum                       | `reconhecerRecusaTransicao(error, tipo)`: decide pelo **SQLSTATE `23514`** (constante `ERRCODE_TRANSICAO_INVALIDA`, o mesmo que as etapas 029/030 mandam o banco usar) e usa a mensagem só para extrair os dois status envolvidos                |
+| frase          | texto do banco               | `mensagemRecusaTransicao(error, tipo)`: "Esta entrega está em "Pronto para Despacho" e não pode ir para "Entregue". O próximo passo é "Cotação de Frete"." — com bifurcação lista as duas opções e, em estado terminal, diz que o fluxo terminou |
+| rótulos        | nenhum no módulo             | `ROTULOS_ENTREGA` (10) e `ROTULOS_COLETA` (7), completos em relação ao enum, para a frase não citar `cotacao_frete`                                                                                                                              |
+| outros erros   | `toast.error(error.message)` | **inalterado**: a função devolve `null` e a tela cai no `error.message` de sempre (inclusive `23514` de outra CHECK constraint e o "Conflito de versão" do travamento otimista)                                                                  |
+
+**Por que só três `onError`:** `Despachos.tsx` tem exatamente duas mutations e ambas mudam status; `KanbanEntregas.tsx` tem
+uma. Upload, exclusão e filtros não foram tocados.
+
+**Evidência (no worktree da branch, sobre `b4d25562`):**
+
+- `npx vitest run src/lib/statusTransitions.test.ts` → **19 testes verdes** (9 herdados + 10 novos: rótulos completos,
+  4 casos de reconhecimento/ignorância, 4 frases - passo único, bifurcação, estado terminal, `null` para os demais erros).
+- `npm run typecheck` → limpo; `npx eslint` nos 4 arquivos → **0 problemas**.
+- `npm run lint:budget` → **80/86 avisos**, idêntico ao `main` medido em `b4d25562` (**0 aviso novo**).
+- `npm run test:coverage` → **97 arquivos** verdes; `npm run build` → ok.
+
+**NÃO VERIFICADO:** o texto novo **não** foi visto em tela, porque a recusa ainda não existe no banco — as etapas 028-033
+(função, triggers das duas tabelas e a migração aplicada) estão em `[~]` aguardando o dono. Enquanto a 033 não for aplicada,
+nenhum caminho de produção dispara esta frase; o que está provado aqui é a unidade (teste) do reconhecimento e da frase.
+Prova em runtime depois da 033: provocar uma transição inválida em `Despachos` e no Kanban e colar o texto exibido.
+
+### Registro - etapas 038 e 039 (2026-11-26) - a tela de cotação multicanal passa a ler e a gravar no banco
+
+**038 fechada.** `src/pages/CotacaoMultiCanal.tsx` mantinha `const [cotacoes, setCotacoes] = useState<CotacaoManual[]>([])`
+(`:100`) espelhando em memória a **mesma** cotação que `createCotacao.mutate`/`mutateAsync` já gravava: duas fontes para o
+mesmo dado, e a cópia local era a que a tabela mostrava. A cópia morreu; a tela agora lê `cotacoes` do hook
+`useCotacoesMulticanal` (query com `.limit(200)`, `refetchInterval` de 30s e join `transportadora:transportadoras`).
+
+| ponto                                                                                                              | antes                                                                                                          | depois                                                                                                                                                                                |
+| ------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| tabela                                                                                                             | `useState<CotacaoManual[]>` local, alimentado por 7 chamadas de `addCotacao` (preço/status inventados na tela) | `cotacoes` do hook, direto da linha do banco                                                                                                                                          |
+| `handleSearch`                                                                                                     | `setCotacoes([])`                                                                                              | `void refetchCotacoes()`                                                                                                                                                              |
+| 4 pontos que já gravavam (`registrarCotacaoPendente`, `handleCotarAPI`, `handleCotarWhatsApp`, `handleCotarEmail`) | gravavam no banco **e** criavam linha local duplicada                                                          | só a gravação; as `observacoes` que existiam apenas na cópia local ("WhatsApp enviado", "Email enviado", "Nexus Blast: Aguardando RPA/WhatsApp") entraram no `createCotacao`          |
+| tipo                                                                                                               | `CotacaoManual` local (`valor`, `transportadora_nome`, `observacoes` obrigatório)                              | `CotacaoMulticanal` do hook (`valor_cotado`, `transportadora.nome_fantasia`, `observacoes` anulável); `CotacaoResultsTable` passou a receber esse tipo e ganhou o badge "Selecionada" |
+
+**039 (código no mesmo PR, aguarda verificação em runtime).** `handleRegistrarResposta` fazia
+`setCotacoes(prev => prev.map(...))` + `toast.success("Resposta registrada!")` sem tocar no banco: o operador lia
+"registrado" e o valor morria no reload. Agora chama `updateCotacao.mutate({ id, valor_cotado, prazo_dias, observacoes,
+status: "respondido" })` - o hook preenche `responded_at`, invalida a query e emite o único toast da ação (o toast local
+saiu). A tela passa a identificar a linha pelo **`id`** da cotação (o estado local antigo só tinha `transportadora_id`):
+clicar "Registrar" na tabela abre o diálogo já amarrado àquela linha. Onde o plano manda não decidir por conta própria -
+**duas ou mais cotações pendentes para a mesma transportadora** - a lista de transportadoras recusa e orienta a registrar
+pela linha desejada na tabela, em vez de escolher a primeira.
+
+**Cotações de API externa (Rodonaves, Melhor Envio, Lalamove):** eram as únicas linhas sem gravação nenhuma, com
+`transportadora_id` fictício (`"rodonaves-id"`, `me-<id>`, `"lalamove-id"`) - impossíveis de persistir na coluna
+`transportadora_id UUID NOT NULL REFERENCES transportadoras(id)`
+(`supabase/migrations/20260317213459_b43e2938...sql:5`). Agora a cotação é gravada quando o provedor corresponde a uma
+transportadora cadastrada na busca; quando não corresponde, **não** entra no banco e o operador recebe um aviso dizendo
+qual cotação e qual valor não foram registrados (antes essa cotação aparecia e desaparecia no reload sem deixar rastro).
+
+**Consequência assumida:** a tabela lista as cotações do usuário (teto de 200 do hook), não apenas as da busca atual.
+Filtrar por trecho/período é regra de negócio e ficou fora desta etapa.
+
+**Evidência (no worktree da branch):**
+
+- `grep -n "setCotacoes\|addCotacao\|crypto.randomUUID" src/pages/CotacaoMultiCanal.tsx` → **vazio** (as duas fontes acabaram).
+- `grep -n "setCotacoes\|updateCotacao" src/pages/CotacaoMultiCanal.tsx` → só `updateCotacao.mutate` em `handleRegistrarResposta`.
+- `npx tsc --noEmit -p tsconfig.app.json` → limpo; `npx eslint` nos 2 arquivos → 0 erros.
+- `npm run lint:budget` → **77/86 avisos** (idêntico ao `main`; a memoização de `respondidas` foi ajustada para não subir o teto).
+- `npx vitest run` → 96 arquivos / 811 testes verdes, + `src/pages/cotacao-multicanal/CotacaoResultsTable.test.tsx` (4 casos novos: nome do join, `valor_cotado`, `id` correto no `onRegistrar`, badge "Selecionada").
+
+**NÃO VERIFICADO:** o comportamento em runtime **não** foi exercitado - não há credencial/serviço de banco nesta sessão,
+então não registrei resposta de cotação real nem conferi `valor_cotado`/`responded_at` na linha de `cotacoes_multicanal`,
+e não há medição de tela publicada. Falta: registrar uma resposta em produção, recarregar e conferir a linha; e confirmar o
+deploy após o merge.
+
+### Registro - etapas 223 a 227 (2026-11-25) - os cinco pontos de colunas explícitas já estavam no main
+
+As cinco etapas da onda 6 que trocam `select("*")` por colunas explícitas **já estavam implementadas no
+`main`** por PRs anteriores; nenhuma exigiu código novo. O trabalho foi verificar uma por uma contra a lista
+real de colunas de `types.ts` e contra o consumo da tela, e registrar a evidência.
+
+| etapa | arquivo                                                                                   | commit que entregou           | verificação feita                                                                                                                                                                                                                                                                                                                                                                                  |
+| ----- | ----------------------------------------------------------------------------------------- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 223   | `src/pages/Envios.tsx:351-362`                                                            | `cb64f276` (#315)             | 15 colunas e os dois joins explícitos; `.is("deleted_at")` e `.limit(500)` intactos. Cruzamento das 33 colunas de `entregas` com o arquivo: 18 nomes aparecem, e os 3 que ficam fora do `select` (`cliente_id`, `transportadora_id`, `deleted_at`) são campo do formulário de criação (`:437,441`) e filtro da consulta (`:360`), nunca leitura de linha. **Zero coluna usada e não selecionada.** |
+| 224   | `src/pages/Coletas.tsx:148-161`                                                           | `8acf1702`                    | 22 das 31 colunas; `fornecedores!fk_coletas_fornecedor` e `transportadoras!fk_coletas_transportadora` preservados; `.limit(500)` em `:161`. Único nome fora do `select` é `deleted_at`, usado como filtro em `:159`.                                                                                                                                                                               |
+| 225   | `src/hooks/analytics/useDrillDown.tsx:69,88,107`                                          | `d199a88c` (#316)             | três leituras explícitas (coletas, entregas e fretes_internos) com `.limit(100)` em `:82,101,112`; o mapeamento de `:128-137` lê `numero_coleta`/`numero_entrega`/`destino`, `status`, `created_at` e `endereco_coleta`/`endereco_entrega` - tudo selecionado - e `DrillDownModal.tsx:132-154` renderiza apenas `id`, `numero`, `status`, `created_at` e `endereco`.                               |
+| 226   | `src/hooks/logistics/useSLANotifications.tsx:313,327`                                     | `786f725e` (#317)             | `id, numero_entrega, status, previsao_entrega` e `id, numero_coleta, status, data_prevista_coleta`; cobrem o que `checkEntregaSLA` (`:206-218`) e `checkColetaSLA` (`:232-236`) leem. `setInterval` e `lastCheckedAt` intocados.                                                                                                                                                                   |
+| 227   | `src/pages/RelatorioPDF.tsx:92-97`, `src/hooks/logistics/useCotacoesMulticanal.tsx:53-66` | `de6487e4`, `45be2b3d` (#397) | explícitos, com `.limit(2000)` (`:100`) e `.is("deleted_at")` intactos.                                                                                                                                                                                                                                                                                                                            |
+
+**O único ponto que sobrou é justamente o que o plano manda não mexer:** `src/features/logistics/services/LogisticsService.ts:8`
+continua com `select('*')`, mas `getDeliveries` **não tem chamador** - a classe inteira não é importada em
+nenhum ponto de `src/` (`grep -rn 'LogisticsService' src/` só acha a própria definição). O plano diz, nesse
+caso, não inventar lista de colunas e anotar o código morto: registrado como **A-05**.
+
+**NÃO VERIFICADO:** o tamanho em KB das respostas antes/depois (exige `/envios` e `/coletas` em produção com
+a aba Rede), a geração de um PDF real e o disparo de um alerta de SLA com previsão no passado. Sem essas
+medições a evidência é de código, não de comportamento - nada foi deployado nesta sessão.
+
+### Registro - etapa 222 (2026-11-25) - types.ts contra o banco: a drift é de UMA tabela que não existe em produção
+
+**222 fica ABERTA** - a correção é DDL em produção (Regra 8). Sem MCP do Supabase nesta sessão, a prova
+saiu dos próprios artefatos do `types-sync`:
+
+- `gh run list --workflow types-sync.yml`: o último **sucesso** é do cron de 2026-11-23T05:51; no mesmo dia
+  há **duas falhas** por push (11:04 e 13:58), a run `45189263904`.
+- Nessa run o job "Gates e PR de sincronização" para em `Gate 1 falhou: novos erros de TypeScript
+introduzidos pelo novo types.ts`, todos em `src/hooks/sla/useSLAMetas.ts` (`:31,33,50,51,53-57,89,91,96`),
+  incluindo `"user_panel_preferences" is not assignable ...` e `'sla_critico_horas' does not exist`: o
+  candidato gerado do banco vivo **não tem** a tabela que o `types.ts` commitado tem (`:5403-5428`).
+- A mesma run registra `Drift: types=true, catalogo=false, manifesto=false`. `supabase/schema-catalog.json` e
+  `supabase/schema-manifest.json` foram gerados do banco vivo nessa run (e são byte-idênticos aos commitados,
+  conferido nas etapas 132-137) e têm **zero** ocorrências de `user_panel_preferences`, contra 14 e 67 de
+  `user_notification_preferences`. Se a tabela existisse em produção, o manifesto a listaria. **Produção não
+  tem `public.user_panel_preferences`.**
+- `git log -S'user_panel_preferences' -- src/integrations/supabase/types.ts` devolve um único commit,
+  `c565d8cf` (PR #248) - o mesmo que criou `supabase/migrations/20261121153649_user_panel_preferences.sql`.
+  A PR **editou o `types.ts` à mão**, exatamente o que o plano proíbe num arquivo gerado, e é por isso que a
+  drift aparece sem que o `types-sync` jamais tenha rodado com sucesso depois.
+- O último dispatch de `.github/workflows/aplicar-migration.yml` foi em 2026-11-20T18:06, **antes** de a
+  migration existir (arquivo de 21/11 15:36, merge em 23/11). A migration nunca foi aplicada.
+
+**Correção de uma leitura anterior:** o registro das etapas 132-137 diz que a run 45189263904 acusa a tabela
+"presente em produção e ausente no arquivo commitado". É o contrário - ela está no arquivo commitado e falta
+em produção, coerente com `types=true` e catálogo/manifesto idênticos. O texto original ficou com nota
+apontando para este registro.
+
+**Impacto em produção:** `PainelSLA.tsx:96` consome `useSLAMetas()`; `useSLAMetas.ts:31-36` faz
+`.from("user_panel_preferences")` e lança o erro (`:36`), sem fallback. Pior: `PainelSLA.tsx:242-244` chama
+`saveMetas(draftMetas)` e mostra `toast.success("Metas de SLA atualizadas")` **sem condição**, enquanto
+`saveError` (`useSLAMetas.ts:119`) não é consumido em nenhum ponto da página - o usuário vê "salvo" e nada é
+persistido. Registrado como **A-04**.
+
+**Compatibilidade migration x types.ts:** conferi coluna por coluna. A migration cria `id`, `user_id`,
+`sla_critico_horas`, `sla_alto_horas`, `sla_medio_horas`, `sla_meta_on_time_pct`, `created_at` e
+`updated_at`, que é exatamente o `Row` de `types.ts:5403-5412`. Aplicar a migration resolve a drift sem
+tocar no arquivo gerado. Resíduo esperado: a tabela nova nasce com os GRANTs padrão do Supabase, então
+`scripts/db-audit/grants-baseline.json` pode acusar diferença e precisar de regeneração (mudança de repo,
+não de banco).
+
+**Nada foi alterado nesta etapa:** nem `types.ts` (gerado), nem a migration, nem o workflow. A correção é
+disparar `aplicar-migration.yml` com `arquivo=supabase/migrations/20261121153649_user_panel_preferences.sql`
+e `confirmacao=APLICAR` (exige o secret `DESTINO_URL` e o environment `banco-leitura`) - Regra 8.
+
+### Registro - etapa 221 (2026-11-25) - metrica executiva passa de 18 consultas para 3
+
+**Causa:** identica a da 220 no hook gemeo (`src/hooks/analytics/useExecutiveMetrics.tsx`). O bloco `trends`
+pedia a mesma tabela seis vezes, mudando so o intervalo de `created_at`, e os seis intervalos sao contiguos; o
+agrupamento por mes estava no laco do cliente. Achado P-03.
+
+**Entrega:** as 18 consultas viraram **3**, uma por tabela (`:45-69`), com a mesma forma que a 220 deixou no
+`useKPIBenchmark`: janela unica de `startOfMonth(subMonths(now, 5))` ate `endOfMonth(now)`, `agruparPorMes` com
+`Record<string, T[]>` + `forEach` (`:72-84`) e a chave local `format(new Date(linha.created_at), "yyyy-MM")`.
+`created_at` entrou no `select` das tres, porque passou a ser lido no cliente. Tetos escalados na proporcao que o
+plano exige -- `entregas` e `coletas` 1000/mes -> 6000, `ocorrencias` 500/mes -> 3000 (`:55,62,68`). Nao houve
+extracao de hook compartilhado (o plano veta: refatoracao nao pedida, dois arquivos por vez); os dois hooks ficam
+com o mesmo desenho, lado a lado. OTIF (`:91-102`), custo de frete (`:103-106`) e a ordem cronologica dos seis
+meses (`subMonths(now, periodsBack - 1 - i)`) continuam como estavam. As outras duas consultas do arquivo
+(`carrierOtif`, `avgCollectionTime`) nao foram tocadas.
+
+**Mudanca visivel, deliberada:** o teto de `ocorrencias` por mes era 500 e agora e 3000 para os seis meses. Num
+mes com mais de 500 ocorrencias a tela passa a mostrar a contagem real (ate 3000) em vez do 500 cortado -- mesmo
+efeito que a 220 teve em `entregas`/`coletas`, e o que o plano pediu ao mandar escalar a proporcao.
+
+**Verificacao:** spec `tests/contracts/executive-metrics-consulta-unica.spec.ts` (7 casos) sobre
+`tests/contracts/executive-metrics-fixtures.ts` (servidor de mentira que filtra por intervalo como o PostgREST,
+projeta so as colunas pedidas e aplica o `limit` de verdade, mais o **espelho do codigo anterior** de `trends`
+na `4f18e691`). Casos: 3 consultas, uma por tabela; janela unica de seis meses, `created_at` no select das tres e
+tetos 6000/6000/3000; **os seis meses identicos ao codigo anterior, campo por campo**, num cenario com as duas
+bordas do mes (23:30 do ultimo dia -- que em UTC cai no mes seguinte -- e 00:30 do primeiro dia), linha deletada,
+uma ocorrencia deletada (que o codigo antigo **nao** filtra, e continua nao filtrando) e linhas fora da janela em
+cada ponta; o mesmo com 70 linhas espalhadas por oito meses; ordem cronologica com rotulo `MMM/yy`; 9000
+ocorrencias no mes corrente viram 3000 (o teto corta); ausencia de laco `for`, de `monthsPromises` e de
+`.limit(1000)` no bloco, com exatamente 3 `.from("...")`, e as outras duas consultas do arquivo intactas.
+Valores do mes corrente no cenario de bordas conferidos a mao: 5 entregas, 3 entregas/finalizadas com 2 no prazo
+(OTIF 66,7%), 3 coletas, 4 ocorrencias e frete 660.
+`npx tsc --noEmit` 0 erros; `npx eslint` nos tres arquivos 0 avisos / 0 erros; `npx vitest run` **812/812** em 96
+arquivos; o spec tambem passa com `TZ=UTC`.
+**Prova por mutacao: 9/9 capturadas** (teto fixo em 1000; `created_at` fora do select de entregas; janela
+comecando um mes antes; chave do mes em UTC em vez de local; baldes de coletas lendo ocorrencias; filtro de
+deletadas fora de entregas; teto de ocorrencias em 6000; formula do OTIF sobre todas as entregas em vez das
+entregues; meses em ordem invertida).
+
+**Nao verificado:** o volume real por mes no banco (a consulta do plano pede credencial de Supabase, que esta
+sessao nao tem) e a contagem de requisicoes na aba Rede do `/dashboard` executivo, que so da para medir depois do
+deploy. Por isso o risco do teto unico segue anotado como A-03.
+
+### Registro - etapa 220 (2026-11-25) - benchmark de KPI passa de 18 consultas para 3
+
+**Causa:** mesma raiz da 219, um degrau abaixo. Mesmo em paralelo, o hook pedia a **mesma tabela seis vezes**,
+mudando so o intervalo de `created_at` -- e os seis intervalos sao contiguos. O agrupamento por mes estava no
+laco do cliente em vez de na consulta. Achado P-03.
+
+**Entrega:** as 18 consultas viraram **3**, uma por tabela (`src/hooks/analytics/useKPIBenchmark.tsx:49-71`).
+Cada uma cobre a janela inteira, de `startOfMonth(subMonths(new Date(), periodsBack - 1))` ate
+`endOfMonth(new Date())`, e o mes de cada linha sai de `format(new Date(linha.created_at), "yyyy-MM")` no
+cliente, num `Record<string, T[]>` montado com `forEach` (`:75-87`) -- o mesmo desenho de
+`src/hooks/logistics/useTrackingAnalytics.tsx:138-141`. A chave e **local**, exatamente o criterio que o servidor
+ja usava (`startOfMonth`/`endOfMonth`), entao os seis pontos nao se deslocam. Teto ajustado para
+`periodsBack * 1000` (6000) nas tres (`:44`), mantendo a proporcao do que o codigo pedia antes (1000 por mes), e
+`created_at` entrou no `select` das tres porque passou a ser lido no cliente. Nenhum calculo, filtro de status ou
+formula foi tocado; `periods.sort` continua garantindo a ordem do grafico.
+
+**Verificacao:** spec `tests/contracts/kpi-benchmark-consulta-unica.spec.ts` (8 casos) sobre
+`tests/contracts/kpi-benchmark-fixtures.ts`, que traz um servidor de mentira (filtra por intervalo como o
+PostgREST, projeta so as colunas pedidas e aplica o `limit` de verdade) e o **espelho do codigo anterior**
+(`df6b3e2e`) para comparar os seis pontos. Casos: 3 consultas, uma por tabela; janela unica e teto 6000 nas tres;
+`ocorrencias` tambem com teto (A-01 resolvido); **os seis pontos identicos ao algoritmo anterior, campo por
+campo**, num cenario com as bordas do mes (23:30 do ultimo dia e 00:30 do primeiro dia -- no fuso do Brasil esses
+dois caem em meses UTC diferentes do mes local); linhas fora da janela e uma linha deletada; o mesmo com 40 linhas
+espalhadas por oito meses; ordenacao ascendente; ausencia de laco com `await` e de `.limit(1000)`, com exatamente
+3 `.from("...")` e 3 `.limit(teto)`; formulas e comparacao entre os dois ultimos periodos intactas.
+Os valores do mes corrente no cenario de bordas foram conferidos a mao: 5 entregas, 2 no prazo (SLA 40%), frete
+660, custo medio 132, 2 ocorrencias (taxa 40%), tempo medio 7/3 dias.
+**Prova por mutacao: 9/9 capturadas** (teto fixo em 1000; `created_at` fora do select; janela comecando um mes
+antes; agrupamento por mes UTC em vez de local; baldes de entregas e coletas trocados; filtro de deletados fora;
+teto fora de `ocorrencias`; `sort` removido; formula do SLA alterada).
+
+**Substitui:** o guard da etapa 219 (`tests/contracts/kpi-benchmark-paralelo.spec.ts`, 9 casos) foi removido --
+ele provava a forma que deixou de existir (`Promise.all` por mes). O achado P-03 continua coberto, agora pela prova
+mais forte: 3 consultas medidas no cliente falso e igualdade numerica contra o codigo anterior.
+
+**Verificado:** `npx tsc --noEmit` 0 erros; `npx eslint .` 77 avisos / 0 erros (o mesmo numero do `main`, sem
+gastar orcamento); `npx vitest run` 804/804 em 95 arquivos; `grep -c 'from("entregas")\|from("coletas")\|from("ocorrencias")'`
+no hook = **3**, o esperado do plano.
+
+**Nao verificado:** o volume real de linhas por mes no banco (a consulta do plano
+`SELECT date_trunc('month', created_at) ... FROM entregas` exige credencial de Supabase, que esta sessao nao tem)
+-- e por isso o risco do teto unico segue aberto em A-02; e a contagem de requisicoes na aba Rede do `/analytics`,
+que so pode ser medida depois do deploy.
+
+### Registro - etapa 219 (2026-11-25) - meses do benchmark de KPI deixam de ser consultados em serie
+
+**Causa:** `useKPIBenchmark` abria `for (let i = 0; i < periodsBack; i++)` e dentro dele fazia **tres `await` em
+sequencia** (`entregas`, `coletas`, `ocorrencias`). Com o padrao `periodsBack = 6` eram **18 idas ao banco uma
+depois da outra** antes de a tela aparecer: a espera era a soma das 18, nao a maior delas. Achado P-03. Os seis
+meses nao dependem um do outro.
+
+**Entrega:** o `for` virou `Array.from({ length: periodsBack }).map(async (_, i) => ...)` envolvido em
+`Promise.all`, e as tres consultas do mes viraram um `Promise.all` proprio com desestruturacao de tupla — a mesma
+forma do arquivo gemeo `src/hooks/analytics/useExecutiveMetrics.tsx:40-55`. **Nenhum calculo mudou** (guias
+`docs/qa/04-PLANO.md`): os filtros de status, `custoTotal`, `slaRate`, `ocorrenciaRate`, `tempoMedioEntrega` e a
+comparacao entre os dois ultimos periodos ficaram linha a linha iguais; `periods.push({...})` virou `return {...}`
+dentro do callback e o `sort` por periodo (que ja existia) garante a ordem final, entao o grafico nao inverte. O
+`.limit(1000)` de `entregas` e `coletas` foi preservado (remover recriaria P-01) e o `Promise.all` nao introduz
+erro novo: as consultas ja ignoravam `error` (so desestruturavam `data`).
+
+**Limpado de passagem (a mudanca obrigou):** o `/* eslint-disable sonarjs/cognitive-complexity */` do topo virou
+diretiva nao usada -- a complexidade caiu ao sair do laco -- e foi removido; com isso o arquivo continua com 0
+avisos, sem gastar orcamento de lint.
+
+**Verificacao:** spec novo `tests/contracts/kpi-benchmark-paralelo.spec.ts`, 9 casos: ausencia de `for (` e de
+`periodsBack; i++`; `Array.from({ length: periodsBack })` com `.map(async (_, i) =>`; **exatamente dois**
+`Promise.all` (meses e tabelas); as tres tabelas dentro do `Promise.all` interno, na ordem entregas -> coletas ->
+ocorrencias e **sem `await supabase`** entre elas; dois `.limit(1000)`; `periods.sort` por periodo presente;
+`return {` no lugar de `periods.push(` com `period`/`periodLabel`; os filtros de status e as formulas de taxa
+comparados sem depender de quebra de linha; comparacao dos dois ultimos periodos intacta. **Prova por mutacao:
+10/10 capturadas** (meses fixos em 1; sem o `Promise.all` externo; teto trocado; teto adicionado em
+`ocorrencias`; `sort` removido; formula do SLA alterada; volta do `push`; comparacao com 3 periodos; `await`
+solto na primeira consulta; `periodLabel` removido). `npx tsc --noEmit` 0 erros; `npx eslint` do arquivo 0
+problemas; `npx prettier --write` aplicado (o repo nao tem gate de formatacao).
+
+**Nao verificado:** a cascata de requisicoes em paralelo no `/analytics` e a igualdade dos numeros na tela exigem
+navegador com sessao real (sem credencial nesta sessao). A prova aqui e estrutural, com a comparacao dos calculos
+por contrato.
+
+**Registrado (nao corrigido):** a consulta de `ocorrencias` (`:65-69`) segue **sem teto**, ao contrario das duas
+outras -- anotado como A-01 em "Achados novos", fora do escopo desta etapa.
+
+**Risco assumido:** 18 consultas simultaneas em vez de sequenciais elevam o pico no banco por alguns milissegundos;
+com teto de 1000 por consulta (e sem teto na de ocorrencias, A-01) isso foi considerado aceitavel para a tela de
+analytics.
+
+### Registro - etapa 216 (2026-11-25) - tempo real de notificacoes deixa de recarregar a cada aviso
+
+**Causa:** a tela registrava `useRealtime({ table: "notifications", onInsert/onUpdate/onDelete: () => refetch() })`.
+Achado P-02. Cada notificacao nova, cada marcacao de lida e cada exclusao recarregava a listagem; depois da etapa
+213 a recarga rebaixa uma pagina em vez da tabela inteira, mas em rajada continua linear: um disparo em lote de 30
+avisos gerava 30 requisicoes. Pior, `onUpdate: () => refetch()` fechava um laco com as proprias mutacoes da tela --
+marcar como lida grava (`update` de `read`), o tempo real avisa, a pagina rebaixa.
+
+**Entrega:** o tratamento saiu da tela para `src/hooks/data/useNotificacoesRealtime.ts` (novo; manter as ~60 linhas
+no arquivo da tela estouraria o orcamento de 400 linhas do `max-lines`). O contrato do `useRealtime` **nao** foi
+tocado -- 12 telas dependem dele e o defeito dele e de outro achado (R-02); a assinatura continua ativa (remover o
+tempo real e deixar so o polling resolveria o custo destruindo a funcionalidade).
+
+- `onInsert`/`onDelete` mudam o conjunto (a linha entra ou sai): acumulam numa janela de **400 ms**
+  (`clearTimeout` + `setTimeout`) e disparam **uma** invalidacao ao fim dela. Uma rajada vira uma requisicao.
+- `onUpdate` nao recarrega: o payload do tempo real traz a linha (`{ old, new }` -- `onUpdate?: (payload: { old: T;
+new: T }) => void` em `useRealtime.tsx`), entao a alteracao e aplicada no cache da pagina onde a linha esta, por
+  `setQueriesData` na chave `["notifications"]` e troca por `id`. Duas armadilhas tratadas: (a) essa chave tambem
+  casa com a entrada de contagem (`["notifications","stats",userId]`), que **nao tem** `data` -- sem o guard
+  `Array.isArray(atual.data)` a contagem do cabecalho viraria uma pagina de linhas; (b) com filtro ou busca ativos
+  a linha pode **sair** do conjunto (filtro "nao lidas" + linha marcada como lida), e so a recarga responde certo
+  -- nesse caso o hook cai na recarga agrupada.
+- Cleanup no unmount (`clearTimeout`) para nao invalidar depois da tela sair. A tela nao passa `queryKey` ao tempo
+  real de proposito: aquela invalidacao, dentro do hook, e imediata e a rajada voltaria a ser uma requisicao por
+  aviso. As mutacoes da propria tela (`markReadMut`, `markAllReadMut`, `deleteMut`) continuam invalidando.
+
+**Verificacao:** spec novo `tests/contracts/notificacoes-realtime-agrupado.spec.ts`, 11 casos: tela sem `refetch` e
+sem import direto do `useRealtime`; contrato `{ old, new }` no hook do tempo real (evidencia da decisao do
+`setQueriesData`); janela entre 300 e 500 ms e usada como argumento do agendamento; `clearTimeout` antes de
+reagendar; **uma** invalidacao e dentro da janela; duas saidas de `clearTimeout` (reagendamento e unmount);
+`setQueriesData` na chave e troca por `id`; guard do `data`; saida por filtro ativo antes do caminho pontual;
+`filtroAtivo` vindo dos tres filtros da consulta; `insert`/`delete` no caminho agrupado e `update` no pontual.
+**Prova por mutacao: 11/11 capturadas** (recarga direta sem janela, sem `clearTimeout`, janela de 1500 ms, sem a
+saida por filtro, sem o guard, `insert` pelo caminho pontual, tela sem tempo real, tela passando `queryKey`,
+`filtroAtivo` fixo, troca por `id` removida, contrato do `useRealtime` sem a linha). `npx tsc --noEmit` 0 erros;
+`npx eslint .` 77 avisos / 0 erros (orcamento 86, sem aviso novo -- a tela ficou em 363 linhas).
+
+**Nao verificado:** o teste de duas abas do plano (criar notificacao numa aba e ver aparecer na outra em ate 1 s)
+exige navegador e sessao real; nao ha credencial nesta sessao. A prova aqui e estrutural (contrato por mutacao).
+
+**Fora do escopo (registrado):** o defeito R-02 do `useRealtime` (assinatura derrubada e reaberta a cada render, em
+12 telas) segue aberto -- a etapa 216 nao o toca.
+
+### Registro - etapa 217 (2026-11-25) - uma consulta a `notifications` (achado P-03)
+
+**Causa:** `useAccuracyMetaCycle` montava `Promise.all(rows.map(...))` e dentro do laco consultava
+`notifications` **uma vez por transportadora configurada** (`.eq("user_id")` + `.gte("created_at")` +
+`.contains("metadata", { source, carrier })` + `.limit(1)`). Com 10 transportadoras, 10 consultas quase
+identicas, diferindo so no `carrier` -- que vive dentro de um `jsonb`, e por isso o autor pediu um valor por vez.
+
+**Entrega:** antes do laco, **uma** consulta a `notifications` com so a parte comum do filtro
+(`.select("metadata")`, `.eq("user_id", uid)`, `.gte("created_at", dayAgoIso)`,
+`.contains("metadata", { source: "accuracy-meta-monitor" })`, `.order("created_at", desc)`, `.limit(500)`); o
+`carrier` de cada linha vira um `Set` em memoria e o laco passou a fazer `carriersNotificados.has(...)`. O
+`.limit(1)` do laco saiu e o teto passou a ser do conjunto -- com ordem, porque teto sobre conjunto sem ordem
+corta de forma nao deterministica. **Atalho evitado:** um `.or(...)` com um `contains` por transportadora
+estouraria o limite de tamanho de URL do PostgREST (414) justamente para quem tem muitas configuracoes.
+
+**Semantica preservada:** a chave do `Set` e o `carrier` gravado pelo monitor (`?? null` quando ausente) e a
+consulta usa `s.transportadora ?? "__all__"` -- exatamente o que o `.contains({ carrier })` antigo comparava, dos
+dois lados. So o `select` mudou de `id` para `metadata` (a linha inteira era payload morto: so o `carrier` e
+usado). A logica de `status` (`ok`/`warming`/`pending`/`notified`), a janela de 24 h, a chamada
+`supabase.rpc("count_prediction_breach_days", ...)` (etapa 218, DDL) e o `staleTime`/`refetchInterval` de 60 s
+ficaram intactos.
+
+**Verificacao:** spec de contrato novo `tests/contracts/accuracy-meta-consulta-unica.spec.ts` (9 casos): zero
+`from("notifications")` e zero `.limit(1)` dentro do `rows.map`; a consulta agregada antes do laco com os tres
+filtros e o teto **depois** da ordem; continuam duas consultas no arquivo (a agregada e a do ultimo alerta, com
+`maybeSingle`); o `Set` montado com `meta?.carrier ?? null` e consultado com `s.transportadora ?? "__all__"`;
+nenhum `contains` com `carrier`; a `rpc` intacta (`_target`/`_carrier`); o bloco de `status` comparado **byte a
+byte**. **8 mutacoes** -- consulta de volta dentro do laco, sem teto, teto sem ordem, `select("id")`, chave nula
+virando `"__all__"` na leitura, chave de busca sem o mapeamento, `>=` virando `>` no status e `_carrier: null` na
+rpc -- falham **2/1/1/1/1/1/1/1**; versao correta 9/9. Suite completa **768/768** (92 arquivos), `tsc --noEmit` 0,
+`eslint .` **77 avisos / 0 erros** (orcamento 86).
+
+**Achado nao corrigido aqui (fora do escopo):** o monitor grava o alerta "todas as transportadoras" ora como
+`carrier: "__all__"`, ora como `carrier: null` (ver `accuracy-meta-monitor/index.ts:93-95` e
+`escalation.ts:58`, que tratam os dois como variantes da mesma coisa). O hook compara so com `"__all__"`, entao
+uma notificacao gravada com `carrier: null` nao conta como "ja notificado" nesta tela. Isso **e** o comportamento
+anterior -- foi preservado de proposito, porque mexer nele muda o `status` que decide se o usuario recebe alerta
+-- e virou item de proximos passos.
+
+**Nao verificado:** o numero de consultas no navegador real e a contagem de linhas em 24 h por usuario (sem
+credencial nesta sessao). A aba Rede com o hook ativo deve mostrar 1 requisicao a `notifications`, nao N.
+
+### Registro - etapas 213, 214 e 215 (2026-11-25) - paginacao, filtro e busca no servidor (notificacoes)
+
+**Causa:** `Notificacoes.tsx` baixava ate 200 notificacoes (o `.limit(200)` da etapa 212) e resolvia o resto no
+cliente: `useFilters` varria titulo e mensagem em memoria a cada tecla, `usePagination` recortava 15 por pagina e
+`stats` contava `list.length`. Tres consequencias: (a) `useServerPagination`, o contrato da onda 6, estava escrito
+e **sem nenhum consumidor** -- nada provava que ele funciona; (b) "X de Y" mentia para quem tem mais de 200
+notificacoes, porque Y travava em 200 e as paginas seguintes vinham do array ja baixado; (c) busca e filtro eram
+O(n) no cliente.
+
+**Entrega (as tres etapas em uma PR):** as tres mexem no mesmo arquivo, entao separa-las deixaria a tela num
+estado intermediario inconsistente (pagina do servidor com filtro em memoria). A consulta saiu da tela para
+`src/hooks/data/useNotificacoesPage.ts` (novo): `.select(<7 colunas>, { count: "exact" })` -> `.eq("user_id")` ->
+`eq("type")` / `eq("read")` quando o filtro nao e `all` -> `.or(title.ilike.%x%,message.ilike.%x%)` ->
+`.order("created_at", desc)` -> `.order("id", desc)` -> `.range(from, to)`. Sem `.limit()`: junto de `.range()`
+ele corta a faixa e a ultima pagina vem vazia. O desempate por `id` e obrigatorio -- `created_at` repete em
+disparo em lote e ordem instavel faz o `.range()` repetir ou pular linha entre paginas. O termo digitado passa por
+`replace(/[%,()]/g, "")` antes de entrar no `or`, porque esses caracteres sao sintaxe do PostgREST. Os filtros
+entraram na `queryKey` (`["notifications", userId, { tipo, leitura, busca }]`), entao trocar filtro volta para a
+pagina 1 -- regra 3 do contrato, sem codigo extra. Busca com `useDebounce(..., 350)`. `stats` deixou de derivar da
+lista: sao duas consultas `head: true` (contagem exata, sem trazer linha). A `Pagination` recebe
+`totalItems={pagination.total}` e a faixa exibida e calculada do total do servidor.
+
+**Corrigido de passagem (a mudanca obrigou):** o seletor "Tipo" oferecia `coleta` e `entrega`, chaves de
+`typeConfig` que **nao existem** no enum `notification_type` do banco (`info|success|warning|error|achievement`,
+conferido em `types.ts` -- o tsc acusou TS2345). Com o filtro em memoria isso devolvia lista vazia; mandado ao
+PostgREST viraria **400 e tela de erro**. As opcoes passaram a vir de `TIPOS_NOTIFICACAO` (o enum). `typeConfig`
+ficou intacto para os icones.
+
+**Verificacao:** spec novo `tests/contracts/notificacoes-paginacao-servidor.spec.ts`, 17 casos: count exato;
+`.range` presente e `.limit` ausente no hook inteiro; os dois `.order` na ordem certa e antes do recorte; os tres
+filtros na cadeia; `ilike` em `title`/`message`; limpeza do termo; filtros na `queryKey`; `enabled: !!userId`;
+duas consultas `head: true`; tela sem `usePagination`/`useFilters`/`filteredData`; debounce alimentando a
+consulta; `useSelection(rows)`; `totalItems` do servidor (e nunca `rows.length`); faixa calculada; vazio e
+paginacao so depois de `isLoading` cair; limpar filtros zerando a busca; opcoes do seletor vindas do enum.
+**10 mutacoes** -- sem `count`, sem desempate por `id`, `.limit(200)` de volta, filtro de tipo fora da cadeia,
+filtros fora da `queryKey`, busca sem debounce, `totalItems={rows.length}`, `useSelection` com outro conjunto,
+paginacao visivel antes de `isLoading` cair e termo sem limpeza -- falham **1 caso cada**; versao correta 17/17.
+Suite completa **776/776** (92 arquivos), `tsc --noEmit` 0, `eslint .` **77 avisos / 0 erros** (orcamento 86; a
+tela caiu de 399 para 370 linhas e saiu do aviso `max-lines`), `validate:query-limits` **0 nova(s)** -- as duas
+consultas de contagem so passam porque o guard da etapa 211 reconhece `head: true` como nao-listagem (ajuste
+incluido na PR #398).
+
+**Nao verificado:** comportamento visual da paginacao depois do deploy e quantas notificacoes os usuarios reais
+tem no banco (sem credencial nesta sessao). `read_at`, `action_url` e `metadata` seguem sem uso na tela -- fora do
+escopo destas etapas.
 
 ### Registro - etapa 210 (2026-11-25) - achados P-01 e P-04 (cotacoes multicanal)
 
@@ -787,6 +1296,7 @@ classificacao sem confundir com resposta do provedor; `delete` preso a 404/410; 
 `sendNotification` (sem retentativa); resposta do lote intacta.
 
 **Verificado de verdade:**
+
 - Prova por mutacao (A-E): A sem `options.timeout` -> **1** falha; B valor 30 s divergente do helper -> **2**;
   C estouro nao virando `"timeout"` -> **1**; D retentativa no envio -> **1**; E sem a guarda de `statusCode` ->
   **1**. Restaurado -> **7/7**.
@@ -833,6 +1343,7 @@ de `tests/contracts/cors-onda5.spec.ts` foi de **2 para 4** respostas em `ingest
 200-duplicata) tambem levam CORS resolvido.
 
 **Verificado de verdade:**
+
 - Prova por mutacao (A-E): A claim removida -> **2** falhas; B claim depois do insert -> **2**; C relogio do
   servidor na chave -> **2**; D valor medido em texto claro -> **2**; E duplicata com 409 -> **1**. Restaurado
   -> **7/7**.
@@ -866,6 +1377,7 @@ literal, `const headers = getCorsHeaders(req)` antes do preflight e a troca da c
 respondendo com `{ headers }` + varredura agregada de curinga.
 
 **Verificado de verdade:**
+
 - Prova por mutacao (A-E): A `health` revertido ao original -> **4** falhas; B curinga literal de volta numa
   resposta -> **1**; C uma resposta perde o CORS -> **2**; D helper calculado depois do `OPTIONS` -> **1**;
   E a constante antiga volta -> **1**. Restaurado -> **22/22**.
@@ -911,6 +1423,7 @@ respostas e de `...headers`. Mais dois casos de varredura: o preflight responde 
 `...headers`) e nenhuma das 19 ficou com curinga em qualquer cabecalho.
 
 **Verificado de verdade:**
+
 - Prova por mutacao (A-G): A `get-mapbox-token` revertido ao original -> **4** falhas; B curinga literal de
   volta numa resposta -> **3**; C uma resposta perde o CORS -> **1**; D helper calculado depois do `OPTIONS`
   -> **2**; E a constante antiga volta numa resposta -> **2**; F helper nao usado -> **2**; G tres respostas
@@ -959,6 +1472,7 @@ mesmo fallback — se ainda existir preview/deploy do Vercel servindo o app, ele
 funcoes que usam o helper. Incluir esse dominio e mudanca de variavel de ambiente (Regra 8), fora desta etapa.
 
 **Verificado de verdade:**
+
 - `tests/contracts/secure-store-cors.spec.ts` (7 casos): nenhum literal `Access-Control-*` nem `"*"` no arquivo;
   `getCorsHeaders(req)` antes do `OPTIONS`; contagem exata de 10 respostas / 9 `...headers`; 429 com
   `Retry-After` e CORS; rate limit e auth antes de `req.json()`; `catch` B-06 intacto e sem `plaintext`.
@@ -975,7 +1489,6 @@ funcoes que usam o helper. Incluir esse dominio e mudanca de variavel de ambient
 `Access-Control-Allow-Origin`) — depende do deploy desta PR; sera rodado e anotado no fechamento.
 
 **Proximo:** etapa 180 — `external-db-bridge`, mesma receita (a fila 180-198 depende desta).
-
 
 ### Registro - etapa 178 (2026-11-25) - achado B-06 (varredura final das onze)
 
@@ -1013,6 +1526,7 @@ conferidos — `src/hooks/notifications/useWhatsAppNotification.tsx:32`,
 (toast fixo), nao do texto do corpo; nenhuma tela muda.
 
 **Verificado de verdade:**
+
 - `tests/contracts/erro-generico-varredura.spec.ts` (17 casos, um por funcao + logs + chaves de estado) —
   **17/17**. O caso de varredura percorre **todo** `JSON.stringify(...)` dos onze arquivos e falha se algum
   trecho ainda carregar `.message`: foi ele que achou o segundo ponto do `accuracy-weekly-digest` (`:82`), que
@@ -1031,7 +1545,6 @@ quebrar tabela ou credencial em producao; o caminho esta coberto pelas mutacoes 
 
 **Proximo:** etapa 179 — primeira da fila de CORS `*` (aprovacao do dono).
 
-
 ### Registro - etapa 177 (2026-11-25) - achado B-06 (`smart-carrier-selection`)
 
 **Causa:** o `catch` montava a resposta a mao com `{ error: "Internal Server Error", message: error.message }` e
@@ -1045,7 +1558,7 @@ texto de policy no corpo da resposta de quem pediu a cotacao.
 - `:242-247` — o ramo `ValidationError` -> `validationErrorResponse` (400 com o campo, etapa 146) continua
   **antes**; o resto virou `return internalErrorResponse(error, corsHeaders, "smart-carrier-selection")`: 500
   `{"error":"INTERNAL_ERROR"}`, sem mensagem interna e sem stack. O `log({ level: LogLevel.ERROR, message: ...,
-  meta: { error: error.message } })` foi mantido — o detalhe continua no log.
+meta: { error: error.message } })` foi mantido — o detalhe continua no log.
 - **Nao tocado:** a regra de escolha e os pesos default (`price_weight: 0.5`, `time_weight: 0.3`,
   `performance_weight: 0.2`, `max_sla_days: 15`) e o caminho de sucesso `{ success: true, recommendations }`.
 
@@ -1068,7 +1581,6 @@ tinha um `TS18046` proprio, removido junto); `deno lint` 11 = baseline 11; `deno
 plano (`grep -n 'error.message|internalErrorResponse'`): executada — `error.message` so na meta do log e o
 `internalErrorResponse` no `catch`. Falha de banco real: NAO EXECUTADO (exigiria derrubar tabela em producao)
 — RASTREADO pelo codigo.
-
 
 ### Registro - etapa 176 (2026-11-25) - achado B-06 (`rodonaves-webhook`)
 
@@ -1106,7 +1618,6 @@ internalErrorResponse\|throw updateError'`): executada — nao ha `throw updateE
 dentro das metas de `log.error` e o `internalErrorResponse` esta no `catch`. Webhook real da Rodonaves: NAO
 EXECUTADO (exigiria a origem configurada com o segredo real) — RASTREADO pelo codigo.
 
-
 ### Registro - etapa 175 (2026-11-25) - achado B-06 (`lalamove-webhook`)
 
 **Causa:** o `catch` de `lalamove-webhook` devolvia `{"error": error.message}` com status 500. A funcao grava
@@ -1141,7 +1652,6 @@ internalErrorResponse'`): executada — a unica ocorrencia de `error.message` e 
 `log.error`; a resposta de erro nao carrega nada das tabelas. Webhook real com payload invalido: NAO EXECUTADO
 (exigiria a origem Lalamove configurada) — RASTREADO pelo codigo.
 
-
 ### Registro - etapa 174 (2026-11-25) - achado B-06 (`nexus-webhook-receiver`)
 
 **Causa:** o `catch` de `nexus-webhook-receiver` (recebe webhooks do Nexus e repassa para
@@ -1175,7 +1685,6 @@ executada — a unica ocorrencia restante e `:202`, dentro da meta do `log.error
 nada do terceiro. Webhook real do Nexus: NAO EXECUTADO (exigiria origem externa configurada) — RASTREADO pelo
 codigo.
 
-
 ### Registro - etapa 173 (2026-11-25) - achado B-06 (`db-health-weekly-report`)
 
 **Causa:** `db-health-weekly-report` montava `throw new Error("Resend error [<status>]: <corpo do provedor>")` e o
@@ -1208,7 +1717,6 @@ ternarias). `tsc` 0; `lint:budget` sem erro, dentro do orcamento; suite 71 arqui
 pedida pelo plano (`sed -n '220,230p'`): executada — o `if (!response.ok)` nao tem mais `errBody` e o corpo do
 parceiro so aparece dentro do `log.error`. Execucao real do cron com falha do provedor: NAO EXECUTADO (exigiria
 forcar falha do Resend em producao) — rastreado pelo contrato do codigo.
-
 
 ### Registro - etapa 172 (2026-11-25) - achado B-06 (`resend-email`)
 
@@ -1244,7 +1752,6 @@ internalErrorResponse'` + `sed -n '55,72p'`): executada — nao ha mais `error.m
 `internalErrorResponse` esta em `:76`; a resposta de erro nao carrega nada do provedor. Envio real para dominio
 invalido: NAO EXECUTADO (exigiria gastar envio em producao) — RASTREADO pelo codigo.
 
-
 ### Registro - etapa 171 (2026-11-25) - achado B-06 (`rodonaves-api`, demais pontos)
 
 **Causa:** a mesma da etapa 170 nos outros pontos do arquivo: `apiGet` (`:193-200`), `apiMutate` (`:226-233`) e
@@ -1263,8 +1770,7 @@ do parceiro saia na resposta HTTP das acoes de rastreio, cotacao, comprovantes e
 - Handler — a resposta do tipo `RTEError` passou a usar o mapa `MENSAGEM_POR_CODIGO` (texto em portugues
   escolhido pelo **codigo que nos lancamos**: `RTE_AUTH_FAILED`, `RTE_SCOPE_BLOCKED`, `RTE_TIMEOUT`,
   `RTE_BAD_REQUEST`, `RTE_UPSTREAM_ERROR`), em vez de `error.message`. O `catch` inesperado passou a devolver
-  `internalErrorResponse(error, corsHeaders, "rodonaves-api")` (etapa 164) — some o `error.message` e o corpo de
-  500.
+  `internalErrorResponse(error, corsHeaders, "rodonaves-api")` (etapa 164) — some o `error.message` e o corpo de 500.
 - **Nao tocado:** fluxo de token/cache, disjuntor, `buildQS`, o roteamento por `action`, o ramo
   `ValidationError` -> 422 e a tela de sincronizacao da Rodonaves (R-04 tem etapa propria).
 
@@ -1282,6 +1788,7 @@ texto do mapa -> 1; restaurado -> 7/7. `deno check` 4 (baseline 6: os dois `log.
 `lint:budget` 77/86; suite 70 arquivos / 527 testes. Verificacao pedida pelo plano (`grep -rn 'rodonaves-api'
 src/` + `sed -n '1705,1720p'`): executada — a resposta de erro nao carrega texto do parceiro. Erro de cotacao
 forcado em runtime: NAO EXECUTADO (exigiria chamada real ao parceiro) — RASTREADO pelo codigo.
+
 ### Registro - etapa 170 (2026-11-25) - achado B-06 (`rodonaves-api`, login)
 
 **Causa:** `:130-134` promovia o corpo de erro do **login** da Rodonaves a mensagem de excecao:
@@ -1325,7 +1832,7 @@ tambem em `create_order`, `get_order` e `cancel_order`, nao so na cotacao.
   (corte de 500 chars para nao virar log gigante). A resposta 4xx virou
   `{ error: true, status, message: 'Transportadora recusou a solicitacao' }` — sem `details`.
 - `catch` — `error: error.message` virou `error: isBreaker ? 'Transportadora indisponivel' : 'Falha ao
-  chamar a transportadora'`, mantendo `circuitOpen` e o status 503/500. O ramo `ValidationError` -> 422
+chamar a transportadora'`, mantendo `circuitOpen` e o status 503/500. O ramo `ValidationError` -> 422
   continua igual (a etapa 149 depende dele).
 - **Nao tocado:** `safeFetch` (tempo limite e disjuntor), `lalamoveBreaker`, a assinatura HMAC, o
   `throw new Error('Lalamove Server Error: ...')` que dispara o disjuntor em 5xx e o roteamento por
@@ -1362,8 +1869,8 @@ modelo de dados interno (tabela, coluna, restricao) para quem chamasse — o opo
 **Correcao (so o arquivo da etapa):**
 
 - `:53` — `if (error) throw error;` virou `log.error("[execute-protocol] Falha ao executar protocolo:",
-  { protocol_name, code: error.code, message: error.message })` + `throw new Error("Falha ao executar
-  protocolo")`. O log carrega o **nome do protocolo**, que e o que o chamador usa para corrigir; a tabela
+{ protocol_name, code: error.code, message: error.message })` + `throw new Error("Falha ao executar
+protocolo")`. O log carrega o **nome do protocolo**, que e o que o chamador usa para corrigir; a tabela
   interna nao vaza.
 - `:59` `catch` — `return internalErrorResponse(error, corsHeaders, "execute-protocol")`: erro de banco vira 500
   `{"error":"INTERNAL_ERROR"}`, sem texto do Postgres e sem `stack`.
@@ -1389,7 +1896,6 @@ autenticado); a resposta generica e o log sao o mesmo caminho ja verificado nas 
 `confirm: z.literal(true)` das etapas 072/101; ausencia de log estruturado nos caminhos de sucesso (auditoria
 10.9).
 
-
 ### Registro - etapa 167 (2026-11-25) - achado B-06 (`lgpd-erase-user`)
 
 **Causa:** o `catch` de `:102` devolvia `{ error: error.message }` com 400. Numa rotina de apagamento de dado
@@ -1400,7 +1906,7 @@ guardam dado do titular — instrucao pronta para quem tentar burlar o apagament
 **Correcao (so o arquivo da etapa):**
 
 - `:63` perfil — `throw profileError` virou `log.error("[lgpd-erase-user] Falha ao apagar perfil:",
-  { step: "profiles.delete", code, message })` + `throw new Error("Falha ao apagar perfil")`.
+{ step: "profiles.delete", code, message })` + `throw new Error("Falha ao apagar perfil")`.
 - `:68` auth — mesmo padrao com `step: "auth.users.delete"`.
 - `:92` auditoria — mesmo padrao com `step: "audit_logs.insert"`.
 - `:102` `catch` — `return internalErrorResponse(error, corsHeaders, "lgpd-erase-user")`: erro de banco vira 500
@@ -1486,7 +1992,6 @@ o padrao de resposta e o mesmo do helper ja verificado na etapa 164).
 
 **Fora de escopo (registrado, nao tocado):** CORS `*` (etapa 192), dedupe (etapa 199), texto do log em
 `nexus_tactical_logs` que carrega BPM e `vehicle_id`.
-
 
 ### Registro - etapa 164 (2026-11-25) - achado B-06 (`_shared/httpError.ts`)
 
@@ -1591,13 +2096,13 @@ família `_shared/httpError` (etapas 164+); CORS `*`.
 **Correção:**
 
 - `predict-delays`: `invokeFunction("whatsapp-notification", { action: "send_delay_alert", phone, entrega_id,
-  coleta_id, variables })` com o tempo limite **padrão do helper (10 s)** e corpo idêntico ao anterior. Como são N x M
+coleta_id, variables })` com o tempo limite **padrão do helper (10 s)** e corpo idêntico ao anterior. Como são N x M
   envios, cada falha soma em `falhasAlerta` (`:370`) e, no fim, um único `log("WARN", "Delay alerts not delivered", {
-  falhas: falhasAlerta })` (`:375`) resume — sem um log por destinatário e sem `throw` novo.
+falhas: falhasAlerta })` (`:375`) resume — sem um log por destinatário e sem `throw` novo.
 - `predict-delays-scheduled`: `invokeFunction("predict-delays", {}, { timeoutMs: PREDICT_TIMEOUT_MS })` com **30 s**
   (`:11`) — folgado porque ninguém espera a resposta (é cron a cada 30 min), mas finito, e menor que o intervalo do
   cron, então uma execução travada não se empilha com a próxima. Quando `!predResp.ok` (`:81`), `log("ERROR", ...,
-  { reason, status, falhas: 1 })` e resposta **500 estruturada** `{ success: false, reason }` — a falha passa a ficar
+{ reason, status, falhas: 1 })` e resposta **500 estruturada** `{ success: false, reason }` — a falha passa a ficar
   registrada, que era justamente o que o `throw` cru perdia.
 
 **Mudança de comportamento:** `predict-delays` continua respondendo 200 mesmo se nenhum aviso sair (`falhas > 0` fica
@@ -1619,6 +2124,7 @@ de verdade em produção).
 
 **Fora de escopo (registrado, não tocado):** `error.message` cru (`predict-delays:389`, etapa 178); a janela de
 idempotência de 2 min e a leitura de `prevKeys` da agendada; CORS `*`.
+
 ### Registro - etapa 160 (2026-11-25) - achado B-05 (`send-password-reset`)
 
 **Causa:** `index.ts:151` chamava `supabaseAdmin.functions.invoke("resend-email", ...)` **dentro do caminho da
@@ -1721,6 +2227,7 @@ pendurar o laço; os demais usuários continuam sendo avisados na mesma execuç�
 repositório são as etapas 159-163.
 
 **Evidência:**
+
 - `tests/contracts/normalize-freight-alerta-interno.spec.ts` (novo, 4 casos): nenhum `await fetch(` no arquivo e
   `invokeFunction("whatsapp-notification"` no lugar; mensagem e variáveis preservadas; falha por usuário contada
   (`if (!envio.ok) { falhas += 1;`) com `reason` no log e sem `throw`; resumo `if (falhas > 0)` com `total`.
@@ -1765,6 +2272,7 @@ chamadas uma a uma). Merge publica em produção sem efeito até a 157.
 terceiros continuam em `safeFetch`; os `supabase.functions.invoke()` antigos só saem nas etapas 159-163.
 
 **Evidência:**
+
 - `tests/contracts/invoke-function-timeout.spec.ts` (novo, 8 casos): URL e cabeçalhos corretos com token de serviço,
   corpo serializado e `signal` presente; barra final da env não duplica `//`; 500 → `ok:false`/`reason:"http"` com o
   corpo; tempo limite real (fetch respeitando o abort, `timeoutMs: 20`) → `reason:"timeout"` **sem lançar**; erro de
@@ -1782,7 +2290,7 @@ terceiros continuam em `safeFetch`; os `supabase.functions.invoke()` antigos só
 ### Registro - etapa 155 (2026-11-24) - achado B-04 (`ocr-receipt-processor`)
 
 **Causa:** `index.ts:23` (`const body = await req.json()`) alimentava `validateContract` (`:26`), que validava
-`storage_path`/`delivery_id` apenas como *texto com tamanho mínimo*, e desestruturava o mesmo corpo **cru** para
+`storage_path`/`delivery_id` apenas como _texto com tamanho mínimo_, e desestruturava o mesmo corpo **cru** para
 `:48` (`supabaseAdmin.storage.from("documents").download(storage_path)`) e para os filtros `:73-74`
 (`.eq("delivery_id", ...)` / `.eq("storage_path", ...)`). Resultado: um chamador autenticado conseguia baixar
 **qualquer objeto do bucket `documents`** (contratos, anexos de outra entrega) só enviando outro caminho, e ler o
@@ -1808,6 +2316,7 @@ extensão é restringida (`heic`, `jpeg`, `png`, `webp`, `pdf` passam).
 só registra o upload e marca para revisão manual).
 
 **Evidência:**
+
 - `tests/contracts/ocr-receipt-entrada.spec.ts` (novo, 10 casos): caminho real do componente aceito; `heic`/`jpeg`/
   `png`/`webp` aceitos; `../fora.pdf`, `documents/outro.pdf`, `/etc/passwd`, `receipts`, vazio e só espaços
   recusados; `receipts/../secret.pdf`, `receipts/sub/arquivo.pdf` e `receipts/<uuid>/x.pdf` recusados; caminho acima
@@ -1837,6 +2346,7 @@ no parceiro; `message` sem teto inflava a requisição. `send_cotacao` (`:129-15
 
 **Correção:** `parse.ts` novo (puro) com `parseInstance`, `parsePhone`, `parseSendTextRequest`,
 `parseCotacaoRequest` e `parseStatusRequest`, usados nas três ações:
+
 - `instance` numa **lista fechada** montada no topo do `index.ts` (`ALLOWED_INSTANCES`): `EVOLUTION_ALLOWED_INSTANCES`
   (separado por vírgula) + `EVOLUTION_INSTANCE_NAME` (a conexão que `whatsapp-notification/index.ts:37-38` já usa)
   ou `"PRINCIPAL"`, com `pattern` `^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$` para barrar `/` e `..` na URL;
@@ -1856,6 +2366,7 @@ mensagem acima de 4096 passam a receber 400 **sem** chamar a Evolution. O único
 envios dessa conexão passam a receber 400. O bloco de auth (`:34-43`, etapa 006) e o rate limit **não foram tocados**.
 
 **Evidência:**
+
 - `tests/contracts/evolution-whatsapp-envio.spec.ts` (novo, 12 casos): envio do hook aceito; `5511999999999` aceito;
   `123`, `(11) 99999-9999`, `11999999999` e `+551199999999999999` recusados em `phone`; `instance` fora da lista
   recusada citando `PRINCIPAL, SUPORTE`; `instance` vazia/`../../admin`/número recusadas; corpo não-objeto recusado;
@@ -1879,7 +2390,7 @@ envios dessa conexão passam a receber 400. O bloco de auth (`:34-43`, etapa 006
 `:72` (`body.conversationHistory || []`) e `:73` (`body.stream || false`) **sem validar tipo nem tamanho**; o único
 guard era `!message` → 400 (`:75-86`). A pergunta ia inteira para o Gemini: um texto de megabytes (ou um
 `conversationHistory` gigante) virava uma requisição paga ao provedor, e `conversationHistory` não-lista quebrava
-o spread `...conversationHistory.slice(-10)` com 500 genérico. `stream` string (`"false"`) é *truthy* e ligava SSE,
+o spread `...conversationHistory.slice(-10)` com 500 genérico. `stream` string (`"false"`) é _truthy_ e ligava SSE,
 mudando o formato da resposta.
 
 **Correção:** `parse.ts` novo com `parseAssistantRequest`, chamado em `index.ts:74`. Limites: pergunta
@@ -1908,6 +2419,7 @@ e temperatura; `userId` (`:71`) continua sem uso (`deno lint`, herdado — B-06/
 do 400.
 
 **Evidência:**
+
 - `tests/contracts/ai-logistics-assistant-texto.spec.ts` (novo, 13 casos): pedido mínimo vira `{message, [], false}`;
   espaços aparados; alias `prompt` preservado; corpo vazio/nulo/lista/texto recusado com a mensagem PT-BR; teto exato
   aceito e 4001 recusado citando `4000`; `stream` `true`/`false` aceitos e `"true"` recusado; histórico não-lista e
@@ -1959,6 +2471,7 @@ do dono e etapa própria.
 mantém o rastreio em sandbox (etapa 008, dona).
 
 **Evidência:**
+
 - `tests/contracts/lalamove-tracking-id.spec.ts` (novo, 9 casos): `orderId` numérico e com hífen/`_` aceitos; sem
   `orderId` → campo `orderId`; `../orders/1`, `1/2`, `1?x=1`, `1 2`, `.1` → campo `orderId`; 65 caracteres →
   campo `orderId` (64 aceitos); sem `driverId` → campo `driverId`; `drv/1` e `drv 1` → campo `driverId`; corpo
@@ -2017,6 +2530,7 @@ citado no plano (`external-db-bridge/index.ts:4`). `_shared/validate.ts` não fo
 por padrão mantém a cotação em sandbox (etapa 008, dona).
 
 **Evidência:**
+
 - `tests/contracts/melhor-envio-cotacao.spec.ts` (novo, 11 casos): payload real do painel normaliza
   `"20040-020"` → `"20040020"` e preserva `options`; sem CEP de destino → campo `to.postal_code`; CEP de 7 dígitos
   → campo `from.postal_code`; sem volumes → campo `volumes` (alias de `useMelhorEnvio.tsx:128`); lista vazia e
@@ -2070,6 +2584,7 @@ módulo. Mesmo precedente de `external-db-bridge/index.ts:4` (citado no plano) e
 catch (`:73`) são B-06/etapa 172; CORS `*` é a etapa 181.
 
 **Evidência:**
+
 - `tests/contracts/resend-email-contrato.spec.ts` (novo, 7 casos): os três campos como os chamadores enviam;
   lista preservada; 15 entradas inválidas em `to` (sem arroba, `a@b`, espaço, `@b.com`, `a@.com`, número,
   lista com item ruim, lista vazia, 51 destinatários) → campo `to`; assunto vazio/201 caracteres → campo
@@ -2129,6 +2644,7 @@ módulo. Mesmo precedente de `external-db-bridge/index.ts:8` (`ALLOWED_ACTIONS`/
 (`:170`/`:173`) são B-06/etapa 169; CORS inline é etapa 192.
 
 **Evidência:**
+
 - `tests/contracts/lalamove-api-route.spec.ts` (novo, 8 casos): as 4 rotas reais com `upstreamPath` montado;
   tolerância a barra final/espaços/`/v3`; verbo errado em rota válida → campo `method` (4 combinações); verbo fora
   da lista/ausente (`DELETE`, `get`, `42`) → campo `method`; 15 caminhos fora da lista → campo `path` (inclui
@@ -2182,6 +2698,7 @@ estavam. Fora de escopo (registrado): `:94` ainda devolve `error.message` cru (e
 registrava a função como publicada e sem uso), então não há chamada legítima que passe a ser recusada.
 
 **Evidência:**
+
 - `tests/contracts/ingest-biosync-input.spec.ts` (novo, 8 casos): leitura válida preservada; limites 20 e 300
   aceitos; `"abc"` → campo `heart_rate`; ausente/`null`/`""`/espaços/`true`/`[]`/`{}`/`19`/`301`/`-5` → campo
   `heart_rate`; `"150"` (texto numérico) vira `150`; `driver_id`/`vehicle_id` ausentes/vazios/número/lista →
@@ -2232,6 +2749,7 @@ Nenhum trigger ou outra edge chama `notify_status_change` hoje (grep em `src/`, 
 além do próprio arquivo), então não há chamada legítima que passe a ser recusada.
 
 **Evidência:**
+
 - `tests/contracts/webhook-status-input.spec.ts` (novo, 10 casos): `data` completo preservado; corpo sem
   `data` → campo `data` (era o 500); `data` nulo/lista/texto/número/booleano → campo `data`; `entrega_id`
   ausente ou vazio → campo `entrega_id`; `new_status` ausente/vazio/espaçado/número/objeto/lista → campo
@@ -2289,6 +2807,7 @@ invoca a função; `:31`/`:32` tipam `estado_destino: string` e `peso_kg: number
 chamador envia peso em texto, então não há chamada legítima que passe a ser recusada.
 
 **Evidência:**
+
 - `tests/contracts/smart-carrier-selection-input.spec.ts` (novo, 8 casos): UF normalizada; peso `0` aceito como
   limite válido; `"abc"` recusado; `undefined`/`null`/`""`/`"   "`/`[]`/`{}`/`true`/`-1` recusados; UF ausente,
   curta, longa, vazia ou não alfabética recusada; opcionais preservados e tipo errado recusado; só os 4 campos do
@@ -2336,6 +2855,7 @@ sobre `reportId` é usado exatamente onde o caminho exige. `report_type` fica co
 nunca rodar.
 
 **Evidência:**
+
 - `tests/contracts/scheduled-reports-fields.spec.ts` (novo, 7 casos): allowlist descarta `user_id`, `id`,
   `created_at`, `last_sent_at`, `next_send_at` e campo arbitrário; update parcial não sobrescreve campo ausente;
   `frequency`, `day_of_week`, `day_of_month`, `time_of_day`, `recipients`, `filters` e `is_active` inválidos
@@ -2412,10 +2932,10 @@ identificadores reais do payload: `data.key.id` (id da mensagem no Evolution API
 
 **141 — `carrier-webhook-receiver/index.ts`.** A chave `${carrier_id}:${event_type}:${timestamp ?? ""}` virou
 `buildEventKey` com provider `carrier:<carrier_id>`, identificador ? [identificador] : [payload.event_type,
-payload.timestamp || await bodyHash(payload)], payload)`. Com `event_id`/`id` a chave é o identificador; sem
-ele, `event_type` ainda entra, mas o componente que discriminava vazio passa a ser **o hash do corpo** —
+payload.timestamp || await bodyHash(payload)], payload)`. Com `event_id`/`id`a chave é o identificador; sem
+ele,`event_type`ainda entra, mas o componente que discriminava vazio passa a ser **o hash do corpo** —
 dois payloads diferentes do mesmo tipo geram chaves diferentes e dois payloads idênticos continuam
-deduplicando. Nada mais na função mudou: o padrão de referência de erro sem vazamento e o `mapCarrierStatus`
+deduplicando. Nada mais na função mudou: o padrão de referência de erro sem vazamento e o`mapCarrierStatus`
 estão intocados.
 
 **Validação (executada nesta sessão).** `deno check` nos 4 arquivos + o novo: **3 erros herdados antes e
@@ -2438,7 +2958,6 @@ carrier vinham sem `timestamp` — números que o plano pede para registrar: com
 brutos em `webhook_events_processed.payload`, dá para contar depois do deploy. E a **142** (gate de `grep`
 em `scripts/ci/`) continua `[~]`, aguardando o dono: toca `scripts/` e a automação da CI.
 
-
 ### Registro - etapas 132 a 137 (2026-11-23) - achado B-01
 
 **132 - a unicidade existe no banco ao vivo.** Sem MCP do Supabase nesta sessão, a prova veio do próprio
@@ -2448,10 +2967,10 @@ byte** ao commitado - sha256 `5575176495c7d31a7ed5277ea9e80ea16840fe679af86041dc
 `schema-catalog.json` também: `fef0bfe4baba70df133966e3063675edf9ab24a519c461b5f62ea98a0d9b1527`). Nomes
 reais das restrições de unicidade, lidos de `constraints` **e** `indexes` do manifesto:
 
-| tabela | restrição | colunas |
-|---|---|---|
+| tabela                     | restrição                                        | colunas                |
+| -------------------------- | ------------------------------------------------ | ---------------------- |
 | `webhook_events_processed` | `webhook_events_processed_event_id_provider_key` | `(event_id, provider)` |
-| `idempotency_keys` | `idempotency_keys_idempotency_key_key` | `(idempotency_key)` |
+| `idempotency_keys`         | `idempotency_keys_idempotency_key_key`           | `(idempotency_key)`    |
 
 As duas tabelas têm também a `_pkey` respectiva, e `service_role` tem `DELETE` concedido em
 `webhook_events_processed` (`relation_grants`), então o código das etapas 133-136 não precisa de DDL.
@@ -2496,7 +3015,8 @@ comportamento fica para depois do merge. Não houve teste contra o banco ao vivo
 - `src/integrations/supabase/types.ts` está atrás do banco: a run 45189263904 do `types-sync` acusa
   `user_panel_preferences` (metas de SLA da #248) presente em produção e ausente no arquivo commitado, o
   que derruba o gate de TypeScript do próprio `types-sync` desde 2026-11-23. Drift de tipos, não de
-  restrições.
+  restrições. **[Corrigido na etapa 222: a direção estava invertida - a tabela está no arquivo
+  commitado e falta em produção. Ver "Registro - etapa 222".]**
 - O teste da 137 depende de `serve()` continuar inline nas duas edges; se alguém exportar o handler, o
   teste vira redundante e deve ser trocado por teste de unidade com cliente simulado.
 
@@ -2504,8 +3024,8 @@ comportamento fica para depois do merge. Não houve teste contra o banco ao vivo
 
 **Decisão de nome, comum às quatro:** criei `src/lib/realtimeChannel.ts:12`
 (`uniqueChannelName(base)` devolve `base-<timestamp base36>-<contador do módulo>`) e usei **sufixo por
-instância nas quatro**, não `user.id`. Motivo: o caso que o achado descreve é *duas montagens do mesmo
-usuário* (duas abas, dois componentes, widget mais página) e nome por usuário não separa isso. O helper
+instância nas quatro**, não `user.id`. Motivo: o caso que o achado descreve é _duas montagens do mesmo
+usuário_ (duas abas, dois componentes, widget mais página) e nome por usuário não separa isso. O helper
 evita copiar o contador em quatro arquivos e não depende de `crypto` (ausente em parte dos ambientes de
 teste). No lugar do `useRef` do padrão de `useRealtime.tsx:94` usei `useState(() => ...)`: o inicializador
 preguiçoso roda uma vez por instância, então o nome é estável entre renders - que é o que o plano exige
@@ -2537,14 +3057,14 @@ sufixo por argumento. Os **dois** caminhos de saída removem o canal: o timeout 
 agora passam por `uniqueChannelName`. Sobraram **6 nomes fixos**, todos fora do escopo do achado (o achado
 nomeia hooks; estes são componentes, página e utilitário):
 
-| Arquivo | Nome fixo | Risco |
-| --- | --- | --- |
-| `src/components/map/TacticalTerminal.tsx:49` | `tactical-logs` | **colide** com `MapaRotas.tsx:139` |
-| `src/pages/MapaRotas.tsx:139` | `tactical-logs` | mesmo tópico do terminal tático |
-| `src/components/common/RealtimeStatus.tsx:25` | `system-health-check` | um por app - benigno |
-| `src/components/common/RealtimeBadge.tsx:22` | `presence-health` | um por app - benigno |
-| `src/components/freight/ResponseConsole.tsx:35` | `raw_responses` | duas telas abertas → a segunda perde eventos |
-| `src/utils/systemTester.ts:37` | `health-ping` | roda uma vez no auto-teste - benigno |
+| Arquivo                                         | Nome fixo             | Risco                                        |
+| ----------------------------------------------- | --------------------- | -------------------------------------------- |
+| `src/components/map/TacticalTerminal.tsx:49`    | `tactical-logs`       | **colide** com `MapaRotas.tsx:139`           |
+| `src/pages/MapaRotas.tsx:139`                   | `tactical-logs`       | mesmo tópico do terminal tático              |
+| `src/components/common/RealtimeStatus.tsx:25`   | `system-health-check` | um por app - benigno                         |
+| `src/components/common/RealtimeBadge.tsx:22`    | `presence-health`     | um por app - benigno                         |
+| `src/components/freight/ResponseConsole.tsx:35` | `raw_responses`       | duas telas abertas → a segunda perde eventos |
+| `src/utils/systemTester.ts:37`                  | `health-ping`         | roda uma vez no auto-teste - benigno         |
 
 **Achado novo R-09b:** `TacticalTerminal.tsx:49` e `MapaRotas.tsx:139` assinam **o mesmo tópico**,
 `tactical-logs`. Com as duas telas montadas, a segunda faz `.on()` depois do `.subscribe()` da primeira -
@@ -2601,14 +3121,14 @@ sozinho.
 `grep -rn "setTimeout(" src/ --include=*.ts --include=*.tsx`, sem `*.test.*`: **49 arquivos e 66
 chamadas**. Os 10 do R-08 são 10 dessas 66, e agora estão cancelados.
 
-| Grupo | Arquivos | Chamadas | Situação |
-| --- | --- | --- | --- |
-| Os 10 timers do R-08 (cancelados neste lote) | 6 | 10 | `[x]` |
-| Hooks com `clearTimeout` + `use-toast.ts` (timer no `Map toastTimeouts`) | 8 | 11 | corretos |
-| Legítimos do A-08 em hooks (`useDeliveryRoutes.tsx:256`, `useGeocoding.tsx:75`) | 2 | 2 | legítimos |
-| `useQRScanner.tsx` | 1 | 2 | `:136` benigno (só ref) · `:213` → R-08b |
-| **Total em `src/hooks/`** | **17** | **25** | conferido |
-| **Fora de `src/hooks/`** (30 componentes/telas + `main.tsx` + `CircuitBreaker.ts` + `systemTester.ts`) | **32** | **41** | só `CircuitBreaker.ts:39` e `BiometricConsentModal.tsx:66` são legítimos do A-08; o resto → R-08b |
+| Grupo                                                                                                  | Arquivos | Chamadas | Situação                                                                                          |
+| ------------------------------------------------------------------------------------------------------ | -------- | -------- | ------------------------------------------------------------------------------------------------- |
+| Os 10 timers do R-08 (cancelados neste lote)                                                           | 6        | 10       | `[x]`                                                                                             |
+| Hooks com `clearTimeout` + `use-toast.ts` (timer no `Map toastTimeouts`)                               | 8        | 11       | corretos                                                                                          |
+| Legítimos do A-08 em hooks (`useDeliveryRoutes.tsx:256`, `useGeocoding.tsx:75`)                        | 2        | 2        | legítimos                                                                                         |
+| `useQRScanner.tsx`                                                                                     | 1        | 2        | `:136` benigno (só ref) · `:213` → R-08b                                                          |
+| **Total em `src/hooks/`**                                                                              | **17**   | **25**   | conferido                                                                                         |
+| **Fora de `src/hooks/`** (30 componentes/telas + `main.tsx` + `CircuitBreaker.ts` + `systemTester.ts`) | **32**   | **41**   | só `CircuitBreaker.ts:39` e `BiometricConsentModal.tsx:66` são legítimos do A-08; o resto → R-08b |
 
 O achado R-08, que é **de hooks**, fecha aqui: nenhum hook de `src/hooks/` cria `setTimeout`
 em callback sem referência e sem `clearTimeout`, exceto os dois legítimos que o A-08 nomeia.
@@ -2643,21 +3163,21 @@ plano indica (`grep -rln "createMut\|createMutation" src/pages/ src/components/`
 `AdminADR`. A hipótese R-05 não cai inteira, mas quase: o padrão `disabled={...isPending}` é
 de fato o da casa.
 
-| Tela / formulário | Evidência | Protegido? |
-| --- | --- | --- |
-| `PickupDialog` (criar coleta) | `src/components/coletas/PickupDialog.tsx:69` (`loading`) e `:468` (`disabled={loading}`) | sim |
-| `Envios` (criar entrega) | `src/pages/Envios.tsx:1117` (`disabled={!form.endereco_entrega \|\| createMut.isPending}`) | sim |
-| `Clientes` (criar) | `src/pages/Clientes.tsx:921-924` (+ `:927` com `Loader2`) | sim |
-| `Clientes` (editar) | `src/pages/Clientes.tsx:948-951` | sim |
-| `Fornecedores` (criar) | `src/pages/Fornecedores.tsx:780-783` | sim |
-| `Fornecedores` (editar) | `src/pages/Fornecedores.tsx:806-809` | sim |
-| `FretesInternos` (criar) | `src/pages/FretesInternos.tsx:702-703` | sim |
-| `FretesInternos` (editar) | `src/pages/FretesInternos.tsx:729-730` | sim |
-| `Ocorrencias` (criar) | `src/pages/Ocorrencias.tsx:788` (+ `:775` com `uploading`) | sim |
-| `Ocorrencias` (editar) | `src/pages/Ocorrencias.tsx:910` | sim |
-| **`AdminADR` (criar ADR)** | `src/pages/AdminADR.tsx:247` — só `disabled={!newAdr.title \|\| !newAdr.decision}`, sem `isPending` | **não** |
-| `Coletas` (excluir) | `src/components/common/ConfirmDialog.tsx:87` (`disabled={isLoading \|\| !canConfirm}`) | sim |
-| `Despachos` (despachar/confirmar) | `src/pages/Despachos.tsx:552` e `:604` via `ConfirmDialog` | sim |
+| Tela / formulário                 | Evidência                                                                                           | Protegido? |
+| --------------------------------- | --------------------------------------------------------------------------------------------------- | ---------- |
+| `PickupDialog` (criar coleta)     | `src/components/coletas/PickupDialog.tsx:69` (`loading`) e `:468` (`disabled={loading}`)            | sim        |
+| `Envios` (criar entrega)          | `src/pages/Envios.tsx:1117` (`disabled={!form.endereco_entrega \|\| createMut.isPending}`)          | sim        |
+| `Clientes` (criar)                | `src/pages/Clientes.tsx:921-924` (+ `:927` com `Loader2`)                                           | sim        |
+| `Clientes` (editar)               | `src/pages/Clientes.tsx:948-951`                                                                    | sim        |
+| `Fornecedores` (criar)            | `src/pages/Fornecedores.tsx:780-783`                                                                | sim        |
+| `Fornecedores` (editar)           | `src/pages/Fornecedores.tsx:806-809`                                                                | sim        |
+| `FretesInternos` (criar)          | `src/pages/FretesInternos.tsx:702-703`                                                              | sim        |
+| `FretesInternos` (editar)         | `src/pages/FretesInternos.tsx:729-730`                                                              | sim        |
+| `Ocorrencias` (criar)             | `src/pages/Ocorrencias.tsx:788` (+ `:775` com `uploading`)                                          | sim        |
+| `Ocorrencias` (editar)            | `src/pages/Ocorrencias.tsx:910`                                                                     | sim        |
+| **`AdminADR` (criar ADR)**        | `src/pages/AdminADR.tsx:247` — só `disabled={!newAdr.title \|\| !newAdr.decision}`, sem `isPending` | **não**    |
+| `Coletas` (excluir)               | `src/components/common/ConfirmDialog.tsx:87` (`disabled={isLoading \|\| !canConfirm}`)              | sim        |
+| `Despachos` (despachar/confirmar) | `src/pages/Despachos.tsx:552` e `:604` via `ConfirmDialog`                                          | sim        |
 
 **NÃO VERIFICADO:** o teste de duplo clique no navegador com dado real e a consulta
 `select count(*), numero_coleta ... having count(*) > 1` que o plano pede. Não há staging: o teste
@@ -2677,6 +3197,7 @@ duplo no ícone de lixeira dispara dois deletes. Fora do escopo da 122 (que só 
 envio nomeado pela 121); entra em "Próximos passos".
 
 **Verificação**
+
 - `grep -rn "disabled={.*isPending\|disabled={loading"` nos arquivos da tabela → todos os envios com o
   `disabled` ligado ao estado da gravação
 - `npx tsc --noEmit` → 0
@@ -2716,6 +3237,7 @@ etapa futura propagar `row` até `onImport`. A tela diz isso em texto, para não
 número errado ao usuário.
 
 **Verificação**
+
 - `npx tsc --noEmit` → 0
 - `npx eslint src/pages/ImportacaoMassa.tsx src/pages/CotacaoMultiCanal.tsx` → 0 erros, 0 avisos
 - `npx prettier --check` nos dois arquivos → limpo
@@ -2758,6 +3280,7 @@ exata do sino (`src/hooks/notifications/useNotifications.tsx:27`), fazendo o ale
 recarregar a página.
 
 **Verificação**
+
 - `npx tsc --noEmit` -> 0 erros
 - `npx vitest run --coverage` -> 40 arquivos, All files 71.53 st / 67.34 br / 75.14 fn / 73.58 li, sem `ERROR: Coverage`
 - `npx eslint` nos 4 arquivos -> 0 erros, 1 aviso **herdado** (`PredictionAccuracyTimeline.tsx:82`, `react-hooks/set-state-in-effect`; linhas idênticas na `main`)
@@ -2777,6 +3300,7 @@ de assinaturas. Nenhum tipo legítimo passou a ser recusado.
 Mesma lógica, sem mudança de comportamento.
 
 **Verificação**
+
 - `npx vitest run src/lib/fileSignature.test.ts` -> 3/3 (PDF válido aceito; PNG com cabeçalho de JPEG recusado; tipo fora da tabela recusado)
 - `npx vitest run --coverage` -> 41 arquivos, All files 71.65 st / 67.41 br / 75.29 fn / 73.67 li, sem `ERROR: Coverage`; `fileSignature.ts` 100% nas quatro métricas
 - `npx tsc --noEmit` -> 0 erros
@@ -2806,6 +3330,7 @@ Os outros itens do menu (Recebido, Em Transito) seguem sem confirmacao de propos
 sao transicoes normais, e atrito indiscriminado faz o operador parar de ler.
 
 **Verificacao**
+
 - `npx tsc --noEmit` -> 0 erros
 - `npx eslint src/pages/LogisticaReversa.tsx` -> 0 erros, 0 avisos
 - `grep` confirma `ConfirmDialog` importado (`:4`) e o menu sem `updateStatus.mutate`
@@ -2830,6 +3355,7 @@ nao usados, o que o ESLint reprova. A primeira tentativa foi um ternario encadea
 `sonarjs/no-nested-conditional` (78/86) - por isso a versao final usa if-chain.
 
 **Verificacao**
+
 - `npx tsc --noEmit` -> 0 erros
 - `npx eslint src/pages/Despachos.tsx` -> 0 erros, 0 avisos
 - `npm run lint:budget` -> 77/86 avisos (sem aviso novo)
@@ -2846,13 +3372,13 @@ pagina inteira, o que perde filtro e estado da tela.
 Trocado pelo desenho de `Coletas.tsx:288-303`: `EmptyState variant="error"` com titulo
 especifico de cada tela e `action={{ label: "Tentar novamente", onClick: () => refetch() }}`.
 
-| Etapa | Tela | Titulo | `refetch` |
-| --- | --- | --- | --- |
-| 099 | Envios | Erro ao carregar entregas | ja existia |
-| 100 | Clientes | Erro ao carregar clientes | acrescentado |
-| 101 | Fornecedores | Erro ao carregar fornecedores | acrescentado |
-| 102 | FretesInternos | Erro ao carregar fretes internos | acrescentado |
-| 103 | Ocorrencias | Erro ao carregar ocorrencias | acrescentado |
+| Etapa | Tela           | Titulo                           | `refetch`    |
+| ----- | -------------- | -------------------------------- | ------------ |
+| 099   | Envios         | Erro ao carregar entregas        | ja existia   |
+| 100   | Clientes       | Erro ao carregar clientes        | acrescentado |
+| 101   | Fornecedores   | Erro ao carregar fornecedores    | acrescentado |
+| 102   | FretesInternos | Erro ao carregar fretes internos | acrescentado |
+| 103   | Ocorrencias    | Erro ao carregar ocorrencias     | acrescentado |
 
 Quatro das cinco nao desestruturavam `refetch`, que e o que o botao precisa - por isso o
 botao nao podia ter sido ligado antes. O `AlertCircle` ficou orfao em quatro arquivos
@@ -2864,6 +3390,7 @@ Nada de `window.location.reload()` no botao, como o plano alerta: recarrega a ap
 inteira e esconde que a falha era de uma consulta so.
 
 **Verificacao**
+
 - `npx tsc --noEmit` -> 0 erros
 - `npx eslint <as cinco>` -> 0 erros, 6 avisos (exatamente o baseline da main)
 - `npm run lint:budget` -> 77/86
@@ -2876,14 +3403,14 @@ inteira e esconde que a falha era de uma consulta so.
 Estas seis etapas vieram implementadas de sessao anterior e ficaram sem marcacao. Conferi
 cada uma contra o codigo real antes de marcar, em vez de confiar no registro:
 
-| Etapa | Onde esta a prova |
-| --- | --- |
-| 062 | `Coletas.tsx:853-866` - botao `Pencil` no cartao com `e.stopPropagation()`, `setSelectedPickup(c)` e `setIsDialogOpen(true)` |
-| 063 | `Coletas.tsx:951-955` - `onEdit` no `PickupDetailsDialog` fechando detalhes antes de abrir edicao |
-| 064 | `PickupDialog.tsx:102-103` - `setIsReverse`/`setIsUrgent` dentro do `useEffect`, e `:119-120` zerando no ramo de criacao |
-| 065 | `Coletas.tsx:122-136` - `deleteColetaMut` com `.update({ deleted_at })`, nunca `.delete()` |
-| 066 | `Coletas.tsx:867-879` (botao `Trash2` com `stopPropagation`) e `:925-937` (`ConfirmDialog` com `isLoading`) |
-| 067 | `Coletas.tsx:159` - `.is("deleted_at", null)` na consulta da lista; a exportacao CSV de `:364` usa o array `coletas` ja filtrado, nao consulta de novo |
+| Etapa | Onde esta a prova                                                                                                                                      |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 062   | `Coletas.tsx:853-866` - botao `Pencil` no cartao com `e.stopPropagation()`, `setSelectedPickup(c)` e `setIsDialogOpen(true)`                           |
+| 063   | `Coletas.tsx:951-955` - `onEdit` no `PickupDetailsDialog` fechando detalhes antes de abrir edicao                                                      |
+| 064   | `PickupDialog.tsx:102-103` - `setIsReverse`/`setIsUrgent` dentro do `useEffect`, e `:119-120` zerando no ramo de criacao                               |
+| 065   | `Coletas.tsx:122-136` - `deleteColetaMut` com `.update({ deleted_at })`, nunca `.delete()`                                                             |
+| 066   | `Coletas.tsx:867-879` (botao `Trash2` com `stopPropagation`) e `:925-937` (`ConfirmDialog` com `isLoading`)                                            |
+| 067   | `Coletas.tsx:159` - `.is("deleted_at", null)` na consulta da lista; a exportacao CSV de `:364` usa o array `coletas` ja filtrado, nao consulta de novo |
 
 **Ponto verificado na 067:** `PickupConference.tsx:73` faz `.update()`, nao `.select()`, e
 `PickupDetailsDialog.tsx:115` idem - nenhum dos dois lista coletas, entao nao precisam do
@@ -2900,15 +3427,15 @@ Nenhuma alteracao de codigo nesta rodada: as seis ja estavam na `main`.
 Sete etapas da onda 1 de seguranca ja estavam implementadas e sem marcacao. Conferi uma a
 uma contra o codigo antes de marcar:
 
-| Etapa | Prova no codigo |
-| --- | --- |
-| 001 | `nexus-webhook-receiver/index.ts:36-37` - o HMAC e sempre exigido e `verifyWebhookHmac` devolve `false` quando o segredo nao existe (fail-closed). Nao ha condicional desligando a verificacao |
-| 003 | `_shared/auth.ts:69` - `export async function requireRole(` |
-| 004 | `webhook-status/index.ts:29-31` - aceita `x-internal-secret` ou papel `admin`, e recusa o resto |
-| 005 | `webhook-status/index.ts:184-185` - o dispatch consulta `client_webhooks` filtrando por `created_by` do chamador quando ele e usuario; `:161` grava `user_id` em auditoria |
-| 007 | `evolution-whatsapp/index.ts:118` - `user_id: auth.claims.sub` na mensagem enviada |
-| 012 | `health/index.ts:22` - usa `anon_key` de proposito, porque `health` e publica (`verify_jwt=false`); nao expoe `service_role` |
-| 013 | `health-check/index.ts:32` - checa o Auth por `/auth/v1/health`, nao pela API administrativa de usuarios |
+| Etapa | Prova no codigo                                                                                                                                                                                |
+| ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 001   | `nexus-webhook-receiver/index.ts:36-37` - o HMAC e sempre exigido e `verifyWebhookHmac` devolve `false` quando o segredo nao existe (fail-closed). Nao ha condicional desligando a verificacao |
+| 003   | `_shared/auth.ts:69` - `export async function requireRole(`                                                                                                                                    |
+| 004   | `webhook-status/index.ts:29-31` - aceita `x-internal-secret` ou papel `admin`, e recusa o resto                                                                                                |
+| 005   | `webhook-status/index.ts:184-185` - o dispatch consulta `client_webhooks` filtrando por `created_by` do chamador quando ele e usuario; `:161` grava `user_id` em auditoria                     |
+| 007   | `evolution-whatsapp/index.ts:118` - `user_id: auth.claims.sub` na mensagem enviada                                                                                                             |
+| 012   | `health/index.ts:22` - usa `anon_key` de proposito, porque `health` e publica (`verify_jwt=false`); nao expoe `service_role`                                                                   |
+| 013   | `health-check/index.ts:32` - checa o Auth por `/auth/v1/health`, nao pela API administrativa de usuarios                                                                                       |
 
 **Observacao da 005:** quando o chamador e interno (`x-internal-secret`), `callerSub` e
 `undefined` e a consulta nao filtra por dono - o que e o comportamento correto para o
@@ -2942,6 +3469,7 @@ fica bloqueado ate a palavra ser digitada; acao nao destrutiva executa direto.
 `requireTyping`) o caso do bloqueio falha - 1 falha de 3. Com a mudanca, 3 de 3 passam.
 
 **Verificacao**
+
 - `npx tsc --noEmit` -> 0 erros
 - `npx eslint <os quatro arquivos>` -> 0 erros, 4 avisos (baseline)
 - `npm run lint:budget` -> 77/86
@@ -2957,17 +3485,17 @@ Nenhum arquivo alterado, historico nao reescrito.
 **054 - filtro `deleted_at` nas leituras de `transportadoras`.** Auditado consulta por
 consulta, nao por contagem de linha. Todas as leituras filtram:
 
-| Arquivo | Onde |
-| --- | --- |
-| `Transportadoras.tsx` | `:206-208` |
-| `ConfiguracoesFrete.tsx` | `:171-173` |
-| `ExportacaoDados.tsx` | `:86-88` |
-| `Envios.tsx` | `:386-388` |
-| `usePrefetch.ts` | `:60-62` |
+| Arquivo                   | Onde       |
+| ------------------------- | ---------- |
+| `Transportadoras.tsx`     | `:206-208` |
+| `ConfiguracoesFrete.tsx`  | `:171-173` |
+| `ExportacaoDados.tsx`     | `:86-88`   |
+| `Envios.tsx`              | `:386-388` |
+| `usePrefetch.ts`          | `:60-62`   |
 | `useDashboardMetrics.tsx` | `:331-335` |
 | `useExecutiveMetrics.tsx` | `:111-113` |
-| `useGlobalSearch.tsx` | `:129-131` |
-| `PickupDialog.tsx` | `:132-134` |
+| `useGlobalSearch.tsx`     | `:129-131` |
+| `PickupDialog.tsx`        | `:132-134` |
 
 As consultas sem o filtro sao `.insert()` e `.update()` (`Transportadoras.tsx:269`,
 `:303`, `:337`, `:366`; `ConfiguracoesFrete.tsx:187`) - ali o filtro nao se aplica,
@@ -2998,7 +3526,6 @@ Atualize ao fim de cada sessão de trabalho.
 
 **Última etapa trabalhada:** — · **Data:** — · **Próxima etapa independente:** 267
 
-
 ### Registro - etapas 068-096 (2026-11-23)
 
 **068/069/077/082** - ja estavam feitas na `main` antes desta sessao. Evidencia: `grep -rn
@@ -3012,20 +3539,20 @@ removido.
 
 **084-095** - 11 arquivos, 12 chamadas de `useRealtime` corrigidas:
 
-| Etapa | Arquivo | Mudanca |
-|---|---|---|
-| 084 | `src/pages/Envios.tsx` | `onEntregaRealtime` em `useCallback` |
-| 085 | `src/pages/KanbanEntregas.tsx` | `onEntregaKanban` em `useCallback` |
-| 086 | `src/pages/Index.tsx` | `DASHBOARD_ENTREGAS_QUERY_KEY` constante de modulo |
-| 087 | `src/pages/Index.tsx` | `DASHBOARD_COLETAS_QUERY_KEY` constante de modulo |
-| 088 | `src/pages/Coletas.tsx` | `COLETAS_QUERY_KEY` constante de modulo |
-| 089 | `src/components/audit/AuditTrailViewer.tsx` | `onAuditLogInsert` em `useCallback` |
-| 090 | `src/pages/RastreamentoMotorista.tsx` | `onColetaTracking` em `useCallback` |
-| 091 | `src/pages/Ranking.tsx` | `onLevelChange` em `useCallback` |
-| 092 | `src/pages/SLADashboard.tsx` | `onEntregaChange` em `useCallback` |
-| 093 | `src/pages/Notificacoes.tsx` | `onNotificationChange` em `useCallback` |
-| 094 | `src/pages/Despachos.tsx` | `onEntregaNova` e `onEntregaAtualizada` separados; o som (`playNotification`) fica no de insert, para nao tocar duas vezes se o canal reabrir |
-| 095 | `src/pages/CustosDashboard.tsx` | `handleRefetch` era arrow recriada a cada render; virou `useCallback` com deps `[startDate, endDate]` |
+| Etapa | Arquivo                                     | Mudanca                                                                                                                                       |
+| ----- | ------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| 084   | `src/pages/Envios.tsx`                      | `onEntregaRealtime` em `useCallback`                                                                                                          |
+| 085   | `src/pages/KanbanEntregas.tsx`              | `onEntregaKanban` em `useCallback`                                                                                                            |
+| 086   | `src/pages/Index.tsx`                       | `DASHBOARD_ENTREGAS_QUERY_KEY` constante de modulo                                                                                            |
+| 087   | `src/pages/Index.tsx`                       | `DASHBOARD_COLETAS_QUERY_KEY` constante de modulo                                                                                             |
+| 088   | `src/pages/Coletas.tsx`                     | `COLETAS_QUERY_KEY` constante de modulo                                                                                                       |
+| 089   | `src/components/audit/AuditTrailViewer.tsx` | `onAuditLogInsert` em `useCallback`                                                                                                           |
+| 090   | `src/pages/RastreamentoMotorista.tsx`       | `onColetaTracking` em `useCallback`                                                                                                           |
+| 091   | `src/pages/Ranking.tsx`                     | `onLevelChange` em `useCallback`                                                                                                              |
+| 092   | `src/pages/SLADashboard.tsx`                | `onEntregaChange` em `useCallback`                                                                                                            |
+| 093   | `src/pages/Notificacoes.tsx`                | `onNotificationChange` em `useCallback`                                                                                                       |
+| 094   | `src/pages/Despachos.tsx`                   | `onEntregaNova` e `onEntregaAtualizada` separados; o som (`playNotification`) fica no de insert, para nao tocar duas vezes se o canal reabrir |
+| 095   | `src/pages/CustosDashboard.tsx`             | `handleRefetch` era arrow recriada a cada render; virou `useCallback` com deps `[startDate, endDate]`                                         |
 
 **096** - bloco `CONTRATO DE ESTABILIDADE:` acima de `export function useRealtime`
 explicando que o hook absorve a instabilidade via `cbRef`, mas o chamador paga render extra
@@ -3034,6 +3561,7 @@ em `src/` - os 12 acima mais 2 em `src/hooks/logistics/useUnifiedTracking.tsx:19
 eram corretos e servem de exemplo no comentario. Nenhum arrow inline restante.
 
 **Verificacao executada**
+
 - `npm run typecheck` -> 0 erros
 - `npm run lint:budget` -> 77/86 avisos (a main estava em 86/86: estas etapas liberaram 9 de margem), 0 erros
 - `npx vitest run src/hooks/ src/pages/ src/lib/` -> 261 testes passando
@@ -3043,3 +3571,213 @@ eram corretos e servem de exemplo no comentario. Nenhum arrow inline restante.
 `useMultiTableRealtime` (mesmo arquivo, a partir de `useRealtime.tsx:222`) ainda tem
 `eslint-disable` nas dependencias do efeito e dispara o aviso `refs during render` na
 linha 234. A etapa 083 proibe tocar nele; fica registrado para etapa futura.
+
+---
+
+### Registro - etapas 281 e 282 (2026-11-24) - testes de criar coleta e de mover status
+
+**281 - criar coleta.** O plano (`04-PLANO.md:11341`) supunha um *hook* de coletas; ele nao existe: a
+escrita mora no dialogo, `src/components/coletas/PickupDialog.tsx:162`
+(`supabase.from("coletas").insert(...)`). Caminho real conferido por leitura antes de escrever o teste.
+
+Criado `src/components/coletas/PickupDialog.test.tsx` (7 casos):
+
+| Caso                            | O que prova                                                                                                                                                       |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Entrada valida                  | 1 insert com `numero_coleta`, `endereco_coleta`, `status: "aguardando_liberacao"`, `qtd_volumes: 0`, flags em `false`, toast "Protocolo Injetado" e `onSuccess`    |
+| Campo obrigatorio vazio         | 0 insert, 0 toast, 0 `onSuccess` - a validacao segura a escrita                                                                                                    |
+| Erro do banco (`permission denied`) | toast `variant: "destructive"` com o motivo do banco e o dialogo permanece aberto                                                                              |
+| Duplo envio (3 cliques)         | 1 insert (R-05)                                                                                                                                                    |
+| Reversa + Urgente               | `is_reverse` e `is_urgent` em `true` no payload, `observacoes` prefixado com `[LOGISTICA_REVERSA]`                                                                 |
+| Inbound depois de Reversa       | `is_reverse: false` no payload                                                                                                                                     |
+| CANCELAR_LOG                    | avisa o pai para fechar e nao escreve nada                                                                                                                         |
+
+**282 - mover entrega de status.** `count: "exact"` ja estava nas duas telas: `Despachos.tsx:223` e `:284`,
+`KanbanEntregas.tsx:328` - etapas 044-048 cumpridas. As mutacoes seguem **separadas por tela** (nao ha hook
+comum): o plano mandava registrar isso em vez de duplicar teste - registrado.
+
+Criado `src/pages/Despachos.test.tsx` (12 casos), renderizando a pagina com o `supabase` dublado.
+
+A mutacao:
+
+| Caso                               | O que prova                                                                                                                                                 |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Transicao permitida com `count: 1` | 1 update com `{ status: "cotacao_frete" }` e `{ count: "exact" }`, `onStatusChange` avisado, toast "Movido para ..." e a fila recarregada (2 leituras)        |
+| Sem destino unico (`despachado`)   | nao existe botao PROSSEGUIR e nenhum update sai                                                                                                             |
+| `count: 0`                         | recusa com a mensagem de registro alterado por outro usuario, **sem** toast de sucesso, **sem** `onStatusChange` e **sem** gravar `kanban_history`            |
+| Erro do banco                      | a mutacao rejeita e o motivo do banco chega ao usuario                                                                                                      |
+
+A tela em volta (segundo bloco): Sincronizar recarrega a fila; evento de tempo real de insert toca o aviso e
+recarrega, o de update recarrega sem tocar som; clique no cartao abre os detalhes (som de navegacao) e o
+aviso de status recarrega; cartao mostra box e tags; erro de leitura mostra o estado de erro e "Tentar
+novamente" refaz a consulta.
+
+O despacho final (terceiro bloco) e a unica saida que passa por confirmacao na tela: `nf_emitida` tem
+`despachado` como destino unico (`src/lib/statusTransitions.ts:16`), e `moveToNext` (`:268`) chama
+`setConfirmItem(item)` em vez de mover direto.
+
+| Caso                                  | O que prova                                                                                                                                              |
+| ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| NF de simples remessa ausente         | toast "NF de Simples Remessa obrigatoria", nenhum update e o dialogo de confirmacao nao abre                                                                |
+| Confirmacao autorizada                | o dialogo abre com o item, so o "autorizar" dispara a escrita: 1 update com `status: "despachado"` e `{ count: "exact" }`, `onStatusChange`, `kanban_history` (from `nf_emitida` -> `despachado`, notes "Despacho final autorizado"), toast de sucesso e fila recarregada |
+| Confirmacao com `count: 0`            | recusa com a mensagem de registro alterado por outro usuario e nenhum toast de sucesso                                                                      |
+
+O caso `count: 0` cobre a mesma trava que a etapa 277 pede em nivel de hook, so que pela tela; **277 segue
+aberta** porque o Kanban nao foi exercitado.
+
+**Por que existem os segundos blocos (cobertura).** Importar `Despachos.tsx` e `PickupDialog.tsx` coloca os
+dois no denominador da cobertura global (`vitest.config.ts`, piso de 73% em funcoes):
+
+| Momento                                           | Funcoes |
+| ------------------------------------------------- | ------- |
+| Sem os dois arquivos (base da `main`)             | 73.40%  |
+| So com os 8 testes de mutacao/criacao             | 71.75%  |
+| Com os caminhos de tela cobertos (16 testes)      | 73.84%  |
+| Com o despacho final coberto (19 testes)          | 74.43%  |
+
+A segunda linha foi o que reprovou `Unit & Integration Tests` e `quality-gate` na primeira rodada da PR. O
+piso nao foi mexido: o que subiu foi a cobertura real de `Despachos.tsx` (18/31 -> 31/31 funcoes) e de
+`PickupDialog.tsx` (4/14 -> 10/14).
+
+**Verificacao executada**
+
+- `npx vitest run src/pages/Despachos.test.tsx src/components/coletas/PickupDialog.test.tsx` -> 2 arquivos, 19 testes, 0 falhas
+- `npm run test:coverage` -> `All files 76.21 li / 70.19 br / 74.43 fn / 78.25 st`, exit 0 (100 arquivos, 0 falhas);
+  `Despachos.tsx` em 92.38 li / 75.71 br / 100 fn / 100 st, `PickupDialog.tsx` em 75.4 li / 66.17 br / 57.14 fn / 74.13 st
+- `npm run typecheck` -> 0 erros
+- `npx eslint src/pages/Despachos.test.tsx src/components/coletas/PickupDialog.test.tsx` -> 0 problemas
+
+**Nao verificado.** Nenhuma chamada real ao Supabase: os dois testes rodam contra dublo. O `count: 0` de
+verdade depende do gatilho de versao no banco.
+
+**Achados (vão para `03-ACHADOS.md` na etapa 297, nenhum corrigido aqui - fora do escopo).**
+
+1. As mutacoes de status estao duplicadas por tela (`Despachos.tsx` e `KanbanEntregas.tsx`), sem hook comum:
+   qualquer regra nova de transicao precisa ser aplicada duas vezes.
+2. `moveToNext` (`Despachos.tsx:256-274`) mistura tres desfechos no mesmo handler: muda direto quando ha destino
+   unico, abre confirmacao quando o destino e `despachado`, e recusa por toast quando falta `nf_remessa`. Os tres
+   estao cobertos aqui. Mas a trava de NF e a confirmacao existem **so nessa tela**: `KanbanEntregas.tsx` nao
+   menciona `nf_remessa` fora da lista de colunas lidas (`:71`) e do select (`:279`), e nao importa
+   `ConfirmDialog` - mover para `despachado` pelo Kanban (`:328`) nao exige NF de simples remessa nem pede
+   autorizacao. Divergencia entre as duas telas, para decisao do dono (etapa 283/297).
+3. O despacho final pede "esta acao e irreversivel" no texto, mas o status `despachado` ainda aceita
+   `em_transito` (`statusTransitions.ts:17`): o texto do dialogo promete mais do que o banco garante.
+
+## O que sobrou (etapa 298) - medido em 2026-11-24, `main` em `c7fc18ae`
+
+Travessia de 001 a 300 contra este arquivo: **219 concluidas**, **61 parciais**, **20 nao iniciadas**
+(219 + 61 + 20 = 300; nenhuma etapa sem marca). Achado por achado, o estado final esta em `03-ACHADOS.md`
+(35 resolvidos / 15 parciais / 15 abertos).
+
+### Esperando o dono (61 etapas `[~]`)
+
+| Assunto                                                      | Etapas                                                                                                                              | O que trava                                                                   |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
+| Banco: DDL, RLS, unicidade e indices                         | 024, 025, 027-033, 037, 055, 056, 058, 222, 228, 229, 234, 240, 263, 265, 266, 290, 295                                              | nada disso roda sem sua autorizacao (regra 8)                                  |
+| Segredo e ambiente de producao                               | 002, 010, 011, 014, 019, 270, 285, 286                                                                                                | confirmar o estado do segredo, ou remover o que ficou obsoleto                 |
+| Decisao de negocio (o que existe e o que morre)               | 006, 008, 009, 016, 017, 018, 039, 041, 043, 060, 070-076, 120, 142, 211, 248, 255, 257, 272, 273, 274, 283, 288                       | escolher entre corrigir, remover ou aceitar                                    |
+| Fechamento do proprio plano                                  | 284, 299                                                                                                                              | pisos de cobertura e bateria final de gates: os dois mexem em gate de CI       |
+
+### Aberta por falta de acesso ao banco (13)
+
+023, 026, 230, 231, 232, 233, 235, 236, 237, 238, 239, 264, 287 - todas exigem consulta ao banco ao vivo para
+decidir (RLS real, unicidade, uso de indice, existencia de tabela). Nenhuma e codigo pronto esperando merge.
+
+### Nao executada (7)
+
+- **057, 061** - dependem da decisao de 056 e 060 (exclusao logica de `fretes_internos` e o registro unico de
+  SQL avulso).
+- **218** - a variante da RPC so faz sentido depois de decidir o destino da `reconcile_pending_freights` (070).
+- **264, 265** - bloqueadas pelo secret `SUPABASE_DB_URL` (263).
+- **275** - base de teste de hook e de tela: a unica etapa de codigo que ainda nao comecou.
+- **277** - teste do `count` fora da tela: a versao de tela esta coberta desde a 282, falta a de hook.
+- **289, 296** - mostrar as falhas de webhook numa tela e regerar a branch `contexto`; as duas dependem das
+  tabelas do banco que ninguem conseguiu confirmar (287) e do snapshot (263).
+
+### PRs abertas (2, nenhuma mergeavel sem voce)
+
+| PR                                                    | Assunto                                                              | Por que espera                                    |
+| ----------------------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------- |
+| [#398](https://github.com/adm01-debug/Loggi_Flow_V2/pull/398) | guard de CI para consulta de listagem sem teto (etapa 211)           | mexe em workflow (regra 8)                        |
+| [#340](https://github.com/adm01-debug/Loggi_Flow_V2/pull/340) | tira dois SQL historicos da raiz de `scripts/` (etapa 060)           | a etapa 060 pede a sua decisao                    |
+
+---
+
+### Registro - etapas 297, 298 e 300 (2026-11-24) - fechamento da documentacao do QA
+
+**297 - estado final de cada achado.** Nao reescrevi nenhum achado: cada um dos 65 blocos de
+`03-ACHADOS.md` ganhou uma unica linha `**Estado (2026-11-24):**` logo depois do `-> Etapas`, e o topo do
+arquivo ganhou o bloco de fechamento (data, commit da `main`, banco e a contagem). A classificacao nao veio
+da memoria: um script cruzou o campo `-> Etapas NNN` de cada achado com as marcas de `05-PROGRESSO.md` -
+`RESOLVIDO` somente quando **todas** as etapas do achado estao `[x]`.
+
+| Resultado | Achados | IDs |
+| --- | --- | --- |
+| RESOLVIDO | 35 | S-02, F-01, C-03, D-01, D-03, A-07, A-11, A-12, A-13, R-01 a R-06 (exceto R-07), R-08, R-09, B-01, B-03 a B-10, P-02, P-03, H-01, H-05, H-06, H-07, H-08, H-10, H-15 |
+| PARCIAL | 15 | S-01, S-03, S-06, S-07, C-02, D-02, A-08, R-07, B-02, P-01, P-04, H-02, H-03, H-04, H-12 |
+| ABERTO | 15 | S-04, S-05, S-08, F-02, F-03, C-01, D-04, A-09, A-10, P-05, P-06, H-09, H-11, H-13, H-14 |
+
+Verificacao da etapa (esperado: os dois numeros iguais): `grep -c '^## [A-Z]-[0-9]'` = **65** e
+`grep -c '^\*\*Estado ('` = **65**. Nenhum achado ficou sem fechamento e nenhum recebeu dois.
+
+Tambem consolidei a secao "Achados novos": A-06, A-07 e A-08 entraram na tabela (achados das etapas 281/282)
+e um paragrafo novo diz quais dos oito seguem abertos e em que ordem de dano.
+
+**298 - o que sobrou.** Secao nova no fim deste arquivo, com as tres listas que o plano pede (esperando o
+dono, aberta por falta de acesso, nao executada) e as 2 PRs abertas agrupadas por assunto. A travessia
+001-300 fechou **219 + 61 + 20**. Nenhuma PR foi mergeada nesta etapa e nenhum codigo foi tocado.
+
+**300 - relatorio de uma pagina.** `docs/qa/06-RELATORIO-FINAL.md`, datado, com o commit da `main` e o nome
+do banco no alto.
+
+**Verificacao executada**
+
+- `grep -c '^## [A-Z]-[0-9]' docs/qa/03-ACHADOS.md` -> 65; `grep -c '^\*\*Estado (' docs/qa/03-ACHADOS.md` -> 65
+- `grep -c '^- [x]' docs/qa/05-PROGRESSO.md` -> 219; `- [ ]` -> 20; `- [~]` -> 61
+- `wc -l docs/qa/06-RELATORIO-FINAL.md` -> dentro da faixa de uma pagina
+- `grep -n 'jvfhclubfpxrtrrazrgr' docs/qa/06-RELATORIO-FINAL.md` -> presente
+
+**Nao verificado.** Nenhuma das 13 etapas que dependem do banco ao vivo foi executada: o estado delas e
+"aberta por falta de acesso", nao "correta". Nada aqui foi validado contra producao.
+
+---
+
+### Registro - etapa 211 (2026-11-25) - achado P-01 (guard de teto na CI)
+
+**Causa:** as etapas 204 a 210 consertaram cinco consultas sem teto e nada impedia a sexta. A varredura nova
+mostra o tamanho real da divida: **248 consultas de listagem em `src/`, 61 delas sem `.limit`/`.range`** (52
+pares arquivo:tabela). A regra existia so na cabeca de quem revisa.
+
+**Entrega:** `scripts/ci/validate-query-limits.mjs` (Node puro, sem dependencia) percorre `src/`, acha cada
+`.from(<tabela>)` com `.select` e considera **com teto** quem termina em `.limit(`, `.range(`, `.single(` ou
+`.maybeSingle(`, **ou** quando o teto entra depois na variavel da consulta (`let query = supabase.from(...);
+... await query.order(...).limit(500)`). O fim da cadeia e calculado respeitando string, template com `${}` e
+comentario, entao `select("a; b")` nao corta a cadeia no meio. Duas listas de excecao em
+`scripts/ci/query-limits.allowlist.json`: `tabelas` (as 9 tabelas de dominio pequeno que o plano descartou,
+cada uma com o motivo numa linha) e `baseline` (divida congelada por par arquivo:tabela, no formato de
+catraca -- a contagem pode cair, nunca subir). Ligado como `validate:query-limits` no `package.json` e como
+passo `Validate Query Limits (listing caps)` no job `quality-gate` do `ci-nexus.yml`, depois do
+`validate:no-console`. Documentado em `scripts/ci/README.md`.
+
+**Por que catraca e nao "zero de divida":** ligar em modo falha contra as 61 cadeias existentes reprovaria
+toda PR -- exatamente o risco que o plano descreve. A catraca entrega o efeito pretendido hoje (consulta nova
+sem teto reprova) sem travar o repositorio, e cada conserto aperta o baseline com `--update-baseline`.
+
+**Verificacao:** saida limpa na `main` do commit: `643 arquivos, 248 consultas, 61 cadeias sem teto (divida
+congelada 52), 0 nova(s)`, codigo 0. **Zero falso positivo na lista de 16 listagens corretas do plano** --
+duas delas caem no padrao de teto adiado e foram conferidas na pratica: `useSecurityEvents.ts:33-57`
+(`query = query.limit(filters?.limit || 100)`) e `useConciliacao.tsx:123` (`await query.order(...).limit(2000)`),
+igual a `useDrillDown.tsx:67,82`. Teste de sabotagem do plano executado: tirar o `.limit(500)` de
+`Envios.tsx` faz o script reprovar apontando `src/pages/Envios.tsx:351` com codigo 1; `git checkout` devolve
+codigo 0. `node --test scripts/ci/validate-query-limits.unit.mjs` 17/17 (repositorio sintetico em
+`os.tmpdir()`: teto inline, sem teto, `.range`/`.single`/`.maybeSingle`, teto adiado que conta e que nao conta,
+`select` com `;` na string, `Array.from`, arquivo de teste, allowlist de tabela, catraca igual/acima/abaixo,
+`--update-baseline`, `--warn` com saida 0, `src/` ausente, `--json`). `node --test scripts/ci/*.unit.mjs
+scripts/lib/*.unit.mjs` 432/432. `npm run automation:test` 103/103 (contrato exigido por mexer em `scripts/`).
+`actionlint` no workflow 0. `act -j quality-gate -n` simula o job inteiro, incluindo o passo novo.
+
+**Nao verificado:** o passo rodando no runner do GitHub (so a simulacao com `act`); e quais das 61 cadeias
+realmente devolvem volume hoje -- sem credencial de banco nesta sessao. As 61 cadeias sao achado novo em
+relacao ao plano (que falava em 5): ficam como divida congelada e viram etapas futuras da onda 6.
+
+**Merge:** autorizado pelo dono; entra pelo PR #398 junto do passo novo no `ci-nexus.yml`.

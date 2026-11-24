@@ -8,9 +8,9 @@
     "Reconferido campo a campo contra a API em 2026-11-09 (branch protection, repo, actions, rulesets,",
     "environments). required_pull_request_reviews: null = nenhum review obrigatorio; numero = aprovacoes."
   ],
-  "medido_em": "2026-11-12",
+  "medido_em": "2026-11-23",
   "repo": {
-    "private": true
+    "private": false
   },
   "branch_protection_main": {
     "strict": false,

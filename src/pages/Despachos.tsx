@@ -35,7 +35,11 @@ import { ExpeditionDetailsDialog } from "@/components/shipping/ExpeditionDetails
 import { useAudioFeedback } from "@/hooks/notifications/useAudioFeedback";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { useRuleTriggers } from "@/hooks/logistics/useRuleTriggers";
-import { TRANSICOES_ENTREGA } from "@/lib/statusTransitions";
+import {
+  TRANSICOES_ENTREGA,
+  mensagemRecusaTransicao,
+} from "@/lib/statusTransitions";
+import { assertAtualizou } from "@/lib/conflitoVersao";
 
 interface Despacho {
   id: string;
@@ -220,10 +224,7 @@ export default function Despachos() {
         .eq("id", item.id)
         .eq("version", item.version);
       if (error) throw error;
-      if (count === 0)
-        throw new Error(
-          "Conflito de versão — registro alterado por outro usuário, por favor recarregue",
-        );
+      assertAtualizou(count);
 
       await onStatusChange("entrega", item.id, { status: nextStatus });
 
@@ -248,7 +249,8 @@ export default function Despachos() {
       );
       refetch();
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) =>
+      toast.error(mensagemRecusaTransicao(error, "entrega") ?? error.message),
   });
 
   const moveToNext = (item: Despacho) => {
@@ -284,10 +286,7 @@ export default function Despachos() {
         .eq("id", item.id)
         .eq("version", item.version);
       if (error) throw error;
-      if (count === 0)
-        throw new Error(
-          "Conflito de versão — registro alterado por outro usuário, por favor recarregue",
-        );
+      assertAtualizou(count);
 
       await onStatusChange("entrega", item.id, { status: "despachado" });
 
@@ -308,7 +307,8 @@ export default function Despachos() {
       setConfirmItem(null);
       refetch();
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) =>
+      toast.error(mensagemRecusaTransicao(error, "entrega") ?? error.message),
   });
 
   const confirmDispatch = () => {

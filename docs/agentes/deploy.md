@@ -2,16 +2,16 @@
 
 Ler quando for confirmar um deploy, mexer em env vars do Vercel, domínio ou deploy de edge functions.
 
-| O que | Valor |
-|---|---|
-| Projeto Vercel | `loggi-flow-v2` (`prj_nlhANvvSlulm7XwtN46kKeMhEKdw`) |
-| Team | `juca1` (`team_QyN41X0q8hrqhW80AwokbFLv`) |
-| URL de produção | `https://loggi-flow-v2.vercel.app` (também é a `homepage` do repo no GitHub) |
-| Aliases | `loggi-flow-v2-juca1.vercel.app`, `loggi-flow-v2-git-main-juca1.vercel.app` |
-| Framework / build / output | Vite + React · `npm run build` (roda `prebuild` = `validate-csp`) · `dist/` · Node **24.x** no Vercel (a CI do GitHub usa Node 20) |
-| Proteção | `ssoProtection` ligada para tudo que não é domínio próprio — preview só abre logado no time; `passwordProtection` desligada |
-| MCP Vercel | `mcp__Vercel__*` — leitura é livre; **escrita é ação de produção** |
-| Lovable | o projeto nasceu no Lovable (`lovable-tagger` no `vite.config.ts`, `.lovable/`, `@lovable.dev/cloud-auth-js`); app `logiflow-nexus.lovable.app` e projeto `uwbpzfcysppwikfpnzok.lovableproject.com` ainda aparecem em código. O que você muda aqui **não** volta para o Lovable sozinho |
+| O que                      | Valor                                                                                                                                                                                                                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Projeto Vercel             | `loggi-flow-v2` (`prj_nlhANvvSlulm7XwtN46kKeMhEKdw`)                                                                                                                                                                                                                                    |
+| Team                       | `juca1` (`team_QyN41X0q8hrqhW80AwokbFLv`)                                                                                                                                                                                                                                               |
+| URL de produção            | `https://loggi-flow-v2.vercel.app` (também é a `homepage` do repo no GitHub)                                                                                                                                                                                                            |
+| Aliases                    | `loggi-flow-v2-juca1.vercel.app`, `loggi-flow-v2-git-main-juca1.vercel.app`                                                                                                                                                                                                             |
+| Framework / build / output | Vite + React · `npm run build` (roda `prebuild` = `validate-csp`) · `dist/` · Node **24.x** no Vercel (a CI do GitHub usa Node 20)                                                                                                                                                      |
+| Proteção                   | `ssoProtection` ligada para tudo que não é domínio próprio — preview só abre logado no time; `passwordProtection` desligada                                                                                                                                                             |
+| MCP Vercel                 | `mcp__Vercel__*` — leitura é livre; **escrita é ação de produção**                                                                                                                                                                                                                      |
+| Lovable                    | o projeto nasceu no Lovable (`lovable-tagger` no `vite.config.ts`, `.lovable/`, `@lovable.dev/cloud-auth-js`); app `logiflow-nexus.lovable.app` e projeto `uwbpzfcysppwikfpnzok.lovableproject.com` ainda aparecem em código. O que você muda aqui **não** volta para o Lovable sozinho |
 
 ## Deploy
 
@@ -34,14 +34,16 @@ produção — avise o dono).
 
 ### Edge functions (Supabase)
 
-Deploy **manual**, nunca automático: `.github/workflows/deploy-functions.yml` (`workflow_dispatch`, input
-`only` para uma função específica) contra o projeto `jvfhclubfpxrtrrazrgr`. Exige o secret
-`SUPABASE_ACCESS_TOKEN` (token pessoal `sbp_…`); sem ele o job falha no primeiro passo, de propósito.
-Nunca rode `supabase functions deploy` direto em produção, e confirme o run depois de disparar.
+Deploy **automático em merge para a `main`** quando o diff toca `supabase/functions/**`, e também manual por
+`workflow_dispatch` (input `only` para uma função específica): `.github/workflows/deploy-functions.yml:9-13`
+contra o projeto `jvfhclubfpxrtrrazrgr`. Exige o secret `SUPABASE_ACCESS_TOKEN` (token pessoal `sbp_…`);
+sem ele o job falha no primeiro passo, de propósito. Nunca rode `supabase functions deploy` direto em produção, e
+confirme o run (e registre o horário) depois do merge.
 
-Consequência: **merge na `main` publica o front, não as edges.** Mudança que dependa das duas pontas precisa
-do dispatch do workflow logo depois do merge, na ordem certa (código novo primeiro quando a edge é
-retrocompatível; a edge primeiro quando o contrato muda).
+Consequência: **merge na `main` publica o front e, se o diff tocar `supabase/functions/**`, também as
+edges.** Quando o diff não toca `supabase/functions/**`, as edges ficam como estão e a única saída é o
+dispatch manual. Mudança que dependa das duas pontas: confirme os dois runs (front e edges) e registre os
+horários.
 
 ## Env vars no Vercel
 

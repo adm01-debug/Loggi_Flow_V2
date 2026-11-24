@@ -34,7 +34,10 @@ import {
 import { useTransportadoraRotas } from "@/hooks/logistics/useTransportadoraRotas";
 import { useRodonavesTracking } from "@/hooks/logistics/useRodonavesTracking";
 import { useMelhorEnvio } from "@/hooks/logistics/useMelhorEnvio";
-import { useCotacoesMulticanal } from "@/hooks/logistics/useCotacoesMulticanal";
+import {
+  useCotacoesMulticanal,
+  type CotacaoMulticanal,
+} from "@/hooks/logistics/useCotacoesMulticanal";
 import { useLalamoveOrders } from "@/hooks/logistics/useLalamoveOrders";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
@@ -43,15 +46,22 @@ import { CotacaoCarrierList } from "./cotacao-multicanal/CotacaoCarrierList";
 import { CotacaoResultsTable } from "./cotacao-multicanal/CotacaoResultsTable";
 import { NegotiationAssistant } from "@/components/freight";
 import { Progress } from "@/components/ui/progress";
+import { SkeletonTable } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/common/EmptyState";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type {
-  CotacaoManual,
-  TransportadoraComCanal,
-} from "./cotacao-multicanal/types";
+import type { TransportadoraComCanal } from "./cotacao-multicanal/types";
 
 import { NexusCoverageMap } from "@/components/freight/NexusCoverageMap";
+
+function nomeTransportadora(cotacao: CotacaoMulticanal) {
+  return (
+    cotacao.transportadora?.nome_fantasia ||
+    cotacao.transportadora?.razao_social ||
+    "Transportadora não identificada"
+  );
+}
 
 function notificarFimDoBlast(succeeded: number, total: number, falhas: number) {
   if (falhas === 0) {
@@ -71,7 +81,15 @@ function notificarFimDoBlast(succeeded: number, total: number, falhas: number) {
 
 export default function CotacaoMultiCanal() {
   const { searchRoutes } = useTransportadoraRotas();
-  const { createCotacao } = useCotacoesMulticanal();
+  const {
+    cotacoes,
+    isLoading,
+    error,
+    refetch: refetchCotacoes,
+    createCotacao,
+    updateCotacao,
+    selectCotacao,
+  } = useCotacoesMulticanal();
   const rodonaves = useRodonavesTracking();
   const melhorEnvio = useMelhorEnvio();
   const lalamove = useLalamoveOrders();
@@ -97,7 +115,7 @@ export default function CotacaoMultiCanal() {
   const [manualValor, setManualValor] = useState("");
   const [manualPrazo, setManualPrazo] = useState("");
   const [manualObs, setManualObs] = useState("");
-  const [cotacoes, setCotacoes] = useState<CotacaoManual[]>([]);
+  const [manualCotacaoId, setManualCotacaoId] = useState<string | null>(null);
   const [blastFalhas, setBlastFalhas] = useState<
     { transportadora: string; mensagem: string }[]
   >([]);
@@ -115,6 +133,53 @@ export default function CotacaoMultiCanal() {
   };
   const weights = STRATEGY_WEIGHTS[nexusStrategy] ?? STRATEGY_WEIGHTS.Normal;
 
+  // Cotações de API externa (Rodonaves, Melhor Envio, Lalamove) só podem ser
+  // persistidas quando o provedor tem transportadora cadastrada: a coluna
+  // transportadora_id é UUID NOT NULL com FK para transportadoras(id). Sem
+  // transportadora cadastrada, a cotação não entra no banco e o operador é avisado.
+  const registrarCotacaoExterna = (
+    disponiveis: TransportadoraComCanal[],
+    dados: {
+      nome: string;
+      valor_cotado: number | null;
+      prazo_dias: number | null;
+      observacoes: string;
+    },
+  ) => {
+    const alvo = disponiveis.find((c) =>
+      [c.transportadora?.nome_fantasia, c.transportadora?.razao_social].some(
+        (n) => n && n.toLowerCase().includes(dados.nome.toLowerCase()),
+      ),
+    );
+    if (!alvo) {
+      toast.warning(
+        `Cotação ${dados.nome}${
+          dados.valor_cotado !== null
+            ? ` (R$ ${dados.valor_cotado.toFixed(2)})`
+            : ""
+        } não registrada: nenhuma transportadora cadastrada corresponde a esse provedor.`,
+      );
+      return;
+    }
+    createCotacao.mutate({
+      transportadora_id: alvo.transportadora_id,
+      canal: "api",
+      origem_estado: origemEstado,
+      origem_cidade: origemCidade || undefined,
+      destino_estado: destinoEstado,
+      destino_cidade: destinoCidade || undefined,
+      peso_kg: pesoKg ? parseFloat(pesoKg) : undefined,
+      volumes: parseInt(volumes),
+      valor_mercadoria: valorMercadoria
+        ? parseFloat(valorMercadoria)
+        : undefined,
+      valor_cotado: dados.valor_cotado ?? undefined,
+      prazo_dias: dados.prazo_dias ?? undefined,
+      observacoes: dados.observacoes,
+      status: "respondido",
+    });
+  };
+
   const handleSearch = async () => {
     if (!origemEstado || !destinoEstado) {
       toast.error("Selecione os estados de origem e destino");
@@ -123,7 +188,7 @@ export default function CotacaoMultiCanal() {
 
     setIsSearching(true);
     setHasSearched(true);
-    setCotacoes([]);
+    void refetchCotacoes();
     setCarriers([]);
 
     try {
@@ -176,16 +241,11 @@ export default function CotacaoMultiCanal() {
           })
           .then((res) => {
             if (res?.data) {
-              addCotacao({
-                id: crypto.randomUUID(),
-                transportadora_id: "rodonaves-id", // Use a standard ID or find in carriers
-                transportadora_nome: "Rodonaves RTE",
-                canal: "api",
-                valor: res.data.Valor,
-                prazo_dias: res.data.PrazoEntrega,
-                status: "respondido",
+              registrarCotacaoExterna(enriched, {
+                nome: "Rodonaves",
+                valor_cotado: res.data.Valor ?? null,
+                prazo_dias: res.data.PrazoEntrega ?? null,
                 observacoes: "Cotação automática API Rodonaves",
-                created_at: new Date().toISOString(),
               });
             }
           })
@@ -212,20 +272,14 @@ export default function CotacaoMultiCanal() {
               };
               (res as MEOption[]).forEach((option) => {
                 if (!option.error) {
-                  addCotacao({
-                    id: crypto.randomUUID(),
-                    transportadora_id: `me-${option.id}`,
-                    transportadora_nome: `Melhor Envio - ${option.name}`,
-                    canal: "api",
-                    valor: parseFloat(String(option.price ?? "0")),
+                  registrarCotacaoExterna(enriched, {
+                    nome: "Melhor Envio",
+                    valor_cotado: parseFloat(String(option.price ?? "0")),
                     prazo_dias:
                       option.delivery_range?.max ??
                       option.delivery_time ??
                       null,
-
-                    status: "respondido",
-                    observacoes: `Serviço: ${option.name}`,
-                    created_at: new Date().toISOString(),
+                    observacoes: `Melhor Envio — serviço: ${option.name}`,
                   });
                 }
               });
@@ -246,16 +300,11 @@ export default function CotacaoMultiCanal() {
           })
           .then((res) => {
             if (res?.priceBreakdown) {
-              addCotacao({
-                id: crypto.randomUUID(),
-                transportadora_id: "lalamove-id",
-                transportadora_nome: "Lalamove",
-                canal: "api",
-                valor: parseFloat(res.priceBreakdown.total),
+              registrarCotacaoExterna(enriched, {
+                nome: "Lalamove",
+                valor_cotado: parseFloat(res.priceBreakdown.total),
                 prazo_dias: 1, // Lalamove is usually same day
-                status: "respondido",
                 observacoes: "Cotação automática Lalamove",
-                created_at: new Date().toISOString(),
               });
             }
           })
@@ -291,17 +340,7 @@ export default function CotacaoMultiCanal() {
       destino_estado: destinoEstado,
       peso_kg: pesoKgValue,
       volumes: parseInt(volumes),
-    });
-    addCotacao({
-      id: crypto.randomUUID(),
-      transportadora_id: carrier.transportadora_id,
-      transportadora_nome: carrier.transportadora?.nome_fantasia || "N/A",
-      canal,
-      valor: null,
-      prazo_dias: null,
-      status: "pendente",
       observacoes,
-      created_at: new Date().toISOString(),
     });
   };
 
@@ -373,19 +412,6 @@ export default function CotacaoMultiCanal() {
     notificarFimDoBlast(succeeded, total, falhas.length);
   };
 
-  const addCotacao = (c: CotacaoManual) =>
-    setCotacoes((prev) => {
-      // Avoid duplicates
-      if (
-        prev.some(
-          (x) =>
-            x.transportadora_id === c.transportadora_id && x.canal === c.canal,
-        )
-      )
-        return prev;
-      return [...prev, c];
-    });
-
   const handleCotarAPI = async (carrier: TransportadoraComCanal) => {
     if (!pesoKg) {
       toast.error("Informe o peso para cotar via API");
@@ -412,17 +438,6 @@ export default function CotacaoMultiCanal() {
         "Cotação via Nexus Blast (API) — aguardando resposta da transportadora",
       status: "pendente",
     });
-    addCotacao({
-      id: crypto.randomUUID(),
-      transportadora_id: carrier.transportadora_id,
-      transportadora_nome: carrier.transportadora?.nome_fantasia || "N/A",
-      canal: "api",
-      valor: valorCalculado,
-      prazo_dias: carrier.prazo_dias,
-      status: "pendente",
-      observacoes: "Nexus Blast API — aguardando resposta",
-      created_at: new Date().toISOString(),
-    });
   };
 
   const handleCotarWhatsApp = (carrier: TransportadoraComCanal) => {
@@ -440,17 +455,7 @@ export default function CotacaoMultiCanal() {
       destino_estado: destinoEstado,
       peso_kg: pesoKg ? parseFloat(pesoKg) : undefined,
       volumes: parseInt(volumes),
-    });
-    addCotacao({
-      id: crypto.randomUUID(),
-      transportadora_id: carrier.transportadora_id,
-      transportadora_nome: carrier.transportadora?.nome_fantasia || "N/A",
-      canal: "whatsapp",
-      valor: null,
-      prazo_dias: null,
-      status: "pendente",
       observacoes: "WhatsApp enviado",
-      created_at: new Date().toISOString(),
     });
     toast.success("Mensagem WhatsApp aberta!");
   };
@@ -473,17 +478,7 @@ export default function CotacaoMultiCanal() {
       destino_estado: destinoEstado,
       peso_kg: pesoKg ? parseFloat(pesoKg) : undefined,
       volumes: parseInt(volumes),
-    });
-    addCotacao({
-      id: crypto.randomUUID(),
-      transportadora_id: carrier.transportadora_id,
-      transportadora_nome: carrier.transportadora?.nome_fantasia || "N/A",
-      canal: "email",
-      valor: null,
-      prazo_dias: null,
-      status: "pendente",
       observacoes: "Email enviado",
-      created_at: new Date().toISOString(),
     });
     toast.success("Email aberto!");
   };
@@ -493,47 +488,69 @@ export default function CotacaoMultiCanal() {
       toast.error("Informe o valor");
       return;
     }
-    setCotacoes((prev) =>
-      prev.map((c) =>
-        c.transportadora_id === selectedCarrier.transportadora_id &&
-        c.status === "pendente"
-          ? {
-              ...c,
-              valor: parseFloat(manualValor),
-              prazo_dias: manualPrazo ? parseInt(manualPrazo) : null,
-              status: "respondido" as const,
-              observacoes: manualObs || c.observacoes,
-            }
-          : c,
-      ),
-    );
-    toast.success("Resposta registrada!");
+    const pendente = manualCotacaoId
+      ? cotacoes.find((c) => c.id === manualCotacaoId)
+      : null;
+    if (!pendente) {
+      toast.error(
+        "Cotação pendente não encontrada — atualize a lista e tente de novo",
+      );
+      return;
+    }
+    // O hook preenche responded_at, invalida a query e emite o toast de sucesso.
+    updateCotacao.mutate({
+      id: pendente.id,
+      valor_cotado: parseFloat(manualValor),
+      prazo_dias: manualPrazo ? parseInt(manualPrazo) : undefined,
+      observacoes: manualObs || pendente.observacoes || undefined,
+      status: "respondido",
+    });
     setManualDialog(false);
     setManualValor("");
     setManualPrazo("");
     setManualObs("");
     setSelectedCarrier(null);
+    setManualCotacaoId(null);
   };
 
-  const respondidas = cotacoes.filter(
-    (c) => c.status === "respondido" && c.valor !== null,
+  /**
+   * Escolha explicita do operador (etapa 040): grava status=selecionado na linha.
+   * A de menor valor continua sendo sugestao, nao decisao automatica.
+   */
+  const handleEscolherCotacao = (cotacaoId: string) => {
+    selectCotacao.mutate(cotacaoId);
+  };
+
+  // "respondido" + "selecionado": ao escolher, a linha muda de status na
+  // invalidacao da query e, sem isso, melhor cotacao/economia/passo voltariam
+  // para o estado anterior logo apos a escolha.
+  const respondidas = useMemo(
+    () =>
+      cotacoes.filter(
+        (c) =>
+          (c.status === "respondido" || c.status === "selecionado") &&
+          c.valor_cotado !== null,
+      ),
+    [cotacoes],
   );
   const melhorCotacao =
     respondidas.length > 0
-      ? respondidas.reduce((a, b) => (a.valor! < b.valor! ? a : b))
+      ? respondidas.reduce((a, b) =>
+          (a.valor_cotado ?? Infinity) < (b.valor_cotado ?? Infinity) ? a : b,
+        )
       : null;
   const savings = useMemo(() => {
     if (respondidas.length < 2) {
       return 0;
     }
-    const v = respondidas.map((c) => c.valor!);
+    const v = respondidas.map((c) => c.valor_cotado!);
     return Math.max(...v) - Math.min(...v);
   }, [respondidas]);
   const averageValue = useMemo(() => {
     if (respondidas.length === 0) {
       return null;
     }
-    const v = respondidas.map((c) => c.valor!);
+    const v = respondidas.map((c) => c.valor_cotado!);
     return v.reduce((acc, x) => acc + x, 0) / v.length;
   }, [respondidas]);
   const currentStep = useMemo(() => {
@@ -828,8 +845,8 @@ export default function CotacaoMultiCanal() {
                   animate={{ opacity: 1, x: 0 }}
                 >
                   <NegotiationAssistant
-                    bestValue={melhorCotacao.valor}
-                    carrierName={melhorCotacao.transportadora_nome}
+                    bestValue={melhorCotacao.valor_cotado}
+                    carrierName={nomeTransportadora(melhorCotacao)}
                     averageValue={averageValue}
                   />
                 </motion.div>
@@ -853,10 +870,10 @@ export default function CotacaoMultiCanal() {
                     </CardHeader>
                     <CardContent className="p-3 pt-0">
                       <p className="font-bold text-sm truncate">
-                        {melhorCotacao?.transportadora_nome}
+                        {melhorCotacao ? nomeTransportadora(melhorCotacao) : null}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        R$ {melhorCotacao?.valor?.toFixed(2)}
+                        R$ {melhorCotacao?.valor_cotado?.toFixed(2)}
                       </p>
                     </CardContent>
                   </Card>
@@ -877,7 +894,7 @@ export default function CotacaoMultiCanal() {
                           return (
                             <>
                               <p className="font-bold text-sm truncate">
-                                {fastest.transportadora_nome}
+                                {nomeTransportadora(fastest)}
                               </p>
                               <p className="text-xs text-muted-foreground">
                                 {fastest.prazo_dias} dias
@@ -901,17 +918,17 @@ export default function CotacaoMultiCanal() {
                         {(() => {
                           const bestValue = respondidas.reduce((a, b) => {
                             const scoreA =
-                              a.valor! * weights.price +
+                              (a.valor_cotado ?? 0) * weights.price +
                               (a.prazo_dias || 0) * 50 * weights.time;
                             const scoreB =
-                              b.valor! * weights.price +
+                              (b.valor_cotado ?? 0) * weights.price +
                               (b.prazo_dias || 0) * 50 * weights.time;
                             return scoreA < scoreB ? a : b;
                           });
                           return (
                             <>
                               <p className="font-bold text-sm truncate">
-                                {bestValue.transportadora_nome}
+                                {nomeTransportadora(bestValue)}
                               </p>
                               <p className="text-xs text-muted-foreground">
                                 Equilíbrio sugerido pelo Nexus
@@ -926,6 +943,37 @@ export default function CotacaoMultiCanal() {
               )}
             </AnimatePresence>
 
+            {isLoading && cotacoes.length === 0 && (
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm">Carregando cotações…</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <SkeletonTable rows={4} cols={5} />
+                </CardContent>
+              </Card>
+            )}
+
+            {!isLoading && error && (
+              <Card className="border-destructive/40 bg-destructive/5">
+                <CardContent className="p-4 space-y-3">
+                  <p className="text-sm font-medium text-destructive">
+                    Não foi possível carregar as cotações registradas.
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {error.message}
+                  </p>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => void refetchCotacoes()}
+                  >
+                    Tentar novamente
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+
             <AnimatePresence>
               {hasSearched && (
                 <motion.div
@@ -939,21 +987,60 @@ export default function CotacaoMultiCanal() {
                     onCotarWhatsApp={handleCotarWhatsApp}
                     onCotarEmail={handleCotarEmail}
                     onRegistrar={(c) => {
+                      const pendentes = cotacoes.filter(
+                        (x) =>
+                          x.transportadora_id === c.transportadora_id &&
+                          x.status === "pendente",
+                      );
+                      if (pendentes.length === 0) {
+                        toast.error(
+                          `Nenhuma cotação pendente para ${
+                            c.transportadora?.nome_fantasia ||
+                            "esta transportadora"
+                          } — cote antes de registrar a resposta.`,
+                        );
+                        return;
+                      }
+                      if (pendentes.length > 1) {
+                        toast.error(
+                          `Há ${pendentes.length} cotações pendentes para esta transportadora — registre a resposta pela linha desejada na tabela.`,
+                        );
+                        return;
+                      }
                       setSelectedCarrier(c);
+                      setManualCotacaoId(pendentes[0].id);
                       setManualDialog(true);
                     }}
                   />
+                  {!isLoading && !error && cotacoes.length === 0 && (
+                    <EmptyState
+                      variant="inbox"
+                      size="sm"
+                      title="Nenhuma cotação registrada ainda"
+                      description="Busque rotas e dispare uma cotação para uma transportadora desta busca — a resposta da transportadora aparece aqui."
+                    />
+                  )}
                   <CotacaoResultsTable
                     cotacoes={cotacoes}
                     melhorCotacao={melhorCotacao}
-                    onRegistrar={(tid) => {
-                      const c = carriers.find(
-                        (x) => x.transportadora_id === tid,
-                      );
-                      if (c) {
-                        setSelectedCarrier(c);
-                        setManualDialog(true);
+                    onEscolher={handleEscolherCotacao}
+                    onRegistrar={(cotacaoId) => {
+                      const cot = cotacoes.find((x) => x.id === cotacaoId);
+                      const c = cot
+                        ? carriers.find(
+                            (x) =>
+                              x.transportadora_id === cot.transportadora_id,
+                          )
+                        : undefined;
+                      if (!cot || !c) {
+                        toast.error(
+                          "Transportadora desta cotação não está na busca atual — refaça a busca para registrar a resposta",
+                        );
+                        return;
                       }
+                      setSelectedCarrier(c);
+                      setManualCotacaoId(cot.id);
+                      setManualDialog(true);
                     }}
                   />
                   {blastFalhas.length > 0 && (

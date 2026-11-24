@@ -6,6 +6,7 @@
 --                                                     ou Bearer service_role. JWT de usuário NÃO passa.
 --   evolution-whatsapp, melhor-envio-api,
 --   log-security-event ............................. Bearer de usuário logado ou service_role.
+--                                                     evolution-whatsapp exige papel admin ou user.
 --                                                     x-internal-secret e anon key NÃO passam.
 -- Os crons mandam x-internal-secret lido do vault ('internal_fn_secret'); ele só autentica se a env
 -- INTERNAL_FN_SECRET das functions tiver o MESMO valor.

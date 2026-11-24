@@ -47,18 +47,24 @@ SECURITY_ALERT_EMAIL|destinatario dos alertas do log-security-event
 SECURITY_SLACK_WEBHOOK_URL|https://hooks.slack.com/services/...
 EVOLUTION_API_URL|WhatsApp Evolution
 EVOLUTION_API_KEY|WhatsApp Evolution
-ATICKET_API_KEY|WhatsApp A-Ticket
-ATICKET_API_URL|opcional; padrao https://api.a-ticket.com.br/v1
+EVOLUTION_INSTANCE_NAME|conexao usada por whatsapp-notification (padrao PRINCIPAL)
+EVOLUTION_ALLOWED_INSTANCES|opcional; conexoes extras aceitas por evolution-whatsapp (virgula)
 APP_URL|URL publica do app, usada nos links dos e-mails de SLA
 # ── CRM / integracao ──
 BITRIX24_WEBHOOK_URL|https://promobrindes.bitrix24.com.br/rest/1/...
 NEXUS_WEBHOOK_SECRET|HMAC do nexus-webhook-receiver (obrigatorio quando definido)
 EXTERNAL_SUPABASE_URL|external-db-bridge: OUTRO projeto Supabase, nunca o oficial
 EXTERNAL_SUPABASE_SERVICE_KEY|external-db-bridge
+EXTERNAL_DB_ALLOWED_TABLES|opcional; tabelas liberadas no bridge (virgula)
+EXTERNAL_DB_ALLOWED_RPCS|opcional; RPCs liberadas no bridge (virgula)
 # ── Cache (Upstash Redis) ──
 # Sem UPSTASH_REDIS_REST_*: rate limiting usa fallback em memoria (funciona, sem persistencia entre cold starts)
 UPSTASH_REDIS_REST_URL|https://...upstash.io
 UPSTASH_REDIS_REST_TOKEN|
+# ── Push (Web Push) ──
+VAPID_SUBJECT|mailto: ou URL do site, usado por push-send
+VAPID_PUBLIC_KEY|chave publica VAPID
+VAPID_PRIVATE_KEY|chave privada VAPID (segredo)
 # ── Plataforma ──
 INTERNAL_FN_SECRET|header x-internal-secret dos crons; o MESMO valor do vault (ver scripts/ops/pos_deploy_functions.sql)
 ALLOWED_ORIGINS|opcional; origens CORS separadas por virgula (padrao *)

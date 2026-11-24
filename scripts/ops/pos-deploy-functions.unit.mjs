@@ -50,7 +50,7 @@ describe('pos_deploy_functions.sql confere com o repositório', () => {
     }
     for (const fn of POR_USUARIO) {
       const src = ler('supabase', 'functions', fn, 'index.ts');
-      assert.match(src, /requireUser\(req\)/, `${fn} não usa requireUser`);
+      assert.match(src, /require(User|Role)\(req/, `${fn} não autentica usuário (requireUser/requireRole)`);
       assert.ok(!/requireInternalSecret/.test(src), `${fn} passou a aceitar x-internal-secret: atualize o runbook`);
     }
     const auth = ler('supabase', 'functions', '_shared', 'auth.ts');
@@ -59,7 +59,7 @@ describe('pos_deploy_functions.sql confere com o repositório', () => {
   });
 
   test('predict-delays-scheduled autenticada executa a previsão (por isso o runbook proíbe o teste nela)', () => {
-    assert.match(ler('supabase', 'functions', 'predict-delays-scheduled', 'index.ts'), /functions\.invoke\(\s*"predict-delays"/);
+    assert.match(ler('supabase', 'functions', 'predict-delays-scheduled', 'index.ts'), /(?:functions\.invoke|invokeFunction)\(\s*"predict-delays"/);
     assert.match(RUNBOOK, /Não repita esse teste em predict-delays-scheduled/);
   });
 
