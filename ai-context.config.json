@@ -1,3 +1,3 @@
 {
-  "publicacao": "Publicado pelo workflow .github/workflows/contexto.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md"
+  "publicacao": "Publicado pelo workflow .github/workflows/contexto-ia.yml em docs/contexto/codigo/ da branch `contexto`. Leia: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md"
 }

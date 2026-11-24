@@ -4,6 +4,7 @@ Regras do dono para qualquer agente de IA; vencem `docs/` (histórico). Detalhe 
 divergiu da realidade → corrija no mesmo PR do fix. Responda sempre em PT-BR.
 
 ## Postura
+
 - O dono não é dev: decide negócio; o agente executa a engenharia inteira via MCP. Nunca passo manual do
   dono nem pedir que ele revise diff.
 - Qualidade + velocidade, mínimo de tokens. Decida como dev sênior; pergunte só com custo, arquitetura,
@@ -23,6 +24,7 @@ divergiu da realidade → corrija no mesmo PR do fix. Responda sempre em PT-BR.
   hora. Nunca imprima nem commite `.env`, tokens ou `service_role`.
 
 ## Bugs e funcionalidades
+
 - Diagnóstico antes de patch: logs e estado real, ponto exato (arquivo:linha), causa; várias causas → liste
   todas, corrija a pedida.
 - Antes da PR, no que tocou: `npx eslint <arquivos>`, `npm run typecheck`, `npx vitest run <caminho>`; mexeu
@@ -31,13 +33,14 @@ divergiu da realidade → corrija no mesmo PR do fix. Responda sempre em PT-BR.
 - O gate de lint é orçamento, não zero: `.warning-budget.json` (hoje `lintWarnings: 105`, `lintErrors: 0`,
   `tsErrors: 0`). Subir o número exige decisão do dono; baixar é bem-vindo (`npm run lint:budget:ratchet`).
 - "Pronto" = PR mergeada + deploy confirmado (Vercel na `main`; edge function pelo `deploy-functions.yml`)
-  + comportamento verificado (log, query ou request real); faltou um → diga onde parou.
+  - comportamento verificado (log, query ou request real); faltou um → diga onde parou.
 - Funcionalidade pronta = integrada ponta a ponta (rota em `src/App.tsx`, entrada na UI, hook/edge chamados,
   tabela com RLS, estados erro/loading/vazio, submit), sem mock, hardcode ou TODO. Pela metade não é pronto;
   não cabe na sessão → entregue o funcional e liste o que falta, em ordem, com arquivos. Nunca deixe código
   morto ou feature "quase" sem dizer.
 
 ## Comunicação
+
 - Resultado primeiro, só o que muda decisão do dono. Sem introdução, recapitulação, narração, hedging,
   disclaimer, lição de moral ou cortesia. Efeito no negócio; técnica só se perguntarem. Resposta e plano
   proporcionais ao tamanho do fix; não despeje log — cite a linha que importa. Caminhos, comandos e links
@@ -49,7 +52,9 @@ divergiu da realidade → corrija no mesmo PR do fix. Responda sempre em PT-BR.
   `Próximos passos: nada pendente neste escopo.`
 
 ## Fluxo Git — detalhe em `docs/agentes/github-ci.md`
-- Repo `adm01-debug/Loggi_Flow_V2`, `main`, **privado**. Escrita no GitHub: MCP **`GITHUB - MCP - FOREVER`**
+
+- Repo `adm01-debug/Loggi_Flow_V2`, `main`, **publico** (medido na API em 2026-11-23: `"visibility":"public"`).
+  Consequencia: nada de segredo em commit, issue, PR ou log de CI - o mundo le. Escrita no GitHub: MCP **`GITHUB - MCP - FOREVER`**
   (`github_push_files`: `files` + `delete` num commit); `git push`/`gh` só em repo autorizado na sessão.
 - Nunca commite em `main`. Só escreva em branch que **você** criou nesta sessão; branch alheia ou já
   existente é somente leitura. Antes do push, confira que o último commit é seu.
@@ -60,7 +65,10 @@ divergiu da realidade → corrija no mesmo PR do fix. Responda sempre em PT-BR.
   responsabilidade, ninguém o cobra no caminho.
 - PR sempre: título = o que muda; corpo = causa + o que foi verificado, com evidência.
 - Mergeie sem aprovação (squash; **apague a branch à mão** — `delete_branch_on_merge` está desligado) PR sua
-  pronta: os 9 required checks verdes, sem conflito, escopo comum (front, edge function, config).
+  pronta: os 10 required checks verdes, sem conflito, escopo comum (front, edge function, config).
+  Os 10 sao: Security Scan, Lint, Type Check, Warning Budget Gate, Unit & Integration Tests,
+  Build Artifact, quality-gate, Security Audits, Agents Docs Integrity e Contratos da automacao local
+  (fonte: `scripts/ci/github-settings-baseline.json`; medido na API em 2026-11-23).
   **Deixe aberta e chame o dono**: DDL/migration em produção; CI/workflows, segredos, Dockerfile; deleção de
   dado, arquitetura ou custo; conflito com PR de outro agente.
 - `strict` está **desligado**: PR atrasada da `main` mergeia mesmo assim. CI de PR antiga não prova nada
@@ -71,6 +79,7 @@ divergiu da realidade → corrija no mesmo PR do fix. Responda sempre em PT-BR.
 - Fim: link da PR + estado.
 
 ## Banco — ler `docs/agentes/banco.md` antes de SQL, migration ou deploy
+
 - Oficial: Supabase Cloud **`jvfhclubfpxrtrrazrgr`** (`supabase/config.toml:1`), SQL pelo MCP
   **`SUPABASE - LOGGI FLOW V2 - MCP`** — confira qual carregou: há vários Supabase quase homônimos na conta
   e nenhum dos outros é este banco.
@@ -79,16 +88,20 @@ divergiu da realidade → corrija no mesmo PR do fix. Responda sempre em PT-BR.
 - **Não escrever** em `hgicfqjayrjurivtygqf` (Lovable Cloud, origem do cutover — só referência de paridade).
   `uwbpzfcysppwikfpnzok` é ref morto ainda citado em `index.html` e em
   `supabase/functions/send-password-reset/index.ts` — dívida, não destino.
-- As 244 migrations do repo são histórico; o estado real é o banco ao vivo (e a fonte `supabase/` da branch
+- As migrations do repo (hoje **250** em 2026-11-23; confira com `ls supabase/migrations/*.sql | wc -l`) são
+  histórico; o estado real é o banco ao vivo (e a fonte `supabase/` da branch
   `contexto`). RLS segue o padrão `SECURITY DEFINER` (`docs/adr/0014-security-definer-rls-pattern.md`);
   exclusão é lógica, por `deleted_at` (`docs/SOFT_DELETE_POLICY.md`).
 
 ## Serviços
+
 - **Vercel** — ler `docs/agentes/deploy.md` ao confirmar deploy ou mexer em env/domínio. Projeto
   `loggi-flow-v2` (team `juca1`), Vite, Node 24.x, `https://loggi-flow-v2.vercel.app`; **merge em `main` =
   deploy de produção**. Nunca segredo de servidor no Vercel; `VITE_*` vai para o bundle e é público.
-- **Edge functions** — 44 em `supabase/functions/`; deploy **manual** pelo `deploy-functions.yml`
-  (`workflow_dispatch`, exige o secret `SUPABASE_ACCESS_TOKEN`); nunca `supabase functions deploy` direto.
+- **Edge functions** — 44 em `supabase/functions/`; deploy **automatico em merge para a `main`**
+  quando o diff toca `supabase/functions/**` (e tambem manual por `workflow_dispatch`), pelo
+  `deploy-functions.yml`. Exige o secret `SUPABASE_ACCESS_TOKEN`. Merge em edge function **e deploy em producao**:
+  confirme o run e registre o horario. Nunca `supabase functions deploy` direto.
   `verify_jwt = false` só onde a auth está no código (HMAC ou `x-internal-secret`) — ver `supabase/config.toml`.
 - **Integrações externas** — Lalamove, Rodonaves, Melhor Envio, Bitrix24, Evolution/A-Ticket (WhatsApp),
   Mapbox, OpenWeather, Resend, OpenAI, Upstash Redis. Chave só em secret de edge function:
@@ -100,7 +113,7 @@ divergiu da realidade → corrija no mesmo PR do fix. Responda sempre em PT-BR.
 - **Regras de domínio** — ler `docs/agentes/regras-dominio.md` ao mexer em coleta, entrega, frete,
   gamificação, papéis de usuário ou CSP.
 - **Contexto gerado para agentes** — branch gerada `contexto`, regerada por automação
-  (`.github/workflows/contexto.yml`). Leia **antes** do README:
+  (`.github/workflows/contexto-ia.yml`). Leia **antes** do README:
   `git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md` (ou
   `raw.githubusercontent.com/adm01-debug/Loggi_Flow_V2/contexto/docs/contexto/00-INDEX.md`, ou MCP do GitHub
   com `ref=contexto`). Três fontes, cada fato com um dono: `codigo/` (rotas, hooks, edges, grafo),
@@ -108,6 +121,7 @@ divergiu da realidade → corrija no mesmo PR do fix. Responda sempre em PT-BR.
   `docs/agentes/contexto-ia.md`. Não edite essa branch nem abra PR dela.
 
 ## Stack e comandos — detalhe em `docs/agentes/mapa-repo.md`
+
 - Vite + React 18 + TS (`src/`), Tailwind/shadcn, Supabase (`supabase/functions/`, `supabase/migrations/`),
   TanStack Query, Sentry, PWA; Playwright em `tests/e2e/`.
 - **npm** é o gerenciador da CI (`npm ci`, `package-lock.json`, Node 20). `bun.lock` e `bun.lockb` existem no
@@ -121,6 +135,7 @@ divergiu da realidade → corrija no mesmo PR do fix. Responda sempre em PT-BR.
 - Automação em `scripts/<nome>/` com README (leia antes de alterar); nunca em `supabase/` nem `src/`.
 
 ## Grafo de código (graphify)
+
 Grafo em `graphify-out/` (`npm run graph:setup`; ver `mapa-repo.md`). Quando `graphify-out/graph.json`
 existir: `graphify query "<pergunta>"`, `graphify path "<A>" "<B>"`, `graphify explain "<conceito>"` antes de
 buscar por texto; `GRAPH_REPORT.md` só para revisão ampla. Alterou código ou o report não é do HEAD atual →

@@ -27,7 +27,7 @@ do repo são histórico, não estado). Onde fica e quem chama? → `codigo/`. Po
 
 ## Quem roda isso
 
-`.github/workflows/contexto.yml` — um workflow, três jobs produtores independentes, um job que monta o
+`.github/workflows/contexto-ia.yml` — um workflow, três jobs produtores independentes, um job que monta o
 índice e publica. Dispara a cada push em `main` que toque `src/`, `supabase/`, os scripts das automações ou
 `docs/contexto/regras/manual/`, mais um agendamento a cada 10 min (minuto 7) e `workflow_dispatch`.
 

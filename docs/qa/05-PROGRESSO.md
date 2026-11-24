@@ -333,15 +333,15 @@
 
 ### Onda 0
 
-- [~] **249** — `AGENTS.md`: corrigir a regra de merge para 10 required checks e nomear o décimo — onda 0 — Alta · **aguarda o dono**
-- [~] **250** — `AGENTS.md`: dizer que o repositório é público — onda 0 — Alta · **aguarda o dono**
-- [~] **251** — `AGENTS.md`: o deploy de edge function é automático em merge para `main` — onda 0 — Alta · **aguarda o dono**
+- [x] **249** — `AGENTS.md`: corrigir a regra de merge para 10 required checks e nomear o décimo — onda 0 — Alta (Regra 8: merge aguarda o dono — PR #329)
+- [x] **250** — `AGENTS.md`: dizer que o repositório é público — onda 0 — Alta (Regra 8: merge aguarda o dono — PR #329)
+- [x] **251** — `AGENTS.md`: o deploy de edge function é automático em merge para `main` — onda 0 — Alta (Regra 8: merge aguarda o dono — PR #329)
 
 ### Onda 8
 
-- [ ] **252** — `AGENTS.md`: corrigir a contagem de migrations de 244 para a contagem real — onda 8 — Baixa
-- [ ] **253** — `AGENTS.md`: corrigir o nome do workflow de contexto (`contexto.yml` → `contexto-ia.yml`) — onda 8 — Baixa
-- [~] **254** — Propagar as correções de H-03 para `docs/agentes/github-ci.md` e `docs/agentes/deploy.md` — onda 8 — Média · **aguarda o dono**
+- [x] **252** — `AGENTS.md`: corrigir a contagem de migrations de 244 para a contagem real — onda 8 — Baixa
+- [x] **253** — `AGENTS.md`: corrigir o nome do workflow de contexto (`contexto.yml` → `contexto-ia.yml`) — onda 8 — Baixa
+- [x] **254** — Propagar as correções de H-03 para `docs/agentes/github-ci.md` e `docs/agentes/deploy.md` — onda 8 — Média (Regra 8: merge aguarda o dono — PR #329)
 - [~] **255** — Fazer a CI conferir os fatos verificáveis que o `AGENTS.md` afirma — onda 8 — Média · **aguarda o dono**
 - [x] **256** — `docs/prod-readiness.md`: corrigir as duas contagens de paridade que caducaram — onda 8 — Alta
 - [~] **257** — Fazer o inventário semanal recontar a paridade e datar o `prod-readiness` — onda 8 — Média · **aguarda o dono**
