@@ -76,11 +76,23 @@ describe("useAccuracyMetaCycle: uma consulta a notifications (etapa 217, P-03)",
     expect(SEM_COMENTARIOS.match(/\.contains\(/g)?.length).toBe(2);
   });
 
-  it("nao toca na chamada de rpc (etapa 218, DDL)", () => {
-    const corpo = corpoDoMap();
-    expect(corpo).toContain("count_prediction_breach_days");
-    expect(corpo).toContain("_target: s.target_pct,");
-    expect(corpo).toContain("_carrier: s.transportadora,");
+  // Ate a etapa 218 o contrato era "nao tocar na rpc", porque a variante em lote ainda era DDL pendente.
+  // Agora que a etapa 218 esta implementada, o contrato e o inverso: a rpc por transportadora so pode
+  // aparecer no caminho de queda, e o lote tem que ser consultado uma unica vez, fora do map.
+  it("consulta a rpc em lote uma vez, fora do map (etapa 218)", () => {
+    const lote = HOOK.indexOf("count_prediction_breach_days_bulk");
+    const map = HOOK.indexOf("const items: CycleItem[] = await Promise.all(");
+    expect(lote).toBeGreaterThan(-1);
+    expect(map).toBeGreaterThan(-1);
+    expect(lote).toBeLessThan(map);
+    expect(HOOK).toContain("{ _pairs: pares }");
+    expect(corpoDoMap()).not.toContain("count_prediction_breach_days");
+  });
+
+  it("mantem a rpc por transportadora so no caminho de queda", () => {
+    expect(SEM_COMENTARIOS.match(/"count_prediction_breach_days"/g)?.length).toBe(1);
+    expect(HOOK).toContain("_target: s.target_pct,");
+    expect(HOOK).toContain("_carrier: s.transportadora,");
   });
 
   it("mantem a logica de status byte a byte", () => {

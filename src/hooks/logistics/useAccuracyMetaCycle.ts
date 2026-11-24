@@ -122,24 +122,26 @@ export function useAccuracyMetaCycle() {
             }),
           );
 
-      const items: CycleItem[] = rows.map((s, indice) => {
-        const breach_days = breachPorLinha[indice] ?? 0;
-        const notified_in_cycle = carriersNotificados.has(s.transportadora ?? "__all__");
-        let status: CycleItem["status"] = "ok";
-        if (breach_days >= s.consecutive_days_alert) {
-          status = notified_in_cycle ? "notified" : "pending";
-        } else if (breach_days > 0) {
-          status = "warming";
-        }
-        return {
-          transportadora: s.transportadora,
-          target_pct: Number(s.target_pct),
-          consecutive_days_alert: s.consecutive_days_alert,
-          breach_days,
-          notified_in_cycle,
-          status,
-        };
-      });
+      const items: CycleItem[] = await Promise.all(
+        rows.map(async (s, indice) => {
+          const breach_days = breachPorLinha[indice] ?? 0;
+          const notified_in_cycle = carriersNotificados.has(s.transportadora ?? "__all__");
+          let status: CycleItem["status"] = "ok";
+          if (breach_days >= s.consecutive_days_alert) {
+            status = notified_in_cycle ? "notified" : "pending";
+          } else if (breach_days > 0) {
+            status = "warming";
+          }
+          return {
+            transportadora: s.transportadora,
+            target_pct: Number(s.target_pct),
+            consecutive_days_alert: s.consecutive_days_alert,
+            breach_days,
+            notified_in_cycle,
+            status,
+          };
+        }),
+      );
 
       const { data: lastNotif } = await supabase
         .from("notifications")
