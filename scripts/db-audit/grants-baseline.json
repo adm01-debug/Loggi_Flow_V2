@@ -3,6 +3,7 @@
     "anon_execute": [
         "alert_slow_queries(threshold_ms numeric)",
         "count_prediction_breach_days(_target numeric, _carrier text)",
+        "count_prediction_breach_days_bulk(_pairs jsonb)",
         "fn_tr_valida_transicao_coleta()",
         "fn_tr_valida_transicao_entrega()",
         "fn_valida_transicao_coleta(p_de coleta_status, p_para coleta_status)",
@@ -143,6 +144,6 @@
         "webhook_events_processed"
     ],
     "how_to_regenerate": "scripts/db-audit/grants-baseline.sql (E26)",
-    "service_role_execute_count": 117,
-    "authenticated_execute_count": 63
+    "service_role_execute_count": 118,
+    "authenticated_execute_count": 64
 }

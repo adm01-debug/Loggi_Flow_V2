@@ -5809,6 +5809,14 @@ export type Database = {
         Args: { _carrier?: string; _target: number }
         Returns: number
       }
+      count_prediction_breach_days_bulk: {
+        Args: { _pairs: Json }
+        Returns: {
+          breach_days: number
+          carrier: string
+          target: number
+        }[]
+      }
       detect_health_score_regression: {
         Args: { p_threshold?: number }
         Returns: {
