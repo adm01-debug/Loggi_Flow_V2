@@ -223,7 +223,7 @@ serve(async (req) => {
       log.error("Failed to send failure alert:", alertError);
     }
 
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: "INTERNAL_ERROR" }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });

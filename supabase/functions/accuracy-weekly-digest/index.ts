@@ -79,10 +79,17 @@ async function handlePreview(req: Request): Promise<Response> {
     .limit(500);
 
   if (nErr) {
-    return new Response(JSON.stringify({ ok: false, error: nErr.message }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    log.error("accuracy-weekly-digest: falha ao ler notificacoes", {
+      code: nErr.code,
+      message: nErr.message,
     });
+    return new Response(
+      JSON.stringify({ ok: false, error: "INTERNAL_ERROR" }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
   }
 
   const report = buildDigest((notifs ?? []) as DigestNotification[], now);
@@ -230,7 +237,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         ok: false,
-        error: err instanceof Error ? err.message : String(err),
+        error: "INTERNAL_ERROR",
       }),
       {
         status: 500,

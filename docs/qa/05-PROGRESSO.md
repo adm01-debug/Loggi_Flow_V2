@@ -253,7 +253,7 @@
 - [x] **175** — `lalamove-webhook`: erro genérico na resposta ao webhook — onda 5 — Média
 - [x] **176** — `rodonaves-webhook`: erro genérico na resposta ao webhook — onda 5 — Média
 - [x] **177** — `smart-carrier-selection`: erro genérico na resposta da cotação — onda 5 — Média
-- [ ] **178** — Varredura final de `error.message`: as onze funções restantes de B-06 — onda 5 — Média
+- [x] **178** — Varredura final de `error.message`: as onze funções restantes de B-06 — onda 5 — Média
 - [~] **179** — `secure-store`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — **Crítica** · **aguarda o dono**
 - [ ] **180** — `get-mapbox-token`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — **Crítica**
 - [ ] **181** — `resend-email`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Alta
@@ -434,6 +434,61 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapa 178 (2026-11-25) - achado B-06 (varredura final das onze)
+
+**Causa:** doze respostas de erro em onze funcoes ainda devolviam a mensagem interna: `whatsapp-notification`
+(`:318`), `bitrix24-integration` (`:398`), `get-weather-data` (`:42`), `health-check` (`:70`),
+`ocr-receipt-processor` (`:86`), `predict-delays` (`:396`), `nexus-auto-healing` (`:110`), `new-device-alert`
+(`:202`), `check-rate-limit` (`:144`), `normalize-freight-response` (`:226`), `accuracy-weekly-digest`
+(`:228` e o `nErr` de `:82`). Nove delas expunham o texto do Postgres/terceiro cru (nome de tabela, coluna,
+policy, mensagem do provedor) a quem chamasse a funcao. O `accuracy-weekly-digest` tinha **dois** pontos: alem
+do `catch` final, o `if (nErr)` da leitura de `notifications` devolvia `nErr.message` com 500.
+
+**Correcao (uma linha por funcao, 12 linhas no total):** a mensagem passou a ser a mesma do helper da etapa 164
+(`"INTERNAL_ERROR"`); nada mais mudou. **O status HTTP de cada funcao foi preservado**: 500 em sete, **503** no
+`health-check` (o monitor le o status) e **400** em `get-weather-data`, `ocr-receipt-processor` e
+`nexus-auto-healing`. Tambem foram preservadas as chaves de estado que quem chama ja le:
+`success: false` (`whatsapp-notification`, `bitrix24-integration`, `predict-delays`), `ok: false`
+(`accuracy-weekly-digest`) e `status: "unhealthy"` (`health-check`).
+
+**Por que nao `internalErrorResponse` em todas:** o helper fixa **500** e o corpo `{"error":"INTERNAL_ERROR"}`.
+Aplicado nas onze, ele mudaria o status de quatro funcoes (o 503 do monitor e os tres 400 de validacao) e
+apagaria as chaves de estado — as duas coisas que a etapa proibe. Onde o corpo era so o erro e o status 500, o
+resultado e byte a byte o mesmo do helper.
+
+**O detalhe nao se perdeu:** tres funcoes nao registravam nada no `catch` e ganharam log (o `whatsapp` e o
+`predict-delays` e o `new-device-alert` ja logavam):
+`log.error("Weather lookup failed:", { error: error instanceof Error ? error.message : String(error) })`
+(`get-weather-data`, que tambem passou a importar `_shared/logger.ts`), o mesmo para
+`nexus-auto-healing` (`"Auto-healing request failed:"`) e `ocr-receipt-processor` (`"OCR processing failed:"`,
+depois do ramo de `ValidationError`, que continua respondendo 400 com o campo).
+
+**Quem via o detalhe:** quem chamasse as funcoes direto (curl, script, outra edge). Nos tres consumidores de UI
+conferidos — `src/hooks/notifications/useWhatsAppNotification.tsx:32`,
+`src/components/shipping/DeliveryReceiptUpload.tsx:112` e
+`src/components/predictions/DigestPreviewPanel.tsx:32` — a tela depende do erro **HTTP** do `functions.invoke`
+(toast fixo), nao do texto do corpo; nenhuma tela muda.
+
+**Verificado de verdade:**
+- `tests/contracts/erro-generico-varredura.spec.ts` (17 casos, um por funcao + logs + chaves de estado) —
+  **17/17**. O caso de varredura percorre **todo** `JSON.stringify(...)` dos onze arquivos e falha se algum
+  trecho ainda carregar `.message`: foi ele que achou o segundo ponto do `accuracy-weekly-digest` (`:82`), que
+  o plano nao listava.
+- Prova por mutacao (A-O, cada uma derruba exatamente 1 caso): A-F volta a mensagem em `whatsapp`,
+  `bitrix24`, `predict-delays`, `health-check`, `new-device-alert`, `check-rate-limit` -> 1 falha cada;
+  G-L idem em `normalize-freight-response`, `accuracy` (catch e `nErr`), `ocr`, `nexus`, `get-weather` -> 1
+  cada; M-O remove o log novo de `ocr`, `nexus` e `get-weather` -> 1 cada. Restaurado -> 17/17.
+- `deno check`: **0 erro nas 11** funcoes, igual ao baseline (medido funcao por funcao contra
+  `origin/main`); `deno lint`: limpo nas 11; `deno fmt --check`: **identico ao baseline** (os tres logs novos
+  foram reescritos no formato do `fmt`; o diff restante e herdado, ja presente antes da etapa).
+- `tsc --noEmit` 0; `npm run lint:budget` ok; suite **586/586** depois do rebase em `main` (`f48a57a9`).
+
+**NAO EXECUTADO:** derrubar o Postgres/terceiro de verdade para ver o 500/503/400 na resposta — exigiria
+quebrar tabela ou credencial em producao; o caminho esta coberto pelas mutacoes acima.
+
+**Proximo:** etapa 179 — primeira da fila de CORS `*` (aprovacao do dono).
+
 
 ### Registro - etapa 177 (2026-11-25) - achado B-06 (`smart-carrier-selection`)
 

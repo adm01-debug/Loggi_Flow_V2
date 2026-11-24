@@ -199,7 +199,7 @@ const handler = async (req: Request): Promise<Response> => {
     });
   } catch (error: any) {
     log.error("Error in new-device-alert function:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: "INTERNAL_ERROR" }), {
       status: 500,
       headers: { "Content-Type": "application/json", ...corsHeaders },
     });

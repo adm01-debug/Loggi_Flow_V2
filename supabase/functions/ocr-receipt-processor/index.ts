@@ -83,7 +83,10 @@ serve(async (req) => {
     if (error instanceof ValidationError) {
       return validationErrorResponse(error, corsHeaders);
     }
-    return new Response(JSON.stringify({ error: error.message }), {
+    log.error("OCR processing failed:", {
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return new Response(JSON.stringify({ error: "INTERNAL_ERROR" }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 400,
     });

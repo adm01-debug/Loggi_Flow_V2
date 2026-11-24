@@ -395,7 +395,7 @@ serve(async (req) => {
   } catch (error) {
     log.error("Bitrix24 integration error:", error);
     return new Response(
-      JSON.stringify({ success: false, error: error.message }),
+      JSON.stringify({ success: false, error: "INTERNAL_ERROR" }),
       {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
