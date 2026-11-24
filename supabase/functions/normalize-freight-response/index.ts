@@ -5,6 +5,7 @@ import { requireString } from "../_shared/validate.ts";
 import { log } from "../_shared/logger.ts";
 import { parseLocaleNumber } from "../_shared/number.ts";
 import { safeFetch } from "../_shared/safeFetch.ts";
+import { invokeFunction } from "../_shared/invokeFunction.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -121,8 +122,7 @@ serve(async (req) => {
             messages: [
               {
                 role: "system",
-                content:
-                  config.ai_prompt ||
+                content: config.ai_prompt ||
                   'Extract freight price and delivery days from the text. Return JSON: {"price": number, "days": number}',
               },
               { role: "user", content: text },
@@ -189,25 +189,34 @@ serve(async (req) => {
           if (s.whatsapp_phone) phoneByUser.set(s.user_id, s.whatsapp_phone);
         }
 
+        let falhas = 0;
         for (const user of usersToNotify) {
           const phone = phoneByUser.get(user.user_id);
-          if (phone) {
-            await fetch(`${supabaseUrl}/functions/v1/whatsapp-notification`, {
-              method: "POST",
-              headers: {
-                Authorization: `Bearer ${supabaseKey}`,
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                action: "send_normalization_alert",
-                phone,
-                variables: {
-                  transportadora: "Nexus Engine",
-                  cotacao_id: "Internal",
-                },
-              }),
+          if (!phone) continue;
+
+          const envio = await invokeFunction("whatsapp-notification", {
+            action: "send_normalization_alert",
+            phone,
+            variables: {
+              transportadora: "Nexus Engine",
+              cotacao_id: "Internal",
+            },
+          });
+
+          if (!envio.ok) {
+            falhas += 1;
+            log.warn("Falha ao avisar usuário sobre erro de normalização", {
+              userId: user.user_id,
+              reason: envio.reason,
             });
           }
+        }
+
+        if (falhas > 0) {
+          log.warn("Alertas de normalização não entregues", {
+            falhas,
+            total: usersToNotify.length,
+          });
         }
       }
     } catch (alertError) {
