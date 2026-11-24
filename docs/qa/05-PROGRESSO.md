@@ -394,7 +394,7 @@
 
 ### Onda 8
 
-- [~] **295** — Fechar no banco ao vivo os seis achados marcados HIPÓTESE — onda 8 — Alta · **aguarda o dono**
+- [~] **295** — Fechar no banco ao vivo os seis achados marcados HIPÓTESE — onda 8 — Alta — **F-02, F-03, P-05 e P-06 fechados com consulta ao banco ao vivo (2026-11-24); S-05 e S-08 dependem do painel, aguardam o dono**
 - [x] **296** — Regerar a branch `contexto` para que as fontes reflitam o código corrigido — onda 8 — Média · **regerada em 2026-11-24** (run `45410194923`)
 - [x] **297** — Atualizar `03-ACHADOS.md` e `05-PROGRESSO.md` com o estado final de cada achado — onda 8 — Alta
 - [x] **298** — Reler o plano inteiro e registrar o que ficou sem etapa executada — onda 8 — Alta
@@ -4090,3 +4090,41 @@ Commit publicado: `2026-11-24T14:09:53+00:00` — `chore(contexto): 3 fonte(s) r
 6 migrations com extensão dobrada — `docs/contexto/supabase/migrations/20261124090000_fn_valida_transicao_entrega.sql.sql`
 e outras cinco. São exatamente as migrations aplicadas pelo `aplicar-migration.yml`, cujo registro no ledger
 guarda o nome com `.sql` e o produtor acrescenta `.sql` de novo. O conteúdo está correto; só o nome mente.
+
+
+## Registro da etapa 295 — os seis achados HIPÓTESE, medidos no banco ao vivo
+
+Consultas feitas em **2026-11-24** contra o projeto `jvfhclubfpxrtrrazrgr` pela Management API
+(`/database/query`), **somente leitura** — nenhum `CREATE`, `ALTER` ou `DROP`.
+
+- **F-02 — REFUTADO.** As três tabelas têm RLS ligado: `pg_class.relrowsecurity = true` em
+  `geo_blocking_rules` (2 policies), `geo_blocking_settings` (2) e `scheduled_reports` (4). Varrendo `public`
+  inteiro: **130 tabelas, 130 com RLS**, **0** com policy e sem RLS e **0** com RLS ligado e sem policy. O
+  padrão que a auditoria suspeitou não existe em nenhuma tabela hoje. Nota: a consulta do plano
+  (`SELECT * FROM get_rls_audit() WHERE status='critical'`) não roda em dois pontos — a função **não tem**
+  coluna `status` (a coluna é `severity`) e ela recusa papéis sem admin (`Access denied: admin role required`
+  para o papel da Management API), então esse caminho nunca teria fechado o achado.
+- **F-03 — CONFIRMADO para os números, REFUTADO para o rastreio.** `coletas_numero_coleta_key UNIQUE
+  (numero_coleta)` e `entregas_numero_entrega_key UNIQUE (numero_entrega)` existem, e as duas colunas são
+  `NOT NULL` — logo a geração por trigger `BEFORE INSERT` não tem como duplicar. Já `codigo_rastreamento` é
+  `NULL`-ável e tem apenas dois índices btree **parciais e não únicos**
+  (`idx_entregas_rastreamento`, `idx_entregas_codigo_rastreamento`): nada no banco impede dois fretes com o
+  mesmo código. Achado novo, **não corrigido aqui** (medir, não consertar) — candidato a etapa própria.
+- **P-05 — CONFIRMADO (inventário).** `pg_indexes` em 2026-11-24: **coletas 14**, **entregas 21**,
+  `telemetry_logs` 5 índices, incluindo as constraints `_pkey` e `_numero_*_key`.
+- **P-06 — CONFIRMADO com ressalva.** Os três pares que a **#428** remove continuam no banco e a definição
+  confirma a redundância: `idx_entregas_transportadora`/`idx_coletas_transportadora` são parciais sobre a
+  mesma coluna de `*_transportadora_id`, e `idx_audit_logs_record_id_table` é prefixo de
+  `idx_audit_logs_record_composite`. Sobram, fora do escopo da #428, quatro candidatos com a definição
+  conferida: `idx_entregas_status` (prefixo de `idx_entregas_status_created_at`), `idx_entregas_status_active`
+  (prefixo de `idx_entregas_status_composite`), `idx_coletas_status_active` (prefixo de
+  `idx_coletas_status_created_at`) e o par `idx_entregas_rastreamento` × `idx_entregas_codigo_rastreamento`
+  (mesma coluna, predicados diferentes). **Não** são redundantes, apesar da aparência: os dois índices de
+  `audit_logs` por `record_id` (`_record_id_created` × `_record_composite`) servem consultas diferentes.
+  Ressalva que impede conclusão por `idx_scan`: as 20 entradas com `idx_scan = 0` incluem tabelas com
+  **0 linha** (`entregas`, `coletas`, `rastreamento_historico`, `audit_logs`; só `telemetry_logs` tem 394),
+  então o contador mede ausência de uso, não desuso.
+- **S-05 — SEGUE ABERTO (dono).** `ALLOW_TEST_MODE` nas edge functions de produção só é legível no painel do
+  Supabase; a etapa 010 já pede a mesma confirmação.
+- **S-08 — SEGUE ABERTO (dono).** Restrição de URL do token `VITE_MAPBOX_TOKEN` só existe no painel do Mapbox;
+  a etapa 019 já pede a mesma confirmação.
