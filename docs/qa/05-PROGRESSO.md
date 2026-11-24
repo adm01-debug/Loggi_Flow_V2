@@ -247,7 +247,7 @@
 - [x] **169** — `lalamove-api`: parar de repassar a resposta de erro da Lalamove — onda 5 — Alta
 - [x] **170** — `rodonaves-api`: parar de transformar o erro do **login** da Rodonaves em mensagem — onda 5 — **Crítica**
 - [x] **171** — `rodonaves-api`: erro genérico na resposta e detalhe só no log — onda 5 — Alta
-- [ ] **172** — `resend-email`: parar de repassar o erro do provedor de e-mail — onda 5 — Alta
+- [x] **172** — `resend-email`: parar de repassar o erro do provedor de e-mail — onda 5 — Alta
 - [ ] **173** — `db-health-weekly-report`: parar de repassar o erro do terceiro no relatório — onda 5 — Média
 - [ ] **174** — `nexus-webhook-receiver`: erro genérico na resposta ao webhook — onda 5 — Média
 - [ ] **175** — `lalamove-webhook`: erro genérico na resposta ao webhook — onda 5 — Média
@@ -435,6 +435,41 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 
 ## Registro de execução
 
+### Registro - etapa 172 (2026-11-25) - achado B-06 (`resend-email`)
+
+**Causa:** `resend-email` fazia `throw new Error(data.error.message || "Failed to send email")` com o corpo de
+erro do Resend e devolvia `error.message` no `catch`. A resposta de erro do provedor pode conter o endereco de
+destino, o dominio de envio e o id da chave usada — tudo isso saia no corpo da resposta desta funcao (que
+tambem servia de detalhe para `accuracy-weekly-digest`/`accuracy-meta-monitor` em `results[].detail`).
+
+**Correcao (so o arquivo da etapa):**
+
+- `:59-66` — a resposta do provedor passou a ir **apenas** para o log, com o status HTTP e corte de 500 chars
+  (`log.error("[resend-email] Provedor recusou o envio:", { status: response.status, body: JSON.stringify(data).slice(0, 500) })`),
+  e o erro lancado virou mensagem fixa `"Falha ao enviar o e-mail pelo provedor"`. Nao ha id de tentativa do
+  provedor na resposta.
+- `:73-76` — o `catch` passou a devolver `internalErrorResponse(error, corsHeaders, "resend-email")` (etapa 164):
+  500 generico, sem mensagem interna e sem stack. O ramo `ValidationError` -> 422 (etapa 150) continua antes.
+- **Nao tocado:** o bloco de auth `:20-31` (padrao correto citado na etapa 004), a validacao de
+  `to`/`subject`/`html`/`from` (etapa 150), o CORS `*` (etapa 181) e o caminho de sucesso
+  (`{ success: true, id: data.id }` do proprio Resend no envio bem-sucedido).
+
+**Quem via o detalhe:** os tres chamadores sao edge functions internas
+(`send-password-reset:156`, `accuracy-weekly-digest:184`, `accuracy-meta-monitor:201`); nenhuma tela mostra o
+texto do provedor. `send-password-reset` ja registra o motivo no log e segue; o digest passa a registrar
+`reason` generico. O detalhe completo agora esta no log da edge.
+
+**Verificado de verdade:** `tests/contracts/resend-email-erro-provedor.spec.ts` (6 casos) — 6/6; o contrato da
+etapa 150 continua 7/7 (13/13 juntos). Prova por mutacao: A volta a ecoar `data.error.message` -> 1 falha; B
+remove o `log.error` -> 1; C remove o `slice(0, 500)` -> 1; D volta a `error: error.message` no catch -> 2; E
+remove o ramo de `ValidationError` -> 2; F altera o caminho de sucesso -> 1; restaurado -> 6/6. `deno check` 0
+(baseline 1); `deno lint` 1 = baseline 1; `deno fmt --check` = baseline 1 (import da linha 4, herdado). `tsc` 0;
+`lint:budget` 77/86; suite 71 arquivos / 533 testes. Verificacao pedida pelo plano (`grep -n 'error.message\|
+internalErrorResponse'` + `sed -n '55,72p'`): executada — nao ha mais `error.message` no arquivo e o
+`internalErrorResponse` esta em `:76`; a resposta de erro nao carrega nada do provedor. Envio real para dominio
+invalido: NAO EXECUTADO (exigiria gastar envio em producao) — RASTREADO pelo codigo.
+
+
 ### Registro - etapa 171 (2026-11-25) - achado B-06 (`rodonaves-api`, demais pontos)
 
 **Causa:** a mesma da etapa 170 nos outros pontos do arquivo: `apiGet` (`:193-200`), `apiMutate` (`:226-233`) e
@@ -472,7 +507,6 @@ texto do mapa -> 1; restaurado -> 7/7. `deno check` 4 (baseline 6: os dois `log.
 `lint:budget` 77/86; suite 70 arquivos / 527 testes. Verificacao pedida pelo plano (`grep -rn 'rodonaves-api'
 src/` + `sed -n '1705,1720p'`): executada — a resposta de erro nao carrega texto do parceiro. Erro de cotacao
 forcado em runtime: NAO EXECUTADO (exigiria chamada real ao parceiro) — RASTREADO pelo codigo.
-
 ### Registro - etapa 170 (2026-11-25) - achado B-06 (`rodonaves-api`, login)
 
 **Causa:** `:130-134` promovia o corpo de erro do **login** da Rodonaves a mensagem de excecao:

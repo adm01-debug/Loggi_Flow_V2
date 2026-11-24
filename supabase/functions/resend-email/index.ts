@@ -2,6 +2,8 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { requireInternalSecret, requireUser } from "../_shared/auth.ts";
 import { safeFetch } from "../_shared/safeFetch.ts";
 import { ValidationError, validationErrorResponse } from "../_shared/validate.ts";
+import { log } from "../_shared/logger.ts";
+import { internalErrorResponse } from "../_shared/httpError.ts";
 import { parseEmailRequest } from "./parse.ts";
 
 const corsHeaders = {
@@ -55,7 +57,12 @@ serve(async (req) => {
 
     const data = await response.json();
     if (data.error) {
-      throw new Error(data.error.message || "Failed to send email");
+      // A resposta do Resend carrega destino, dominio e id da chave: fica no log.
+      log.error("[resend-email] Provedor recusou o envio:", {
+        status: response.status,
+        body: JSON.stringify(data).slice(0, 500),
+      });
+      throw new Error("Falha ao enviar o e-mail pelo provedor");
     }
 
     return new Response(JSON.stringify({ success: true, id: data.id }), {
@@ -66,12 +73,6 @@ serve(async (req) => {
       return validationErrorResponse(error, corsHeaders);
     }
 
-    return new Response(
-      JSON.stringify({ success: false, error: error.message }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      },
-    );
+    return internalErrorResponse(error, corsHeaders, "resend-email");
   }
 });
