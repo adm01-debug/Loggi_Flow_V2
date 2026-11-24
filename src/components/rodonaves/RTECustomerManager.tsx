@@ -21,10 +21,18 @@ import {
   capabilityReason,
   isActionAvailable,
 } from "@/lib/rodonaves/capabilities";
+import {
+  extractFallbackNotice,
+  fallbackNoticeMessage,
+  isBlockedResponse,
+} from "@/lib/rodonaves/fallbackNotice";
 
 type Row = Record<string, unknown>;
 
 function extractRows(data: { data?: unknown }): Row[] {
+  // Bloqueio sem alternativa liberada não é registro: devolver a linha do
+  // marcador (`_status`/`_fallback`/`_note`) poluiria a tabela.
+  if (isBlockedResponse(data)) return [];
   const raw = data?.data;
   if (Array.isArray(raw)) return raw as Row[];
   if (raw && typeof raw === "object") {
@@ -205,6 +213,18 @@ export function RTECustomerManager() {
       if (error) throw error;
       if (!data?.success)
         throw new Error(str(data?.error) || "Erro na API Rodonaves");
+
+      const notice = extractFallbackNotice(data);
+      if (notice) {
+        // Sem alternativa liberada não existe dado a exibir: o payload de
+        // bloqueio do gateway não pode ser tratado como resultado.
+        if (isBlockedResponse(data)) {
+          throw new Error(fallbackNoticeMessage(notice));
+        }
+        toast.warning(fallbackNoticeMessage(notice), {
+          id: `rte-fallback-${notice.route}`,
+        });
+      }
       return data;
     } catch (err) {
       toast.error(str(err instanceof Error ? err.message : err));
