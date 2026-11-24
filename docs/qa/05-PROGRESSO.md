@@ -71,10 +71,10 @@
 - [~] **031** — Levar a regra "não despacha sem nota fiscal" para o banco — onda 3 — Crítica · **aguarda o dono**
 - [~] **032** — Testar função, triggers e regra da NF num Postgres descartável, antes de produção — onda 3 — Crítica · **aguarda o dono**
 - [~] **033** — Aplicar as migrações da máquina de estados no banco, com o dono presente — onda 3 — Crítica · **aguarda o dono**
-- [ ] **034** — Extrair o mapa de transições para um módulo compartilhado, completo e testado — onda 3 — Alta
+- [x] **034** — Extrair o mapa de transições para um módulo compartilhado, completo e testado — onda 3 — Alta
 - [x] **035** — `Despachos` passa a usar o mapa compartilhado — onda 3 — Alta
 - [x] **036** — `KanbanEntregas` valida a transição antes de gravar — onda 3 — Alta
-- [ ] **037** — Traduzir a recusa do banco em mensagem que o operador entende — onda 3 — Média
+- [~] **037** — Traduzir a recusa do banco em mensagem que o operador entende — onda 3 — Média · **código neste PR; verificação em runtime depende da 033 (dono)**
 - [x] **038** — `CotacaoMultiCanal`: a tabela da tela passa a ler do banco, não do `useState` — onda 3 — Crítica
 - [~] **039** — Registrar a resposta da transportadora no banco, não na memória — onda 3 — Crítica — **código no PR da 038; aguarda verificação em runtime (registrar resposta e conferir `valor_cotado`/`responded_at` no banco)**
 - [ ] **040** — Marcar no banco qual cotação foi a escolhida — onda 3 — Alta
@@ -438,6 +438,40 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapa 037 (2026-11-26) - a recusa de transição vira frase de operação, e a 034 fecha a contabilidade
+
+**034 marcada como concluída (atraso de checklist).** O módulo `src/lib/statusTransitions.ts`, o teste
+`src/lib/statusTransitions.test.ts` (9 casos) e a exportação pelo barrel `src/lib/index.ts:78-84` entraram no **#311**;
+só a marcação neste arquivo ficou para trás. Nada de código mudou na etapa 034 agora.
+
+**037 (código pronto, verificação de runtime bloqueada).** As telas mostravam o texto cru do `RAISE EXCEPTION` do banco:
+`Despachos.tsx` em duas mutations (`:251` avanço de coluna, `:311` autorização do despacho final) e `KanbanEntregas.tsx`
+(`:341`, no `description` do toast). O operador lia `Transição de status inválida: pronto_despacho -> entregue` e não sabia
+o que fazer.
+
+| ponto | antes | depois |
+|---|---|---|
+| reconhecimento | nenhum | `reconhecerRecusaTransicao(error, tipo)`: decide pelo **SQLSTATE `23514`** (constante `ERRCODE_TRANSICAO_INVALIDA`, o mesmo que as etapas 029/030 mandam o banco usar) e usa a mensagem só para extrair os dois status envolvidos |
+| frase | texto do banco | `mensagemRecusaTransicao(error, tipo)`: "Esta entrega está em "Pronto para Despacho" e não pode ir para "Entregue". O próximo passo é "Cotação de Frete"." — com bifurcação lista as duas opções e, em estado terminal, diz que o fluxo terminou |
+| rótulos | nenhum no módulo | `ROTULOS_ENTREGA` (10) e `ROTULOS_COLETA` (7), completos em relação ao enum, para a frase não citar `cotacao_frete` |
+| outros erros | `toast.error(error.message)` | **inalterado**: a função devolve `null` e a tela cai no `error.message` de sempre (inclusive `23514` de outra CHECK constraint e o "Conflito de versão" do travamento otimista) |
+
+**Por que só três `onError`:** `Despachos.tsx` tem exatamente duas mutations e ambas mudam status; `KanbanEntregas.tsx` tem
+uma. Upload, exclusão e filtros não foram tocados.
+
+**Evidência (no worktree da branch, sobre `b4d25562`):**
+- `npx vitest run src/lib/statusTransitions.test.ts` → **19 testes verdes** (9 herdados + 10 novos: rótulos completos,
+  4 casos de reconhecimento/ignorância, 4 frases - passo único, bifurcação, estado terminal, `null` para os demais erros).
+- `npm run typecheck` → limpo; `npx eslint` nos 4 arquivos → **0 problemas**.
+- `npm run lint:budget` → **80/86 avisos**, idêntico ao `main` medido em `b4d25562` (**0 aviso novo**).
+- `npm run test:coverage` → **97 arquivos** verdes; `npm run build` → ok.
+
+**NÃO VERIFICADO:** o texto novo **não** foi visto em tela, porque a recusa ainda não existe no banco — as etapas 028-033
+(função, triggers das duas tabelas e a migração aplicada) estão em `[~]` aguardando o dono. Enquanto a 033 não for aplicada,
+nenhum caminho de produção dispara esta frase; o que está provado aqui é a unidade (teste) do reconhecimento e da frase.
+Prova em runtime depois da 033: provocar uma transição inválida em `Despachos` e no Kanban e colar o texto exibido.
+
 
 ### Registro - etapas 038 e 039 (2026-11-26) - a tela de cotação multicanal passa a ler e a gravar no banco
 
