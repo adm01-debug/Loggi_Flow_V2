@@ -98,7 +98,7 @@ const CAPABILITIES: readonly RTECapability[] = [
     gateway: "tracking",
     status: "bloqueado",
     note: "receipt-key-list responde 403 (sem permissão).",
-    fallback: "delivery-proof",
+    fallback: "delivery-receipt-by-protocols",
   },
   {
     action: "delivery-receipt-by-protocols",

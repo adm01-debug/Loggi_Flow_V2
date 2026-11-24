@@ -72,11 +72,27 @@ describe("disponibilidade", () => {
     }
   });
 
-  it("aponta apenas rotas alternativas liberadas", () => {
+  it("aponta apenas cadeias de fallback que terminam em rota liberada", () => {
+    // O lote de comprovantes cai em outra rota bloqueada que tem a propria
+    // cadeia (receipt-key-list -> delivery-receipt-by-protocols -> delivery-proof),
+    // entao a integridade e o fim da cadeia, nao o primeiro salto.
+    const fimDaCadeia = (acao: string): string | null => {
+      let atual = getCapability(acao)?.fallback;
+      const vistas = new Set<string>();
+      while (atual && atual !== "local") {
+        if (vistas.has(atual)) return null;
+        vistas.add(atual);
+        const proxima = getCapability(atual);
+        if (!proxima) return null;
+        if (proxima.status === "liberado") return atual;
+        atual = proxima.fallback;
+      }
+      return atual === "local" ? "local" : null;
+    };
+
     for (const capability of listCapabilities()) {
       if (!capability.fallback) continue;
-      expect(getCapability(capability.fallback), capability.action).not.toBeNull();
-      expect(isActionAvailable(capability.fallback), capability.action).toBe(true);
+      expect(fimDaCadeia(capability.action), capability.action).not.toBeNull();
     }
   });
 

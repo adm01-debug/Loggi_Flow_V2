@@ -765,27 +765,48 @@ async function getDeliveryReceiptByProtocols(p: Record<string, unknown>) {
 
 // NEW: OCCURRENCE RECEIPTS (3 endpoints)
 async function getOccurrenceReceipt(p: Record<string, unknown>) {
-  return apiGet(TRACKING_GATEWAY, "/api/v1/occurrencereceipt", {
+  return withFallback(
+    () =>
+      apiGet(TRACKING_GATEWAY, "/api/v1/occurrencereceipt", {
     BillOfLadingId: p.billOfLadingId as number,
     OccurenceCode: p.occurrenceCode as string,
     LoadImageContent: p.loadImageContent as boolean,
-  });
+  }),
+    {
+      fallback: "local",
+      note: "occurrence-receipt responde 403 (gestão interna da RTE): sem alternativa liberada neste contrato.",
+    },
+  );
 }
 
 async function getOccurrenceReceiptList(p: Record<string, unknown>) {
-  return apiGet(TRACKING_GATEWAY, "/api/v1/occurrencereceipt/list", {
+  return withFallback(
+    () =>
+      apiGet(TRACKING_GATEWAY, "/api/v1/occurrencereceipt/list", {
     BillOfLadingId: p.billOfLadingId as number,
     OccurenceCode: p.occurrenceCode as string,
     LoadImageContent: p.loadImageContent as boolean,
-  });
+  }),
+    {
+      fallback: "local",
+      note: "occurrence-receipt-list responde 403 (gestão interna da RTE): sem alternativa liberada neste contrato.",
+    },
+  );
 }
 
 async function getOccurrenceReceiptImageUrl(p: Record<string, unknown>) {
-  return apiGet(TRACKING_GATEWAY, "/api/v1/occurrencereceipt/imageurl", {
+  return withFallback(
+    () =>
+      apiGet(TRACKING_GATEWAY, "/api/v1/occurrencereceipt/imageurl", {
     BillOfLadingId: p.billOfLadingId as number,
     OccurenceCode: p.occurrenceCode as string,
     RemoveImageUrlExpire: p.removeImageUrlExpire as boolean,
-  });
+  }),
+    {
+      fallback: "local",
+      note: "occurrence-receipt-image responde 403 (gestão interna da RTE): sem alternativa liberada neste contrato.",
+    },
+  );
 }
 
 // ORDERS
@@ -922,24 +943,45 @@ async function getDeadline(cepOrigem: string, cepDestino: string) {
 // ==========================================
 
 async function saveCustomer(p: Record<string, unknown>) {
-  return apiMutate(
+  return withFallback(
+    () =>
+      apiMutate(
     CUSTOMER_GATEWAY,
     "POST",
     "/api/v1/customer/savecustomer",
     p.body,
+  ),
+    {
+      fallback: "local",
+      note: "customer-save responde 403 (gestão interna da RTE): sem alternativa liberada neste contrato.",
+    },
   );
 }
 
 async function getCustomerById(id: number) {
-  return apiGet(CUSTOMER_GATEWAY, `/api/v1/customer/${id}`, {});
+  return withFallback(
+    () =>
+      apiGet(CUSTOMER_GATEWAY, `/api/v1/customer/${id}`, {}),
+    {
+      fallback: "local",
+      note: "customer-get-by-id responde 403 (gestão interna da RTE): sem alternativa liberada neste contrato.",
+    },
+  );
 }
 
 async function getCustomersByDate(p: Record<string, unknown>) {
-  return apiGet(CUSTOMER_GATEWAY, "/api/v1/customer", {
+  return withFallback(
+    () =>
+      apiGet(CUSTOMER_GATEWAY, "/api/v1/customer", {
     LastChangedDate: p.lastChangedDate as string,
     Page: p.page as number,
     AmountByPage: p.amountByPage as number,
-  });
+  }),
+    {
+      fallback: "local",
+      note: "customer-list responde 403 (gestão interna da RTE): sem alternativa liberada neste contrato.",
+    },
+  );
 }
 
 async function getCustomerByTaxId(p: Record<string, unknown>) {
@@ -951,45 +993,94 @@ async function getCustomerByTaxId(p: Record<string, unknown>) {
 }
 
 async function getCustomerByDescription(p: Record<string, unknown>) {
-  return apiGet(CUSTOMER_GATEWAY, "/api/v1/customer/getbydescription", {
+  return withFallback(
+    () =>
+      apiGet(CUSTOMER_GATEWAY, "/api/v1/customer/getbydescription", {
     Key: p.key as string,
     Description: p.description as string,
     Page: p.page as number,
     AmountByPage: p.amountByPage as number,
-  });
+  }),
+    {
+      fallback: "local",
+      note: "customer-search responde 403 (gestão interna da RTE): sem alternativa liberada neste contrato.",
+    },
+  );
 }
 
 async function getCustomerFullByDescription(p: Record<string, unknown>) {
-  return apiGet(CUSTOMER_GATEWAY, "/api/v1/customer/getfullbydescription", {
+  return withFallback(
+    () =>
+      apiGet(CUSTOMER_GATEWAY, "/api/v1/customer/getfullbydescription", {
     Key: p.key as string,
     Description: p.description as string,
     Page: p.page as number,
     AmountByPage: p.amountByPage as number,
-  });
+  }),
+    {
+      fallback: "local",
+      note: "customer-search-full responde 403 (gestão interna da RTE): sem alternativa liberada neste contrato.",
+    },
+  );
 }
 
 async function getAddressesByTaxId(taxId: string) {
-  return apiGet(
+  return withFallback(
+    () =>
+      apiGet(
     CUSTOMER_GATEWAY,
     `/api/v1/address/getbytaxidregistration/${taxId}`,
     {},
+  ),
+    {
+      fallback: "local",
+      note: "address-list responde 403 (gestão interna da RTE): sem alternativa liberada neste contrato.",
+    },
   );
 }
 
 async function createAddress(p: Record<string, unknown>) {
-  return apiMutate(CUSTOMER_GATEWAY, "POST", "/api/v1/address", p.body);
+  return withFallback(
+    () =>
+      apiMutate(CUSTOMER_GATEWAY, "POST", "/api/v1/address", p.body),
+    {
+      fallback: "local",
+      note: "address-create responde 403 (gestão interna da RTE): sem alternativa liberada neste contrato.",
+    },
+  );
 }
 
 async function updateAddress(p: Record<string, unknown>) {
-  return apiMutate(CUSTOMER_GATEWAY, "PUT", "/api/v1/address", p.body);
+  return withFallback(
+    () =>
+      apiMutate(CUSTOMER_GATEWAY, "PUT", "/api/v1/address", p.body),
+    {
+      fallback: "local",
+      note: "address-update responde 403 (gestão interna da RTE): sem alternativa liberada neste contrato.",
+    },
+  );
 }
 
 async function deleteAddress(id: number) {
-  return apiMutate(CUSTOMER_GATEWAY, "DELETE", `/api/v1/address/${id}`);
+  return withFallback(
+    () =>
+      apiMutate(CUSTOMER_GATEWAY, "DELETE", `/api/v1/address/${id}`),
+    {
+      fallback: "local",
+      note: "address-delete responde 403 (gestão interna da RTE): sem alternativa liberada neste contrato.",
+    },
+  );
 }
 
 async function updatePerson(p: Record<string, unknown>) {
-  return apiMutate(CUSTOMER_GATEWAY, "PUT", "/api/v1/person", p.body);
+  return withFallback(
+    () =>
+      apiMutate(CUSTOMER_GATEWAY, "PUT", "/api/v1/person", p.body),
+    {
+      fallback: "local",
+      note: "person-update responde 403 (gestão interna da RTE): sem alternativa liberada neste contrato.",
+    },
+  );
 }
 
 // ==========================================
@@ -1077,12 +1168,19 @@ async function cancelPickup(protocol: number) {
 }
 
 async function resendExpressPickup(id: number) {
-  return apiMutate(
+  return withFallback(
+    () =>
+      apiMutate(
     PICKUP_GATEWAY,
     "POST",
     "/api/v1/pickup/resendrodonavesexpresspickup",
     undefined,
     { id },
+  ),
+    {
+      fallback: "local",
+      note: "pickup-resend-express responde 403 (gestão interna da RTE): sem alternativa liberada neste contrato.",
+    },
   );
 }
 
@@ -1213,15 +1311,30 @@ async function getUnitData(unitId?: number) {
 }
 
 async function getUnitCalendarByProtocol(protocol: number) {
-  return apiGet(
+  return withFallback(
+    () =>
+      apiGet(
     SELFATTENDANCE_GATEWAY,
     "/webapi/unit/v1/calenderunitbyprotocol",
     { protocol },
+  ),
+    {
+      fallback: "local",
+      note: "unit-calendar responde 403 (gestão interna da RTE): sem alternativa liberada neste contrato.",
+    },
   );
 }
 
 async function selfAttendanceQuotation(p: Record<string, unknown>) {
-  return apiMutate(SELFATTENDANCE_GATEWAY, "POST", "/webapi/quotation", p.body);
+  return withFallback(
+    () =>
+      apiMutate(SELFATTENDANCE_GATEWAY, "POST", "/webapi/quotation", p.body),
+    {
+      fallback: "quotation",
+      note: "nova-cotacao (SelfAttendance) responde 403: cotação feita pela rota liberada.",
+    },
+    () => simulateQuotation((p.body as Record<string, unknown>) ?? p),
+  );
 }
 
 async function selfAttendanceDeliveryTime(p: Record<string, unknown>) {
