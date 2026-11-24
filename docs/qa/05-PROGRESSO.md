@@ -395,7 +395,7 @@
 ### Onda 8
 
 - [~] **295** — Fechar no banco ao vivo os seis achados marcados HIPÓTESE — onda 8 — Alta · **aguarda o dono**
-- [ ] **296** — Regerar a branch `contexto` para que as fontes reflitam o código corrigido — onda 8 — Média
+- [x] **296** — Regerar a branch `contexto` para que as fontes reflitam o código corrigido — onda 8 — Média · **regerada em 2026-11-24** (run `45410194923`)
 - [x] **297** — Atualizar `03-ACHADOS.md` e `05-PROGRESSO.md` com o estado final de cada achado — onda 8 — Alta
 - [x] **298** — Reler o plano inteiro e registrar o que ficou sem etapa executada — onda 8 — Alta
 - [~] **299** — Rodar a bateria completa de gates e comparar com os números do começo — onda 8 — Alta · **aguarda o dono**
@@ -3702,7 +3702,7 @@ Atualize ao fim de cada sessão de trabalho.
 | Não iniciadas `[ ]`     | 3          |
 | **Total**               | **300**    |
 
-**Última etapa trabalhada:** 239 · **Data:** 2026-11-24 · **Próxima etapa independente:** 058 (gate
+**Última etapa trabalhada:** 296 · **Data:** 2026-11-24/25 · **Próxima etapa independente:** 018 (teste automático de `.env` na CI), 142 (gate de chave de dedupe), 266 (snapshot do banco sem saída verde em silêncio)
 automático da política de exclusão lógica; a 057 já entrou). A **027** (`logistica_reversa.codigo_rastreio_reverso`
 sem `UNIQUE`) segue como DDL dependente do dono, e a **#428** espera o ok para os três `DROP INDEX`.
 
@@ -4057,3 +4057,36 @@ Uma linha por etapa concluída. A coluna **Evidência** é o que diferencia etap
 ---
 
 
+
+## Registro da etapa 296 - branch contexto regerada (2026-11-24)
+
+Depois de ~300 etapas as três fontes da branch `contexto` descreviam uma árvore que já não existia — e são
+a primeira coisa que qualquer agente lê. A regeração foi disparada por `workflow_dispatch` sobre a `main`
+`e65af9d8`, com os **três** produtores verdes no run `45410194923`:
+
+| Job | Estado |
+| --- | --- |
+| Produtor `codigo/` (`gerar.mjs`) | success |
+| Produtor `regras/` (`generate.py`) | success |
+| Produtor `supabase/` (`snapshot.py`) | success |
+| Índice único + branch `contexto` | success |
+
+Commit publicado: `2026-11-24T14:09:53+00:00` — `chore(contexto): 3 fonte(s) regerada(s) @ main e65af9d [skip ci]`.
+
+**Verificação**
+- `git show origin/contexto:docs/contexto/00-INDEX.md | sed -n '1,16p'` -> cabeçalho
+  `Gerado automaticamente por indice.py · 2026-11-24 14:09 UTC · HEAD e65af9d8af`, e a linha do banco real
+  agora `ok · 0 min atrás` (antes: "ainda não gerado"); código `ok · 1 min atrás`, regras `ok · 0 min atrás`
+- `docs/contexto/supabase/errors.md` -> `_nenhum_`; `docs/contexto/codigo/erros_do_gerador` não trouxe erro
+- `docs/contexto/codigo/testes.json` -> `total: 201` (`contrato 57`, `unit 137`, `e2e 2`, `pytest 5`), com
+  `cobertura_por_arquivo` e `sem_teste` — reflete as etapas 275-282, não os "61 de 61 sem teste" da versão velha
+- `docs/contexto/supabase/tables/public/fretes_internos.md:32` -> coluna 16 `deleted_at |
+  timestamp with time zone | sim`: o snapshot enxerga a DDL da etapa 056
+- `git ls-tree -r --name-only origin/contexto docs/contexto/supabase/ | wc -l` -> **553** arquivos
+- o job do banco saiu **verde com dados**, não verde com aviso: o secret `SUPABASE_DB_URL` existe (etapa 263
+  resolvida na prática)
+
+**Achado novo, sem conserto nesta etapa (mudança de automação exige o dono):** o produtor do snapshot grava
+6 migrations com extensão dobrada — `docs/contexto/supabase/migrations/20261124090000_fn_valida_transicao_entrega.sql.sql`
+e outras cinco. São exatamente as migrations aplicadas pelo `aplicar-migration.yml`, cujo registro no ledger
+guarda o nome com `.sql` e o produtor acrescenta `.sql` de novo. O conteúdo está correto; só o nome mente.
