@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { extractFallbackNotice, fallbackNoticeMessage } from "./fallbackNotice";
+import {
+  extractFallbackNotice,
+  fallbackNoticeMessage,
+  isBlockedResponse,
+} from "./fallbackNotice";
 
 describe("extractFallbackNotice", () => {
   it("devolve null quando a rota principal respondeu", () => {
@@ -42,6 +46,29 @@ describe("extractFallbackNotice", () => {
     const fundo = { _note: "muito fundo" };
     const payload = { data: { data: { data: { data: { data: fundo } } } } };
     expect(extractFallbackNotice(payload)).toBeNull();
+  });
+});
+
+describe("isBlockedResponse", () => {
+  it("reconhece o payload de bloqueio sem alternativa", () => {
+    expect(
+      isBlockedResponse({
+        data: { _status: 403, _fallback: "local", _note: "sem liberacao" },
+      }),
+    ).toBe(true);
+  });
+
+  it("nao confunde rota alternativa (com dado) com bloqueio", () => {
+    expect(
+      isBlockedResponse({
+        data: { Result: [{ ProtocolNumber: "1" }], _note: "via track-batch" },
+      }),
+    ).toBe(false);
+  });
+
+  it("devolve false para resposta comum", () => {
+    expect(isBlockedResponse({ data: { Result: [] } })).toBe(false);
+    expect(isBlockedResponse(null)).toBe(false);
   });
 });
 

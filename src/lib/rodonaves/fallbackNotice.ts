@@ -45,6 +45,16 @@ export function extractFallbackNotice(
   return null;
 }
 
+/**
+ * `true` quando a resposta é o marcador de bloqueio da RTE (`_status: 403`) e,
+ * portanto, não carrega dado nenhum — esse payload não pode virar registro ou
+ * linha de tabela na UI. Uma rota alternativa também traz `_note`, mas com
+ * dado real, e por isso não conta como bloqueio.
+ */
+export function isBlockedResponse(payload: unknown): boolean {
+  return extractFallbackNotice(payload)?.blocked === true;
+}
+
 /** Texto curto para o toast de aviso. */
 export function fallbackNoticeMessage(notice: RTEFallbackNotice): string {
   return notice.blocked

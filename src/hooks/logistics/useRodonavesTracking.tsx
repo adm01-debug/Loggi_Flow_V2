@@ -2,7 +2,11 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { extractFallbackNotice, fallbackNoticeMessage } from '@/lib/rodonaves';
+import {
+  extractFallbackNotice,
+  fallbackNoticeMessage,
+  isBlockedResponse,
+} from '@/lib/rodonaves';
 import { toast } from 'sonner';
 
 // ==========================================
@@ -100,6 +104,9 @@ async function invokeRodonaves(action: string, params: object) {
   // saber que o dado veio de outra rota antes de decidir com base nele.
   const notice = extractFallbackNotice(data);
   if (notice) {
+    // Bloqueio sem alternativa liberada não tem dado a exibir: sobe como erro
+    // para o painel não renderizar o payload de bloqueio como resultado.
+    if (isBlockedResponse(data)) throw new Error(fallbackNoticeMessage(notice));
     toast.warning('Dado obtido por rota alternativa', {
       id: `rte-fallback-${notice.route}`,
       description: fallbackNoticeMessage(notice),
