@@ -247,6 +247,10 @@ Este grupo existe porque o projeto Supabase oficial não ficou acessível nesta 
 
 - **Camada:** banco / ferramentas de contexto · **Severidade:** **Alta** · **Confiança:** confirmado · **Método:** EXECUTADO
 
+> **Corrigido nas etapas 020-022** (`scripts/ai-context/gerar.mjs`): o gerador não afirma mais "sem RLS"
+> nesse cenário — publica `sem_rls: 'desconhecido'`, `tabelas_rls_indeterminado` e a consulta ao catálogo que
+> decide. No repositório atual: 12 partições `audit_logs_y*` indeterminadas e 0 tabelas "sem RLS" confirmadas.
+
 **Problema hoje.** `docs/contexto/codigo/banco.json` (branch `contexto`) marca `rls: false` em 36 tabelas.
 Dessas, 32 são partições mensais de `audit_logs` e `rastreamento_historico` — e o RLS **é** habilitado nelas
 por DDL dinâmico, que o gerador não lê:

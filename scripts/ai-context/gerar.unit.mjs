@@ -674,6 +674,37 @@ test('INDEX.md do fixture: números batem com os JSON, todo arquivo citado exist
   for (const f of fs.readdirSync(out)) assert.doesNotMatch(fs.readFileSync(path.join(out, f), 'utf8'), /eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.|sk_live_|postgres(ql)?:\/\/[^ ]*:[^ @]+@/, f);
 });
 
+test('banco: RLS em três estados — partição protegida dentro de DO $$ não vira "sem RLS"', (t) => {
+  const read = isolatedFixture(t, (dir) => {
+    w(dir, 'supabase/migrations/005_particoes.sql', `create table public.audit_logs (id bigint, criado_em timestamptz) partition by range (criado_em);
+create table public.audit_logs_y2026m01 partition of public.audit_logs for values from ('2026-01-01') to ('2026-02-01');`);
+    w(dir, 'supabase/migrations/006_rls_particoes.sql', `do $$
+declare r record;
+begin
+  for r in select c.relname from pg_class c
+    join pg_namespace n on n.oid = c.relnamespace
+    where n.nspname = 'public' and c.relname like 'audit_logs_y%' and not c.relrowsecurity
+  loop
+    execute format('alter table public.%I enable row level security', r.relname);
+  end loop;
+end $$;`);
+    w(dir, 'supabase/migrations/007_plana.sql', `create table public.pagamentos_plano (id uuid primary key);`);
+  });
+  const b = read('banco.json');
+  assert.equal(b.tabelas.audit_logs_y2026m01.sem_rls, 'desconhecido', 'ligada dentro de DO $$: não é "sem RLS"');
+  assert.equal(b.tabelas.audit_logs_y2026m01.rls_indeterminado, true);
+  assert.equal(b.tabelas.pagamentos_plano.sem_rls, true, 'tabela comum segue comprovadamente sem RLS');
+  assert.equal(b.tabelas.pagamentos_plano.rls_indeterminado, undefined);
+  const fer = read('ferramentas.json');
+  assert.ok(!fer.permissoes.tabelas_sem_rls.includes('audit_logs_y2026m01'), 'não afirma "sem RLS" sobre a partição');
+  assert.deepEqual(fer.permissoes.tabelas_rls_indeterminado, ['audit_logs_y2026m01']);
+  assert.ok(fer.permissoes.tabelas_rls_indeterminado_como_decidir.includes('relrowsecurity'), 'publica a consulta que decide no banco vivo');
+  const base = read('baseline.json');
+  assert.ok(!base.alertas.tabelas_sem_rls.includes('audit_logs_y2026m01'));
+  assert.deepEqual(base.alertas.tabelas_rls_indeterminado, ['audit_logs_y2026m01']);
+  assert.ok(b.avisos.some((a) => /RLS indeterminado/.test(a)), 'aviso informa quantas ficaram indeterminadas');
+});
+
 test('ordem de criação dos arquivos no disco não muda a saída', (t) => {
   const files = { 'supabase/migrations/2.sql': 'alter table public.t add column b int;', 'supabase/migrations/1.sql': 'create table public.t (id int);' };
   for (const n of ['d', 'a', 'c', 'b', 'e']) { files[`src/hooks/use${n.toUpperCase()}.ts`] = `import '../lib/${n}';\nexport const use${n.toUpperCase()} = () => supabase.from('t');`; files[`src/lib/${n}.ts`] = `export const ${n} = 1;`; files[`supabase/functions/fn-${n}/index.ts`] = 'Deno.serve(() => new Response("x"));'; }

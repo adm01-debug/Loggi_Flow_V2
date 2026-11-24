@@ -51,9 +51,9 @@
 
 ### Onda 0
 
-- [ ] **020** — Gerador de contexto: parar de afirmar "sem RLS" quando o arquivo tem DDL dinâmico — onda 0 — Alta
-- [ ] **021** — Separar, nos resumos gerados, "tabela sem RLS" de "não deu para saber" — onda 0 — Alta
-- [ ] **022** — Teste de regressão: partição protegida por `DO $$` não pode aparecer como "sem RLS" — onda 0 — Média
+- [x] **020** — Gerador de contexto: parar de afirmar "sem RLS" quando o arquivo tem DDL dinâmico — onda 0 — Alta
+- [x] **021** — Separar, nos resumos gerados, "tabela sem RLS" de "não deu para saber" — onda 0 — Alta
+- [x] **022** — Teste de regressão: partição protegida por `DO $$` não pode aparecer como "sem RLS" — onda 0 — Média
 
 ### Onda 1
 
@@ -131,15 +131,15 @@
 - [x] **079** — Teste unitário da validação de assinatura de arquivo — onda 4 — Média
 - [x] **080** — Provar, arquivo por arquivo, quais dos oito "hooks sem importador" estão realmente mortos — onda 4 — Baixa
   <!-- Veredictos (261123):
-              1. components/accessibility/index.ts — VIVO por caminho direto (SkipLinks, LiveRegionProvider, ReducedMotionProvider importados em MainLayout.tsx:13, LazyProviders.tsx:8-9)
-              2. components/common/index.ts — VIVO (barril; exports EmptyState, ConfirmDialog, Pagination… em uso por caminhos diretos)
-              3. components/pwa/index.ts — VIVO por caminho direto (OfflineBanner, InstallPrompt, UpdatePrompt em MainLayout.tsx:14,47,52)
-              4. hooks/gamification/useGamification.ts — VIVO (importado por GamificationPanel, LevelUpModal, AppSidebar, Header, FavoriteMetricsBar via caminho sem extensão)
-                 hooks/gamification/useGamification.tsx — INDEFINIDO: 349 linhas vs .ts 259, implementações divergem; comentário P18 em authService.ts:43 indica .tsx como schema em uso; aguarda decisão do dono
-              5. hooks/rodonaves/index.ts — VIVO por caminho direto (useSLOTargets, useSLOSnapshots, useGatewayHealth importados em RTEGateway* panels)
-              6. hooks/ai/useNexusSimulator.ts — REMOVIDO em etapa 069 (PR #300)
-              7. hooks/security/useSelfHealing.ts — REMOVIDO em etapa 068 (PR #300)
-              8. utils/performance.ts — MORTO: useRenderingMonitor e measureAction sem nenhum importador (grep -rn "useRenderingMonitor\|measureAction" src/ → vazio) -->
+                  1. components/accessibility/index.ts — VIVO por caminho direto (SkipLinks, LiveRegionProvider, ReducedMotionProvider importados em MainLayout.tsx:13, LazyProviders.tsx:8-9)
+                  2. components/common/index.ts — VIVO (barril; exports EmptyState, ConfirmDialog, Pagination… em uso por caminhos diretos)
+                  3. components/pwa/index.ts — VIVO por caminho direto (OfflineBanner, InstallPrompt, UpdatePrompt em MainLayout.tsx:14,47,52)
+                  4. hooks/gamification/useGamification.ts — VIVO (importado por GamificationPanel, LevelUpModal, AppSidebar, Header, FavoriteMetricsBar via caminho sem extensão)
+                     hooks/gamification/useGamification.tsx — INDEFINIDO: 349 linhas vs .ts 259, implementações divergem; comentário P18 em authService.ts:43 indica .tsx como schema em uso; aguarda decisão do dono
+                  5. hooks/rodonaves/index.ts — VIVO por caminho direto (useSLOTargets, useSLOSnapshots, useGatewayHealth importados em RTEGateway* panels)
+                  6. hooks/ai/useNexusSimulator.ts — REMOVIDO em etapa 069 (PR #300)
+                  7. hooks/security/useSelfHealing.ts — REMOVIDO em etapa 068 (PR #300)
+                  8. utils/performance.ts — MORTO: useRenderingMonitor e measureAction sem nenhum importador (grep -rn "useRenderingMonitor\|measureAction" src/ → vazio) -->
 - [x] **081** — Remover só o que a etapa 080 provou morto — onda 4 — Baixa
   <!-- Removido: src/utils/performance.ts (useRenderingMonitor + measureAction, zero importadores) -->
 - [x] **082** — Remover `_shared/service-wrapper.ts`, que nenhuma função usa — onda 4 — Baixa
@@ -438,6 +438,23 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapas 020, 021 e 022 (2026-11-26) - o gerador de contexto para de afirmar "sem RLS" no que ele não viu
+
+**O defeito.** `scripts/ai-context/gerar.mjs` marcava `sem_rls: true` em toda tabela cujo `CREATE TABLE` não
+trouxesse `ENABLE ROW LEVEL SECURITY` literal. Partição mensal ligada dentro de `DO $$` cai nessa regra — no
+repositório real eram 12 (`audit_logs_y2026m01`…`m12`), e o achado F-01 mostra que o caso já mordeu 32 tabelas.
+
+| etapa | o que mudou                                                                                                                                                                                                                                                                                                                            |
+| ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 020   | `sem_rls` passa a ter três estados: `true` (nada liga RLS para a tabela), `'desconhecido'` (bloco dinâmico do conjunto liga RLS sobre nome calculado — `public.%I`/`LIKE 'x_y%'` — e alcança a tabela) e `false` (ENABLE literal). Campo irmão `rls_indeterminado: true` para quem filtra por booleano. Parser de statements intocado. |
+| 021   | `ferramentas.json → permissoes` e `baseline.json → alertas` publicam `tabelas_sem_rls` (só confirmadas) **e** `tabelas_rls_indeterminado`, mais `tabelas_rls_indeterminado_como_decidir` com a consulta ao catálogo que resolve no banco vivo. O array `banco.avisos` ganhou a contagem das indeterminadas.                            |
+| 022   | `scripts/ai-context/gerar.unit.mjs`: caso novo com partição protegida por `DO $$` — exige `'desconhecido'` na partição, `true` na tabela comum, e ausência da partição em `tabelas_sem_rls` nos dois resumos.                                                                                                                          |
+
+**Verificado.** `node --test scripts/ai-context/gerar.unit.mjs` → **39/39** (a asserção antiga de
+`payments.sem_rls === true` continua valendo: aquele bloco dinâmico cria policy, não liga RLS). Gerador rodado
+no repositório real: **12 indeterminadas** (`audit_logs_y*`), **0** "sem RLS" confirmadas, 52 blocos de DDL
+dinâmico sinalizados. `npm run automation:test` → **103/103**.
 
 ### Registro - etapas 267, 268, 269, 276 e 278 (2026-11-26) - contabilidade do orçamento de lint e dos testes que travam as correções
 
