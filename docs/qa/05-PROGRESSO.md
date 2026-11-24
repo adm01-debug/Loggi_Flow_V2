@@ -104,7 +104,7 @@
 ### Onda 8
 
 - [~] **060** — Tirar os dois SQL históricos do lugar onde parecem tarefa pendente — onda 8 — Média · **aguarda o dono**
-- [ ] **061** — Registrar, em um lugar só, qual SQL avulso já foi aplicado e onde — onda 8 — Média
+- [x] **061** — Registrar, em um lugar só, qual SQL avulso já foi aplicado e onde — onda 8 — Média
 
 ### Onda 2
 
@@ -3739,5 +3739,88 @@ do banco no alto.
 
 **Nao verificado.** Nenhuma das 13 etapas que dependem do banco ao vivo foi executada: o estado delas e
 "aberta por falta de acesso", nao "correta". Nada aqui foi validado contra producao.
+
+---
+
+### Registro - etapas 062 e 063 (2026-11-24) - ja estavam na main
+
+As duas estavam implementadas e nao marcadas. A marcacao faltando fazia o caminho
+parecer trabalho perdido de outro agente.
+
+**062 - abrir a edicao pelo cartao.** `src/pages/Coletas.tsx:851-864`: botao `Pencil`
+com `e.stopPropagation()` (necessario, porque o `onClick` do `Card` em `:752-756` abre
+os detalhes), chamando `setSelectedPickup(c)` e depois `setIsDialogOpen(true)`. O
+`<PickupDialog>` em `:938-943` ja recebia `pickup={selectedPickup}` - essa linha nao
+faltava. O `onClick` do cartao continua abrindo **detalhes**, como a etapa exige: as
+duas portas existem.
+
+**063 - editar de dentro dos detalhes.** `src/pages/Coletas.tsx:951-955`: o
+`PickupDetailsDialog` recebe `onEdit`, que fecha os detalhes, seleciona o item e abre o
+dialogo de edicao.
+
+Nenhuma alteracao de codigo nas duas.
+
+**Verificacao**
+- `grep -n 'setSelectedPickup(c)' -A2 src/pages/Coletas.tsx` -> os tres pontos
+  (`:754` detalhes, `:860` edicao, `:953` onEdit) chamam `setSelectedPickup` antes de
+  abrir o dialogo correspondente
+- `grep -n 'pickup={selectedPickup}' src/pages/Coletas.tsx` -> `:942` (PickupDialog) e
+  `:948` (PickupDetailsDialog)
+
+### Registro - etapa 061 (2026-11-24)
+
+Depois da 060 os dois SQL historicos estao no lugar certo, mas a informacao de **o que foi
+aplicado, quando e em qual projeto** continuava dispersa entre o cabecalho de cada arquivo,
+uma linha de `banco.md` e uma de `scripts/audit/README.md`. Sem um lugar unico, um agente
+encontra "remediacao" e conclui que e pendente.
+
+Acrescentada a `docs/agentes/banco.md` - o documento que o `AGENTS.md` manda ler antes de
+qualquer SQL, migration ou deploy - uma secao "SQL avulso ja aplicado", com tabela de
+caminho, data, projeto e situacao, mais a frase que fecha a duvida para o futuro: DDL novo
+vai para `supabase/migrations/`, nunca como script avulso.
+
+Nao foi criado documento novo de proposito: o repositorio ja tem documentacao que contradiz
+documentacao, e a informacao tem de entrar onde o protocolo ja obriga a olhar.
+
+As linhas de `banco.md:32-41` sobre os projetos que nao sao o destino ficaram intactas - sao
+a protecao contra escrever no banco errado.
+
+**Verificacao**
+- `node scripts/ci/check-claude-md-integrity.mjs` -> exit 0
+- `grep -n 'historico/\|nao reexecutar' -i docs/agentes/banco.md` -> os dois arquivos listados
+  (`:50-51`) com data, projeto e marca de nao reexecutar
+
+### Registro - etapa 060 (2026-11-24) - implementada e mergeada (#340)
+
+Dois `.sql` pontuais de agosto/2026 estavam soltos na raiz de `scripts/`, entre
+utilitarios que sao para rodar. Alteram banco, nao tem runner, e o aviso de
+"HISTORICO - NAO REEXECUTAR" so aparecia para quem abrisse o arquivo - a listagem
+da pasta dizia o contrario.
+
+Movidos com `git mv` (historico preservado) para `scripts/historico/`, com
+`README.md` curto declarando que ali so entra SQL ja aplicado e que nada ali se executa.
+
+Os tres pontos de referencia atualizados:
+
+- `scripts/audit/sql.unit.mjs:26-27` (constantes `cleanup` e `remediacao`)
+- `scripts/audit/README.md:58`
+- `docs/agentes/banco.md:35`
+
+Conteudo SQL **nao** foi tocado - a revisao de 2026-11-09 ja os deixou replay-safe,
+e qualquer edicao invalidaria os testes que verificam o conteudo.
+
+**Verificacao**
+- `node --test scripts/audit/sql.unit.mjs` -> **28 testes, 0 falhas, 0 pulados**; o
+  Postgres descartavel subiu e os dois arquivos foram executados de verdade no novo caminho
+- `npm run automation:test` -> **103 testes, 0 falhas**
+- `node scripts/ci/check-claude-md-integrity.mjs` -> exit 0
+- `grep` nao encontra nenhuma referencia apontando para a raiz de `scripts/`
+
+Uma linha por etapa concluída. A coluna **Evidência** é o que diferencia etapa concluída de etapa
+"deveria funcionar": cole o comando e o resultado, ou a consulta e o retorno.
+
+| Etapa | PR  | Mergeada? | Deploy confirmado? | Evidência da verificação |
+| ----- | --- | --------- | ------------------ | ------------------------ |
+|       |     |           |                    |                          |
 
 ---

@@ -32,13 +32,30 @@ testar tela e nunca rode script de escrita "só para ver".
 ### Projetos que NÃO são o destino (não escrever neles)
 
 - **`hgicfqjayrjurivtygqf`** — Lovable Cloud, **origem** do cutover. Serve só como referência de paridade
-  (policies, corpo de função, cron) e é a fonte de `scripts/cleanup_triggers_source.sql`,
+  (policies, corpo de função, cron) e é a fonte de `scripts/historico/cleanup_triggers_source.sql`,
   `scripts/ops/backup_origem.sh` e `docs/ops/cron_jobs_origem.json`. Escrita ali não afeta o app.
 - **`uwbpzfcysppwikfpnzok`** — ref **morto**, ainda citado em `index.html` (dns-prefetch/preconnect) e em
   `supabase/functions/send-password-reset/index.ts` (URL de fallback do e-mail de reset). É dívida a limpar,
   nunca destino de query.
 - Há vários Supabase quase homônimos na conta do dono (Zapp Web V2, Gestão de Clientes, Gestão de Produtos).
   **Confirme qual MCP carregou antes de rodar SQL.**
+
+### SQL avulso já aplicado (fora do ledger de migrations)
+
+**Não há DDL avulso pendente.** Os dois scripts abaixo já rodaram e estão guardados em
+`scripts/historico/` apenas como registro. Nenhum deles se reexecuta.
+
+| Caminho | Aplicado em | Projeto | Situação |
+| --- | --- | --- | --- |
+| `scripts/historico/origem_remediacao_2026-08-31.sql` | 2026-08-31 | `hgicfqjayrjurivtygqf` (origem, somente leitura desde o cutover) | Já aplicado — **não reexecutar** |
+| `scripts/historico/cleanup_triggers_source.sql` | 2026-08-31 (blocos 1-2) | `hgicfqjayrjurivtygqf` (origem, somente leitura desde o cutover) | Já aplicado — **não reexecutar**; o bloco 3 foi substituído por `cron.unschedule` na origem |
+
+Um agente que encontre um `.sql` chamado "remediação" ou "cleanup" e conclua que é
+tarefa pendente está errado: o registro está aqui, com data e projeto.
+
+**DDL novo não vira script avulso.** Vai para `supabase/migrations/` e segue a ordem
+da primeira regra abaixo (arquivo → PR → merge → deploy do código → apply). Não existe
+workflow que aplique DDL: quem aplica é o dono, pelo MCP.
 
 ## Regras de migration
 

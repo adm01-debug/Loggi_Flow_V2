@@ -55,7 +55,7 @@ Teste: `AUDIT_TEST_PG_URL=postgres://postgres@127.0.0.1:5432/postgres node --tes
 ## Testes
 
 `node --test scripts/audit/sql.unit.mjs` roda os três manifestos e os dois scripts históricos da origem
-(`scripts/cleanup_triggers_source.sql`, `scripts/origem_remediacao_2026-08-31.sql`) num Postgres descartável com fixture estilo
+(`scripts/historico/cleanup_triggers_source.sql`, `scripts/historico/origem_remediacao_2026-08-31.sql`) num Postgres descartável com fixture estilo
 Supabase. Com `AUDIT_TEST_PG_URL` (superuser de um servidor de teste) cria e apaga bancos `audit_t_*` nele; sem a env, sobe um
 cluster temporário com `initdb`/`pg_ctl` (não funciona como root). Sem nenhum dos dois, os testes são pulados. Nunca aponte
 para o banco do projeto.
