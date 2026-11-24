@@ -377,7 +377,7 @@
 - [x] **281** — Teste do caminho de criar coleta — onda 8 — Alta
 - [x] **282** — Teste do caminho de mover entrega de status — onda 8 — Alta
 - [~] **283** — Resolver o usuário semeado do `tests/e2e/` e dizer por que ele não roda na CI — onda 8 — Média · **aguarda o dono**
-- [~] **284** — Subir os pisos de cobertura para travar o que as etapas 275-282 conquistaram — onda 8 — Média · **aguarda o dono**
+- [~] **284** — Subir os pisos de cobertura para travar o que as etapas 275-282 conquistaram — onda 8 — Média · **PR #437 aberta; aguarda o dono** (altera limiar de gate da CI)
 - [~] **285** — Confirmar com o dono se `VITE_SENTRY_DSN` está configurado no Vercel — onda 8 — Média · **aguarda o dono**
 - [~] **286** — Provar que um erro de front chega ao Sentry — onda 8 — Média · **aguarda o dono**
 - [x] **287** — Verificar no banco ao vivo se `webhook_failures` e `cron_job_logs` existem — onda 8 — Média — **nenhuma das duas existe**
@@ -4201,3 +4201,34 @@ ordem de migration proíbe.
   `exit=0`
 - `grep -n "banco.json" AGENTS.md docs/agentes/banco.md docs/agentes/contexto-ia.md` -> 5 ocorrências, todas
   com a ressalva (AGENTS.md:97, banco.md:93, contexto-ia.md:66,69,71)
+
+## Registro da etapa 284 — pisos de cobertura subidos (2026-11-24)
+
+**Medição (spec pede medir depois das etapas 275-282 mergeadas, na suíte inteira):** rodada duas vezes
+sobre a `main` `37295911`, sem nenhuma mudança de teste, as duas com os mesmos números — 101 arquivos,
+852 testes, `All files` `75.9 st / 69.93 br / 73.55 fn / 78.05 li`. Estável, então o piso pode subir.
+
+| Piso | Antes | Medido | Medido − 1 | Agora |
+| --- | --- | --- | --- | --- |
+| statements | 70 | 75.9 | 74.9 | **74** |
+| branches | 67 | 69.93 | 68.93 | **68** |
+| functions | 73 | 73.55 | 72.55 | **73** (não mexe) |
+| lines | 72 | 78.05 | 77.05 | **77** |
+
+`functions` é a exceção: a fórmula (medido − 1 = 72.55) cairia **abaixo** do piso atual e o comentário do
+próprio arquivo proíbe descer sem aprovação. Fica em 73, com o comentário do bloco dizendo isso — é a
+única margem apertada (0,55 ponto) e a próxima etapa que quiser mexer ali precisa medir de novo.
+
+**Mudança:** só o bloco `coverage.thresholds` e o comentário dele em `vitest.config.ts`. `include`,
+`exclude`, `environment`, `setupFiles`, `testTimeout` e `hookTimeout` intactos.
+
+**Enforcement:** `ci.yml:81` roda `npm run test:coverage` — os pisos derrubam a CI de verdade, não são
+só um número no arquivo.
+
+**Evidência**
+- `npm run test:coverage` (2ª e 3ª execuções) -> 101 arquivos, 852 testes, 0 falha; `All files 75.9 /
+  69.93 / 73.55 / 78.05`; `grep -c "does not meet"` = 0 com os pisos novos
+- `npx tsc --noEmit` e `npm run lint:budget` — nenhum arquivo de código tocado (só config)
+
+**Estado:** PR aberta, **não mergeada** — a spec marca "precisa de aprovação humana antes do merge" e o
+piso é limiar de gate da CI (regra 8). Reverter = `git revert`.
