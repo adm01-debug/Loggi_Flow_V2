@@ -2,10 +2,14 @@ import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Clock, Star, Search, Loader2, Truck, Package } from 'lucide-react';
+import { Clock, Star, Search, Loader2, Truck, Package, AlertTriangle } from 'lucide-react';
 import { useRodonavesTracking } from "@/hooks/logistics/useRodonavesTracking";
 import { toast } from 'sonner';
 import { formatCEP } from '@/lib/validations';
+import {
+  resolveCubageFactor,
+  resolveTaxableWeight,
+} from '@/lib/rodonaves/taxableWeight';
 
 export function RodonavesQuotation() {
   const rodonaves = useRodonavesTracking();
@@ -53,6 +57,32 @@ export function RodonavesQuotation() {
     }
     rodonaves.getCubageFactor({ cnpjRemetente: cubageCnpj.replace(/\D/g, '') });
   }, [cubageCnpj, rodonaves]);
+
+  // Dimensões medidas na conferência: o peso cubado define o que a
+  // transportadora vai cobrar quando supera o peso declarado.
+  const [dims, setDims] = useState({
+    lengthCm: '', widthCm: '', heightCm: '', quantity: '1',
+  });
+
+  const updateDim = useCallback((field: string, value: string) => {
+    setDims(prev => ({ ...prev, [field]: value }));
+  }, []);
+
+  const hasDims = Boolean(dims.lengthCm && dims.widthCm && dims.heightCm);
+  const factor = resolveCubageFactor(
+    rodonaves.cubageResult?.data?.CubingFactor ??
+      rodonaves.cubageResult?.data?.cubingFactor,
+  );
+  const taxable = resolveTaxableWeight(
+    parseFloat(form.peso) || 0,
+    {
+      lengthCm: parseFloat(dims.lengthCm) || 0,
+      widthCm: parseFloat(dims.widthCm) || 0,
+      heightCm: parseFloat(dims.heightCm) || 0,
+      quantity: parseInt(dims.quantity) || 0,
+    },
+    factor,
+  );
 
   return (
     <div className="space-y-6">
@@ -157,12 +187,84 @@ export function RodonavesQuotation() {
           <Button className="w-full" size="sm" onClick={handleCubage}>
             <Search className="w-4 h-4 mr-2" />Consultar Cubagem
           </Button>
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <Label htmlFor="cub-length">Comprimento (cm)</Label>
+              <Input
+                id="cub-length"
+                inputMode="decimal"
+                value={dims.lengthCm}
+                onChange={e => updateDim('lengthCm', e.target.value)}
+                placeholder="Ex: 120"
+              />
+            </div>
+            <div>
+              <Label htmlFor="cub-width">Largura (cm)</Label>
+              <Input
+                id="cub-width"
+                inputMode="decimal"
+                value={dims.widthCm}
+                onChange={e => updateDim('widthCm', e.target.value)}
+                placeholder="Ex: 100"
+              />
+            </div>
+            <div>
+              <Label htmlFor="cub-height">Altura (cm)</Label>
+              <Input
+                id="cub-height"
+                inputMode="decimal"
+                value={dims.heightCm}
+                onChange={e => updateDim('heightCm', e.target.value)}
+                placeholder="Ex: 80"
+              />
+            </div>
+            <div>
+              <Label htmlFor="cub-qty">Volumes</Label>
+              <Input
+                id="cub-qty"
+                inputMode="numeric"
+                value={dims.quantity}
+                onChange={e => updateDim('quantity', e.target.value)}
+                placeholder="1"
+              />
+            </div>
+          </div>
+
           {rodonaves.cubageResult?.data && (
             <div className="p-3 rounded-lg bg-muted/30 border text-sm">
               <div className="text-xl font-bold text-primary">
                 Fator: {rodonaves.cubageResult.data.CubingFactor || rodonaves.cubageResult.data.cubingFactor || 'N/A'}
               </div>
               <p className="text-muted-foreground mt-1">Use este fator para calcular peso cubado: (C × L × A) ÷ fator</p>
+            </div>
+          )}
+
+          {hasDims && (
+            <div className="p-3 rounded-lg border text-sm space-y-1" data-testid="taxable-weight">
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Volume</span>
+                <span>{taxable.volumeM3} m³</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Peso cubado</span>
+                <span>{taxable.cubicKg} kg</span>
+              </div>
+              <div className="flex items-center justify-between font-semibold">
+                <span>Peso taxável</span>
+                <span className="text-primary">{taxable.taxableKg} kg</span>
+              </div>
+              {taxable.billedByCubage ? (
+                <p className="flex items-start gap-1 text-warning">
+                  <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
+                  A cubagem supera o peso declarado em {taxable.surchargePercent}%:
+                  a cobrança será por {taxable.taxableKg} kg.
+                </p>
+              ) : (
+                <p className="text-muted-foreground">
+                  Fator {factor} kg/m³
+                  {rodonaves.cubageResult?.data ? '' : ' (padrão de mercado — consulte o cliente para confirmar)'}
+                </p>
+              )}
             </div>
           )}
         </div>
