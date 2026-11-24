@@ -282,7 +282,7 @@
 
 - [x] **202** — Criar `useServerPagination` e **definir** o contrato de paginação no servidor — onda 6 — Crítica
 - [x] **203** — Documentar o contrato de paginação e marcar `usePagination` como "só memória" — onda 6 — Alta
-- [ ] **204** — `useTrackingAnalytics`: pôr teto no servidor na leitura de `rastreamento_historico` — onda 6 — Crítica
+- [x] **204** — `useTrackingAnalytics`: pôr teto no servidor na leitura de `rastreamento_historico` — onda 6 — Crítica
 - [ ] **205** — `Analytics.tsx`: passar o intervalo de datas que a tela já tem para `useTrackingAnalytics` — onda 6 — Crítica
 - [ ] **206** — `useTrackingAnalytics`: tornar a janela de datas obrigatória na assinatura — onda 6 — Alta
 - [ ] **207** — `useLogisticsCalendar`: pôr teto na leitura de `coletas` — onda 6 — Alta
@@ -434,6 +434,31 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapa 204 (2026-11-25) - achado P-01 (`useTrackingAnalytics` sem teto)
+
+**Causa:** `src/hooks/logistics/useTrackingAnalytics.tsx:122-124` montava
+`.from('rastreamento_historico').select('*').order('recorded_at', { ascending: true })` sem `.limit()` e sem
+`.range()`. Os filtros de data de `:127-132` sao condicionais e o unico chamador, `src/pages/Analytics.tsx:71`,
+chama `useTrackingAnalytics()` **sem argumentos** — os dois `if` nunca entravam, e `/analytics` baixava
+`rastreamento_historico` inteira. E a tabela de maior crescimento do sistema (uma linha por consulta de rastreio,
+com 18 particoes mensais) e era a unica leitura do repositorio sem nenhum teto.
+
+**Entrega:** `.limit(TRACKING_POINTS_LIMIT)` com `TRACKING_POINTS_LIMIT = 5000` — mesmo valor ja usado em
+`ExportacaoDados.tsx`/`AuditTrail.tsx`, nenhum numero novo. A ordem no servidor virou `ascending: false`
+**antes** do corte: com `ascending: true` o teto guardaria os 5000 pontos **mais antigos** da tabela, e a tela
+mostraria metricas plausiveis e erradas — pior que lentidao. O cliente reinverte com
+`const orderedPoints = [...(data || [])].reverse()` antes do agrupamento por `lalamove_order_id`; o `reverse` e
+sobre uma copia, entao o array do react-query nao e mutado. Nao foi para 500: o agrupamento corta ordens no meio
+e produz metrica errada em silencio. A janela de data obrigatoria fica nas etapas 205/206.
+
+**Verificacao:** spec de contrato novo `tests/contracts/tracking-teto-5000.spec.ts` (5 casos) amarrando a cadeia
+do servidor, o valor do teto, a ordem-antes-do-corte e a reinversao. 6 mutacoes — ordem crescente e sem teto,
+teto 500, sem reinversao, `reverse` mutando o array do cliente, `.range()` no lugar do teto e `forEach` no array
+nao reinvertido — falham **2/2/1/1/2/1**; a versao correta passa 5/5. `eslint` limpo nos dois arquivos, `tsc` 0,
+`lint:budget` 77/86 com 0 erros, suite **725/725** (85 arquivos). Diff: 11 insercoes, 2 delecoes.
+**Nao verificado:** a contagem real de linhas de `rastreamento_historico` ("pontos registrados" antes/depois,
+como o plano sugere) — nao ha credencial de banco nesta sessao.
 
 ### Registro - etapa 203 (2026-11-25) - achado P-01 (contrato de paginacao documentado)
 

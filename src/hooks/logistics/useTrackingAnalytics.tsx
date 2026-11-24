@@ -114,6 +114,11 @@ const analyzeTrackingData = (points: TrackingPoint[]): TrackingMetrics | null =>
   };
 };
 
+// `rastreamento_historico` e a tabela de maior crescimento do sistema: uma linha por consulta
+// de rastreio. Sem teto, /analytics baixa a tabela inteira. 5000 e o mesmo teto de
+// ExportacaoDados/AuditTrail; a janela de data (dateFrom/dateTo) e opcional.
+const TRACKING_POINTS_LIMIT = 5000;
+
 export const useTrackingAnalytics = (dateFrom?: Date, dateTo?: Date) => {
   const { user } = useAuth();
   return useQuery({
@@ -122,7 +127,8 @@ export const useTrackingAnalytics = (dateFrom?: Date, dateTo?: Date) => {
       let query = supabase
         .from('rastreamento_historico')
         .select('*')
-        .order('recorded_at', { ascending: true });
+        .order('recorded_at', { ascending: false })
+        .limit(TRACKING_POINTS_LIMIT);
 
       if (dateFrom) {
         query = query.gte('recorded_at', dateFrom.toISOString());
@@ -135,8 +141,11 @@ export const useTrackingAnalytics = (dateFrom?: Date, dateTo?: Date) => {
 
       if (error) throw error;
 
+      // O teto corta os pontos mais antigos, entao o cliente reinverte para ordem cronologica.
+      const orderedPoints = [...(data || [])].reverse();
+
       const groupedByOrder: Record<string, TrackingPoint[]> = {};
-      (data || []).forEach((point) => {
+      orderedPoints.forEach((point) => {
         if (!groupedByOrder[point.lalamove_order_id]) {
           groupedByOrder[point.lalamove_order_id] = [];
         }
