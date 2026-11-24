@@ -4,31 +4,53 @@
 
 import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
 import { fixture, escreve, stub, roda, limpa } from './helpers.mjs';
 
 const SCRIPT = 'audit-gate.mjs';
-const root = fixture(SCRIPT);
-after(() => limpa(root));
-stub(root, 'npm', `[ -n "$NPM_SLEEP" ] && exec sleep "$NPM_SLEEP"
+const NPM_STUB = `[ -n "$NPM_SLEEP" ] && exec sleep "$NPM_SLEEP"
 [ "$1 $2" = "audit --json" ] || { echo "stub npm: chamada inesperada: $*" >&2; exit 99; }
 [ -n "$NPM_ERR" ] && echo "$NPM_ERR" >&2
 cat "$NPM_OUT"
-exit "\${NPM_EXIT:-0}"`);
+exit "\${NPM_EXIT:-0}"`;
 
-function audit(saida, exit = 0, env = {}) {
-  const arq = escreve(root, 'npm-out.txt', typeof saida === 'string' ? saida : JSON.stringify(saida, null, 2));
-  return roda(root, SCRIPT, { env: { NPM_OUT: arq, NPM_EXIT: String(exit), ...env } });
+const root = fixture(SCRIPT);
+after(() => limpa(root));
+stub(root, 'npm', NPM_STUB);
+
+// A allowlist publicada está vazia (etapa 270), então os casos que exercitam o mecanismo de isenção
+// montam a sua numa cópia própria do script — o comportamento testado é o do gate, não o da lista.
+const rootsDaAllowlist = [];
+const comAllowlist = (...nomes) => {
+  const r = fixture(SCRIPT);
+  rootsDaAllowlist.push(r);
+  stub(r, 'npm', NPM_STUB);
+  const arquivo = path.join(r, 'scripts', SCRIPT);
+  const fonte = fs.readFileSync(arquivo, 'utf8');
+  const injetado = fonte.replace(/const ALLOWLIST = new Set\(\[[^\]]*\]\);/, `const ALLOWLIST = new Set(${JSON.stringify(nomes)});`);
+  assert.notEqual(injetado, fonte, 'não achou a linha da allowlist para injetar');
+  fs.writeFileSync(arquivo, injetado);
+  return r;
+};
+after(() => {
+  for (const r of rootsDaAllowlist) limpa(r);
+});
+
+function audit(saida, exit = 0, env = {}, r = root) {
+  const arq = escreve(r, 'npm-out.txt', typeof saida === 'string' ? saida : JSON.stringify(saida, null, 2));
+  return roda(r, SCRIPT, { env: { NPM_OUT: arq, NPM_EXIT: String(exit), ...env } });
 }
 const vuln = (name, severity, extra = {}) => ({ name, severity, isDirect: true, via: [], effects: [], range: '*', nodes: [`node_modules/${name}`], fixAvailable: false, ...extra });
 const relatorio = (...vulns) => ({ auditReportVersion: 2, vulnerabilities: Object.fromEntries(vulns.map((v) => [v.name, v])), metadata: {} });
 
-const passa = (nome, saida, exit, re = /Sem critical\/high fora da allowlist/) => test(`passa: ${nome}`, () => {
-  const r = audit(saida, exit);
+const passa = (nome, saida, exit, re = /Sem critical\/high fora da allowlist/, fixtureRoot = root) => test(`passa: ${nome}`, () => {
+  const r = audit(saida, exit, {}, fixtureRoot);
   assert.equal(r.status, 0, r.saida);
   assert.match(r.stdout, re);
 });
-const falha = (nome, saida, exit, re) => test(`falha: ${nome}`, () => {
-  const r = audit(saida, exit);
+const falha = (nome, saida, exit, re, fixtureRoot = root) => test(`falha: ${nome}`, () => {
+  const r = audit(saida, exit, {}, fixtureRoot);
   assert.equal(r.status, 1, r.saida);
   assert.match(r.stderr, re);
   assert.doesNotMatch(r.stdout, /✅/);
@@ -37,8 +59,8 @@ const falha = (nome, saida, exit, re) => test(`falha: ${nome}`, () => {
 
 passa('nenhuma vulnerabilidade', relatorio(), 0);
 passa('só low/moderate/info (npm audit sai 1)', relatorio(vuln('a', 'low'), vuln('b', 'moderate'), vuln('c', 'info')), 1);
-passa('high em pacote da allowlist (xlsx)', relatorio(vuln('xlsx', 'high')), 1, /allowlist ativa: xlsx/);
-passa('critical em pacote da allowlist (vite)', relatorio(vuln('vite', 'critical')), 1, /allowlist ativa: vite/);
+passa('high em pacote da allowlist (xlsx)', relatorio(vuln('xlsx', 'high')), 1, /allowlist ativa: xlsx/, comAllowlist('xlsx'));
+passa('critical em pacote da allowlist (vite)', relatorio(vuln('vite', 'critical')), 1, /allowlist ativa: vite/, comAllowlist('vite'));
 passa('resposta real do npm 10 sem vulnerabilidades', { auditReportVersion: 2, vulnerabilities: {}, metadata: { vulnerabilities: { info: 0, low: 0, moderate: 0, high: 0, critical: 0, total: 0 }, dependencies: { prod: 2, dev: 0, optional: 0, peer: 0, peerOptional: 0, total: 1 } } }, 0);
 
 falha('high fora da allowlist', relatorio(vuln('foo', 'high')), 1, /- foo \(high\)/);
@@ -78,16 +100,26 @@ test('falha: npm audit travado é interrompido pelo timeout', () => {
 });
 
 test('avisa quando uma entrada da allowlist não tem mais vulnerabilidade', () => {
-  const r = audit(relatorio(vuln('xlsx', 'high')), 1);
+  const r = audit(relatorio(vuln('xlsx', 'high')), 1, {}, comAllowlist('xlsx', 'vite'));
   assert.equal(r.status, 0, r.saida);
   assert.match(r.stderr, /vite/);
   assert.doesNotMatch(r.stderr, /xlsx/);
 });
 
 test('sem aviso de allowlist quando todas as entradas ainda cobrem algo', () => {
-  const r = audit(relatorio(vuln('xlsx', 'high'), vuln('vite', 'high'), vuln('picomatch', 'high')), 1);
+  const r = audit(relatorio(vuln('xlsx', 'high'), vuln('vite', 'high'), vuln('picomatch', 'high')), 1, {}, comAllowlist('xlsx', 'vite', 'picomatch'));
   assert.equal(r.status, 0, r.saida);
   assert.equal(r.stderr, '');
+});
+
+// Etapa 270: esvaziar a allowlist não pode ser silencioso — se o advisory voltar, o gate tem de
+// reprovar de novo, e não sair verde porque a entrada ficou no lugar.
+test('allowlist vazia: high em xlsx/vite/picomatch volta a reprovar (etapa 270)', () => {
+  const r = audit(relatorio(vuln('xlsx', 'high'), vuln('vite', 'high'), vuln('picomatch', 'high')), 1);
+  assert.equal(r.status, 1, r.saida);
+  assert.match(r.stderr, /- xlsx \(high\)/);
+  assert.doesNotMatch(r.stderr, /allowlist ativa/);
+  assert.doesNotMatch(r.stderr, /sem efeito/);
 });
 
 // Advisory que atinge dezenas de pacotes transitivamente (caso picomatch
@@ -105,6 +137,7 @@ passa(
   ),
   1,
   /allowlist ativa: .*picomatch/,
+  comAllowlist('xlsx', 'vite', 'picomatch'),
 );
 
 falha(
