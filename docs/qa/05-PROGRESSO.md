@@ -374,8 +374,8 @@
 - [x] **278** — Teste da confirmação em exclusão em massa (trava a correção de D-01) — onda 8 — Crítica
 - [x] **279** — Teste do fail-closed de assinatura de webhook (trava a correção de S-01) — onda 8 — Crítica
 - [x] **280** — Teste da idempotência atômica dos webhooks (trava a correção de B-01) — onda 8 — Crítica
-- [ ] **281** — Teste do caminho de criar coleta — onda 8 — Alta
-- [ ] **282** — Teste do caminho de mover entrega de status — onda 8 — Alta
+- [x] **281** — Teste do caminho de criar coleta — onda 8 — Alta
+- [x] **282** — Teste do caminho de mover entrega de status — onda 8 — Alta
 - [~] **283** — Resolver o usuário semeado do `tests/e2e/` e dizer por que ele não roda na CI — onda 8 — Média · **aguarda o dono**
 - [~] **284** — Subir os pisos de cobertura para travar o que as etapas 275-282 conquistaram — onda 8 — Média · **aguarda o dono**
 - [~] **285** — Confirmar com o dono se `VITE_SENTRY_DSN` está configurado no Vercel — onda 8 — Média · **aguarda o dono**
@@ -495,7 +495,8 @@ por `if (action.variant === "destructive")` antes de chamar `onClick`.
 
 **Ainda pendente neste bloco.** **277** pede um teste de hook provando que `kanban_history` não é gravado
 quando `count === 0`: hoje existe só `src/lib/conflitoVersao.test.ts` (o `throw` da etapa 048), sem o
-mock de Supabase no nível do hook. **275, 279, 280, 281 e 282** seguem abertas.
+mock de Supabase no nível do hook. **275 e 277** seguem abertas (279 e 280
+fecharam na etapa seguinte deste bloco; 281 e 282 fecharam em `Registro - etapas 281 e 282`).
 
 **NÃO VERIFICADO.** Nada aqui depende de sessão autenticada: as cinco etapas foram conferidas por leitura de
 arquivo e por execução de teste local. O que **não** foi feito é o teste de duas abas das etapas 044-048,
@@ -3558,3 +3559,94 @@ eram corretos e servem de exemplo no comentario. Nenhum arrow inline restante.
 `useMultiTableRealtime` (mesmo arquivo, a partir de `useRealtime.tsx:222`) ainda tem
 `eslint-disable` nas dependencias do efeito e dispara o aviso `refs during render` na
 linha 234. A etapa 083 proibe tocar nele; fica registrado para etapa futura.
+
+---
+
+### Registro - etapas 281 e 282 (2026-11-24) - testes de criar coleta e de mover status
+
+**281 - criar coleta.** O plano (`04-PLANO.md:11341`) supunha um *hook* de coletas; ele nao existe: a
+escrita mora no dialogo, `src/components/coletas/PickupDialog.tsx:162`
+(`supabase.from("coletas").insert(...)`). Caminho real conferido por leitura antes de escrever o teste.
+
+Criado `src/components/coletas/PickupDialog.test.tsx` (7 casos):
+
+| Caso                            | O que prova                                                                                                                                                       |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Entrada valida                  | 1 insert com `numero_coleta`, `endereco_coleta`, `status: "aguardando_liberacao"`, `qtd_volumes: 0`, flags em `false`, toast "Protocolo Injetado" e `onSuccess`    |
+| Campo obrigatorio vazio         | 0 insert, 0 toast, 0 `onSuccess` - a validacao segura a escrita                                                                                                    |
+| Erro do banco (`permission denied`) | toast `variant: "destructive"` com o motivo do banco e o dialogo permanece aberto                                                                              |
+| Duplo envio (3 cliques)         | 1 insert (R-05)                                                                                                                                                    |
+| Reversa + Urgente               | `is_reverse` e `is_urgent` em `true` no payload, `observacoes` prefixado com `[LOGISTICA_REVERSA]`                                                                 |
+| Inbound depois de Reversa       | `is_reverse: false` no payload                                                                                                                                     |
+| CANCELAR_LOG                    | avisa o pai para fechar e nao escreve nada                                                                                                                         |
+
+**282 - mover entrega de status.** `count: "exact"` ja estava nas duas telas: `Despachos.tsx:223` e `:284`,
+`KanbanEntregas.tsx:328` - etapas 044-048 cumpridas. As mutacoes seguem **separadas por tela** (nao ha hook
+comum): o plano mandava registrar isso em vez de duplicar teste - registrado.
+
+Criado `src/pages/Despachos.test.tsx` (12 casos), renderizando a pagina com o `supabase` dublado.
+
+A mutacao:
+
+| Caso                               | O que prova                                                                                                                                                 |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Transicao permitida com `count: 1` | 1 update com `{ status: "cotacao_frete" }` e `{ count: "exact" }`, `onStatusChange` avisado, toast "Movido para ..." e a fila recarregada (2 leituras)        |
+| Sem destino unico (`despachado`)   | nao existe botao PROSSEGUIR e nenhum update sai                                                                                                             |
+| `count: 0`                         | recusa com a mensagem de registro alterado por outro usuario, **sem** toast de sucesso, **sem** `onStatusChange` e **sem** gravar `kanban_history`            |
+| Erro do banco                      | a mutacao rejeita e o motivo do banco chega ao usuario                                                                                                      |
+
+A tela em volta (segundo bloco): Sincronizar recarrega a fila; evento de tempo real de insert toca o aviso e
+recarrega, o de update recarrega sem tocar som; clique no cartao abre os detalhes (som de navegacao) e o
+aviso de status recarrega; cartao mostra box e tags; erro de leitura mostra o estado de erro e "Tentar
+novamente" refaz a consulta.
+
+O despacho final (terceiro bloco) e a unica saida que passa por confirmacao na tela: `nf_emitida` tem
+`despachado` como destino unico (`src/lib/statusTransitions.ts:16`), e `moveToNext` (`:268`) chama
+`setConfirmItem(item)` em vez de mover direto.
+
+| Caso                                  | O que prova                                                                                                                                              |
+| ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| NF de simples remessa ausente         | toast "NF de Simples Remessa obrigatoria", nenhum update e o dialogo de confirmacao nao abre                                                                |
+| Confirmacao autorizada                | o dialogo abre com o item, so o "autorizar" dispara a escrita: 1 update com `status: "despachado"` e `{ count: "exact" }`, `onStatusChange`, `kanban_history` (from `nf_emitida` -> `despachado`, notes "Despacho final autorizado"), toast de sucesso e fila recarregada |
+| Confirmacao com `count: 0`            | recusa com a mensagem de registro alterado por outro usuario e nenhum toast de sucesso                                                                      |
+
+O caso `count: 0` cobre a mesma trava que a etapa 277 pede em nivel de hook, so que pela tela; **277 segue
+aberta** porque o Kanban nao foi exercitado.
+
+**Por que existem os segundos blocos (cobertura).** Importar `Despachos.tsx` e `PickupDialog.tsx` coloca os
+dois no denominador da cobertura global (`vitest.config.ts`, piso de 73% em funcoes):
+
+| Momento                                           | Funcoes |
+| ------------------------------------------------- | ------- |
+| Sem os dois arquivos (base da `main`)             | 73.40%  |
+| So com os 8 testes de mutacao/criacao             | 71.75%  |
+| Com os caminhos de tela cobertos (16 testes)      | 73.84%  |
+| Com o despacho final coberto (19 testes)          | 74.43%  |
+
+A segunda linha foi o que reprovou `Unit & Integration Tests` e `quality-gate` na primeira rodada da PR. O
+piso nao foi mexido: o que subiu foi a cobertura real de `Despachos.tsx` (18/31 -> 31/31 funcoes) e de
+`PickupDialog.tsx` (4/14 -> 10/14).
+
+**Verificacao executada**
+
+- `npx vitest run src/pages/Despachos.test.tsx src/components/coletas/PickupDialog.test.tsx` -> 2 arquivos, 19 testes, 0 falhas
+- `npm run test:coverage` -> `All files 76.21 li / 70.19 br / 74.43 fn / 78.25 st`, exit 0 (100 arquivos, 0 falhas);
+  `Despachos.tsx` em 92.38 li / 75.71 br / 100 fn / 100 st, `PickupDialog.tsx` em 75.4 li / 66.17 br / 57.14 fn / 74.13 st
+- `npm run typecheck` -> 0 erros
+- `npx eslint src/pages/Despachos.test.tsx src/components/coletas/PickupDialog.test.tsx` -> 0 problemas
+
+**Nao verificado.** Nenhuma chamada real ao Supabase: os dois testes rodam contra dublo. O `count: 0` de
+verdade depende do gatilho de versao no banco.
+
+**Achados (vão para `03-ACHADOS.md` na etapa 297, nenhum corrigido aqui - fora do escopo).**
+
+1. As mutacoes de status estao duplicadas por tela (`Despachos.tsx` e `KanbanEntregas.tsx`), sem hook comum:
+   qualquer regra nova de transicao precisa ser aplicada duas vezes.
+2. `moveToNext` (`Despachos.tsx:256-274`) mistura tres desfechos no mesmo handler: muda direto quando ha destino
+   unico, abre confirmacao quando o destino e `despachado`, e recusa por toast quando falta `nf_remessa`. Os tres
+   estao cobertos aqui. Mas a trava de NF e a confirmacao existem **so nessa tela**: `KanbanEntregas.tsx` nao
+   menciona `nf_remessa` fora da lista de colunas lidas (`:71`) e do select (`:279`), e nao importa
+   `ConfirmDialog` - mover para `despachado` pelo Kanban (`:328`) nao exige NF de simples remessa nem pede
+   autorizacao. Divergencia entre as duas telas, para decisao do dono (etapa 283/297).
+3. O despacho final pede "esta acao e irreversivel" no texto, mas o status `despachado` ainda aceita
+   `em_transito` (`statusTransitions.ts:17`): o texto do dialogo promete mais do que o banco garante.
