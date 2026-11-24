@@ -75,8 +75,8 @@
 - [x] **035** — `Despachos` passa a usar o mapa compartilhado — onda 3 — Alta
 - [x] **036** — `KanbanEntregas` valida a transição antes de gravar — onda 3 — Alta
 - [ ] **037** — Traduzir a recusa do banco em mensagem que o operador entende — onda 3 — Média
-- [ ] **038** — `CotacaoMultiCanal`: a tabela da tela passa a ler do banco, não do `useState` — onda 3 — Crítica
-- [ ] **039** — Registrar a resposta da transportadora no banco, não na memória — onda 3 — Crítica
+- [x] **038** — `CotacaoMultiCanal`: a tabela da tela passa a ler do banco, não do `useState` — onda 3 — Crítica
+- [~] **039** — Registrar a resposta da transportadora no banco, não na memória — onda 3 — Crítica — **código no PR da 038; aguarda verificação em runtime (registrar resposta e conferir `valor_cotado`/`responded_at` no banco)**
 - [ ] **040** — Marcar no banco qual cotação foi a escolhida — onda 3 — Alta
 - [ ] **041** — "Nexus Blast" e o envio por e-mail passam a criar a cotação no banco — onda 3 — Alta
 - [ ] **042** — Mostrar carregando, erro e vazio na tela de cotação multicanal — onda 3 — Média
@@ -438,6 +438,51 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapas 038 e 039 (2026-11-26) - a tela de cotação multicanal passa a ler e a gravar no banco
+
+**038 fechada.** `src/pages/CotacaoMultiCanal.tsx` mantinha `const [cotacoes, setCotacoes] = useState<CotacaoManual[]>([])`
+(`:100`) espelhando em memória a **mesma** cotação que `createCotacao.mutate`/`mutateAsync` já gravava: duas fontes para o
+mesmo dado, e a cópia local era a que a tabela mostrava. A cópia morreu; a tela agora lê `cotacoes` do hook
+`useCotacoesMulticanal` (query com `.limit(200)`, `refetchInterval` de 30s e join `transportadora:transportadoras`).
+
+| ponto | antes | depois |
+|---|---|---|
+| tabela | `useState<CotacaoManual[]>` local, alimentado por 7 chamadas de `addCotacao` (preço/status inventados na tela) | `cotacoes` do hook, direto da linha do banco |
+| `handleSearch` | `setCotacoes([])` | `void refetchCotacoes()` |
+| 4 pontos que já gravavam (`registrarCotacaoPendente`, `handleCotarAPI`, `handleCotarWhatsApp`, `handleCotarEmail`) | gravavam no banco **e** criavam linha local duplicada | só a gravação; as `observacoes` que existiam apenas na cópia local ("WhatsApp enviado", "Email enviado", "Nexus Blast: Aguardando RPA/WhatsApp") entraram no `createCotacao` |
+| tipo | `CotacaoManual` local (`valor`, `transportadora_nome`, `observacoes` obrigatório) | `CotacaoMulticanal` do hook (`valor_cotado`, `transportadora.nome_fantasia`, `observacoes` anulável); `CotacaoResultsTable` passou a receber esse tipo e ganhou o badge "Selecionada" |
+
+**039 (código no mesmo PR, aguarda verificação em runtime).** `handleRegistrarResposta` fazia
+`setCotacoes(prev => prev.map(...))` + `toast.success("Resposta registrada!")` sem tocar no banco: o operador lia
+"registrado" e o valor morria no reload. Agora chama `updateCotacao.mutate({ id, valor_cotado, prazo_dias, observacoes,
+status: "respondido" })` - o hook preenche `responded_at`, invalida a query e emite o único toast da ação (o toast local
+saiu). A tela passa a identificar a linha pelo **`id`** da cotação (o estado local antigo só tinha `transportadora_id`):
+clicar "Registrar" na tabela abre o diálogo já amarrado àquela linha. Onde o plano manda não decidir por conta própria -
+**duas ou mais cotações pendentes para a mesma transportadora** - a lista de transportadoras recusa e orienta a registrar
+pela linha desejada na tabela, em vez de escolher a primeira.
+
+**Cotações de API externa (Rodonaves, Melhor Envio, Lalamove):** eram as únicas linhas sem gravação nenhuma, com
+`transportadora_id` fictício (`"rodonaves-id"`, `me-<id>`, `"lalamove-id"`) - impossíveis de persistir na coluna
+`transportadora_id UUID NOT NULL REFERENCES transportadoras(id)`
+(`supabase/migrations/20260317213459_b43e2938...sql:5`). Agora a cotação é gravada quando o provedor corresponde a uma
+transportadora cadastrada na busca; quando não corresponde, **não** entra no banco e o operador recebe um aviso dizendo
+qual cotação e qual valor não foram registrados (antes essa cotação aparecia e desaparecia no reload sem deixar rastro).
+
+**Consequência assumida:** a tabela lista as cotações do usuário (teto de 200 do hook), não apenas as da busca atual.
+Filtrar por trecho/período é regra de negócio e ficou fora desta etapa.
+
+**Evidência (no worktree da branch):**
+- `grep -n "setCotacoes\|addCotacao\|crypto.randomUUID" src/pages/CotacaoMultiCanal.tsx` → **vazio** (as duas fontes acabaram).
+- `grep -n "setCotacoes\|updateCotacao" src/pages/CotacaoMultiCanal.tsx` → só `updateCotacao.mutate` em `handleRegistrarResposta`.
+- `npx tsc --noEmit -p tsconfig.app.json` → limpo; `npx eslint` nos 2 arquivos → 0 erros.
+- `npm run lint:budget` → **77/86 avisos** (idêntico ao `main`; a memoização de `respondidas` foi ajustada para não subir o teto).
+- `npx vitest run` → 96 arquivos / 811 testes verdes, + `src/pages/cotacao-multicanal/CotacaoResultsTable.test.tsx` (4 casos novos: nome do join, `valor_cotado`, `id` correto no `onRegistrar`, badge "Selecionada").
+
+**NÃO VERIFICADO:** o comportamento em runtime **não** foi exercitado - não há credencial/serviço de banco nesta sessão,
+então não registrei resposta de cotação real nem conferi `valor_cotado`/`responded_at` na linha de `cotacoes_multicanal`,
+e não há medição de tela publicada. Falta: registrar uma resposta em produção, recarregar e conferir a linha; e confirmar o
+deploy após o merge.
 
 
 ### Registro - etapas 223 a 227 (2026-11-25) - os cinco pontos de colunas explícitas já estavam no main
