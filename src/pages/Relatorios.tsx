@@ -129,6 +129,7 @@ export default function Relatorios() {
       const { data, error } = await supabase
         .from("fretes_internos")
         .select("id, status, created_at, data_entrega_efetiva")
+        .is("deleted_at", null)
         .gte("created_at", startDate.toISOString())
         .limit(5000);
       if (error) throw error;

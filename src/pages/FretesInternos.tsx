@@ -165,6 +165,7 @@ export default function FretesInternos() {
       const { data, error } = await supabase
         .from("fretes_internos")
         .select("*")
+        .is("deleted_at", null)
         .order("created_at", { ascending: false })
         .limit(500);
       if (error) throw error;
@@ -237,6 +238,7 @@ export default function FretesInternos() {
           xp_reward: data.xp_reward,
           observacoes: data.observacoes || null,
         })
+        .is("deleted_at", null)
         .eq("id", id);
       if (error) throw error;
     },
@@ -253,7 +255,7 @@ export default function FretesInternos() {
     mutationFn: async (id: string) => {
       const { error } = await supabase
         .from("fretes_internos")
-        .delete()
+        .update({ deleted_at: new Date().toISOString() })
         .eq("id", id);
       if (error) throw error;
     },
@@ -275,6 +277,7 @@ export default function FretesInternos() {
       const { error } = await supabase
         .from("fretes_internos")
         .update(update)
+        .is("deleted_at", null)
         .eq("id", id);
       if (error) throw error;
     },
@@ -288,6 +291,7 @@ export default function FretesInternos() {
     const { error } = await supabase
       .from("fretes_internos")
       .update({ status })
+      .is("deleted_at", null)
       .in("id", ids);
     if (error) toast.error("Erro: " + error.message);
     else {
