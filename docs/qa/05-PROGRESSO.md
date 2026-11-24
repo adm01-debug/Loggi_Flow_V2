@@ -239,7 +239,7 @@
 - [x] **161** — `predict-delays` e `predict-delays-scheduled`: tempo limite nas chamadas internas — onda 5 — Média
 - [x] **162** — `accuracy-meta-monitor`: tempo limite nas duas chamadas internas — onda 5 — Média
 - [x] **163** — `accuracy-weekly-digest`: tempo limite na chamada interna — onda 5 — Média
-- [ ] **164** — Criar `_shared/httpError.ts`: uma resposta de erro que não vaza o detalhe interno — onda 5 — Alta
+- [x] **164** — Criar `_shared/httpError.ts`: uma resposta de erro que não vaza o detalhe interno — onda 5 — Alta
 - [ ] **165** — `ingest-biosync`: parar de devolver o erro do Postgres — onda 5 — Alta
 - [ ] **166** — `scheduled-reports`: parar de devolver o erro do Postgres — onda 5 — Alta
 - [ ] **167** — `lgpd-erase-user`: parar de devolver o erro do Postgres — onda 5 — Alta
@@ -435,6 +435,35 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 
 ## Registro de execução
 
+### Registro - etapa 164 (2026-11-25) - achado B-06 (`_shared/httpError.ts`)
+
+**Causa:** nao havia envoltorio padrao de erro; cada funcao montava o `catch` a mao e o caminho mais curto era
+devolver `error.message`. Nas funcoes que fazem `throw` do erro do PostgREST (`ingest-biosync:50`,
+`scheduled-reports:42`, `lgpd-erase-user`, `execute-protocol`) quem chamou recebe nome de tabela, de coluna, de
+restricao e texto de policy de RLS.
+
+**Correcao:** `supabase/functions/_shared/httpError.ts` (arquivo novo, ninguem importa ainda — sem efeito em
+producao ate a etapa 165):
+
+- `internalErrorResponse(err, headers, tag)` — `ValidationError` continua virando 422 com o campo violado
+  (`validationErrorResponse` de `_shared/validate.ts`), e o resto vira `{"error":"INTERNAL_ERROR"}` com 500.
+- O detalhe vai **so** para o log (`log.error("[tag] Error:", { error: String(err) })`), sem `stack`, copiando o
+  padrao ja correto de `external-db-bridge:367-375`, `secure-store:91`, `carrier-webhook-receiver:221-227`.
+- `Content-Type: application/json` sobrescrito, headers do chamador preservados.
+- `_shared/service-wrapper.ts` **nao** foi tocado (nenhuma funcao o importa; decisao fica na onda de higiene) e
+  `_shared/validate.ts` tambem nao.
+
+**Verificado de verdade:** `tests/contracts/http-error.spec.ts` 5/5 (500 sem texto do Postgres, log com a tag e o
+detalhe, sem pilha na resposta, headers preservados, `ValidationError` -> 422 sem log de erro). Prova por mutacao:
+A corpo devolve o erro cru -> 1 falha; B sem ramo de `ValidationError` -> 1; C sem `log.error` -> 1; D devolve a
+pilha -> 2; E sem `Content-Type` -> 1; restaurado 5/5. `deno fmt --check` / `deno check` / `deno lint` limpos no
+arquivo novo; `tsc` 0 erros; `npm run lint:budget` 77/86 com 0 erros; suite 62 arquivos / 482 testes verdes.
+
+**Nao verificado:** consumo real pelas funcoes da faixa 165-178 (etapa seguinte).
+
+**Fora de escopo (registrado, nao tocado):** adocao do helper nas 22 funcoes que montam o `catch` a mao
+(etapas 165+); destino de `_shared/service-wrapper.ts`; CORS `*`.
+
 ### Registro - etapa 163 (2026-11-25) - achado B-05 (`accuracy-weekly-digest`)
 
 **Causa:** `index.ts:179` chamava `supabase.functions.invoke("resend-email", ...)` **dentro do laço de destinatários**
@@ -463,7 +492,6 @@ suite 61 arquivos; cobertura 76,23 / 73,6 / 78,19 / 78,46.
 
 **Fora de escopo (registrado, nao tocado):** `nErr.message` cru (`:82` e `:170`) e o `catch (err)` final
 (`:226-240`) devolvendo `error.message` — familia `_shared/httpError` (etapas 164+); CORS `*`.
-
 ### Registro - etapa 162 (2026-11-25) - achado B-05 (`accuracy-meta-monitor`)
 
 **Causa:** `index.ts:196` (e-mail) e `:215` (WhatsApp) chamavam `supabase.functions.invoke(...)` dentro do laço de
