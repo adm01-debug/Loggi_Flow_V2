@@ -51,26 +51,42 @@ export function useAccuracyMetaCycle() {
 
       const dayAgoIso = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
+      // Uma consulta so (P-03): antes era uma por transportadora configurada. O unico filtro que
+      // varia entre elas vive dentro de `metadata`, entao ele sai do banco e vira comparacao em
+      // memoria -- um `.or(...)` com um `contains` por transportadora estouraria o limite de URL do
+      // PostgREST (414) justamente para quem tem muitas configuracoes.
+      const { data: notificadas, error: erroNotificadas } = await supabase
+        .from("notifications")
+        .select("metadata")
+        .eq("user_id", uid)
+        .gte("created_at", dayAgoIso)
+        .contains("metadata", { source: "accuracy-meta-monitor" })
+        // Sem ordem, teto em conjunto sem ordem e corte nao deterministico.
+        .order("created_at", { ascending: false })
+        .limit(500);
+      if (erroNotificadas) throw erroNotificadas;
+
+      // A chave e a mesma dos dois lados: o `carrier` gravado pelo monitor (nulo quando ausente) e
+      // `s.transportadora ?? "__all__"` procurado abaixo. Assim a comparacao continua equivalente
+      // ao `.contains({ carrier })` que existia aqui.
+      const carriersNotificados = new Set<string | null>(
+        (notificadas ?? []).map((n) => {
+          const meta = n.metadata as { carrier?: string | null } | null;
+          return meta?.carrier ?? null;
+        }),
+      );
+
       const items: CycleItem[] = await Promise.all(
         rows.map(async (s) => {
-          const [{ data: breach }, { data: notif }] = await Promise.all([
-            supabase.rpc("count_prediction_breach_days" as never, {
+          const { data: breach } = await supabase.rpc(
+            "count_prediction_breach_days" as never,
+            {
               _target: s.target_pct,
               _carrier: s.transportadora,
-            } as never),
-            supabase
-              .from("notifications")
-              .select("id")
-              .eq("user_id", uid)
-              .gte("created_at", dayAgoIso)
-              .contains("metadata", {
-                source: "accuracy-meta-monitor",
-                carrier: s.transportadora ?? "__all__",
-              })
-              .limit(1),
-          ]);
+            } as never,
+          );
           const breach_days = Number(breach ?? 0);
-          const notified_in_cycle = !!(notif && notif.length > 0);
+          const notified_in_cycle = carriersNotificados.has(s.transportadora ?? "__all__");
           let status: CycleItem["status"] = "ok";
           if (breach_days >= s.consecutive_days_alert) {
             status = notified_in_cycle ? "notified" : "pending";
