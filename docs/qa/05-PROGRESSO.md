@@ -222,7 +222,7 @@
 ### Onda 5
 
 - [x] **146** — `smart-carrier-selection`: validar `peso_kg` e os números do cálculo de frete — onda 5 — Alta
-- [ ] **147** — `webhook-status`: exigir `data` antes de desestruturar — onda 5 — Alta
+- [x] **147** — `webhook-status`: exigir `data` antes de desestruturar — onda 5 — Alta
 - [ ] **148** — `ingest-biosync`: validar `heart_rate` como número antes de comparar com o limite — onda 5 — Alta
 - [ ] **149** — `lalamove-api`: `path` e `method` do corpo decidem o roteamento sem `requireEnum` — onda 5 — Alta
 - [ ] **150** — `resend-email`: validar `to`, `subject` e `html` antes de entregar ao provedor — onda 5 — Alta
@@ -434,6 +434,60 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapa 147 (2026-11-23) - achado B-04 (`webhook-status`)
+
+**Causa:** `index.ts:43` lia o corpo e `:46-52` desestruturava `data` sem verificar que existisse — corpo sem
+`data` devolvia **500**. Pior: `new_status` ausente fazia `wh.events.includes(undefined)` (`:60`) nunca casar
+webhook nenhum, então a função respondia `success: true, processed: 0` sem notificar ninguém: erro silencioso.
+
+**Correção:** o corpo passou a ser interpretado por `parseWebhookStatusInput` (`parse.ts:28`), que valida
+`action` com `requireEnum` sobre `ALLOWED_ACTIONS` (`notify_status_change`, `list_webhooks`) e, só para
+`notify_status_change`, exige `data` como objeto (`requireRecord`) com `entrega_id` e `new_status` obrigatórios
+(`requireString`) e `old_status`/`numero_entrega`/`codigo_rastreamento` opcionais (`optionalString`). O retorno é
+uma união discriminada por `action`, e o `switch` passou a usar `parsed.action`/`parsed.data` (`:45-56`); o
+`record_id` da auditoria (`:186`) e `new_data.new_status` (`:187`) passaram a usar os valores **validados**, não
+mais `data.*` cru. `ValidationError` devolve 422 no `catch` (`:204-206`), antes do log e do 500. HMAC de saída
+(`:93-124`), bloco de auth (`:28-40`) e CORS não foram tocados.
+
+**Mudança de comportamento:** ação desconhecida/ausente passou de `default: 400 "Action not implemented"` para
+**422** com o campo `action` nomeado. O `default` foi removido por ficar inalcançável. É o contrato já previsto em
+`docs/PLANO_FRONTEND_CONTRATOS_190_ETAPAS.md:271` ("ação inválida recebe 422").
+
+**Desvio consciente (módulo puro `parse.ts`):** `index.ts:2` importa de `esm.sh` e o vitest não carrega o
+módulo; sem extrair o parse não haveria teste executável. Mesmo precedente de `scheduled-reports/fields.ts`
+(143-145) e `smart-carrier-selection/parse.ts` (146). `_shared/validate.ts` não foi alterado — o
+`requireRecord` local vive em `parse.ts:50`.
+
+**Quem chama, conferido:** `src/hooks/integrations/useClientWebhooks.tsx:106` invoca a função enviando só
+`{ webhookId }`, sem `action` — **já falhava antes** (400 "Action not implemented: undefined") e agora recebe 422;
+é bug do hook, registrado em `docs/PLANO_FRONTEND_CONTRATOS_190_ETAPAS.md:271`, fora do escopo desta etapa.
+Nenhum trigger ou outra edge chama `notify_status_change` hoje (grep em `src/`, `supabase/`, sem resultado
+além do próprio arquivo), então não há chamada legítima que passe a ser recusada.
+
+**Evidência:**
+- `tests/contracts/webhook-status-input.spec.ts` (novo, 10 casos): `data` completo preservado; corpo sem
+  `data` → campo `data` (era o 500); `data` nulo/lista/texto/número/booleano → campo `data`; `entrega_id`
+  ausente ou vazio → campo `entrega_id`; `new_status` ausente/vazio/espaçado/número/objeto/lista → campo
+  `new_status`; opcionais continuam opcionais; espaços normalizados; `action` ausente/nula/vazia/"xpto"/"Notify"/
+  número/lista → campo `action`; `list_webhooks` sem `data`; e o último caso lê a fonte da edge e afirma
+  `parseWebhookStatusInput` antes do `switch`, `= parsed.data`, `validationErrorResponse` no catch e ausência de
+  `} = data;`.
+- Prova de regressão por mutação, duas: com `data` virando `body["data"] ?? {}` (o atalho que a etapa manda
+  evitar) falham **2 de 10**; com `index.ts` voltando a `const { action, data } = await req.json()` falha
+  **1 de 10**. Restaurado, 10/10.
+- `npx vitest run --coverage` (branch rebaseada na main `ca15101a`, já com a 146): **46 arquivos / 365 testes,
+  todos passando** (exit 0); `webhook-status/parse.ts` com 100/100/100/100; cobertura total subiu de
+  73,59/70,51/76,77/75,62 para **73,76/70,71/76,9/75,79**.
+- `deno check`: 2 erros, **exatamente os mesmos de `origin/main`** (`log.error(..., err)` e
+  `log.error(..., error)` recebendo `unknown` — herdados, em `:139`/`:207`); `deno lint`: `index.ts` = 2 =
+  baseline, `parse.ts` = 0; `deno fmt --check` de `parse.ts` limpo (`index.ts` não foi reformatado, para não
+  gerar churn).
+- `npx tsc --noEmit` 0; `eslint` do teste novo 0; `npm run lint:budget` = "All checks within budget" (78/86).
+
+**NÃO VERIFICADO:** requisição real sem `data` depois do deploy (exige `x-internal-secret` ou sessão admin) e o
+disparo ponta a ponta para um webhook de cliente real; e o hook do front continua enviando corpo sem `action`
+(bug de outra etapa, não regressão desta).
 
 ### Registro - etapa 146 (2026-11-23) - achado B-04 (`smart-carrier-selection`)
 

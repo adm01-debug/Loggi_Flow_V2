@@ -3,6 +3,11 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import { log } from "../_shared/logger.ts";
 import { safeFetch } from "../_shared/safeFetch.ts";
 import { requireInternalSecret, requireRole } from "../_shared/auth.ts";
+import {
+  ValidationError,
+  validationErrorResponse,
+} from "../_shared/validate.ts";
+import { parseWebhookStatusInput } from "./parse.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -39,9 +44,11 @@ serve(async (req) => {
     // sub do usuário autenticado (nulo para chamadas internas)
     const callerSub = (!isInternal && roleAuth?.ok) ? roleAuth.claims.sub : undefined;
 
-    const { action, data } = await req.json();
+    const parsed = parseWebhookStatusInput(
+      (await req.json()) as Record<string, unknown>,
+    );
 
-    switch (action) {
+    switch (parsed.action) {
       case "notify_status_change": {
         const {
           entrega_id,
@@ -49,7 +56,7 @@ serve(async (req) => {
           new_status,
           numero_entrega,
           codigo_rastreamento,
-        } = data;
+        } = parsed.data;
 
         // Get active webhooks configured for this specific event (status)
         const { data: webhooks, error: whError } = await supabase
@@ -157,9 +164,9 @@ serve(async (req) => {
         await supabase.from("audit_logs").insert({
           action: "webhook_notify_status_change",
           table_name: "client_webhooks",
-          record_id: data.entrega_id ?? "unknown",
+          record_id: entrega_id,
           user_id: callerSub ?? null,
-          new_data: { processed: relevantWebhooks.length, new_status: data.new_status },
+          new_data: { processed: relevantWebhooks.length, new_status },
         }).then(() => {/* best-effort */});
 
         return new Response(
@@ -192,19 +199,11 @@ serve(async (req) => {
         });
       }
 
-      default:
-        return new Response(
-          JSON.stringify({
-            success: false,
-            error: `Action not implemented: ${action}`,
-          }),
-          {
-            status: 400,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          },
-        );
     }
   } catch (error) {
+    if (error instanceof ValidationError) {
+      return validationErrorResponse(error, corsHeaders);
+    }
     log.error("Webhook dispatcher critical failure:", error);
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
