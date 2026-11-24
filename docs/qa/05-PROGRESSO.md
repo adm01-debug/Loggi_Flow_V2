@@ -103,7 +103,7 @@
 
 ### Onda 8
 
-- [~] **060** — Tirar os dois SQL históricos do lugar onde parecem tarefa pendente — onda 8 — Média · **aguarda o dono**
+- [x] **060** — Tirar os dois SQL históricos do lugar onde parecem tarefa pendente — onda 8 — Média · implementada e mergeada em `171f858a` (#340)
 - [x] **061** — Registrar, em um lugar só, qual SQL avulso já foi aplicado e onde — onda 8 — Média
 
 ### Onda 2
@@ -3696,13 +3696,13 @@ Atualize ao fim de cada sessão de trabalho.
 
 |                         | Quantidade |
 | ----------------------- | ---------- |
-| Concluídas `[x]`        | 249         |
-| Aguardando o dono `[~]` | 48         |
+| Concluídas `[x]`        | 252         |
+| Aguardando o dono `[~]` | 46         |
 | Bloqueadas `[!]`        | 0          |
-| Não iniciadas `[ ]`     | 3          |
+| Não iniciadas `[ ]`     | 2          |
 | **Total**               | **300**    |
 
-**Última etapa trabalhada:** 296 · **Data:** 2026-11-24/25 · **Próxima etapa independente:** 018 (teste automático de `.env` na CI), 142 (gate de chave de dedupe), 266 (snapshot do banco sem saída verde em silêncio)
+**Última etapa trabalhada:** 142 · **Data:** 2026-11-25 · **Próxima etapa independente:** 018 (teste automático de `.env` na CI, PR #438 aberta) e 266 (snapshot do banco sem saída verde em silêncio)
 automático da política de exclusão lógica; a 057 já entrou). A **027** (`logistica_reversa.codigo_rastreio_reverso`
 sem `UNIQUE`) segue como DDL dependente do dono, e a **#428** espera o ok para os três `DROP INDEX`.
 
@@ -3879,7 +3879,6 @@ decidir (RLS real, unicidade, uso de indice, existencia de tabela). Nenhuma e co
 | PR                                                    | Assunto                                                              | Por que espera                                    |
 | ----------------------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------- |
 | [#398](https://github.com/adm01-debug/Loggi_Flow_V2/pull/398) | guard de CI para consulta de listagem sem teto (etapa 211)           | mexe em workflow (regra 8)                        |
-| [#340](https://github.com/adm01-debug/Loggi_Flow_V2/pull/340) | tira dois SQL historicos da raiz de `scripts/` (etapa 060)           | a etapa 060 pede a sua decisao                    |
 
 ---
 
@@ -4233,3 +4232,17 @@ casos), `scripts/ci/README.md` (seção nova), `package.json` (`validate:dedupe-
 **Decisão:** o gate **não** foi ligado a nenhum workflow (a etapa 142 proíbe mexer na CI e a escolha de
 required check é do dono); entra como `npm run validate:dedupe-keys`, mergeável sem alterar comportamento
 de CI. PR #439.
+
+## Registro - correcao de contagem e status da 060 (2026-11-25)
+
+A etapa **060** estava **implementada e mergeada** em `171f858a` (#340) desde 24/11 - `scripts/historico/`
+existe com os dois SQL, `scripts/audit/sql.unit.mjs:26-27`, `scripts/audit/README.md:58` e
+`docs/agentes/banco.md:35` ja apontam para o caminho novo, e `scripts/*.sql` nao existe. Mesmo assim a
+linha de status continuava `[~] aguarda o dono` e o #340 seguia listado como PR aberta em "O que sobrou".
+
+Corrigido aqui: linha 060 -> `[x]`, linha do #340 removida da tabela de PRs pendentes, e contagem do
+resumo recalculada pelo padrao `- [x|~|!| ] **NNN**` sobre as 300 etapas: **252 `[x]` / 46 `[~]` / 0 `[!]` /
+2 `[ ]`** (as duas nao iniciadas de verdade sao 218, que tem PR #433 aberta, e 289, bloqueada pela 288).
+
+Conferido tambem que o resumo contava `[ ]` como 3 - o arquivo tem 6 linhas `- [ ]`, mas 4 sao itens do
+checklist de retomada, nao etapas; com o padrao estrito o total fecha em 300.
