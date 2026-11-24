@@ -109,7 +109,10 @@ export const useLogisticsCalendar = (filters: CalendarFilters) => {
             transportadoras (nome_fantasia),
             clientes (razao_social)
           `)
-          .not('previsao_entrega', 'is', null);
+          .not('previsao_entrega', 'is', null)
+          // teto operacional (mesmo de Coletas.tsx/Envios.tsx); a ordem evita corte arbitrario
+          .order('previsao_entrega', { ascending: true })
+          .limit(500);
 
         if (filters.status.length > 0) {
           const entregaStatuses = filters.status.filter(s => 
