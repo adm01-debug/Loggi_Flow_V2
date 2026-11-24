@@ -4,6 +4,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
 import { log, LogLevel } from "../_shared/logger.ts";
 import { ValidationError, validationErrorResponse } from "../_shared/validate.ts";
+import { internalErrorResponse } from "../_shared/httpError.ts";
 import { parseSmartSelectionInput } from "./parse.ts";
 
 serve(async (req) => {
@@ -243,15 +244,6 @@ serve(async (req) => {
       message: "Smart carrier selection function error",
       meta: { error: error.message },
     });
-    return new Response(
-      JSON.stringify({
-        error: "Internal Server Error",
-        message: error.message,
-      }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      },
-    );
+    return internalErrorResponse(error, corsHeaders, "smart-carrier-selection");
   }
 });
