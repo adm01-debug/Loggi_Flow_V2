@@ -775,6 +775,7 @@
         "fretes_internos.created_at:timestamp with time zone:not-null",
         "fretes_internos.updated_at:timestamp with time zone:not-null",
         "fretes_internos.organization_id:uuid:nullable",
+        "fretes_internos.deleted_at:timestamp with time zone:nullable",
         "geo_access_rules.id:uuid:not-null",
         "geo_access_rules.country_code:character varying(2):not-null",
         "geo_access_rules.country_name:character varying(100):not-null",

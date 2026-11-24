@@ -624,6 +624,7 @@
         "freight_selection_rules.id": "9eb0988535c3822cb67934be7c6886ed",
         "freight_webhooks.is_active": "0b8a4c2dd7ae7c1d7a8d17095021caf6",
         "fretes_internos.created_at": "2ee64b1d53e1f8dc8df73647e8fba382",
+        "fretes_internos.deleted_at": "5acc3145d7627a563843e137480b1cbf",
         "fretes_internos.updated_at": "2ee64b1d53e1f8dc8df73647e8fba382",
         "geo_access_rules.is_active": "5f9ad89188e050540d87b07591dbfefe",
         "geo_blocked_attempts.email": "602a149740f6844e02d8d1e0e3b3e3a4",
@@ -3563,7 +3564,7 @@
         "e:public.frete_interno_status|PUBLIC|USAGE|grantor=postgres": "68934a3e9455fa72420237eb05902327",
         "e:public.frete_interno_status|postgres|USAGE|grantor=postgres": "68934a3e9455fa72420237eb05902327"
     },
-    "generated_at": "2026-11-24T12:32:18Z",
+    "generated_at": "2026-11-24T13:40:00Z",
     "column_grants": {
     },
     "schema_grants": {
