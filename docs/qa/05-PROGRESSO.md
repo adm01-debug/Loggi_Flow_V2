@@ -368,9 +368,9 @@
 - [~] **272** — Decidir com o dono o destino de `bun.lock` e `bun.lockb` — onda 8 — Baixa · **aguarda o dono**
 - [~] **273** — Barrar arquivo acidental na raiz antes do merge — onda 8 — Baixa · **aguarda o dono**
 - [~] **274** — Tirar do `AGENTS.md` e do `types-sync.yml` a menção aos locks de bun — onda 8 — Baixa · **aguarda o dono**
-- [ ] **275** — Criar a base de teste de hook e de tela que hoje não existe — onda 8 — Alta
+- [x] **275** — Criar a base de teste de hook e de tela que hoje não existe — onda 8 — Alta · **já estava na `main` (`src/test/`), smoke e testes de referência verdes**
 - [x] **276** — Teste da validação de transição de status (trava a correção de C-01) — onda 8 — Crítica
-- [ ] **277** — Teste da checagem de `count` no controle de concorrência (trava a correção de C-03) — onda 8 — Alta
+- [x] **277** — Teste da checagem de `count` no controle de concorrência (trava a correção de C-03) — onda 8 — Alta · **`useBoxManagement.test.ts` com 3 casos verdes; sem o guard o caso de conflito falha**
 - [x] **278** — Teste da confirmação em exclusão em massa (trava a correção de D-01) — onda 8 — Crítica
 - [x] **279** — Teste do fail-closed de assinatura de webhook (trava a correção de S-01) — onda 8 — Crítica
 - [x] **280** — Teste da idempotência atômica dos webhooks (trava a correção de B-01) — onda 8 — Crítica
@@ -453,6 +453,44 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           | F-02 refutado e F-03 resolvida nos números (etapas 023/026) | 2026-11-24 | agente (SQL read-only no `jvfhclubfpxrtrrazrgr`) |
 
 ## Registro de execução
+
+### Registro - etapas 275 e 277 (2026-11-24) - o caminho de conflito do BOX passa a ter teste
+
+**275 - a base de teste ja existia na `main`.** `src/test/renderWithQuery.tsx` (`renderHookWithQuery` com
+`QueryClientProvider` e `retry: false`), `src/test/supabaseMock.ts` (duplo encadeavel que devolve
+`{ data, error, count }`) e `src/test/testInfra.smoke.test.ts`. A verificacao da etapa rodou assim:
+
+```
+npx vitest run src/test/testInfra.smoke.test.ts src/hooks/logistics/useRuleTriggers.test.tsx \
+  src/hooks/common/useBulkActions.test.ts
+-> Test Files 3 passed (3) - Tests 14 passed (14)
+```
+
+**277 - o teste que faltava.** Arquivo novo `src/hooks/logistics/useBoxManagement.test.ts`, cobrindo a
+mutacao de alocacao de BOX onde ela mora (`src/hooks/logistics/useBoxManagement.tsx:145-164`), com duplo
+proprio do Supabase para controlar `count`, `error` e o `insert` de `kanban_history`:
+
+| caso | duplo devolve | esperado |
+| --- | --- | --- |
+| versao casou | `{ count: 1, error: null }` | aloca com `{ count: "exact" }`, grava `kanban_history` com `notes = "Alocado ao BOX 03"` e anuncia sucesso |
+| registro alterado por outro usuario | `{ count: 0, error: null }` | rejeita com `Conflito de versao`, **nao** grava `kanban_history` e **nao** anuncia sucesso |
+| erro do banco | `{ error: { message: "permission denied..." } }` | rejeita com o motivo do banco e nao grava historico |
+
+```
+npx vitest run src/hooks/logistics/useBoxManagement.test.ts
+-> Test Files 1 passed (1) - Tests 3 passed (3)
+```
+
+**Prova negativa (o teste mede algo):** com `assertAtualizou(count)` comentado em
+`useBoxManagement.tsx:152`, o caso de `count 0` **falha**:
+`AssertionError: promise resolved "undefined" instead of rejecting` (1 failed | 2 passed). Arquivo de
+producao restaurado em seguida (`git diff` vazio).
+
+**Lint e orcamento:** `npx eslint` no arquivo novo -> sem saida (limpo); `npm run lint:budget` ->
+`ESLint warnings 80 / 86`, `ESLint errors 0 / 0`, `TypeScript errors 0 / 0`, `All checks within budget`.
+
+**Despachos:** o outro lado da 277 ja estava coberto por `src/pages/Despachos.test.tsx` (casos `count 1`,
+`count 0` e erro do banco). A mutacao daquela tela vive na propria pagina, nao em hook.
 
 ### Registro - etapas 023, 026 e 287 (2026-11-24) - o banco ao vivo responde: RLS já estava ligado, os números são únicos e as tabelas de log não existem
 
@@ -3573,13 +3611,13 @@ Atualize ao fim de cada sessão de trabalho.
 
 |                         | Quantidade |
 | ----------------------- | ---------- |
-| Concluídas `[x]`        | 234         |
+| Concluídas `[x]`        | 236         |
 | Aguardando o dono `[~]` | 50         |
 | Bloqueadas `[!]`        | 0          |
-| Não iniciadas `[ ]`     | 16         |
+| Não iniciadas `[ ]`     | 14         |
 | **Total**               | **300**    |
 
-**Última etapa trabalhada:** 287 · **Data:** 2026-11-24 · **Próxima etapa independente:** 275 (onda 8). Na
+**Última etapa trabalhada:** 277 · **Data:** 2026-11-24 · **Próxima etapa independente:** 264 (onda 8). Na
 onda 1, a **057** (exclusão lógica em `FretesInternos`) depende das etapas **055** e **056**, que são DDL em
 produção e aguardam o dono; a **027** está na mesma situação.
 
