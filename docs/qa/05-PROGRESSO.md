@@ -229,7 +229,7 @@
 - [x] **151** — `melhor-envio-api`: validar o corpo da cotação — onda 5 — Média
 - [x] **152** — `lalamove-tracking`: validar o identificador de rastreio — onda 5 — Média
 - [x] **153** — `ai-logistics-assistant`: validar e limitar o texto que vai para o modelo — onda 5 — Média
-- [ ] **154** — `evolution-whatsapp`: validar `instance`, `phone` e `message` — onda 5 — Alta
+- [x] **154** — `evolution-whatsapp`: validar `instance`, `phone` e `message` — onda 5 — Alta
 - [ ] **155** — `ocr-receipt-processor`: validar a entrada do comprovante — onda 5 — Média
 - [ ] **156** — Criar `_shared/invokeFunction.ts`: chamada entre funções com tempo limite — onda 5 — Alta
 - [ ] **157** — `normalize-freight-response`: trocar o `fetch` nu para `whatsapp-notification` — onda 5 — Alta
@@ -434,6 +434,53 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapa 154 (2026-11-25) - achado B-04 (`evolution-whatsapp`)
+
+**Causa:** `index.ts:62` (`const body = await req.json()`) e `:68` (`const { instance, phone, message } = data`)
+usavam os campos **sem validação**, com um guard só de falsy (`:69-81`). `instance` era interpolada na URL da
+Evolution (`:88` `/message/sendText/${instance}`, e `:212` `/instance/connectionState/${instance}` sem guard
+nenhum), ou seja **qualquer texto escolhia qual conexão de WhatsApp da empresa falava com o cliente**; `phone`
+ia como `phone.replace(/\D/g, "")` (`:97`), então `"abc"` ou `"123"` viravam número inválido e o erro só aparecia
+no parceiro; `message` sem teto inflava a requisição. `send_cotacao` (`:129-158`) repetia o mesmo padrão.
+
+**Correção:** `parse.ts` novo (puro) com `parseInstance`, `parsePhone`, `parseSendTextRequest`,
+`parseCotacaoRequest` e `parseStatusRequest`, usados nas três ações:
+- `instance` numa **lista fechada** montada no topo do `index.ts` (`ALLOWED_INSTANCES`): `EVOLUTION_ALLOWED_INSTANCES`
+  (separado por vírgula) + `EVOLUTION_INSTANCE_NAME` (a conexão que `whatsapp-notification/index.ts:37-38` já usa)
+  ou `"PRINCIPAL"`, com `pattern` `^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$` para barrar `/` e `..` na URL;
+- `phone` em **E.164 com DDI** (`^\+?\d{12,15}$`), sem normalização "no melhor esforço" (o plano pede recusar, não
+  adivinhar); a linha `phone.replace(/\D/g, "")` continua, agora sobre um número já validado;
+- `message` com teto de **4096 caracteres** (limite de texto do WhatsApp) e os campos opcionais da cotação com
+  **200 cada** (`optionalString` do `_shared` não aceita `maxLength` — helper local, sem tocar em `_shared`);
+- `ValidationError` devolve **400** `{success:false, error, field}` antes do `log("ERROR", …)`.
+
+**Mudança de comportamento:** telefone sem DDI (ex.: `11999999999`), com máscara, `instance` fora da lista e
+mensagem acima de 4096 passam a receber 400 **sem** chamar a Evolution. O único chamador de código é o hook
+`useEvolutionWhatsApp` (`src/hooks/integrations/useEvolutionWhatsApp.tsx:25/43/60`), que é exportado em
+`src/hooks/index.ts:135` mas **não é usado por nenhuma página/componente** (grep em `src/`) — nada na UI quebra.
+
+**Atenção do dono (configuração):** se a conexão real da empresa não se chamar `PRINCIPAL` nem estiver em
+`EVOLUTION_INSTANCE_NAME`, é preciso definir `EVOLUTION_ALLOWED_INSTANCES` nos secrets da Edge Function; sem isso os
+envios dessa conexão passam a receber 400. O bloco de auth (`:34-43`, etapa 006) e o rate limit **não foram tocados**.
+
+**Evidência:**
+- `tests/contracts/evolution-whatsapp-envio.spec.ts` (novo, 12 casos): envio do hook aceito; `5511999999999` aceito;
+  `123`, `(11) 99999-9999`, `11999999999` e `+551199999999999999` recusados em `phone`; `instance` fora da lista
+  recusada citando `PRINCIPAL, SUPORTE`; `instance` vazia/`../../admin`/número recusadas; corpo não-objeto recusado;
+  mensagem só de espaços e 4097 recusadas; cotação só com `instance`+`phone`; opcionais preservados e
+  `valor_mercadoria` de 201 recusado; `check_status` exigindo instance da lista; e o contrato da edge (três parses,
+  sem `} = data;` nem `!instance || !phone`, lista fechada e 400 com `field` antes do `log`).
+- Mutação A — `PHONE_PATTERN` virado `/^.*$/`: 1/12 falha. B — item fora da lista aceito: 1/12. C — `message` sem
+  `maxLength`: 1/12. D — `catch` sem o ramo 400: 1/12. Restaurado: 12/12.
+- `npx vitest run --coverage`: **53 arquivos / 433 testes, todos verdes**; `evolution-whatsapp/parse.ts`
+  100/100/100/100; totais 76 / 73,59 / 78,47 / 78,15 (antes: 75,57/73,22/77,89/77,69).
+- `deno check`: **1 erro = baseline 1** (`log("ERROR", …)` fora do tipo `LogLevel` em `:249`, herdado — B-06);
+  `deno lint`: 5 = baseline 5 (**0** no `parse.ts`; os 5 são 4 `no-import-prefix` e `transportadora` não usado,
+  todos pré-existentes); `deno fmt --check` limpo no `parse.ts`; `npx tsc --noEmit` 0; `npm run lint:budget` OK.
+- **NÃO VERIFICADO:** envio real pela Evolution (exige `EVOLUTION_API_URL`/`EVOLUTION_API_KEY` de produção) e o 400 em
+  produção. Depois do deploy, `{"action":"send_text","data":{"instance":"PRINCIPAL","phone":"123","message":"oi"}}`
+  com JWT válido deve devolver 400 `field: "phone"` **sem** chamada a `EVOLUTION_API_URL` no log.
 
 ### Registro - etapa 153 (2026-11-24) - achado B-04 (`ai-logistics-assistant`)
 
