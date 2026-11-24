@@ -16,6 +16,7 @@
     "validate:dedupe-keys": "node scripts/ci/check-dedupe-keys.mjs",
     "validate:no-console": "node scripts/validate-no-console.mjs",
     "validate:query-limits": "node scripts/ci/validate-query-limits.mjs",
+    "validate:soft-delete": "node scripts/ci/check-soft-delete.mjs",
     "test:rls": "vitest run tests/security/rls-access.spec.ts tests/security/integrations-access.spec.ts",
     "test:security": "vitest run tests/security/",
     "lint": "eslint .",

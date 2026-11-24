@@ -43,6 +43,10 @@ jobs:
       - name: Validate Query Limits (listing caps)
         run: npm run validate:query-limits
 
+      # 🔒 Exclusão lógica — .delete() em tabela com deleted_at reprova a CI (etapa 058)
+      - name: Validate Soft Delete (exclusão lógica)
+        run: npm run validate:soft-delete
+
 
       # 🔒 Dependency audit (high+critical)
       - name: Security Scan (npm audit)

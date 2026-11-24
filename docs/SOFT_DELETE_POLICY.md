@@ -17,9 +17,15 @@ const { softDelete } = useSoftDelete('minha_tabela');
 | Tabela | Motivo |
 | --- | --- |
 | `entregas` | Necessário manter histórico de fretes para auditoria financeira. |
-| `cotacoes` | Base de dados para inteligência de preço. |
+| `coletas` | Histórico de coleta e vínculo com a entrega gerada. |
+| `clientes` | Cadastro referenciado por entregas e coletas. |
+| `fornecedores` | Cadastro referenciado por pagamentos e lançamentos. |
 | `transportadoras` | Não podem ser excluídas fisicamente se houverem entregas vinculadas. |
-| `perfis` | Preservação de logs de auditoria vinculados ao usuário. |
+| `fretes_internos` | Histórico de custo interno por período. |
+
+A lista acima é derivada de `src/integrations/supabase/types.ts` (tabela com `deleted_at` na `Row`) e é
+verificada por `npm run validate:soft-delete` (`scripts/ci/check-soft-delete.mjs`), que roda na CI em
+`.github/workflows/ci-nexus.yml`: `.delete()` em qualquer uma dessas tabelas dentro de `src/` reprova a PR.
 
 ## 🔍 Regras de Consulta
 1.  **Views:** Todas as tabelas com soft delete devem ter uma view `v_active_<tabela>` que filtra `deleted_at IS NULL`.

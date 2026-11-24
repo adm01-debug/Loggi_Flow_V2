@@ -859,6 +859,22 @@
       "manual": ["node", "--test", "scripts/ci/validate-query-limits.unit.mjs"],
       "triggers": ["manual"],
       "reason": "Legado sem chamador literal no inventario; execucao manual controlada. O runner de scripts-tests.yml o coleta por padrao (*.unit.mjs). O dispatcher nao executa esta operacao."
+    },
+    {
+      "id": "legacy-d42815dba2b77deb",
+      "kind": "legacy",
+      "files": ["scripts/ci/check-soft-delete.mjs"],
+      "manual": ["node", "scripts/ci/check-soft-delete.mjs"],
+      "triggers": ["manual"],
+      "reason": "Legado mantido no fluxo existente; referencias literais: package.json:scripts, .github/workflows/ci-nexus.yml. O dispatcher nao executa esta operacao."
+    },
+    {
+      "id": "legacy-98cbfd78afa441f8",
+      "kind": "legacy",
+      "files": ["scripts/ci/check-soft-delete.unit.mjs"],
+      "manual": ["node", "--test", "scripts/ci/check-soft-delete.unit.mjs"],
+      "triggers": ["manual"],
+      "reason": "Legado sem chamador literal no inventario; execucao manual controlada. O runner de scripts-tests.yml o coleta por padrao (*.unit.mjs). O dispatcher nao executa esta operacao."
     }
   ],
   "ci": [
