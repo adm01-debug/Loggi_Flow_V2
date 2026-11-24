@@ -353,7 +353,7 @@
 - [~] **263** — Pedir ao dono o secret `SUPABASE_DB_URL`, sem o qual a fonte de contexto do banco nunca é gerada — onda 8 — Alta · **aguarda o dono**
 - [x] **264** — Rodar o produtor do contexto de banco e confirmar que `docs/contexto/supabase/` foi publicado — onda 8 — Alta · **553 arquivos publicados**
 - [~] **265** — Dizer ao agente o que fazer quando a fonte do banco não existir — onda 8 — Alta · **plano B escrito nos 3 arquivos; altera protocolo, aguarda o dono**
-- [~] **266** — Fazer a ausência do snapshot do banco parar de sair verde em silêncio — onda 8 — Média · **aguarda o dono**
+- [~] **266** — Fazer a ausência do snapshot do banco parar de sair verde em silêncio — onda 8 — Média · **PR #441 aberta; aguarda o dono (mexe em workflow)**
 
 ### Onda 0
 
@@ -4358,3 +4358,51 @@ de 94 para 96) e `.github/workflows/ci.yml` (1 passo).
 - `actionlint .github/workflows/ci.yml` -> `exit=0`
 
 **Pendência do dono:** acrescenta um gate à CI (regra 8) — PR #438 fica aberta.
+
+## Registro - etapa 266 (2026-11-25) - fonte do banco ausente deixa de ser silenciosa
+
+**Problema.** Sem o secret `SUPABASE_DB_URL` (repo) nem `DESTINO_URL` (environment `banco-leitura`) o job
+`banco` saia verde com `::warning::`, `SNAPSHOT_SKIPPED=1` e `exit 0` no agendamento, e a pasta `supabase/`
+da branch `contexto` ficava como estava. Decisao defensavel (144 runs/dia de vermelho nao ajudam), mas a
+fonte mais importante ficou meses sem existir sem nenhum sinal chegar a ninguem - o proprio cabecalho do
+workflow dizia `avisa: ninguem`.
+
+**Caminho escolhido (o recomendado pela spec, nao o atalho).** Nada de trocar `exit 0` por `exit 1` no
+agendamento. Quando a coleta e pulada o proprio passo escreve `docs/contexto/supabase/README.md` com a
+**causa** (falta o secret, nos dois lugares onde ele pode estar) e a **data UTC** do run, e esse arquivo
+entra no artefato publicado: o `publicar` troca a pasta `supabase/` pelo snapshot anterior + o aviso, entao
+a causa passa a viver exatamente onde o agente le o snapshot. Na volta da coleta o proprio workflow apaga o
+arquivo (`rm -f "$SNAPSHOT_DIR/README.md"` antes do `snapshot.py`), para o aviso nao virar mentira.
+
+Nao foi preciso mexer no produtor do indice (`scripts/regras_negocio/indice.py`) nem no formato dos
+manifests: a spec manda parar e propor ao dono se dependesse disso.
+
+**Arquivo tocado:** apenas `.github/workflows/contexto-ia.yml` (cabecalho do topo, passo `Gerar supabase/` e
+o `if: env.SNAPSHOT_SKIPPED != '1'` do passo `Guardar para o publicar`, do job `banco`). A guarda contra
+segredos (`Guard - nenhum segredo na saida`) e a condicao dela **nao** foram tocadas, e os jobs `codigo/` e
+`regras/` continuam iguais.
+
+**Evidencia (execucao local do script extraido do proprio YAML, nao leitura do codigo)**
+- `yaml.safe_load` do arquivo e o `run` do passo `Gerar supabase/` escrito em `/tmp/step266.sh`; os tres
+  caminhos executados com `bash` e ambiente controlado:
+  - agendamento sem secret -> `exit=0`, `README.md` com 17 linhas na pasta do snapshot, com a data
+    (`Estado publicado em 2026-11-24T15:50Z`) e o `GITHUB_ENV` recebendo `SNAPSHOT_SKIPPED=1`
+  - `workflow_dispatch` sem secret -> `exit=1` e o `README.md` tambem escrito antes de falhar
+  - coleta normal (secret presente, `python3` substituido por stub) -> `exit=0`, o `README.md` foi **removido**
+    e o `snapshot.py` foi chamado
+- `/home/joaquim_ataides/.local/bin/actionlint .github/workflows/contexto-ia.yml` -> o unico achado e
+  `SC2129` (style, linha 95 do arquivo do `main`), **herdado**: reproduzido com o arquivo de `origin/main`
+  baixado num diretorio vazio; o patch nao introduz achado novo
+- `act -j banco -n` (dry-run) -> `Job succeeded`, `exit=0`
+- `npm run automation:test` -> verde (contrato da automacao local preservado; nenhum arquivo de `scripts/`
+  foi tocado)
+
+**Como verificar depois do merge (spec da etapa 266):**
+`git fetch origin contexto && git show origin/contexto:docs/contexto/supabase/README.md` deve mostrar a causa
+e a data. O `00-INDEX.md` continua dizendo "ainda nao gerado" na linha do banco real enquanto o secret nao
+existir - fazer o indice ler esse README exige mexer no produtor do indice, o que a spec manda deixar para o
+dono.
+
+**Pendencia do dono:** mexer em workflow e mudanca de CI (Regra 8) - PR #441 fica aberta. O
+comportamento em `main` so muda depois do merge; a primeira execucao agendada seguinte a ele e que publica o
+README na branch `contexto`.
