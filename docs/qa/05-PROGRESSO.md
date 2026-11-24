@@ -254,7 +254,7 @@
 - [x] **176** — `rodonaves-webhook`: erro genérico na resposta ao webhook — onda 5 — Média
 - [x] **177** — `smart-carrier-selection`: erro genérico na resposta da cotação — onda 5 — Média
 - [x] **178** — Varredura final de `error.message`: as onze funções restantes de B-06 — onda 5 — Média
-- [~] **179** — `secure-store`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — **Crítica** · **aguarda o dono**
+- [x] **179** — `secure-store`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — **Crítica**
 - [ ] **180** — `get-mapbox-token`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — **Crítica**
 - [ ] **181** — `resend-email`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Alta
 - [ ] **182** — `whatsapp-notification`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Alta
@@ -434,6 +434,48 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapa 179 (2026-11-25) - achado B-07 (`secure-store`)
+
+**Causa:** `supabase/functions/secure-store/index.ts:9-13` escrevia `Access-Control-Allow-Origin: *` a mao. E a
+funcao que **cifra e decifra PII**: com `*`, qualquer pagina da internet fazia a requisicao com a sessao do
+visitante logado e **lia a resposta** (o `decrypt` devolve o texto claro). Era a mais grave das 25.
+
+**Correcao (so o arquivo da etapa):** `:8` passa a importar `getCorsHeaders` de `../_shared/cors.ts`, o bloco
+literal de `:9-13` saiu e o `serve` calcula `const headers = getCorsHeaders(req)` **antes** do preflight. As
+**10 respostas** usam os cabecalhos resolvidos (o `OPTIONS` com `{ headers }`, as outras nove com `...headers`).
+`_shared/cors.ts`, o `checkRateLimit` (429 com `Retry-After`), a autenticacao por Bearer e o `catch` de padrao
+B-06 (`internal_error` 500, com log da causa) ficaram intactos.
+
+**A confirmacao que a etapa exigia — feita por HTTP real, nao por leitura:** `OPTIONS` na edge `health-check`
+(que ja usa o helper) com `Origin: https://exemplo-malicioso.test` devolveu
+`access-control-allow-origin: https://logiflow-nexus.lovable.app` e `vary: Origin`; com
+`Origin: https://loggi-flow-v2.vercel.app` devolveu **o mesmo valor**. Ou seja: `ALLOWED_ORIGINS` **esta
+configurado** (nao e `*`, nao esta vazio) e a origem do app na allowlist e `https://logiflow-nexus.lovable.app`.
+A origem maliciosa recebe o fallback `list[0]`, que o navegador **nao** casa — o bloqueio e real.
+
+**Achado colateral (nao corrigido aqui):** `https://loggi-flow-v2.vercel.app` **nao** esta na lista e recebe o
+mesmo fallback — se ainda existir preview/deploy do Vercel servindo o app, ele ja esta bloqueado hoje nas 16
+funcoes que usam o helper. Incluir esse dominio e mudanca de variavel de ambiente (Regra 8), fora desta etapa.
+
+**Verificado de verdade:**
+- `tests/contracts/secure-store-cors.spec.ts` (7 casos): nenhum literal `Access-Control-*` nem `"*"` no arquivo;
+  `getCorsHeaders(req)` antes do `OPTIONS`; contagem exata de 10 respostas / 9 `...headers`; 429 com
+  `Retry-After` e CORS; rate limit e auth antes de `req.json()`; `catch` B-06 intacto e sem `plaintext`.
+- Prova por mutacao (A-F): A volta o `*` literal -> 3 falhas; B usa cabecalho estatico -> 3; C chama o helper
+  sem `req` -> 2; D `OPTIONS` sem cabecalhos -> 1; E resolve a origem depois do preflight -> 2; F `catch`
+  responde 200 -> 1. Restaurado -> 7/7.
+- `deno check` **2 erros, os mesmos 2 do baseline** (`origin/main`); `deno lint` limpo; `deno fmt --check`:
+  o unico diff sao as duas linhas herdadas (`:5` ordem de import, `:55` quebra de linha) — **nenhuma linha
+  desta etapa** aparece no diff do `fmt`.
+- `tsc --noEmit` 0; `npm run lint:budget` **ok** (o spec novo caiu em `sonarjs/prefer-specific-assertions` e os
+  dois `expect(...).toBe(n)` viraram `toHaveLength`, antes do commit); suite **593/593**.
+
+**NAO EXECUTADO ainda:** o teste pos-deploy no proprio `secure-store` (origem maliciosa nao deve receber
+`Access-Control-Allow-Origin`) — depende do deploy desta PR; sera rodado e anotado no fechamento.
+
+**Proximo:** etapa 180 — `external-db-bridge`, mesma receita (a fila 180-198 depende desta).
+
 
 ### Registro - etapa 178 (2026-11-25) - achado B-06 (varredura final das onze)
 
