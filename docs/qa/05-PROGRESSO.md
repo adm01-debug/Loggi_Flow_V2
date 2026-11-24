@@ -240,7 +240,7 @@
 - [x] **162** — `accuracy-meta-monitor`: tempo limite nas duas chamadas internas — onda 5 — Média
 - [x] **163** — `accuracy-weekly-digest`: tempo limite na chamada interna — onda 5 — Média
 - [x] **164** — Criar `_shared/httpError.ts`: uma resposta de erro que não vaza o detalhe interno — onda 5 — Alta
-- [ ] **165** — `ingest-biosync`: parar de devolver o erro do Postgres — onda 5 — Alta
+- [x] **165** — `ingest-biosync`: parar de devolver o erro do Postgres — onda 5 — Alta
 - [ ] **166** — `scheduled-reports`: parar de devolver o erro do Postgres — onda 5 — Alta
 - [ ] **167** — `lgpd-erase-user`: parar de devolver o erro do Postgres — onda 5 — Alta
 - [ ] **168** — `execute-protocol`: parar de devolver o erro do Postgres — onda 5 — Alta
@@ -435,6 +435,35 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 
 ## Registro de execução
 
+### Registro - etapa 165 (2026-11-25) - achado B-06 (`ingest-biosync`)
+
+**Causa:** `index.ts:50` fazia `throw error` do PostgREST e o `catch` de `:92` devolvia
+`JSON.stringify({ error: error.message })` com status 400 — o chamador recebia nome de tabela, de coluna e de
+restricao de `bio_sync_telemetry`.
+
+**Correcao (so o arquivo da etapa):**
+
+- `:50` — o `throw error` virou `log.error("[ingest-biosync] Falha ao gravar telemetria:", { code, message })` +
+  `throw new Error("Falha ao gravar telemetria")`. O log leva **apenas** `code` e `message` do Postgres — sem
+  `details`/`hint` e sem batimento, `driver_id` ou `vehicle_id` (LGPD).
+- `:92` — o `catch` inteiro virou `return internalErrorResponse(error, corsHeaders, "ingest-biosync")`; o 422 do
+  `ValidationError` continua igual, agora vindo do helper da etapa 164. Erro de banco passa de 400 para 500 com
+  `{"error":"INTERNAL_ERROR"}`.
+- Nenhum campo `details` "para depuracao" foi criado.
+
+**Verificado de verdade:** `tests/contracts/ingest-biosync-erro-interno.spec.ts` 6/6 + o spec da etapa 148 ajustado
+(a assercao que exigia `validationErrorResponse` no `catch` passou a exigir o helper). Prova por mutacao: A catch
+devolve `error.message` -> 1 falha; B volta a lancar o erro cru -> 1; C log leva o batimento -> 1; D catch sem o
+helper -> 1; E sem log do detalhe -> 2; restaurado 6/6. `deno check` 0 (herdava 1, foi corrigido por tabela);
+`deno lint` 2 = baseline; `deno fmt --check` 1 = baseline; `tsc` 0; `npm run lint:budget` 77/86, 0 erros; suite 63
+arquivos / 488 testes.
+
+**Nao verificado:** erro de banco forcado contra producao (exige chamada autenticada com `vehicle_id` invalido;
+o padrao de resposta e o mesmo do helper ja verificado na etapa 164).
+
+**Fora de escopo (registrado, nao tocado):** CORS `*` (etapa 192), dedupe (etapa 199), texto do log em
+`nexus_tactical_logs` que carrega BPM e `vehicle_id`.
+
 ### Registro - etapa 164 (2026-11-25) - achado B-06 (`_shared/httpError.ts`)
 
 **Causa:** nao havia envoltorio padrao de erro; cada funcao montava o `catch` a mao e o caminho mais curto era
@@ -492,6 +521,7 @@ suite 61 arquivos; cobertura 76,23 / 73,6 / 78,19 / 78,46.
 
 **Fora de escopo (registrado, nao tocado):** `nErr.message` cru (`:82` e `:170`) e o `catch (err)` final
 (`:226-240`) devolvendo `error.message` — familia `_shared/httpError` (etapas 164+); CORS `*`.
+
 ### Registro - etapa 162 (2026-11-25) - achado B-05 (`accuracy-meta-monitor`)
 
 **Causa:** `index.ts:196` (e-mail) e `:215` (WhatsApp) chamavam `supabase.functions.invoke(...)` dentro do laço de
