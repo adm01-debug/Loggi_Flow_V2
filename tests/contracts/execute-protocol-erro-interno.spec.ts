@@ -29,7 +29,7 @@ const blocoDoPayload = entre(
 describe("execute-protocol: erro do banco nao vaza para o chamador", () => {
   it("o catch delega para o helper e nao devolve a mensagem do Postgres", () => {
     expect(blocoDoCatch).toContain(
-      'return internalErrorResponse(error, corsHeaders, "execute-protocol");',
+      'return internalErrorResponse(error, headers, "execute-protocol");',
     );
     expect(blocoDoCatch).not.toContain("error.message");
     expect(blocoDoCatch).not.toContain("status: 400");
@@ -71,6 +71,6 @@ describe("execute-protocol: erro do banco nao vaza para o chamador", () => {
       'const { data, error } = await supabase.rpc("execute_nexus_protocol", {',
     );
     expect(src).toContain("return new Response(JSON.stringify(data), {");
-    expect(src).toContain('"Access-Control-Allow-Origin": "*"');
+    expect(src).toContain("const headers = getCorsHeaders(req);");
   });
 });

@@ -15,12 +15,7 @@ import {
   DigestNotification,
   renderDigestEmail,
 } from "./digest.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
+import { getCorsHeaders } from "../_shared/cors.ts";
 
 // Etapa 163 (achado B-05): o envio do digest passa pelo helper com tempo
 // limite — sem ele um resend-email lento prendia a funcao por destinatario.
@@ -38,6 +33,7 @@ interface DispatchResult {
 }
 
 async function handlePreview(req: Request): Promise<Response> {
+  const headers = getCorsHeaders(req);
   const authHeader = req.headers.get("Authorization") ?? "";
   const token = authHeader.replace(/^Bearer\s+/i, "").trim();
   if (!token) {
@@ -45,7 +41,7 @@ async function handlePreview(req: Request): Promise<Response> {
       JSON.stringify({ ok: false, error: "Missing Authorization header" }),
       {
         status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...headers, "Content-Type": "application/json" },
       },
     );
   }
@@ -60,7 +56,7 @@ async function handlePreview(req: Request): Promise<Response> {
       JSON.stringify({ ok: false, error: "Invalid session" }),
       {
         status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...headers, "Content-Type": "application/json" },
       },
     );
   }
@@ -87,7 +83,7 @@ async function handlePreview(req: Request): Promise<Response> {
       JSON.stringify({ ok: false, error: "INTERNAL_ERROR" }),
       {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...headers, "Content-Type": "application/json" },
       },
     );
   }
@@ -105,14 +101,15 @@ async function handlePreview(req: Request): Promise<Response> {
     }),
     {
       status: 200,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...headers, "Content-Type": "application/json" },
     },
   );
 }
 
 serve(async (req) => {
+  const headers = getCorsHeaders(req);
   if (req.method === "OPTIONS")
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers });
 
   // Modo preview — não envia email, retorna HTML pro usuário chamador.
   if (req.method === "POST") {
@@ -227,7 +224,7 @@ serve(async (req) => {
       }),
       {
         status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...headers, "Content-Type": "application/json" },
       },
     );
   } catch (err) {
@@ -241,7 +238,7 @@ serve(async (req) => {
       }),
       {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...headers, "Content-Type": "application/json" },
       },
     );
   }

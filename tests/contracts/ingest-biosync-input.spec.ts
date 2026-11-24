@@ -105,7 +105,7 @@ describe("ingest-biosync: heart_rate validado (etapa 148 / B-04)", () => {
     expect(fonte).toContain("heart_rate, // validado");
     // O 422 do ValidationError agora sai de _shared/httpError.ts (etapas 164/165).
     expect(fonte).toContain(
-      'return internalErrorResponse(error, corsHeaders, "ingest-biosync");',
+      'return internalErrorResponse(error, headers, "ingest-biosync");',
     );
     expect(fonte).not.toContain("if (error instanceof ValidationError) {");
   });

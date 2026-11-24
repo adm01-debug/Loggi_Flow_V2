@@ -25,7 +25,7 @@ describe("ingest-biosync: erro do banco não vaza para o chamador", () => {
       'import { internalErrorResponse } from "../_shared/httpError.ts";',
     );
     expect(blocoDoCatch).toContain(
-      'return internalErrorResponse(error, corsHeaders, "ingest-biosync");',
+      'return internalErrorResponse(error, headers, "ingest-biosync");',
     );
     expect(blocoDoCatch).not.toContain("error.message");
     expect(src).not.toContain("JSON.stringify({ error: error.message })");

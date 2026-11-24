@@ -126,7 +126,7 @@ describe("etapa 178: nenhuma funcao devolve a mensagem interna do erro", () => {
     const i = src.indexOf("if (error instanceof ValidationError)");
     expect(i).toBeGreaterThan(-1);
     expect(src.slice(i, i + 200)).toContain(
-      "return validationErrorResponse(error, corsHeaders);",
+      "return validationErrorResponse(error, headers);",
     );
   });
 });

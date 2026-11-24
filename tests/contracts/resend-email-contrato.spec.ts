@@ -124,7 +124,7 @@ describe("resend-email: contrato antes de gastar envio (etapa 150 / B-04)", () =
     expect(fonte).toContain('auth.claims.role !== "service_role"');
     expect(fonte).toContain("if (error instanceof ValidationError) {");
     expect(fonte).toContain(
-      "return validationErrorResponse(error, corsHeaders);",
+      "return validationErrorResponse(error, headers);",
     );
   });
 });

@@ -137,7 +137,7 @@ describe("webhook-status: entrada validada (etapa 147 / B-04)", () => {
     expect(fonte).not.toContain("} = data;");
     expect(fonte).toContain("if (error instanceof ValidationError) {");
     expect(fonte).toContain(
-      "return validationErrorResponse(error, corsHeaders);",
+      "return validationErrorResponse(error, headers);",
     );
   });
 });

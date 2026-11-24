@@ -8,20 +8,16 @@ import {
   validationErrorResponse,
 } from "../_shared/validate.ts";
 import { parseWebhookStatusInput } from "./parse.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
+import { getCorsHeaders } from "../_shared/cors.ts";
 
 /**
  * Webhook Status Edge Function
  * Handles notifying external clients about shipment status changes with HMAC signature validation.
  */
 serve(async (req) => {
+  const headers = getCorsHeaders(req);
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers });
   }
 
   try {
@@ -38,7 +34,7 @@ serve(async (req) => {
       const status = roleAuth && !roleAuth.ok ? roleAuth.status : 401;
       return new Response(JSON.stringify({ error: status === 403 ? "Forbidden" : "Unauthorized" }), {
         status,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...headers, "Content-Type": "application/json" },
       });
     }
     // sub do usuário autenticado (nulo para chamadas internas)
@@ -177,7 +173,7 @@ serve(async (req) => {
           }),
           {
             status: 200,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            headers: { ...headers, "Content-Type": "application/json" },
           },
         );
       }
@@ -195,14 +191,14 @@ serve(async (req) => {
         if (error) throw error;
         return new Response(JSON.stringify({ success: true, data: webhooks }), {
           status: 200,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...headers, "Content-Type": "application/json" },
         });
       }
 
     }
   } catch (error) {
     if (error instanceof ValidationError) {
-      return validationErrorResponse(error, corsHeaders);
+      return validationErrorResponse(error, headers);
     }
     log.error("Webhook dispatcher critical failure:", error);
     const errorMessage =
@@ -211,7 +207,7 @@ serve(async (req) => {
       JSON.stringify({ success: false, error: errorMessage }),
       {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...headers, "Content-Type": "application/json" },
       },
     );
   }

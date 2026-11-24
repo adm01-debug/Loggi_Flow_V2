@@ -6,16 +6,12 @@ import { log } from "../_shared/logger.ts";
 import { parseLocaleNumber } from "../_shared/number.ts";
 import { safeFetch } from "../_shared/safeFetch.ts";
 import { invokeFunction } from "../_shared/invokeFunction.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
+import { getCorsHeaders } from "../_shared/cors.ts";
 
 serve(async (req) => {
+  const headers = getCorsHeaders(req);
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+    return new Response("ok", { headers });
   }
 
   try {
@@ -50,7 +46,7 @@ serve(async (req) => {
           nexus_protocol: "NORMALIZE_GATE_REJECTION",
         }),
         {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...headers, "Content-Type": "application/json" },
           status: 400,
         },
       );
@@ -161,7 +157,7 @@ serve(async (req) => {
     }
 
     return new Response(JSON.stringify({ success: true, price, days }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...headers, "Content-Type": "application/json" },
     });
   } catch (error: any) {
     log.error("Normalization error", { error: error.message });
@@ -224,7 +220,7 @@ serve(async (req) => {
     }
 
     return new Response(JSON.stringify({ error: "INTERNAL_ERROR" }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...headers, "Content-Type": "application/json" },
       status: 500,
     });
   }

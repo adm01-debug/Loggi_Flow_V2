@@ -39,7 +39,7 @@ describe("resend-email: erro do provedor de e-mail nao chega ao chamador", () =>
 
   it("o catch usa o helper da etapa 164, sem ecoar mensagem interna", () => {
     expect(blocoCatch).toContain(
-      'return internalErrorResponse(error, corsHeaders, "resend-email");',
+      'return internalErrorResponse(error, headers, "resend-email");',
     );
     expect(blocoCatch).not.toContain("error.message");
     expect(src).not.toContain("error: error.message");
@@ -48,7 +48,7 @@ describe("resend-email: erro do provedor de e-mail nao chega ao chamador", () =>
   it("o ramo de entrada invalida (etapa 150) continua antes do helper", () => {
     expect(blocoCatch).toContain("if (error instanceof ValidationError) {");
     expect(blocoCatch).toContain(
-      "return validationErrorResponse(error, corsHeaders);",
+      "return validationErrorResponse(error, headers);",
     );
     expect(blocoCatch.indexOf("validationErrorResponse")).toBeLessThan(
       blocoCatch.indexOf("internalErrorResponse"),
