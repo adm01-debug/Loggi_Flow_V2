@@ -166,6 +166,22 @@
       "reason": "Legado sem chamador literal no inventário; execução manual controlada após revisar parâmetros e ambiente. O dispatcher não executa esta operação."
     },
     {
+      "id": "legacy-5b2e8d17c3a94f60",
+      "kind": "legacy",
+      "files": ["scripts/ci/check-dedupe-keys.mjs"],
+      "manual": ["node", "scripts/ci/check-dedupe-keys.mjs"],
+      "triggers": ["manual"],
+      "reason": "Legado mantido no fluxo existente; referências literais: package.json:scripts (validate:dedupe-keys). O dispatcher não executa esta operação."
+    },
+    {
+      "id": "legacy-7f19a3c58e0d2b46",
+      "kind": "legacy",
+      "files": ["scripts/ci/check-dedupe-keys.unit.mjs"],
+      "manual": ["node", "--test", "scripts/ci/check-dedupe-keys.unit.mjs"],
+      "triggers": ["manual"],
+      "reason": "Legado sem chamador literal no inventário; execução manual controlada após revisar parâmetros e ambiente. O dispatcher não executa esta operação."
+    },
+    {
       "id": "legacy-70193326af6a063e",
       "kind": "legacy",
       "files": ["scripts/ci/branch-podaveis.mjs"],

@@ -13,6 +13,7 @@
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "validate:csp": "node scripts/validate-csp.mjs",
+    "validate:dedupe-keys": "node scripts/ci/check-dedupe-keys.mjs",
     "validate:no-console": "node scripts/validate-no-console.mjs",
     "validate:query-limits": "node scripts/ci/validate-query-limits.mjs",
     "test:rls": "vitest run tests/security/rls-access.spec.ts tests/security/integrations-access.spec.ts",
