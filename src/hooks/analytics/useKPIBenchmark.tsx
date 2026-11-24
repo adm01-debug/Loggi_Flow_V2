@@ -1,4 +1,3 @@
-/* eslint-disable sonarjs/cognitive-complexity */
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/auth/useAuth";
@@ -36,116 +35,118 @@ export const useKPIBenchmark = (periodsBack: number = 6) => {
   return useQuery({
     queryKey: ["kpi-benchmark", user?.id, periodsBack],
     queryFn: async () => {
-      const periods: PeriodKPIs[] = [];
+      // Os meses nao dependem uns dos outros: o `for` com `await` dentro fazia 18 idas ao banco uma apos a
+      // outra (P-03, 6 meses x 3 consultas). `map` + `Promise.all` poe os meses em paralelo; a ordem final
+      // fica por conta do `sort` por periodo logo abaixo.
+      const periods: PeriodKPIs[] = await Promise.all(
+        Array.from({ length: periodsBack }).map(async (_, i) => {
+          const date = subMonths(new Date(), i);
+          const start = startOfMonth(date);
+          const end = endOfMonth(date);
 
-      for (let i = 0; i < periodsBack; i++) {
-        const date = subMonths(new Date(), i);
-        const start = startOfMonth(date);
-        const end = endOfMonth(date);
+          const [{ data: entregas }, { data: coletas }, { data: ocorrencias }] =
+            await Promise.all([
+              supabase
+                .from("entregas")
+                .select(
+                  "id, status, data_entrega_efetiva, previsao_entrega, valor_frete, data_despacho",
+                )
+                .is("deleted_at", null)
+                .gte("created_at", start.toISOString())
+                .lte("created_at", end.toISOString())
+                .limit(1000),
+              supabase
+                .from("coletas")
+                .select("id, status, data_efetiva_coleta, data_prevista_coleta")
+                .is("deleted_at", null)
+                .gte("created_at", start.toISOString())
+                .lte("created_at", end.toISOString())
+                .limit(1000),
+              supabase
+                .from("ocorrencias")
+                .select("id")
+                .gte("created_at", start.toISOString())
+                .lte("created_at", end.toISOString()),
+            ]);
 
-        // Fetch entregas for this period
-        const { data: entregas } = await supabase
-          .from("entregas")
-          .select(
-            "id, status, data_entrega_efetiva, previsao_entrega, valor_frete, data_despacho",
-          )
-          .is("deleted_at", null)
-          .gte("created_at", start.toISOString())
-          .lte("created_at", end.toISOString())
-          .limit(1000);
+          // Calculate metrics
+          const entregasData = entregas || [];
+          const coletasData = coletas || [];
+          const ocorrenciasData = ocorrencias || [];
 
-        // Fetch coletas for this period
-        const { data: coletas } = await supabase
-          .from("coletas")
-          .select("id, status, data_efetiva_coleta, data_prevista_coleta")
-          .is("deleted_at", null)
-          .gte("created_at", start.toISOString())
-          .lte("created_at", end.toISOString())
-          .limit(1000);
+          const totalEntregas = entregasData.length;
+          const entregasEntregues = entregasData.filter(
+            (e) => e.status === "entregue" || e.status === "finalizado",
+          );
 
-        // Fetch ocorrencias for this period
-        const { data: ocorrencias } = await supabase
-          .from("ocorrencias")
-          .select("id")
-          .gte("created_at", start.toISOString())
-          .lte("created_at", end.toISOString());
+          let entregasNoPrazo = 0;
+          let totalDiasEntrega = 0;
+          let entregasComTempo = 0;
 
-        // Calculate metrics
-        const entregasData = entregas || [];
-        const coletasData = coletas || [];
-        const ocorrenciasData = ocorrencias || [];
-
-        const totalEntregas = entregasData.length;
-        const entregasEntregues = entregasData.filter(
-          (e) => e.status === "entregue" || e.status === "finalizado",
-        );
-
-        let entregasNoPrazo = 0;
-        let totalDiasEntrega = 0;
-        let entregasComTempo = 0;
-
-        entregasEntregues.forEach((e) => {
-          if (e.data_entrega_efetiva && e.previsao_entrega) {
-            const efetiva = new Date(e.data_entrega_efetiva);
-            const prevista = new Date(e.previsao_entrega);
-            if (efetiva <= prevista) {
-              entregasNoPrazo++;
+          entregasEntregues.forEach((e) => {
+            if (e.data_entrega_efetiva && e.previsao_entrega) {
+              const efetiva = new Date(e.data_entrega_efetiva);
+              const prevista = new Date(e.previsao_entrega);
+              if (efetiva <= prevista) {
+                entregasNoPrazo++;
+              }
             }
-          }
 
-          if (e.data_entrega_efetiva && e.data_despacho) {
-            const efetiva = new Date(e.data_entrega_efetiva);
-            const despacho = new Date(e.data_despacho);
-            const dias = Math.ceil(
-              (efetiva.getTime() - despacho.getTime()) / (1000 * 60 * 60 * 24),
-            );
-            if (dias > 0) {
-              totalDiasEntrega += dias;
-              entregasComTempo++;
+            if (e.data_entrega_efetiva && e.data_despacho) {
+              const efetiva = new Date(e.data_entrega_efetiva);
+              const despacho = new Date(e.data_despacho);
+              const dias = Math.ceil(
+                (efetiva.getTime() - despacho.getTime()) /
+                  (1000 * 60 * 60 * 24),
+              );
+              if (dias > 0) {
+                totalDiasEntrega += dias;
+                entregasComTempo++;
+              }
             }
-          }
-        });
+          });
 
-        const custoTotal = entregasData.reduce(
-          (sum, e) => sum + (e.valor_frete || 0),
-          0,
-        );
+          const custoTotal = entregasData.reduce(
+            (sum, e) => sum + (e.valor_frete || 0),
+            0,
+          );
 
-        const totalColetas = coletasData.length;
-        const coletasFinalizadas = coletasData.filter(
-          (c) => c.status === "finalizada" || c.status === "conferencia_ok",
-        );
-        let coletasNoPrazo = 0;
-        coletasFinalizadas.forEach((c) => {
-          if (c.data_efetiva_coleta && c.data_prevista_coleta) {
-            const efetiva = new Date(c.data_efetiva_coleta);
-            const prevista = new Date(c.data_prevista_coleta);
-            if (efetiva <= prevista) {
-              coletasNoPrazo++;
+          const totalColetas = coletasData.length;
+          const coletasFinalizadas = coletasData.filter(
+            (c) => c.status === "finalizada" || c.status === "conferencia_ok",
+          );
+          let coletasNoPrazo = 0;
+          coletasFinalizadas.forEach((c) => {
+            if (c.data_efetiva_coleta && c.data_prevista_coleta) {
+              const efetiva = new Date(c.data_efetiva_coleta);
+              const prevista = new Date(c.data_prevista_coleta);
+              if (efetiva <= prevista) {
+                coletasNoPrazo++;
+              }
             }
-          }
-        });
+          });
 
-        periods.push({
-          period: format(date, "yyyy-MM"),
-          periodLabel: format(date, "MMM/yy"),
-          totalEntregas,
-          entregasNoPrazo,
-          slaRate:
-            totalEntregas > 0 ? (entregasNoPrazo / totalEntregas) * 100 : 0,
-          custoTotal,
-          custoMedio: totalEntregas > 0 ? custoTotal / totalEntregas : 0,
-          ocorrencias: ocorrenciasData.length,
-          ocorrenciaRate:
-            totalEntregas > 0
-              ? (ocorrenciasData.length / totalEntregas) * 100
-              : 0,
-          tempoMedioEntrega:
-            entregasComTempo > 0 ? totalDiasEntrega / entregasComTempo : 0,
-          totalColetas,
-          coletasNoPrazo,
-        });
-      }
+          return {
+            period: format(date, "yyyy-MM"),
+            periodLabel: format(date, "MMM/yy"),
+            totalEntregas,
+            entregasNoPrazo,
+            slaRate:
+              totalEntregas > 0 ? (entregasNoPrazo / totalEntregas) * 100 : 0,
+            custoTotal,
+            custoMedio: totalEntregas > 0 ? custoTotal / totalEntregas : 0,
+            ocorrencias: ocorrenciasData.length,
+            ocorrenciaRate:
+              totalEntregas > 0
+                ? (ocorrenciasData.length / totalEntregas) * 100
+                : 0,
+            tempoMedioEntrega:
+              entregasComTempo > 0 ? totalDiasEntrega / entregasComTempo : 0,
+            totalColetas,
+            coletasNoPrazo,
+          };
+        }),
+      );
 
       // Sort by period ascending
       periods.sort((a, b) => a.period.localeCompare(b.period));

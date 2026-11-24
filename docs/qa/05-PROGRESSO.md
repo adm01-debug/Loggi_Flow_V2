@@ -297,7 +297,7 @@
 - [x] **216** — `Notificacoes.tsx`: o tempo real deixa de rebaixar a lista inteira a cada aviso — onda 6 — Alta
 - [x] **217** — `useAccuracyMetaCycle`: uma única consulta a `notifications` para todas as linhas — onda 6 — Média
 - [ ] **218** — `count_prediction_breach_days`: variante que responde todas as transportadoras numa chamada — onda 6 — Média
-- [ ] **219** — `useKPIBenchmark`: tirar os `await` de dentro do laço — onda 6 — Média
+- [x] **219** — `useKPIBenchmark`: tirar os `await` de dentro do laço — onda 6 — Média
 - [ ] **220** — `useKPIBenchmark`: uma consulta por tabela cobrindo todos os períodos — onda 6 — Média
 - [ ] **221** — `useExecutiveMetrics`: mesma consolidação de 18 consultas para 3 — onda 6 — Baixa
 - [~] **222** — Conferir `types.ts` contra o banco ao vivo e regenerar se houver divergência — onda 6 — Média · **aguarda o dono**
@@ -409,7 +409,7 @@ Problema novo **não se corrige na hora** (regra 4). Anote aqui, com `arquivo:li
 
 | #   | Achado | Onde (arquivo:linha) | Encontrado na etapa | Gravidade estimada |
 | --- | ------ | -------------------- | ------------------- | ------------------ |
-|     |        |                      |                     |                    |
+| A-01 | A consulta de `ocorrencias` do benchmark de KPI nao tem teto, ao contrario das de `entregas`/`coletas` (`.limit(1000)`); mes com muitas ocorrencias baixa a tabela inteira | `src/hooks/analytics/useKPIBenchmark.tsx:65-69` | 219 | Baixa |
 
 ## Etapas que não correspondiam mais ao código
 
@@ -435,6 +435,48 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 
 ## Registro de execução
 
+
+### Registro - etapa 219 (2026-11-25) - meses do benchmark de KPI deixam de ser consultados em serie
+
+**Causa:** `useKPIBenchmark` abria `for (let i = 0; i < periodsBack; i++)` e dentro dele fazia **tres `await` em
+sequencia** (`entregas`, `coletas`, `ocorrencias`). Com o padrao `periodsBack = 6` eram **18 idas ao banco uma
+depois da outra** antes de a tela aparecer: a espera era a soma das 18, nao a maior delas. Achado P-03. Os seis
+meses nao dependem um do outro.
+
+**Entrega:** o `for` virou `Array.from({ length: periodsBack }).map(async (_, i) => ...)` envolvido em
+`Promise.all`, e as tres consultas do mes viraram um `Promise.all` proprio com desestruturacao de tupla — a mesma
+forma do arquivo gemeo `src/hooks/analytics/useExecutiveMetrics.tsx:40-55`. **Nenhum calculo mudou** (guias
+`docs/qa/04-PLANO.md`): os filtros de status, `custoTotal`, `slaRate`, `ocorrenciaRate`, `tempoMedioEntrega` e a
+comparacao entre os dois ultimos periodos ficaram linha a linha iguais; `periods.push({...})` virou `return {...}`
+dentro do callback e o `sort` por periodo (que ja existia) garante a ordem final, entao o grafico nao inverte. O
+`.limit(1000)` de `entregas` e `coletas` foi preservado (remover recriaria P-01) e o `Promise.all` nao introduz
+erro novo: as consultas ja ignoravam `error` (so desestruturavam `data`).
+
+**Limpado de passagem (a mudanca obrigou):** o `/* eslint-disable sonarjs/cognitive-complexity */` do topo virou
+diretiva nao usada -- a complexidade caiu ao sair do laco -- e foi removido; com isso o arquivo continua com 0
+avisos, sem gastar orcamento de lint.
+
+**Verificacao:** spec novo `tests/contracts/kpi-benchmark-paralelo.spec.ts`, 9 casos: ausencia de `for (` e de
+`periodsBack; i++`; `Array.from({ length: periodsBack })` com `.map(async (_, i) =>`; **exatamente dois**
+`Promise.all` (meses e tabelas); as tres tabelas dentro do `Promise.all` interno, na ordem entregas -> coletas ->
+ocorrencias e **sem `await supabase`** entre elas; dois `.limit(1000)`; `periods.sort` por periodo presente;
+`return {` no lugar de `periods.push(` com `period`/`periodLabel`; os filtros de status e as formulas de taxa
+comparados sem depender de quebra de linha; comparacao dos dois ultimos periodos intacta. **Prova por mutacao:
+10/10 capturadas** (meses fixos em 1; sem o `Promise.all` externo; teto trocado; teto adicionado em
+`ocorrencias`; `sort` removido; formula do SLA alterada; volta do `push`; comparacao com 3 periodos; `await`
+solto na primeira consulta; `periodLabel` removido). `npx tsc --noEmit` 0 erros; `npx eslint` do arquivo 0
+problemas; `npx prettier --write` aplicado (o repo nao tem gate de formatacao).
+
+**Nao verificado:** a cascata de requisicoes em paralelo no `/analytics` e a igualdade dos numeros na tela exigem
+navegador com sessao real (sem credencial nesta sessao). A prova aqui e estrutural, com a comparacao dos calculos
+por contrato.
+
+**Registrado (nao corrigido):** a consulta de `ocorrencias` (`:65-69`) segue **sem teto**, ao contrario das duas
+outras -- anotado como A-01 em "Achados novos", fora do escopo desta etapa.
+
+**Risco assumido:** 18 consultas simultaneas em vez de sequenciais elevam o pico no banco por alguns milissegundos;
+com teto de 1000 por consulta (e sem teto na de ocorrencias, A-01) isso foi considerado aceitavel para a tela de
+analytics.
 ### Registro - etapa 216 (2026-11-25) - tempo real de notificacoes deixa de recarregar a cada aviso
 
 **Causa:** a tela registrava `useRealtime({ table: "notifications", onInsert/onUpdate/onDelete: () => refetch() })`.
