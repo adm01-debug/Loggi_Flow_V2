@@ -131,15 +131,15 @@
 - [x] **079** — Teste unitário da validação de assinatura de arquivo — onda 4 — Média
 - [x] **080** — Provar, arquivo por arquivo, quais dos oito "hooks sem importador" estão realmente mortos — onda 4 — Baixa
   <!-- Veredictos (261123):
-          1. components/accessibility/index.ts — VIVO por caminho direto (SkipLinks, LiveRegionProvider, ReducedMotionProvider importados em MainLayout.tsx:13, LazyProviders.tsx:8-9)
-          2. components/common/index.ts — VIVO (barril; exports EmptyState, ConfirmDialog, Pagination… em uso por caminhos diretos)
-          3. components/pwa/index.ts — VIVO por caminho direto (OfflineBanner, InstallPrompt, UpdatePrompt em MainLayout.tsx:14,47,52)
-          4. hooks/gamification/useGamification.ts — VIVO (importado por GamificationPanel, LevelUpModal, AppSidebar, Header, FavoriteMetricsBar via caminho sem extensão)
-             hooks/gamification/useGamification.tsx — INDEFINIDO: 349 linhas vs .ts 259, implementações divergem; comentário P18 em authService.ts:43 indica .tsx como schema em uso; aguarda decisão do dono
-          5. hooks/rodonaves/index.ts — VIVO por caminho direto (useSLOTargets, useSLOSnapshots, useGatewayHealth importados em RTEGateway* panels)
-          6. hooks/ai/useNexusSimulator.ts — REMOVIDO em etapa 069 (PR #300)
-          7. hooks/security/useSelfHealing.ts — REMOVIDO em etapa 068 (PR #300)
-          8. utils/performance.ts — MORTO: useRenderingMonitor e measureAction sem nenhum importador (grep -rn "useRenderingMonitor\|measureAction" src/ → vazio) -->
+              1. components/accessibility/index.ts — VIVO por caminho direto (SkipLinks, LiveRegionProvider, ReducedMotionProvider importados em MainLayout.tsx:13, LazyProviders.tsx:8-9)
+              2. components/common/index.ts — VIVO (barril; exports EmptyState, ConfirmDialog, Pagination… em uso por caminhos diretos)
+              3. components/pwa/index.ts — VIVO por caminho direto (OfflineBanner, InstallPrompt, UpdatePrompt em MainLayout.tsx:14,47,52)
+              4. hooks/gamification/useGamification.ts — VIVO (importado por GamificationPanel, LevelUpModal, AppSidebar, Header, FavoriteMetricsBar via caminho sem extensão)
+                 hooks/gamification/useGamification.tsx — INDEFINIDO: 349 linhas vs .ts 259, implementações divergem; comentário P18 em authService.ts:43 indica .tsx como schema em uso; aguarda decisão do dono
+              5. hooks/rodonaves/index.ts — VIVO por caminho direto (useSLOTargets, useSLOSnapshots, useGatewayHealth importados em RTEGateway* panels)
+              6. hooks/ai/useNexusSimulator.ts — REMOVIDO em etapa 069 (PR #300)
+              7. hooks/security/useSelfHealing.ts — REMOVIDO em etapa 068 (PR #300)
+              8. utils/performance.ts — MORTO: useRenderingMonitor e measureAction sem nenhum importador (grep -rn "useRenderingMonitor\|measureAction" src/ → vazio) -->
 - [x] **081** — Remover só o que a etapa 080 provou morto — onda 4 — Baixa
   <!-- Removido: src/utils/performance.ts (useRenderingMonitor + measureAction, zero importadores) -->
 - [x] **082** — Remover `_shared/service-wrapper.ts`, que nenhuma função usa — onda 4 — Baixa
@@ -357,9 +357,9 @@
 
 ### Onda 0
 
-- [ ] **267** — **FAÇA ISTO PRIMEIRO (1/3)** — abrir margem no orçamento de lint: `SortIcon` nas três telas de cadastro — onda 0 — Alta (destrava o plano)
-- [ ] **268** — **FAÇA ISTO PRIMEIRO (2/3)** — usar o `SortIcon` compartilhado nas outras sete telas — onda 0 — Alta (destrava o plano)
-- [ ] **269** — **FAÇA ISTO PRIMEIRO (3/3)** — pagar os seis avisos do Dashboard Executivo e registrar a margem reservada — onda 0 — Alta (destrava o plano)
+- [x] **267** — **FAÇA ISTO PRIMEIRO (1/3)** — abrir margem no orçamento de lint: `SortIcon` nas três telas de cadastro — onda 0 — Alta (destrava o plano)
+- [x] **268** — **FAÇA ISTO PRIMEIRO (2/3)** — usar o `SortIcon` compartilhado nas outras sete telas — onda 0 — Alta (destrava o plano)
+- [x] **269** — **FAÇA ISTO PRIMEIRO (3/3)** — pagar os seis avisos do Dashboard Executivo e registrar a margem reservada — onda 0 — Alta (destrava o plano)
 
 ### Onda 8
 
@@ -369,9 +369,9 @@
 - [~] **273** — Barrar arquivo acidental na raiz antes do merge — onda 8 — Baixa · **aguarda o dono**
 - [~] **274** — Tirar do `AGENTS.md` e do `types-sync.yml` a menção aos locks de bun — onda 8 — Baixa · **aguarda o dono**
 - [ ] **275** — Criar a base de teste de hook e de tela que hoje não existe — onda 8 — Alta
-- [ ] **276** — Teste da validação de transição de status (trava a correção de C-01) — onda 8 — Crítica
+- [x] **276** — Teste da validação de transição de status (trava a correção de C-01) — onda 8 — Crítica
 - [ ] **277** — Teste da checagem de `count` no controle de concorrência (trava a correção de C-03) — onda 8 — Alta
-- [ ] **278** — Teste da confirmação em exclusão em massa (trava a correção de D-01) — onda 8 — Crítica
+- [x] **278** — Teste da confirmação em exclusão em massa (trava a correção de D-01) — onda 8 — Crítica
 - [ ] **279** — Teste do fail-closed de assinatura de webhook (trava a correção de S-01) — onda 8 — Crítica
 - [ ] **280** — Teste da idempotência atômica dos webhooks (trava a correção de B-01) — onda 8 — Crítica
 - [ ] **281** — Teste do caminho de criar coleta — onda 8 — Alta
@@ -438,6 +438,37 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapas 267, 268, 269, 276 e 278 (2026-11-26) - contabilidade do orçamento de lint e dos testes que travam as correções
+
+**267, 268 e 269 já estavam feitas — o checklist é que ficou para trás.** A prova está no próprio
+`.warning-budget.json`, campo `$comment`, com data de **2026-11-23**: "etapas 267-269 de `docs/qa/04-PLANO.md`
+pagaram 29 avisos `react-hooks/static-components` (`SortIcon` extraído para `src/components/common/SortIcon.tsx`
+
+- `GrowthIndicator`/`KPIStatus`/`DeltaIconDisplay` movidos a nível de módulo); teto baixado de 105 para 86,
+  com ~10 de margem reservada".
+
+| etapa | evidência verificada agora                                                                                                                                                                        |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 267   | `src/components/common/SortIcon.tsx` existe; `grep -rn "const SortIcon" src/` só encontra `src/components/ui/table.tsx` e `src/pages/Ranking.tsx` — **nenhuma** das dez telas listadas no plano   |
+| 268   | idem para as sete telas da etapa (Transportadoras, Envios, Ocorrencias, AlertasCusto, LojaRecompensas, AuditTrailViewer, FreightTableManager)                                                     |
+| 269   | `node -e "require('./.warning-budget.json')"` → `lintWarnings 86`, `lintErrors 0`, `tsErrors 0`; contagem real medida por `eslint -f json` = **80 avisos**, ou seja **6 de margem** contra o teto |
+
+**276 fechada.** `npx vitest run src/lib/statusTransitions.test.ts` → **19 testes verdes** (9 do mapa de
+transições + 10 da recusa traduzida, estes da etapa 037). Cobre os saltos válidos, os inválidos e o estado final.
+
+**278 fechada.** `npx vitest run src/components/common/BulkActions.test.tsx` → **3 testes verdes**, incluindo
+"nao executa a acao ao clicar no botao: apenas abre a confirmacao" e "nao confirma enquanto a palavra exigida
+nao for digitada". `src/components/common/BulkActions.tsx` importa `ConfirmDialog` e desvia a ação destrutiva
+por `if (action.variant === "destructive")` antes de chamar `onClick`.
+
+**Ainda pendente neste bloco.** **277** pede um teste de hook provando que `kanban_history` não é gravado
+quando `count === 0`: hoje existe só `src/lib/conflitoVersao.test.ts` (o `throw` da etapa 048), sem o
+mock de Supabase no nível do hook. **275, 279, 280, 281 e 282** seguem abertas.
+
+**NÃO VERIFICADO.** Nada aqui depende de sessão autenticada: as cinco etapas foram conferidas por leitura de
+arquivo e por execução de teste local. O que **não** foi feito é o teste de duas abas das etapas 044-048,
+registrado na PR #410.
 
 ### Registro - etapas 044 a 048 (2026-11-26) - o "salvou?" do travamento otimista em um lugar só
 
