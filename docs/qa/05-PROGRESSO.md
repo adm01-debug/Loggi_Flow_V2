@@ -249,7 +249,7 @@
 - [x] **171** — `rodonaves-api`: erro genérico na resposta e detalhe só no log — onda 5 — Alta
 - [x] **172** — `resend-email`: parar de repassar o erro do provedor de e-mail — onda 5 — Alta
 - [x] **173** — `db-health-weekly-report`: parar de repassar o erro do terceiro no relatório — onda 5 — Média
-- [ ] **174** — `nexus-webhook-receiver`: erro genérico na resposta ao webhook — onda 5 — Média
+- [x] **174** — `nexus-webhook-receiver`: erro genérico na resposta ao webhook — onda 5 — Média
 - [ ] **175** — `lalamove-webhook`: erro genérico na resposta ao webhook — onda 5 — Média
 - [ ] **176** — `rodonaves-webhook`: erro genérico na resposta ao webhook — onda 5 — Média
 - [ ] **177** — `smart-carrier-selection`: erro genérico na resposta da cotação — onda 5 — Média
@@ -434,6 +434,40 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapa 174 (2026-11-25) - achado B-06 (`nexus-webhook-receiver`)
+
+**Causa:** o `catch` de `nexus-webhook-receiver` (recebe webhooks do Nexus e repassa para
+`external-db-bridge`/`nexus-normalizer`) devolvia `JSON.stringify({ success: false, error: error.message })` com
+status 400. `error.message` podia carregar detalhe do PostgREST/terceiro — nome de tabela/coluna, dica de SQL,
+trecho de payload com PII do cliente — e esse texto ia no corpo da resposta HTTP entregue ao emissor do webhook.
+
+**Correcao (so o arquivo da etapa):**
+
+- `:10` — import de `internalErrorResponse` de `_shared/httpError.ts` (etapa 164).
+- `:200-205` — o `catch` passou a registrar o detalhe **apenas** no log
+  (`log.error('[nexus-webhook-receiver] Webhook processing error:', { message: error instanceof Error ? error.message : String(error) })`)
+  e a devolver `internalErrorResponse(error, corsHeaders, "nexus-webhook-receiver")`: 500 com
+  `{"error":"INTERNAL_ERROR"}`, sem mensagem interna e sem stack. O 500 (e nao 200) e proposital — o emissor
+  do webhook precisa saber que falhou para reenviar; devolver 200 perderia o evento.
+- **Nao tocado:** o HMAC `:40-45` (401), o rate limit `:29-35` (429), `buildEventKey`/`claimIdempotencyKey`
+  `:83-108` (dedupe, etapa 199) e os dois `invokeFunction` com `timeoutMs: NORMALIZE_TIMEOUT_MS`.
+
+**Quem via o detalhe:** o emissor externo do webhook (sistema Nexus) e qualquer um que interceptasse a
+resposta; nenhuma tela do app le esse texto. O detalhe completo agora fica no log da edge.
+
+**Verificado de verdade:** `tests/contracts/nexus-webhook-receiver-erro-generico.spec.ts` (7 casos) — 7/7; os
+specs existentes da funcao (`nexus-webhook-normalizacao.spec.ts`, `nexus-contracts.spec.ts`, `index_test.ts`)
+continuam verdes. Prova por mutacao: A volta a ecoar `error.message` na resposta -> 2 falhas; B devolve 500
+escrito na mao no lugar de `internalErrorResponse` -> 1; C devolve 200 no catch -> 2; D passa o objeto `error`
+como meta do log -> 1; E troca o segredo do HMAC -> 1; F quebra a chave de dedupe -> 1; G sobe o limite de rate
+limit -> 1; restaurado -> 7/7. `deno check` 2 = baseline 2; `deno lint` 3 = baseline 3; `deno fmt --check` =
+baseline (diff herdado nas linhas 15-20 de CORS, nenhuma linha alterada). `tsc` 0; `lint:budget` ok; suite 540
+testes (533 da base + 7 novos). Verificacao pedida pelo plano (`grep -n 'error.message'` + `sed` do catch):
+executada — a unica ocorrencia restante e `:202`, dentro da meta do `log.error`; a resposta de erro nao carrega
+nada do terceiro. Webhook real do Nexus: NAO EXECUTADO (exigiria origem externa configurada) — RASTREADO pelo
+codigo.
+
 
 ### Registro - etapa 173 (2026-11-25) - achado B-06 (`db-health-weekly-report`)
 
