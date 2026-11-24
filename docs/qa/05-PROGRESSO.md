@@ -244,7 +244,7 @@
 - [x] **166** — `scheduled-reports`: parar de devolver o erro do Postgres — onda 5 — Alta
 - [x] **167** — `lgpd-erase-user`: parar de devolver o erro do Postgres — onda 5 — Alta
 - [x] **168** — `execute-protocol`: parar de devolver o erro do Postgres — onda 5 — Alta
-- [ ] **169** — `lalamove-api`: parar de repassar a resposta de erro da Lalamove — onda 5 — Alta
+- [x] **169** — `lalamove-api`: parar de repassar a resposta de erro da Lalamove — onda 5 — Alta
 - [ ] **170** — `rodonaves-api`: parar de transformar o erro do **login** da Rodonaves em mensagem — onda 5 — **Crítica**
 - [ ] **171** — `rodonaves-api`: erro genérico na resposta e detalhe só no log — onda 5 — Alta
 - [ ] **172** — `resend-email`: parar de repassar o erro do provedor de e-mail — onda 5 — Alta
@@ -435,6 +435,49 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 
 ## Registro de execução
 
+### Registro - etapa 169 (2026-11-25) - achado B-06 (`lalamove-api`)
+
+**Causa:** a funcao repassava o corpo de erro **do parceiro** ao chamador: `:60` devolvia
+`details: errorText` (o texto cru da Lalamove) junto com o status, e o `catch` de `:173` devolvia
+`error.message`. O conteudo do erro do parceiro nao e controlado por este repositorio — pode ecoar cabecalho,
+URL com chave ou credencial — e as quatro rotas devolviam `JSON.stringify(result)`, entao o `details` saia
+tambem em `create_order`, `get_order` e `cancel_order`, nao so na cotacao.
+
+**Correcao (so o arquivo da etapa):**
+
+- `:54-61` — o `errorText` passou a ir **apenas** para o log, com o status HTTP do parceiro:
+  `log.error('Lalamove upstream error', { status: response.status, errorText: errorText.slice(0, 500) })`
+  (corte de 500 chars para nao virar log gigante). A resposta 4xx virou
+  `{ error: true, status, message: 'Transportadora recusou a solicitacao' }` — sem `details`.
+- `catch` — `error: error.message` virou `error: isBreaker ? 'Transportadora indisponivel' : 'Falha ao
+  chamar a transportadora'`, mantendo `circuitOpen` e o status 503/500. O ramo `ValidationError` -> 422
+  continua igual (a etapa 149 depende dele).
+- **Nao tocado:** `safeFetch` (tempo limite e disjuntor), `lalamoveBreaker`, a assinatura HMAC, o
+  `throw new Error('Lalamove Server Error: ...')` que dispara o disjuntor em 5xx e o roteamento por
+  `parseLalamoveRoute` (etapa 149). Nenhuma filtragem por palavra-chave no texto do parceiro — ele nao e
+  repassado.
+
+**Quem consumia o detalhe:** nao ha consumidor. O unico chamador e `useLalamoveOrders.tsx`, que so faz
+`if (error) throw error` e mostra `toast.error` generico; ninguem le `details`. O detalhe agora esta no log da
+edge (Supabase Logs / `function_edge_logs`).
+
+**Verificado de verdade:** `tests/contracts/lalamove-api-upstream-erro.spec.ts` (5 casos) — 5/5. Prova por
+mutacao: A devolve `details: errorText` de novo -> 1 falha; B remove o log do corpo do parceiro -> 2; C `catch`
+volta a ecoar `error.message` -> 1; D log sem o status do parceiro -> 1; E remove o `throw` que dispara o
+disjuntor em 5xx -> 1; restaurado 5/5. `deno check` 8 erro <= baseline 9 (nenhum novo; o `log.error` foi usado
+no lugar de `log({ level: 'ERROR' })` de proposito, porque o literal de `level` nao e atribuivel a `LogLevel`
+— erro ja existente em `:110`), `deno lint` 5 = baseline, `deno fmt --check` 1 = baseline; `tsc` 0;
+`lint:budget` 77/86 com 0 erros; suite 67 arquivos / 510 testes. Verificacao do plano: `grep -n
+'errorText|error.message|internalErrorResponse'` retorna `errorText` so na leitura (`:55`) e no log (`:61`), e
+`error.message` so no log do `catch` (`:182`).
+
+**Nao verificado:** erro real do parceiro em producao (a Lalamove de producao exige credencial real; as
+chaves atuais sao de sandbox e nao foram validadas nesta sessao).
+
+**Fora de escopo (registrado, nao tocado):** CORS `*` de `_shared/cors.ts` (etapa 191); o log do `catch`
+continua registrando `error.message` (nao vai para a resposta); erros de tipo herdados do arquivo
+(`e` unknown em `:110`, `LogLevel`).
+
 ### Registro - etapa 168 (2026-11-25) - achado B-06 (`execute-protocol`)
 
 **Causa:** o `catch` de `:59` devolvia `{ error: error.message }` com 400 e o `:53` fazia `throw error` do
@@ -470,6 +513,7 @@ autenticado); a resposta generica e o log sao o mesmo caminho ja verificado nas 
 **Fora de escopo (registrado, nao tocado):** CORS `*` (`:5`, etapa 191); contrato `protocol_id` +
 `confirm: z.literal(true)` das etapas 072/101; ausencia de log estruturado nos caminhos de sucesso (auditoria
 10.9).
+
 
 ### Registro - etapa 167 (2026-11-25) - achado B-06 (`lgpd-erase-user`)
 

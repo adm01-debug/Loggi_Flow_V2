@@ -53,11 +53,21 @@ async function lalamoveRequest(method: string, path: string, body?: object) {
     
     if (!response.ok) {
       const errorText = await response.text()
+      // O corpo de erro do parceiro nao e controlado por este repositorio (pode ecoar cabecalho,
+      // URL ou credencial): fica so no log, e a resposta devolve o status traduzido.
+      log.error('Lalamove upstream error', {
+        status: response.status,
+        errorText: errorText.slice(0, 500),
+      })
       // Only trigger breaker on 5xx or connection issues, handled by the loop if we throw
       if (response.status >= 500) {
         throw new Error(`Lalamove Server Error: ${response.status}`);
       }
-      return { error: true, status: response.status, details: errorText };
+      return {
+        error: true,
+        status: response.status,
+        message: 'Transportadora recusou a solicitacao',
+      };
     }
     
     return response.json()
@@ -169,10 +179,18 @@ serve(async (req) => {
 
     const isBreaker = error.message.includes('Circuit Breaker');
     log({ level: 'ERROR', message: `Lalamove function failure`, meta: { error: error.message } });
-    
-    return new Response(JSON.stringify({ error: error.message, circuitOpen: isBreaker }), {
-      status: isBreaker ? 503 : 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
+
+    return new Response(
+      JSON.stringify({
+        error: isBreaker
+          ? 'Transportadora indisponivel'
+          : 'Falha ao chamar a transportadora',
+        circuitOpen: isBreaker,
+      }),
+      {
+        status: isBreaker ? 503 : 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      },
+    )
   }
 })
