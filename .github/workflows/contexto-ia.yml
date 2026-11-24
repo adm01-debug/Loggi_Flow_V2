@@ -6,7 +6,8 @@
 # nao-e-bug:
 #   - sem-commit: "nada mudou" no publicar significa que nenhuma das tres fontes mudou desde a ultima publicacao
 #   - metricas: metricas/manifests do banco aguardam 60 min desde a coleta publicada; commits de codigo nao reiniciam o prazo
-#   - banco-pulado: sem o secret SUPABASE_DB_URL o job do banco sai verde com aviso e a pasta supabase/ fica como estava
+#   - banco-pulado: sem o secret SUPABASE_DB_URL (repo) nem DESTINO_URL (environment banco-leitura) o job do banco
+#     sai verde com aviso e a pasta supabase/ fica como estava
 name: Contexto para agentes de IA (10 min)
 
 # UM workflow, TRES produtores independentes (um job cada), UM indice, UMA branch:
@@ -177,6 +178,9 @@ jobs:
     if: needs.gate.outputs.banco == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
+    # O DSN do banco vive no environment banco-leitura (o mesmo do aplicar-migration.yml). Sem ele o
+    # produtor ficava pulando para sempre: a branch contexto publicava codigo/ e regras/, nunca supabase/.
+    environment: banco-leitura
     outputs:
       artifact-id: ${{ steps.upload.outputs.artifact-id }}
     env:
@@ -231,13 +235,13 @@ jobs:
 
       - name: Gerar supabase/
         env:
-          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL || secrets.DESTINO_URL }}
           EVENTO: ${{ github.event_name }}
         run: |
           if [ -z "${SUPABASE_DB_URL:-}" ]; then
             # Sem o secret nao ha o que coletar. No agendamento sai verde com aviso para nao pintar
             # 144 runs/dia de vermelho; no dispatch manual falha para a pessoa ver.
-            echo "::warning::Secret SUPABASE_DB_URL nao definido - snapshot pulado (ver scripts/supabase_snapshot/README.md)"
+            echo "::warning::Sem SUPABASE_DB_URL (repo) nem DESTINO_URL (environment banco-leitura) - snapshot pulado (ver scripts/supabase_snapshot/README.md)"
             echo "SNAPSHOT_SKIPPED=1" >> "$GITHUB_ENV"
             if [ "$EVENTO" = "workflow_dispatch" ]; then exit 1; fi
             exit 0
