@@ -568,6 +568,7 @@
         "contract_test_logs.errors:jsonb:nullable",
         "contract_test_logs.latency_ms:integer:nullable",
         "contract_test_logs.created_at:timestamp with time zone:nullable",
+        "contract_test_logs.payload_hash:text:nullable",
         "cotacoes_frete.id:uuid:not-null",
         "cotacoes_frete.entrega_id:uuid:not-null",
         "cotacoes_frete.transportadora_id:uuid:not-null",
