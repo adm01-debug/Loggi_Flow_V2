@@ -7,6 +7,7 @@ import {
   TRANSICOES_ENTREGA,
   mensagemRecusaTransicao,
 } from "@/lib/statusTransitions";
+import { assertAtualizou } from "@/lib/conflitoVersao";
 import { EmptyState } from "@/components/common/EmptyState";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Badge } from "@/components/ui/badge";
@@ -329,10 +330,7 @@ export default function KanbanEntregas() {
         .eq("id", id)
         .eq("version", version);
       if (error) throw error;
-      if (count === 0)
-        throw new Error(
-          "Conflito de versão — registro alterado por outro usuário, por favor recarregue",
-        );
+      assertAtualizou(count);
 
       await onStatusChange("entrega", id, { status });
     },

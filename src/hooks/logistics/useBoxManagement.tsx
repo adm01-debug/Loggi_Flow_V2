@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { differenceInDays } from "date-fns";
 import { QUERY_STALE_TIME } from "@/lib/queryConfig";
 import { uniqueChannelName } from "@/lib/realtimeChannel";
+import { assertAtualizou } from "@/lib/conflitoVersao";
 
 export interface DeliveryWithRelations {
   id: string;
@@ -148,19 +149,18 @@ export function useBoxManagement() {
         .eq("version", version);
 
       if (error) throw error;
-      if (count === 0)
-        throw new Error(
-          "Conflito de versão — registro alterado por outro usuário, por favor recarregue",
-        );
+      assertAtualizou(count);
 
       // Record history
-      const { error: histError } = await supabase.from("kanban_history").insert({
-        delivery_id: deliveryId,
-        from_status: currentDelivery?.status || null,
-        to_status: currentDelivery?.status || "desconhecido",
-        action_by: user?.id,
-        notes: `Alocado ao BOX ${boxId}`,
-      });
+      const { error: histError } = await supabase
+        .from("kanban_history")
+        .insert({
+          delivery_id: deliveryId,
+          from_status: currentDelivery?.status || null,
+          to_status: currentDelivery?.status || "desconhecido",
+          action_by: user?.id,
+          notes: `Alocado ao BOX ${boxId}`,
+        });
       if (histError) console.warn("kanban_history insert:", histError.message);
     },
     onSuccess: (_, { boxNumber }) => {
