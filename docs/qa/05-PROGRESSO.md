@@ -298,7 +298,7 @@
 - [x] **217** — `useAccuracyMetaCycle`: uma única consulta a `notifications` para todas as linhas — onda 6 — Média
 - [ ] **218** — `count_prediction_breach_days`: variante que responde todas as transportadoras numa chamada — onda 6 — Média
 - [x] **219** — `useKPIBenchmark`: tirar os `await` de dentro do laço — onda 6 — Média
-- [ ] **220** — `useKPIBenchmark`: uma consulta por tabela cobrindo todos os períodos — onda 6 — Média
+- [x] **220** — `useKPIBenchmark`: uma consulta por tabela cobrindo todos os períodos — onda 6 — Média
 - [ ] **221** — `useExecutiveMetrics`: mesma consolidação de 18 consultas para 3 — onda 6 — Baixa
 - [~] **222** — Conferir `types.ts` contra o banco ao vivo e regenerar se houver divergência — onda 6 — Média · **aguarda o dono**
 - [ ] **223** — `Envios.tsx`: trocar `select("*")` por colunas explícitas em `entregas` — onda 6 — Média
@@ -409,7 +409,8 @@ Problema novo **não se corrige na hora** (regra 4). Anote aqui, com `arquivo:li
 
 | #   | Achado | Onde (arquivo:linha) | Encontrado na etapa | Gravidade estimada |
 | --- | ------ | -------------------- | ------------------- | ------------------ |
-| A-01 | A consulta de `ocorrencias` do benchmark de KPI nao tem teto, ao contrario das de `entregas`/`coletas` (`.limit(1000)`); mes com muitas ocorrencias baixa a tabela inteira | `src/hooks/analytics/useKPIBenchmark.tsx:65-69` | 219 | Baixa |
+| A-01 | **Resolvido na etapa 220**: a consulta de `ocorrencias` do benchmark de KPI nao tinha teto, ao contrario das de `entregas`/`coletas` (`.limit(1000)`); mes com muitas ocorrencias baixava a tabela inteira | `src/hooks/analytics/useKPIBenchmark.tsx:67-71` | 219 -> 220 | Baixa |
+| A-02 | O teto de 6000 do benchmark de KPI e **unico para os seis meses**: se a soma dos seis passar de 6000 linhas, o PostgREST corta sem ordem definida e qualquer mes pode perder registros (antes o corte era de 1000 **por mes**) | `src/hooks/analytics/useKPIBenchmark.tsx:44,49-71` | 220 | Media |
 
 ## Etapas que não correspondiam mais ao código
 
@@ -435,6 +436,50 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 
 ## Registro de execução
 
+
+### Registro - etapa 220 (2026-11-25) - benchmark de KPI passa de 18 consultas para 3
+
+**Causa:** mesma raiz da 219, um degrau abaixo. Mesmo em paralelo, o hook pedia a **mesma tabela seis vezes**,
+mudando so o intervalo de `created_at` -- e os seis intervalos sao contiguos. O agrupamento por mes estava no
+laco do cliente em vez de na consulta. Achado P-03.
+
+**Entrega:** as 18 consultas viraram **3**, uma por tabela (`src/hooks/analytics/useKPIBenchmark.tsx:49-71`).
+Cada uma cobre a janela inteira, de `startOfMonth(subMonths(new Date(), periodsBack - 1))` ate
+`endOfMonth(new Date())`, e o mes de cada linha sai de `format(new Date(linha.created_at), "yyyy-MM")` no
+cliente, num `Record<string, T[]>` montado com `forEach` (`:75-87`) -- o mesmo desenho de
+`src/hooks/logistics/useTrackingAnalytics.tsx:138-141`. A chave e **local**, exatamente o criterio que o servidor
+ja usava (`startOfMonth`/`endOfMonth`), entao os seis pontos nao se deslocam. Teto ajustado para
+`periodsBack * 1000` (6000) nas tres (`:44`), mantendo a proporcao do que o codigo pedia antes (1000 por mes), e
+`created_at` entrou no `select` das tres porque passou a ser lido no cliente. Nenhum calculo, filtro de status ou
+formula foi tocado; `periods.sort` continua garantindo a ordem do grafico.
+
+**Verificacao:** spec `tests/contracts/kpi-benchmark-consulta-unica.spec.ts` (8 casos) sobre
+`tests/contracts/kpi-benchmark-fixtures.ts`, que traz um servidor de mentira (filtra por intervalo como o
+PostgREST, projeta so as colunas pedidas e aplica o `limit` de verdade) e o **espelho do codigo anterior**
+(`df6b3e2e`) para comparar os seis pontos. Casos: 3 consultas, uma por tabela; janela unica e teto 6000 nas tres;
+`ocorrencias` tambem com teto (A-01 resolvido); **os seis pontos identicos ao algoritmo anterior, campo por
+campo**, num cenario com as bordas do mes (23:30 do ultimo dia e 00:30 do primeiro dia -- no fuso do Brasil esses
+dois caem em meses UTC diferentes do mes local); linhas fora da janela e uma linha deletada; o mesmo com 40 linhas
+espalhadas por oito meses; ordenacao ascendente; ausencia de laco com `await` e de `.limit(1000)`, com exatamente
+3 `.from("...")` e 3 `.limit(teto)`; formulas e comparacao entre os dois ultimos periodos intactas.
+Os valores do mes corrente no cenario de bordas foram conferidos a mao: 5 entregas, 2 no prazo (SLA 40%), frete
+660, custo medio 132, 2 ocorrencias (taxa 40%), tempo medio 7/3 dias.
+**Prova por mutacao: 9/9 capturadas** (teto fixo em 1000; `created_at` fora do select; janela comecando um mes
+antes; agrupamento por mes UTC em vez de local; baldes de entregas e coletas trocados; filtro de deletados fora;
+teto fora de `ocorrencias`; `sort` removido; formula do SLA alterada).
+
+**Substitui:** o guard da etapa 219 (`tests/contracts/kpi-benchmark-paralelo.spec.ts`, 9 casos) foi removido --
+ele provava a forma que deixou de existir (`Promise.all` por mes). O achado P-03 continua coberto, agora pela prova
+mais forte: 3 consultas medidas no cliente falso e igualdade numerica contra o codigo anterior.
+
+**Verificado:** `npx tsc --noEmit` 0 erros; `npx eslint .` 77 avisos / 0 erros (o mesmo numero do `main`, sem
+gastar orcamento); `npx vitest run` 804/804 em 95 arquivos; `grep -c 'from("entregas")\|from("coletas")\|from("ocorrencias")'`
+no hook = **3**, o esperado do plano.
+
+**Nao verificado:** o volume real de linhas por mes no banco (a consulta do plano
+`SELECT date_trunc('month', created_at) ... FROM entregas` exige credencial de Supabase, que esta sessao nao tem)
+-- e por isso o risco do teto unico segue aberto em A-02; e a contagem de requisicoes na aba Rede do `/analytics`,
+que so pode ser medida depois do deploy.
 
 ### Registro - etapa 219 (2026-11-25) - meses do benchmark de KPI deixam de ser consultados em serie
 

@@ -35,45 +35,66 @@ export const useKPIBenchmark = (periodsBack: number = 6) => {
   return useQuery({
     queryKey: ["kpi-benchmark", user?.id, periodsBack],
     queryFn: async () => {
-      // Os meses nao dependem uns dos outros: o `for` com `await` dentro fazia 18 idas ao banco uma apos a
-      // outra (P-03, 6 meses x 3 consultas). `map` + `Promise.all` poe os meses em paralelo; a ordem final
-      // fica por conta do `sort` por periodo logo abaixo.
-      const periods: PeriodKPIs[] = await Promise.all(
-        Array.from({ length: periodsBack }).map(async (_, i) => {
-          const date = subMonths(new Date(), i);
-          const start = startOfMonth(date);
-          const end = endOfMonth(date);
+      // Os seis intervalos sao contiguos: o mes de cada linha sai do proprio `created_at` no cliente, entao
+      // uma consulta por tabela cobre todos os periodos (P-03, etapa 220). Eram 18 consultas, agora 3.
+      const agora = new Date();
+      const inicio = startOfMonth(subMonths(agora, periodsBack - 1));
+      const fim = endOfMonth(agora);
+      // O teto continua proporcional ao que o codigo pedia antes (1000 por mes).
+      const teto = periodsBack * 1000;
 
-          const [{ data: entregas }, { data: coletas }, { data: ocorrencias }] =
-            await Promise.all([
-              supabase
-                .from("entregas")
-                .select(
-                  "id, status, data_entrega_efetiva, previsao_entrega, valor_frete, data_despacho",
-                )
-                .is("deleted_at", null)
-                .gte("created_at", start.toISOString())
-                .lte("created_at", end.toISOString())
-                .limit(1000),
-              supabase
-                .from("coletas")
-                .select("id, status, data_efetiva_coleta, data_prevista_coleta")
-                .is("deleted_at", null)
-                .gte("created_at", start.toISOString())
-                .lte("created_at", end.toISOString())
-                .limit(1000),
-              supabase
-                .from("ocorrencias")
-                .select("id")
-                .gte("created_at", start.toISOString())
-                .lte("created_at", end.toISOString()),
-            ]);
+      const [{ data: entregas }, { data: coletas }, { data: ocorrencias }] =
+        await Promise.all([
+          supabase
+            .from("entregas")
+            .select(
+              "id, status, data_entrega_efetiva, previsao_entrega, valor_frete, data_despacho, created_at",
+            )
+            .is("deleted_at", null)
+            .gte("created_at", inicio.toISOString())
+            .lte("created_at", fim.toISOString())
+            .limit(teto),
+          supabase
+            .from("coletas")
+            .select(
+              "id, status, data_efetiva_coleta, data_prevista_coleta, created_at",
+            )
+            .is("deleted_at", null)
+            .gte("created_at", inicio.toISOString())
+            .lte("created_at", fim.toISOString())
+            .limit(teto),
+          supabase
+            .from("ocorrencias")
+            .select("id, created_at")
+            .gte("created_at", inicio.toISOString())
+            .lte("created_at", fim.toISOString())
+            .limit(teto),
+        ]);
+
+      // A chave do mes e local, o mesmo criterio que o servidor ja filtrava (`startOfMonth`/`endOfMonth`).
+      const agruparPorMes = <T extends { created_at: string }>(linhas: T[]) => {
+        const porMes: Record<string, T[]> = {};
+        linhas.forEach((linha) => {
+          const chave = format(new Date(linha.created_at), "yyyy-MM");
+          if (!porMes[chave]) porMes[chave] = [];
+          porMes[chave].push(linha);
+        });
+        return porMes;
+      };
+
+      const entregasPorMes = agruparPorMes(entregas || []);
+      const coletasPorMes = agruparPorMes(coletas || []);
+      const ocorrenciasPorMes = agruparPorMes(ocorrencias || []);
+
+      const periods: PeriodKPIs[] = Array.from({ length: periodsBack }).map(
+        (_, i) => {
+          const date = subMonths(agora, i);
+          const chave = format(date, "yyyy-MM");
+          const entregasData = entregasPorMes[chave] || [];
+          const coletasData = coletasPorMes[chave] || [];
+          const ocorrenciasData = ocorrenciasPorMes[chave] || [];
 
           // Calculate metrics
-          const entregasData = entregas || [];
-          const coletasData = coletas || [];
-          const ocorrenciasData = ocorrencias || [];
-
           const totalEntregas = entregasData.length;
           const entregasEntregues = entregasData.filter(
             (e) => e.status === "entregue" || e.status === "finalizado",
@@ -127,7 +148,7 @@ export const useKPIBenchmark = (periodsBack: number = 6) => {
           });
 
           return {
-            period: format(date, "yyyy-MM"),
+            period: chave,
             periodLabel: format(date, "MMM/yy"),
             totalEntregas,
             entregasNoPrazo,
@@ -145,7 +166,7 @@ export const useKPIBenchmark = (periodsBack: number = 6) => {
             totalColetas,
             coletasNoPrazo,
           };
-        }),
+        },
       );
 
       // Sort by period ascending
