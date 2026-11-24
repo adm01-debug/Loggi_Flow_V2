@@ -283,7 +283,7 @@
 - [x] **202** — Criar `useServerPagination` e **definir** o contrato de paginação no servidor — onda 6 — Crítica
 - [x] **203** — Documentar o contrato de paginação e marcar `usePagination` como "só memória" — onda 6 — Alta
 - [x] **204** — `useTrackingAnalytics`: pôr teto no servidor na leitura de `rastreamento_historico` — onda 6 — Crítica
-- [ ] **205** — `Analytics.tsx`: passar o intervalo de datas que a tela já tem para `useTrackingAnalytics` — onda 6 — Crítica
+- [x] **205** — `Analytics.tsx`: passar o intervalo de datas que a tela já tem para `useTrackingAnalytics` — onda 6 — Crítica
 - [ ] **206** — `useTrackingAnalytics`: tornar a janela de datas obrigatória na assinatura — onda 6 — Alta
 - [ ] **207** — `useLogisticsCalendar`: pôr teto na leitura de `coletas` — onda 6 — Alta
 - [ ] **208** — `useLogisticsCalendar`: pôr teto na leitura de `entregas` — onda 6 — Alta
@@ -434,6 +434,29 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapa 205 (2026-11-25) - achado P-01 (`Analytics.tsx` nao passava o periodo)
+
+**Causa:** `src/pages/Analytics.tsx:71` chamava `useTrackingAnalytics()` **sem argumento**, embora a tela ja
+mantivesse o `dateRange` no estado (`:60-63`, padrao ultimos 30 dias) e ja o repassasse corretamente para
+`useAnalytics` tres linhas acima (`:65-69`). Como `dateFrom`/`dateTo` sao opcionais na assinatura
+(`useTrackingAnalytics.tsx:117`), o esquecimento nao dava erro de compilacao nem aviso de lint — era invisivel,
+e a consulta mais cara da tela continuava sem filtro.
+
+**Entrega:** so a linha `:71`, com os mesmos fallbacks do `useAnalytics` logo acima:
+`useTrackingAnalytics(dateRange?.from, dateRange?.to || dateRange?.from)`. O `queryKey` do hook ja inclui
+`dateFrom?.toISOString()`/`dateTo?.toISOString()`, entao o cache invalida sozinho quando o usuario troca o
+periodo — nada a acrescentar. Nao foi colocado periodo padrao dentro do hook (duas fontes de verdade para o
+periodo fariam o grafico ignorar o seletor); nem tocado `useAnalytics`/`useKPIBenchmark` (219/220); nem a
+assinatura do hook (etapa 206).
+
+**Verificacao:** spec de contrato novo `tests/contracts/analytics-janela-tracking.spec.ts` (4 casos: nao chama
+sem argumentos, passa o inicio, usa o inicio como fim quando so ha uma ponta, pagina segue como fonte do
+periodo). 4 mutacoes — voltar a chamada vazia, passar so o inicio, tirar o fallback do fim e passar
+`new Date()` fixo — falham **3/1/1/3**; a versao correta passa 4/4. `eslint` limpo nos dois arquivos, `tsc` 0,
+`lint:budget` 77/86 com 0 erros, suite **724/724** (85 arquivos). Diff: 4 insercoes, 1 delecao.
+**Nao verificado:** os "valores antes/depois" do bloco de rastreio que o plano sugere anotar — exigem runtime
+com dado real (sem credencial de banco e sem deploy desta branch nesta sessao).
 
 ### Registro - etapa 204 (2026-11-25) - achado P-01 (`useTrackingAnalytics` sem teto)
 
