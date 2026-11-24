@@ -275,7 +275,7 @@
 - [x] **197** — `accuracy-weekly-digest`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Baixa dentro do grupo, mas manipula dado
 - [x] **198** — `geocode-address`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Média
 - [x] **199** — `ingest-biosync`: deduplicar a telemetria do dispositivo — onda 5 — Média
-- [ ] **200** — `push-send`: tempo limite no envio ao provedor de push — onda 5 — Média
+- [x] **200** — `push-send`: tempo limite no envio ao provedor de push — onda 5 — Média
 - [ ] **201** — Corrigir o comentário de `fetch-with-timeout.ts` que promete retentativa inexistente — onda 5 — Baixa
 
 ### Onda 6
@@ -434,6 +434,47 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapa 200 (2026-11-25) - achado B-09 (`push-send`)
+
+**Causa:** `webpush.sendNotification` (`:160`) fala com FCM/APNs por conta propria e **nao passa por `safeFetch`
+nem por `fetch-with-timeout.ts`**, entao o envio nao tinha tempo limite nenhum. Provedor lento prendia o laco
+por inscricao (`:158`) e o **lote inteiro** morria no limite de execucao da funcao — o `catch` por inscricao que
+ja existia nunca chegava a agir.
+
+**Correcao:** a propria biblioteca aceita o tempo limite — conferido na fonte antes de escolher:
+`web-push@3.6.7`, `src/web-push-lib.js:222` (`if (typeof options.timeout === 'number') timeout = options.timeout;`),
+aplicado ao request HTTPS em `:356-357` e com o socket destruido no evento `timeout` em `:395-397`. Entao o
+terceiro argumento passou a ser `{ timeout: PUSH_TIMEOUT_MS }` com **`PUSH_TIMEOUT_MS = 10000`**, o mesmo valor de
+`_shared/fetch-with-timeout.ts:9` (ha um caso de teste que amarra os dois para nao divergirem depois).
+`Promise.race` resolveria o laco mas **nao** aborta a conexao: a requisicao seguiria viva contra o provedor. A
+opcao nativa aborta de verdade.
+
+**Estouro = falha da inscricao, nunca do lote:** `isPushTimeout` (sem `statusCode` e com `ETIMEDOUT` ou
+`/timeout/i` na mensagem) marca o erro e ele entra na lista `errors` que ja existia como `"timeout"`; o laco
+segue com as outras inscricoes. **Nao ha retentativa** — B-10 e explicito e, aqui, cada reenvio e uma
+notificacao repetida no celular do usuario. Tempo limite **nao** apaga inscricao: o `delete` em
+`push_subscriptions` continua preso apenas ao 404/410 do provedor, porque lentidao nao e inscricao invalida.
+Rate limit, leitura das inscricoes e o formato da resposta (`sent`/`failed`/`errors`) nao foram tocados.
+
+**Teste novo:** `tests/contracts/push-send-timeout.spec.ts` (**7 casos**) — tempo limite explicito em cada envio;
+mesmo valor do helper compartilhado; estouro virando `"timeout"` na lista de erros sem derrubar o lote; a
+classificacao sem confundir com resposta do provedor; `delete` preso a 404/410; uma unica chamada de
+`sendNotification` (sem retentativa); resposta do lote intacta.
+
+**Verificado de verdade:**
+- Prova por mutacao (A-E): A sem `options.timeout` -> **1** falha; B valor 30 s divergente do helper -> **2**;
+  C estouro nao virando `"timeout"` -> **1**; D retentativa no envio -> **1**; E sem a guarda de `statusCode` ->
+  **1**. Restaurado -> **7/7**.
+- `deno check` **0 erros** (igual ao baseline); `deno lint` **3 = 3**; `deno fmt --check` acusa **3 linhas antes e
+  3 depois** (as herdadas de `:183-185`).
+- `tsc --noEmit` 0; `npm run lint:budget` **ok** (77/86 avisos, 0 erros); suite **707/707** (82 arquivos).
+- O proprio gate de avisos pegou uma assercao generica no spec novo (`sonarjs/prefer-specific-assertions`
+  exigindo `toHaveLength` em vez de `.length` + `toBe`) — corrigida antes do commit; nao foi para o CI.
+
+**Dependencia registrada na PR:** o tempo tipico de resposta de FCM/APNs nao esta medido (sem secret VAPID real
+no ambiente de teste), entao os 10 s vieram do padrao ja usado no repositorio; se o provedor costumar demorar
+mais, o lote passa a reportar falhas que antes "funcionavam devagar" e o numero precisa subir.
 
 ### Registro - etapa 199 (2026-11-25) - achado B-08 (`ingest-biosync`)
 
