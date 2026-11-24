@@ -76,33 +76,70 @@ export function useAccuracyMetaCycle() {
         }),
       );
 
-      const items: CycleItem[] = await Promise.all(
-        rows.map(async (s) => {
-          const { data: breach } = await supabase.rpc(
-            "count_prediction_breach_days" as never,
-            {
-              _target: s.target_pct,
-              _carrier: s.transportadora,
-            } as never,
-          );
-          const breach_days = Number(breach ?? 0);
-          const notified_in_cycle = carriersNotificados.has(s.transportadora ?? "__all__");
-          let status: CycleItem["status"] = "ok";
-          if (breach_days >= s.consecutive_days_alert) {
-            status = notified_in_cycle ? "notified" : "pending";
-          } else if (breach_days > 0) {
-            status = "warming";
+      // Uma chamada (P-03): a variante em lote responde todos os pares (transportadora, meta) de uma vez.
+      // A funcao nasce na migration da etapa 218, aplicada depois do deploy deste codigo. Enquanto ela nao
+      // existir -- ou se a resposta vier incompleta -- cai na chamada antiga, uma por transportadora, como
+      // era antes.
+      const chaveDoPar = (carrier: string | null, target: number) => `${carrier ?? "__all__"}|${target}`;
+      const pares = rows.map((s) => ({ carrier: s.transportadora, target: Number(s.target_pct) }));
+
+      const breachPorPar = new Map<string, number>();
+      if (pares.length > 0) {
+        const { data: lote, error: erroLote } = await supabase.rpc(
+          "count_prediction_breach_days_bulk" as never,
+          { _pairs: pares } as never,
+        );
+        if (!erroLote && Array.isArray(lote)) {
+          for (const r of lote as Array<{
+            carrier: string | null;
+            target: number | string;
+            breach_days: number | string;
+          }>) {
+            breachPorPar.set(
+              chaveDoPar(r.carrier ?? null, Number(r.target)),
+              Number(r.breach_days ?? 0),
+            );
           }
-          return {
-            transportadora: s.transportadora,
-            target_pct: Number(s.target_pct),
-            consecutive_days_alert: s.consecutive_days_alert,
-            breach_days,
-            notified_in_cycle,
-            status,
-          };
-        }),
-      );
+        }
+      }
+
+      const chavesEsperadas = new Set(pares.map((p) => chaveDoPar(p.carrier, p.target)));
+      const respostaCompleta =
+        chavesEsperadas.size > 0 && [...chavesEsperadas].every((k) => breachPorPar.has(k));
+
+      const breachPorLinha: number[] = respostaCompleta
+        ? rows.map((s) => breachPorPar.get(chaveDoPar(s.transportadora, Number(s.target_pct))) ?? 0)
+        : await Promise.all(
+            rows.map(async (s) => {
+              const { data: breach } = await supabase.rpc(
+                "count_prediction_breach_days" as never,
+                {
+                  _target: s.target_pct,
+                  _carrier: s.transportadora,
+                } as never,
+              );
+              return Number(breach ?? 0);
+            }),
+          );
+
+      const items: CycleItem[] = rows.map((s, indice) => {
+        const breach_days = breachPorLinha[indice] ?? 0;
+        const notified_in_cycle = carriersNotificados.has(s.transportadora ?? "__all__");
+        let status: CycleItem["status"] = "ok";
+        if (breach_days >= s.consecutive_days_alert) {
+          status = notified_in_cycle ? "notified" : "pending";
+        } else if (breach_days > 0) {
+          status = "warming";
+        }
+        return {
+          transportadora: s.transportadora,
+          target_pct: Number(s.target_pct),
+          consecutive_days_alert: s.consecutive_days_alert,
+          breach_days,
+          notified_in_cycle,
+          status,
+        };
+      });
 
       const { data: lastNotif } = await supabase
         .from("notifications")

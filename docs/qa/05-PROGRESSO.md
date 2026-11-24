@@ -296,7 +296,7 @@
 - [x] **215** — `Notificacoes.tsx`: levar os filtros e a busca para o servidor — onda 6 — Alta
 - [x] **216** — `Notificacoes.tsx`: o tempo real deixa de rebaixar a lista inteira a cada aviso — onda 6 — Alta
 - [x] **217** — `useAccuracyMetaCycle`: uma única consulta a `notifications` para todas as linhas — onda 6 — Média
-- [ ] **218** — `count_prediction_breach_days`: variante que responde todas as transportadoras numa chamada — onda 6 — Média
+- [~] **218** — `count_prediction_breach_days`: variante que responde todas as transportadoras numa chamada — onda 6 — Média · **PR #433 aberta; cria função em produção, aguarda o dono**
 - [x] **219** — `useKPIBenchmark`: tirar os `await` de dentro do laço — onda 6 — Média
 - [x] **220** — `useKPIBenchmark`: uma consulta por tabela cobrindo todos os períodos — onda 6 — Média
 - [x] **221** — `useExecutiveMetrics`: mesma consolidação de 18 consultas para 3 — onda 6 — Baixa
@@ -3697,9 +3697,9 @@ Atualize ao fim de cada sessão de trabalho.
 |                         | Quantidade |
 | ----------------------- | ---------- |
 | Concluídas `[x]`        | 252         |
-| Aguardando o dono `[~]` | 46         |
+| Aguardando o dono `[~]` | 47         |
 | Bloqueadas `[!]`        | 0          |
-| Não iniciadas `[ ]`     | 2          |
+| Não iniciadas `[ ]`     | 1          |
 | **Total**               | **300**    |
 
 **Última etapa trabalhada:** 142 · **Data:** 2026-11-25 · **Próxima etapa independente:** 018 (teste automático de `.env` na CI, PR #438 aberta) e 266 (snapshot do banco sem saída verde em silêncio)
@@ -4406,3 +4406,40 @@ dono.
 **Pendencia do dono:** mexer em workflow e mudanca de CI (Regra 8) - PR #441 fica aberta. O
 comportamento em `main` so muda depois do merge; a primeira execucao agendada seguinte a ele e que publica o
 README na branch `contexto`.
+
+## Registro da etapa 218 — variante em lote de `count_prediction_breach_days`
+
+**Feito:** `supabase/migrations/20261124133000_count_prediction_breach_days_bulk.sql` (novo) e
+`src/hooks/logistics/useAccuracyMetaCycle.ts` — a RPC que era chamada uma vez por transportadora dentro de um
+`Promise.all` virou uma chamada só, com queda automática para a chamada antiga enquanto a função não existir no
+banco. Também corrige, em `docs/agentes/banco.md`, a frase "não existe workflow que aplique DDL" (existe:
+`aplicar-migration.yml`).
+
+**Definição real lida do banco** (2026-11-24, `pg_get_functiondef`): `count_prediction_breach_days(_target
+numeric, _carrier text DEFAULT NULL) RETURNS integer`, `LANGUAGE sql`, `STABLE SECURITY DEFINER`, `SET
+search_path TO 'public'`, sem `GRANT` explícito — os privilégios são o default do Postgres
+(`information_schema.routine_privileges`: `PUBLIC`, `authenticated`, `postgres`, `service_role`). A variante
+nova repete os três atributos e **não altera nem remove** a função antiga, que continua usada por
+`supabase/functions/accuracy-meta-monitor/index.ts:82` e `src/hooks/logistics/usePredictionAccuracySettings.ts:117`.
+
+**Equivalência de resultado (evidência):** a consulta foi comparada com a transcrição literal da função antiga
+sobre um conjunto sintético de 12 pares — carrier nulo, transportadora nula no dado, linha com `was_accurate`
+nulo, linha fora da janela de 30 dias, meta nula e par repetido — com **0 divergências**. O corpo extraído do
+arquivo `.sql` foi executado no banco com 12 pares: 12 linhas, na ordem de entrada; `_pairs` nulo devolve 0
+linhas. `delay_predictions_history` tem 0 linhas na janela de 30 dias, então hoje todo par devolve 0 — igual ao
+que a tela mostra antes da mudança.
+
+**Verificado:** `npx eslint` nos arquivos tocados e `npx tsc --noEmit` (exit 0), `npm run lint:budget` (dentro
+do orçamento, 80/86), `npm run validate:query-limits` (0 consulta nova sem teto), suíte completa (`npx vitest
+run`: 102 arquivos, 856 testes, 0 falha) e os 3 casos novos de `useAccuracyMetaCycle.test.ts` (lote numa
+chamada; queda por erro da função em lote; queda por resposta incompleta).
+
+**Teste de contrato da etapa 217 ajustado:** `tests/contracts/accuracy-meta-consulta-unica.spec.ts` travava
+"não tocar na rpc" — guarda que fazia sentido enquanto a variante em lote era DDL pendente, e que esta etapa
+inverte por definição. O caso foi reescrito para o contrato novo (o lote é consultado uma vez, fora do `map`;
+a rpc por transportadora aparece exatamente uma vez, no caminho de queda) e ganhou um caso próprio. Os outros
+nove casos do arquivo seguem valendo sem alteração — inclusive o que exige a lógica de status byte a byte.
+
+**Pendência (Regra 8 — DDL em produção):** a PR fica aberta aguardando o dono. Depois do apply,
+`SELECT proname FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace WHERE n.nspname = 'public' AND
+proname LIKE 'count_prediction_breach_days%'` deve listar **duas** funções.
