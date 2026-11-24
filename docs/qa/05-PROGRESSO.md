@@ -231,7 +231,7 @@
 - [x] **153** — `ai-logistics-assistant`: validar e limitar o texto que vai para o modelo — onda 5 — Média
 - [x] **154** — `evolution-whatsapp`: validar `instance`, `phone` e `message` — onda 5 — Alta
 - [x] **155** — `ocr-receipt-processor`: validar a entrada do comprovante — onda 5 — Média
-- [ ] **156** — Criar `_shared/invokeFunction.ts`: chamada entre funções com tempo limite — onda 5 — Alta
+- [x] **156** — Criar `_shared/invokeFunction.ts`: chamada entre funções com tempo limite — onda 5 — Alta
 - [ ] **157** — `normalize-freight-response`: trocar o `fetch` nu para `whatsapp-notification` — onda 5 — Alta
 - [ ] **158** — `ingest-biosync`: trocar o `fetch` nu para `bitrix24-integration` — onda 5 — Média
 - [ ] **159** — `nexus-webhook-receiver`: tempo limite nas duas chamadas internas dentro do webhook — onda 5 — **Crítica**
@@ -434,6 +434,50 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapa 156 (2026-11-25) - achado B-05 (`_shared/invokeFunction.ts`)
+
+**Causa:** o repositório não tinha nenhuma chamada entre funções com prazo. O caminho `supabase.functions.invoke()`
+(`nexus-webhook-receiver:141`/`:154`, `send-password-reset:151`, `predict-delays:354`,
+`predict-delays-scheduled:70`, `accuracy-meta-monitor:196`/`:215`, `accuracy-weekly-digest:179`) faz HTTP real e
+**não aceita** `signal`, e os `fetch` nus para o próprio gateway (`normalize-freight-response:195`,
+`ingest-biosync:65`) em Deno **não têm tempo limite**. Se a função chamada trava (provedor externo lento, cold
+start, laço), a chamadora fica pendurada até o limite da plataforma — a escrita de negócio do webhook nunca
+conclui e o evento é reprocessado.
+
+**Correção:** `_shared/invokeFunction.ts` novo, sem retentativa (B-10 diz que retentativa só entra depois):
+`invokeFunction(name, body?, { timeoutMs })` monta `${SUPABASE_URL}/functions/v1/${name}` (barra final da env
+aparada), manda `Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}` e `Content-Type: application/json` via
+`fetchWithTimeout` com padrão de **10 s** (mesmo teto de `safeFetch.ts:107-110`), e **nunca lança**: devolve
+`{ ok: true, status, data }` ou `{ ok: false, reason: "config" | "timeout" | "network" | "http", status?, error, data? }`.
+Nome de função é validado contra `^[a-z0-9][a-z0-9-]{0,62}$` (fecha `../`, `/` e maiúsculas na URL do gateway) e a
+configuração ausente vira `reason: "config"` sem requisição. Duração e nome vão para o log em sucesso e em falha.
+
+**Desvio consciente:** `fetchWithTimeout` **não** foi alterado (o comentário dele é a etapa 201) e `safeFetch`
+também não — ele bloqueia destino interno por desenho e recusaria a URL do próprio projeto. O tempo limite é
+detectado pela mensagem `timed out after` que `fetch-with-timeout.ts:20` emite, porque aquele helper lança `Error`
+comum em vez de `AbortError`. `Deno` é lido via `globalThis` para o módulo continuar importável no vitest.
+
+**Mudança de comportamento:** nenhuma hoje — arquivo novo, ninguém o consome ainda (as etapas 157-163 trocam as
+chamadas uma a uma). Merge publica em produção sem efeito até a 157.
+
+**Fora de escopo (registrado, não tocado):** nenhuma retentativa, disjuntor ou fila (B-10); as 36 chamadas a
+terceiros continuam em `safeFetch`; os `supabase.functions.invoke()` antigos só saem nas etapas 159-163.
+
+**Evidência:**
+- `tests/contracts/invoke-function-timeout.spec.ts` (novo, 8 casos): URL e cabeçalhos corretos com token de serviço,
+  corpo serializado e `signal` presente; barra final da env não duplica `//`; 500 → `ok:false`/`reason:"http"` com o
+  corpo; tempo limite real (fetch respeitando o abort, `timeoutMs: 20`) → `reason:"timeout"` **sem lançar**; erro de
+  conexão → `reason:"network"`; nome inválido (`""`, `Funcao`, `../admin`, `a/b`, `nome_com_underscore`) →
+  `reason:"config"` e fetch nunca chamado; env ausente → `reason:"config"`; 204 sem corpo → `data: null`.
+- Mutação A — sem `timeout` na chamada: 1/8 falha. B — tempo limite classificado como `network`: 1/8. C — sem
+  validação de nome: 1/8. D — sem `Authorization`: 1/8. Restaurado: 8/8.
+- `npx vitest run --coverage`: **54 arquivos / 441 testes, todos verdes**; totais 76,09 / 73,49 / 77,97 / 78,31
+  (antes: 75,82/73,45/78,3/77,96).
+- `deno check` do arquivo: 0 erros; `deno lint` limpo; `deno fmt --check` limpo; `npx tsc --noEmit` 0;
+  `npm run lint:budget` OK (77/86).
+- **NÃO VERIFICADO:** chamada real entre funções em produção (exige deploy e um consumidor — etapa 157). Depois do
+  deploy, o log de qualquer função que use o helper deve mostrar `invokeFunction: ok` com `durationMs`.
 
 ### Registro - etapa 155 (2026-11-24) - achado B-04 (`ocr-receipt-processor`)
 
