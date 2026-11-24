@@ -731,12 +731,15 @@ async function getDeliveryReceiptByProtocols(p: Record<string, unknown>) {
           status: res.status,
           body: body.slice(0, 500),
         });
-        throw new RTEError(
-          "Falha ao buscar comprovantes por protocolos",
-          classifyStatus(res.status),
-          res.status,
-          TRACKING_GATEWAY,
-        );
+        if (res.status === 403) {
+          throw new RTEError(
+            "Falha ao buscar comprovantes por protocolos",
+            classifyStatus(res.status),
+            res.status,
+            TRACKING_GATEWAY,
+          );
+        }
+        throw new Error("Falha ao buscar comprovantes por protocolos");
       }
       return res.json();
     },
@@ -897,6 +900,9 @@ async function getCubageFactor(taxId: string, companyId?: string) {
       note: "peso-cubado responde 403: aplicado o fator padrão de mercado 300 kg/m³; confirme antes de faturar.",
     },
     async () => ({
+      // A UI de cotacao le CubingFactor/cubingFactor; os outros dois nomes
+      // ficam por compatibilidade com consumidores antigos.
+      CubingFactor: 300,
       CubageFactor: 300,
       TaxIdRegistration: taxId,
       CompanyId: companyId ?? null,
