@@ -287,7 +287,7 @@
 - [x] **206** — `useTrackingAnalytics`: tornar a janela de datas obrigatória na assinatura — onda 6 — Alta
 - [x] **207** — `useLogisticsCalendar`: pôr teto na leitura de `coletas` — onda 6 — Alta
 - [x] **208** — `useLogisticsCalendar`: pôr teto na leitura de `entregas` — onda 6 — Alta
-- [ ] **209** — `useLogisticsCalendar`: filtrar no servidor pelo mês que está na tela — onda 6 — Alta
+- [x] **209** — `useLogisticsCalendar`: filtrar no servidor pelo mês que está na tela — onda 6 — Alta
 - [ ] **210** — `useCotacoesMulticanal`: teto no servidor e colunas explícitas — onda 6 — Alta
 - [~] **211** — Guard automatizado: consulta de listagem sem teto reprova a CI — onda 6 — Alta · **aguarda o dono**
 - [x] **212** — `Notificacoes.tsx`: teto imediato na leitura de `notifications` — onda 6 — Alta
@@ -434,6 +434,41 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapa 209 (2026-11-25) - achado P-01 (recorte pelo mes exibido)
+
+**Causa:** depois das etapas 207 e 208 as duas consultas tinham teto, mas continuavam pedindo ao banco todas as
+coletas e entregas com data prevista -- passadas e futuras -- e o calendario descartava no cliente tudo que nao
+era do mes exibido. O teto tinha virado corte arbitrario: navegando para o mes seguinte, as linhas podiam nao
+estar entre as 500 que vieram. A raiz e que `CalendarFilters` nao tinha o mes: a tela sabia qual estava
+exibindo, o hook nao.
+
+**Entrega:** `CalendarFilters` ganhou `from: Date` e `to: Date` **obrigatorios**; as duas consultas ganharam
+`.gte(<coluna>, from.toISOString())` / `.lte(<coluna>, to.toISOString())` (`data_prevista_coleta` e
+`previsao_entrega` sao `timestamptz`, conferido nas migrations, entao ISO com offset e a forma correta) e a
+chave de cache passou a ser `['logistics-calendar', filters, from.toISOString(), to.toISOString()]` -- trocar
+de mes muda a consulta, logo tem que mudar o cache. `CalendarioLogistico.tsx` (unico chamador) passa
+`startOfMonth(currentMonth)` / `endOfMonth(currentMonth)` do `date-fns`, que a propria tela ja importava. Os
+`.limit(500)` das etapas 207 e 208 **permanecem**, agora como rede contra intervalo absurdo e nao como corte
+do mes. Filtros condicionais de status/transportadora intactos.
+
+**Verificacao:** spec de contrato novo `tests/contracts/calendar-filtro-mes.spec.ts` (6 casos). O primeiro faz
+**prova de tipo** checada por `tsc --noEmit`: removidas as diretivas `@ts-expect-error`, o tsc acusa
+`TS2741: Property 'to' is missing in type '{ status: never[]; transportadoraId: null; type: "all"; from: Date; }'`
+e o mesmo para `from` -- o tipo e que trava o esquecimento, nao o aviso. 6 mutacoes: remover o `.gte` de
+coletas, trocar a coluna do `.lte`, tirar `from`/`to` da chave de cache, a tela passar `currentMonth` cru em vez
+do intervalo do mes, devolver o bloco de entregas ao formato da 208 e tirar `from`/`to` do tipo (esta ultima
+pega pelo tsc, nao pelo vitest) -- todas capturadas; versao correta 6/6.
+
+**Observado (risco do plano conferido):** `defaultOptions.queries.staleTime = 60 * 1000` e
+`gcTime = 5 * 60 * 1000` em `src/App.tsx:81-88`. Voltar a um mes ja visitado dentro de 60 s reaproveita o
+cache, entao "varrer" meses nao dispara consulta repetida para o mesmo mes. Navegar para um mes novo passa a
+disparar **uma** consulta por mes (antes era uma so para o ano inteiro) -- em troca, cada resposta e muito
+menor. A tela so navega mes a mes (`addMonths`/`subMonths`), nao tem visao anual; se ganhar, o teto de 500
+volta a cortar e isso deve ser resolvido la, nao aumentando o teto em silencio.
+
+**Nao verificado:** o numero real de linhas por mes no banco e o efeito "antes/depois" na tela -- sem
+credencial de banco e sem deploy nesta sessao.
 
 ### Registro - etapa 208 (2026-11-25) - achado P-01 (teto na leitura de entregas)
 

@@ -34,6 +34,8 @@ export default function CalendarioLogistico() {
     status: [],
     transportadoraId: null,
     type: "all",
+    from: startOfMonth(currentMonth),
+    to: endOfMonth(currentMonth),
   });
 
   const events = calendarResult.data || [];
