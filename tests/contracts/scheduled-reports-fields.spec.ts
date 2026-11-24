@@ -113,6 +113,9 @@ describe("scheduled-reports: allowlist do corpo (etapas 143-145)", () => {
     expect(fonte).toContain(".update(campos)");
     expect(fonte).toContain("if (!isAllowedAction(action)) {");
     expect(fonte).toContain("status: 400");
-    expect(fonte).toContain("return validationErrorResponse(error, corsHeaders);");
+    // O 422 do ValidationError agora sai de _shared/httpError.ts (etapas 164/166).
+    expect(fonte).toContain(
+      'return internalErrorResponse(error, corsHeaders, "scheduled-reports");',
+    );
   });
 });

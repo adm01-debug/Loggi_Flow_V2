@@ -8,8 +8,8 @@ import { safeFetch } from "../_shared/safeFetch.ts";
 import {
   requireString,
   ValidationError,
-  validationErrorResponse,
 } from "../_shared/validate.ts";
+import { internalErrorResponse } from "../_shared/httpError.ts";
 import {
   asRecord,
   buildReportFields,
@@ -60,7 +60,14 @@ export const handler = async (req: Request) => {
           .select()
           .single();
 
-        if (error) throw error;
+        if (error) {
+          // O texto do PostgREST (tabela, coluna, restrição) fica no log; a resposta é genérica.
+          log.error("[Scheduled Reports] Falha ao criar relatório:", {
+            code: error.code,
+            message: error.message,
+          });
+          throw new Error("Falha ao criar relatório");
+        }
         return new Response(JSON.stringify({ success: true, report: data }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
@@ -154,21 +161,8 @@ export const handler = async (req: Request) => {
         );
     }
   } catch (error) {
-    if (error instanceof ValidationError) {
-      // Payload inválido é 422 com o campo culpado, nunca 500.
-      return validationErrorResponse(error, corsHeaders);
-    }
-    log.error("[Scheduled Reports] Error:", { error });
-    return new Response(
-      JSON.stringify({
-        success: false,
-        error: error instanceof Error ? error.message : "Unknown error",
-      }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      },
-    );
+    // 422 do ValidationError segue com o campo culpado; o resto vira 500 genérico.
+    return internalErrorResponse(error, corsHeaders, "scheduled-reports");
   }
 };
 

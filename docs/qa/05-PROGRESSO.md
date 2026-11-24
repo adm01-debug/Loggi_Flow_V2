@@ -241,7 +241,7 @@
 - [x] **163** — `accuracy-weekly-digest`: tempo limite na chamada interna — onda 5 — Média
 - [x] **164** — Criar `_shared/httpError.ts`: uma resposta de erro que não vaza o detalhe interno — onda 5 — Alta
 - [x] **165** — `ingest-biosync`: parar de devolver o erro do Postgres — onda 5 — Alta
-- [ ] **166** — `scheduled-reports`: parar de devolver o erro do Postgres — onda 5 — Alta
+- [x] **166** — `scheduled-reports`: parar de devolver o erro do Postgres — onda 5 — Alta
 - [ ] **167** — `lgpd-erase-user`: parar de devolver o erro do Postgres — onda 5 — Alta
 - [ ] **168** — `execute-protocol`: parar de devolver o erro do Postgres — onda 5 — Alta
 - [ ] **169** — `lalamove-api`: parar de repassar a resposta de erro da Lalamove — onda 5 — Alta
@@ -435,6 +435,38 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 
 ## Registro de execução
 
+### Registro - etapa 166 (2026-11-25) - achado B-06 (`scheduled-reports`)
+
+**Causa:** o insert de `:57-63` fazia `throw error` do PostgREST e o `catch` devolvia
+`error: error instanceof Error ? error.message : "Unknown error"` com 500 — o chamador recebia nome de tabela,
+de coluna e de restricao de `scheduled_reports`. Um erro de coluna inexistente virava um mapa das colunas
+reais para quem estivesse testando.
+
+**Correcao (so o arquivo da etapa):**
+
+- `:63` — `throw error` virou `log.error("[Scheduled Reports] Falha ao criar relatorio:", { code, message })` +
+  `throw new Error("Falha ao criar relatorio")`.
+- `catch` (`:156` no original) — virou `return internalErrorResponse(error, corsHeaders, "scheduled-reports")`.
+  O 422 do `ValidationError` (payload invalido) continua igual, agora vindo do helper; o resto vira 500 com
+  `{"error":"INTERNAL_ERROR"}`, sem `error.code` de Postgres ("23505/23503/42703" dizem ao chamador qual
+  restricao e coluna existem).
+- `user_id` das claims (`auth.claims.sub`) e o filtro `.eq("user_id", userId)` **nao foram tocados** (IDOR).
+
+**Verificado de verdade:** `tests/contracts/scheduled-reports-erro-interno.spec.ts` 6/6 + spec da etapa 143-145
+ajustado (a assercao que exigia `validationErrorResponse` no `catch` passou a exigir o helper). Prova por
+mutacao: A catch volta a ecoar `error.message` -> 1 falha; B volta a lancar o erro cru -> 1; C log sem detalhe ->
+1; D catch devolve `error.code` -> 1; E monta o 500 a mao sem o helper -> 1; restaurado 6/6. `deno check` 0 =
+baseline, `deno lint` 14 = baseline, `deno fmt --check` 1 = baseline; `tsc` 0; `lint:budget` 77/86 com 0 erros;
+suite 64 arquivos / 493 testes. O hook `useScheduledReports` so mostra toast generico, nao le o corpo do erro —
+a troca de formato nao muda a tela.
+
+**Nao verificado:** corpo causando erro de banco contra producao (exige chamada autenticada; o formato de 500 e
+o mesmo helper ja verificado na etapa 164).
+
+**Fora de escopo (registrado, nao tocado):** os outros tres `throw error` do arquivo (update `:83`, delete `:97`,
+list `:110`) — ja passam pelo helper e nao devolvem texto do Postgres, mas mantem o erro cru no `throw`; CORS
+`*`; `gen_random_uuid`/DDL.
+
 ### Registro - etapa 165 (2026-11-25) - achado B-06 (`ingest-biosync`)
 
 **Causa:** `index.ts:50` fazia `throw error` do PostgREST e o `catch` de `:92` devolvia
@@ -463,6 +495,7 @@ o padrao de resposta e o mesmo do helper ja verificado na etapa 164).
 
 **Fora de escopo (registrado, nao tocado):** CORS `*` (etapa 192), dedupe (etapa 199), texto do log em
 `nexus_tactical_logs` que carrega BPM e `vehicle_id`.
+
 
 ### Registro - etapa 164 (2026-11-25) - achado B-06 (`_shared/httpError.ts`)
 
