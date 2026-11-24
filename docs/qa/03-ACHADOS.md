@@ -6,6 +6,7 @@
 > **Fechamento da auditoria · 2026-11-24 · `main` em `c7fc18ae` · banco `jvfhclubfpxrtrrazrgr`**
 > Árvore da auditoria em `d37ba30` (2026-11-22/23). O estado abaixo vem de `05-PROGRESSO.md`, não da memória de quem executou.
 > Contagem: **35 resolvidos / 15 parciais / 15 abertos / 0 refutados** — RESOLVIDO exige todas as etapas do achado concluídas com verificação registrada.
+> **Atualização 2026-11-24 (`main` em `8406f688`): C-01 RESOLVIDO** (etapas 028-037, migrações aplicadas em produção) → **36 resolvidos / 15 parciais / 14 abertos**.
 
 ## Como ler
 
@@ -461,7 +462,11 @@ inteiro de pé, só mais difícil de perceber, porque a tela passa a parecer con
 
 → Etapas **028** a **037**
 
-**Estado (2026-11-24):** ABERTO (028, 037 — aguarda o dono).
+**Estado (2026-11-24):** RESOLVIDO (etapas 028-037). As migracoes da funcao e dos triggers
+estao aplicadas em producao (runs `45382701775`, `45382772891`, `45382829524`, `45382898191`),
+o `sql.unit.mjs` exercita a recusa num Postgres descartavel (29 testes) e as telas que gravam
+status traduzem a recusa `23514` (`Despachos.tsx:253`, `KanbanEntregas.tsx:344`, `Envios.tsx`).
+Registro completo em `05-PROGRESSO.md` ("Registro - etapas 028-033 e 037").
 
 ## C-02 — A tela de cotação multicanal não lê nem grava no banco: a negociação vive na memória do navegador
 
