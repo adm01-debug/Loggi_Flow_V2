@@ -6,6 +6,9 @@ import { verifyWebhookHmac } from "../_shared/webhookSignature.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
 import { buildEventKey, claimIdempotencyKey } from "../_shared/idempotency.ts";
 import { log, redact } from "../_shared/logger.ts";
+import { invokeFunction } from "../_shared/invokeFunction.ts";
+
+const NORMALIZE_TIMEOUT_MS = 5_000;
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -159,12 +162,18 @@ serve(async (req) => {
 
       // 4. Normalize response
       log.info('Normalizing text:', text);
-      const normalizationResponse = await supabaseClient.functions.invoke('normalize-freight-response', {
-        body: { text, transportadora_id: carrier.id, cotacao_id: cotacao.id }
-      });
+      const normalizacao = await invokeFunction(
+        'normalize-freight-response',
+        { text, transportadora_id: carrier.id, cotacao_id: cotacao.id },
+        { timeoutMs: NORMALIZE_TIMEOUT_MS }
+      );
+
+      if (!normalizacao.ok) {
+        log.warn('Normalization unavailable; event already claimed:', { reason: normalizacao.reason });
+      }
 
       return new Response(
-        JSON.stringify({ success: true, carrier: carrier.nome_fantasia, normalization: normalizationResponse.data }),
+        JSON.stringify({ success: true, carrier: carrier.nome_fantasia, normalization: normalizacao.ok ? normalizacao.data : null }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -172,10 +181,17 @@ serve(async (req) => {
     // Handle generic incoming webhooks (e.g. from generic API)
     if (body.source === 'generic_api') {
         const { carrier_id, text, cotacao_id } = body;
-        const normalizationResponse = await supabaseClient.functions.invoke('normalize-freight-response', {
-            body: { text, transportadora_id: carrier_id, cotacao_id }
-        });
-        return new Response(JSON.stringify({ success: true, data: normalizationResponse.data }), { headers: corsHeaders });
+        const normalizacao = await invokeFunction(
+            'normalize-freight-response',
+            { text, transportadora_id: carrier_id, cotacao_id },
+            { timeoutMs: NORMALIZE_TIMEOUT_MS }
+        );
+
+        if (!normalizacao.ok) {
+            log.warn('Normalization unavailable; event already claimed:', { reason: normalizacao.reason });
+        }
+
+        return new Response(JSON.stringify({ success: true, data: normalizacao.ok ? normalizacao.data : null }), { headers: corsHeaders });
     }
 
     return new Response(JSON.stringify({ success: true, message: 'Webhook ignored or not handled' }), { headers: corsHeaders });
