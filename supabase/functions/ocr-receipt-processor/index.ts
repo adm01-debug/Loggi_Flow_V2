@@ -1,7 +1,8 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
 import { validateContract } from "../_shared/contract-validator.ts";
-import { requireString } from "../_shared/validate.ts";
+import { ValidationError, validationErrorResponse } from "../_shared/validate.ts";
+import { parseReceiptRequest } from "./parse.ts";
 import { log } from "../_shared/logger.ts";
 
 const corsHeaders = {
@@ -28,8 +29,7 @@ serve(async (req) => {
       'ocr-receipt-processor',
       body,
       (p) => {
-        requireString(p, 'storage_path', { minLength: 5 });
-        requireString(p, 'delivery_id', { minLength: 10 });
+        parseReceiptRequest(p);
       }
     );
 
@@ -40,12 +40,13 @@ serve(async (req) => {
       });
     }
 
-    const { storage_path, delivery_id } = body;
+    // Valores validados: o corpo bruto não é usado em `download` nem nos filtros.
+    const { storagePath, deliveryId } = parseReceiptRequest(body);
 
     // Get file from storage
     const { data: fileData, error: downloadError } = await supabaseAdmin.storage
       .from("documents")
-      .download(storage_path);
+      .download(storagePath);
 
     if (downloadError) throw downloadError;
 
@@ -54,7 +55,7 @@ serve(async (req) => {
     // efeitos reais a partir dele: marcava a entrega como 'entregue' e o
     // registro de auditoria como 'processed' — ambos falsos. Corrige a causa
     // raiz: não fabricar dado nem aplicar efeito colateral sem extração real.
-    log.info(`OCR não implementado para entrega ${delivery_id}; upload fica para revisão manual.`);
+    log.info(`OCR não implementado para entrega ${deliveryId}; upload fica para revisão manual.`);
 
     const extractedData = {
       extraction_date: new Date().toISOString(),
@@ -70,8 +71,8 @@ serve(async (req) => {
         ocr_status: 'not_implemented',
         error_message: 'OCR automático não implementado nesta function.',
       })
-      .eq("delivery_id", delivery_id)
-      .eq("storage_path", storage_path);
+      .eq("delivery_id", deliveryId)
+      .eq("storage_path", storagePath);
 
     return new Response(JSON.stringify({ success: true, data: extractedData }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -79,6 +80,9 @@ serve(async (req) => {
     });
 
   } catch (error: any) {
+    if (error instanceof ValidationError) {
+      return validationErrorResponse(error, corsHeaders);
+    }
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 400,
