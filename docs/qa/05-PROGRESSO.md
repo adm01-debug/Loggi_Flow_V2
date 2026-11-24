@@ -238,7 +238,7 @@
 - [x] **160** — `send-password-reset`: tempo limite na chamada interna — onda 5 — Alta
 - [x] **161** — `predict-delays` e `predict-delays-scheduled`: tempo limite nas chamadas internas — onda 5 — Média
 - [x] **162** — `accuracy-meta-monitor`: tempo limite nas duas chamadas internas — onda 5 — Média
-- [ ] **163** — `accuracy-weekly-digest`: tempo limite na chamada interna — onda 5 — Média
+- [x] **163** — `accuracy-weekly-digest`: tempo limite na chamada interna — onda 5 — Média
 - [ ] **164** — Criar `_shared/httpError.ts`: uma resposta de erro que não vaza o detalhe interno — onda 5 — Alta
 - [ ] **165** — `ingest-biosync`: parar de devolver o erro do Postgres — onda 5 — Alta
 - [ ] **166** — `scheduled-reports`: parar de devolver o erro do Postgres — onda 5 — Alta
@@ -435,6 +435,35 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 
 ## Registro de execução
 
+### Registro - etapa 163 (2026-11-25) - achado B-05 (`accuracy-weekly-digest`)
+
+**Causa:** `index.ts:179` chamava `supabase.functions.invoke("resend-email", ...)` **dentro do laço de destinatários**
+do digest semanal. `functions.invoke` não aceita tempo limite: um `resend-email` lento prendia a função por
+destinatário e o resumo do disparo (`results`) só voltava no fim. O erro ia para `detail: eErr.message` — mensagem
+crua do provedor, que ainda voltava no corpo da resposta.
+
+**Correção:** o envio passou a usar `invokeFunction("resend-email", { to, subject, html }, { timeoutMs:
+DIGEST_EMAIL_TIMEOUT_MS })` com 10 s (`:27`), mesmo corpo. Como o helper não lança, o `try/catch` saiu: quando
+`!envio.ok` o resultado é `{ status: "error", detail: envio.reason }` (`:192`) e o caminho de sucesso
+(`status: "sent"` + insert em `notifications`) ficou idêntico.
+
+**Mudança de comportamento:** o campo `detail` dos erros deixa de carregar a mensagem crua do provedor e passa a
+trazer o motivo curto (`timeout`, `http_error`, ...); o `catch (e)` interno deixa de existir e uma falha nunca
+interrompe o laço — os demais destinatários seguem recebendo.
+
+**Evidência:** `grep -n 'functions.invoke' supabase/functions/accuracy-weekly-digest/index.ts` -> nenhum;
+`invokeFunction` importado em `:11`, usado em `:183` com `timeoutMs` em `:186`. Spec
+`tests/contracts/accuracy-weekly-digest-timeout.spec.ts` (5 casos); mutações A-E (voltar o `functions.invoke`, tirar o
+`timeoutMs`, trocar `envio.reason`, `if (false)` no lugar de `!envio.ok`, mudar a constante) quebram de 1 a 4 testes
+cada, restaurado 5/5. `deno check` 0, `deno lint` 2 e `deno fmt --check` 1 — todos iguais ao baseline da `main`
+(reprovacao de formato herdada). `tsc --noEmit` 0; `lint:budget` 77/86 avisos, 0 erros; `npx eslint` no spec limpo;
+suite 61 arquivos; cobertura 76,23 / 73,6 / 78,19 / 78,46.
+
+**NAO VERIFICADO:** disparo real do digest com o provedor de e-mail lento (exige os segredos reais).
+
+**Fora de escopo (registrado, nao tocado):** `nErr.message` cru (`:82` e `:170`) e o `catch (err)` final
+(`:226-240`) devolvendo `error.message` — familia `_shared/httpError` (etapas 164+); CORS `*`.
+
 ### Registro - etapa 162 (2026-11-25) - achado B-05 (`accuracy-meta-monitor`)
 
 **Causa:** `index.ts:196` (e-mail) e `:215` (WhatsApp) chamavam `supabase.functions.invoke(...)` dentro do laço de
@@ -465,6 +494,7 @@ diff de formatação.
 
 **Fora de escopo (registrado, não tocado):** o `catch` final (`:286-291`) devolve `error.message` cru ao chamador —
 família `_shared/httpError` (etapas 164+); CORS `*`.
+
 ### Registro - etapa 161 (2026-11-25) - achado B-05 (`predict-delays` e `predict-delays-scheduled`)
 
 **Causa:** duas chamadas internas sem tempo limite.

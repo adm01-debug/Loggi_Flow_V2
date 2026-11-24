@@ -8,6 +8,7 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { log } from "../_shared/logger.ts";
+import { invokeFunction } from "../_shared/invokeFunction.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import {
   buildDigest,
@@ -20,6 +21,10 @@ const corsHeaders = {
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
 };
+
+// Etapa 163 (achado B-05): o envio do digest passa pelo helper com tempo
+// limite — sem ele um resend-email lento prendia a funcao por destinatario.
+const DIGEST_EMAIL_TIMEOUT_MS = 10_000;
 
 interface Recipient {
   user_id: string;
@@ -175,40 +180,31 @@ serve(async (req) => {
         continue;
       }
 
-      try {
-        const { error: eErr } = await supabase.functions.invoke(
-          "resend-email",
-          {
-            body: { to: r.email, subject: email.subject, html: email.html },
-          },
-        );
-        if (eErr) {
-          results.push({
-            user_id: r.user_id,
-            status: "error",
-            detail: eErr.message,
-          });
-        } else {
-          results.push({ user_id: r.user_id, status: "sent" });
-          await supabase.from("notifications").insert({
-            user_id: r.user_id,
-            title: email.subject,
-            message: `Digest semanal com ${report.totalAlerts} alerta(s) enviado para ${r.email}`,
-            type: "info",
-            metadata: {
-              source: "accuracy-weekly-digest",
-              alerts: report.totalAlerts,
-              carriers: report.carriers.length,
-              window_start: report.windowStart,
-              window_end: report.windowEnd,
-            },
-          });
-        }
-      } catch (e) {
+      const envio = await invokeFunction(
+        "resend-email",
+        { to: r.email, subject: email.subject, html: email.html },
+        { timeoutMs: DIGEST_EMAIL_TIMEOUT_MS },
+      );
+      if (!envio.ok) {
         results.push({
           user_id: r.user_id,
           status: "error",
-          detail: e instanceof Error ? e.message : String(e),
+          detail: envio.reason,
+        });
+      } else {
+        results.push({ user_id: r.user_id, status: "sent" });
+        await supabase.from("notifications").insert({
+          user_id: r.user_id,
+          title: email.subject,
+          message: `Digest semanal com ${report.totalAlerts} alerta(s) enviado para ${r.email}`,
+          type: "info",
+          metadata: {
+            source: "accuracy-weekly-digest",
+            alerts: report.totalAlerts,
+            carriers: report.carriers.length,
+            window_start: report.windowStart,
+            window_end: report.windowEnd,
+          },
         });
       }
     }
