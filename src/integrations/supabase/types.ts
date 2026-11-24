@@ -2443,6 +2443,7 @@ export type Database = {
         Row: {
           created_at: string
           data_entrega_efetiva: string | null
+          deleted_at: string | null
           destino: string
           id: string
           motorista: string | null
@@ -2458,6 +2459,7 @@ export type Database = {
         Insert: {
           created_at?: string
           data_entrega_efetiva?: string | null
+          deleted_at?: string | null
           destino: string
           id?: string
           motorista?: string | null
@@ -2473,6 +2475,7 @@ export type Database = {
         Update: {
           created_at?: string
           data_entrega_efetiva?: string | null
+          deleted_at?: string | null
           destino?: string
           id?: string
           motorista?: string | null
