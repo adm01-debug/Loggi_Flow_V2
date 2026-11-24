@@ -280,7 +280,7 @@
 
 ### Onda 6
 
-- [ ] **202** — Criar `useServerPagination` e **definir** o contrato de paginação no servidor — onda 6 — Crítica
+- [x] **202** — Criar `useServerPagination` e **definir** o contrato de paginação no servidor — onda 6 — Crítica
 - [ ] **203** — Documentar o contrato de paginação e marcar `usePagination` como "só memória" — onda 6 — Alta
 - [ ] **204** — `useTrackingAnalytics`: pôr teto no servidor na leitura de `rastreamento_historico` — onda 6 — Crítica
 - [ ] **205** — `Analytics.tsx`: passar o intervalo de datas que a tela já tem para `useTrackingAnalytics` — onda 6 — Crítica
@@ -434,6 +434,47 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapa 202 (2026-11-25) - achado P-01 (`useServerPagination`)
+
+**Causa:** nao havia paginacao no servidor em nenhum ponto do front — `grep -rn '.range(' src/` devolvia zero. O
+que existia era `src/hooks/common/usePagination.ts:57` (`data.slice(startIndex, endIndex)`), recorte **em
+memoria**: a lista inteira ja tinha sido baixada. Sem a peca certa, cada tela de lista longa ou baixava tudo
+(P-01/P-02) ou inventava um `.limit()` proprio — dai as 16 listagens com limite ad-hoc (1 a 5000) e 5 sem teto.
+
+**Entrega:** `src/hooks/common/useServerPagination.ts`, arquivo **novo**, sem consumidor nesta etapa (nenhuma
+tela convertida, `usePagination.ts` intacto — 20 arquivos dependem dele). O contrato esta fechado no topo do
+arquivo porque as etapas 203, 209 e 211+ o citam:
+
+1. pagina vira faixa: `from = (page - 1) * pageSize`, `to = from + pageSize - 1`, e o consumidor chama
+   `.range(from, to)` — nunca com `.limit()`;
+2. total vem do servidor (`{ count: "exact" }`), nao de `rows.length`;
+3. a `queryKey` inclui base de filtros, pagina e `pageSize`; **trocar filtro volta para a pagina 1**;
+4. `placeholderData` mantem as linhas anteriores na troca (para o indicador use `isFetching`, nao `isLoading`);
+5. ordenacao estavel e do consumidor (`.order(...)` com desempate), porque `.range()` sem ordem deterministica
+   repete e some linhas entre paginas.
+
+A forma de retorno espelha `usePagination` (`currentPage`, `pageSize`, `totalPages`, `setPage`, `nextPage`,
+`prevPage`, `setPageSize`) para a barra de paginacao nao ser reescrita quando as telas trocarem de hook.
+
+**Decisoes de desenho:** a pagina fica **ancorada na base de filtros** em que foi escolhida — trocar filtro faz a
+pagina efetiva voltar a 1 sem `useEffect` e sem `setState` durante a renderizacao (regra 3); `setPage` sofre
+clamp em `[1, totalPages]` e valor nao finito vira pagina 1; `resultado.error` do cliente de dados e **lancado**
+para o react-query, porque o Supabase o devolve em vez de lancar. Quando o servidor nao informa `count`, `total`
+e a faixa ja conhecida e libera uma pagina adiante enquanto a atual vier cheia — melhor que dizer "1 de 1" e
+travar a navegacao numa lista que continua.
+
+**Spec:** `src/hooks/common/useServerPagination.test.ts`, **9 casos**: faixa da pagina 1 (0..9) e da pagina 2
+(10..19); `total`/`totalPages` de `count` (25 -> 3 paginas) e nao de `rows.length`; clamp de `setPage(99)`,
+`setPage(0)` e `setPage(NaN)`; `setPageSize` voltando a pagina 1 com a faixa nova; troca de filtro voltando a
+pagina 1; erro do cliente virando `isError` com lista vazia; sem `count`, avanco enquanto a pagina vier cheia e
+parada na parcial; `initialPage`.
+
+**Verificacao:** prova por mutacao A-G -> 8/2/1/1/1/1/1 falhas (faixa errada, `total` de `rows.length`, sem
+clamp, `setPageSize` mantendo a pagina, sem reset de filtro, erro nao lancado, `totalPages` sem `count`),
+restaurado 9/9; `eslint` limpo nos dois arquivos novos; `tsc` 0; `lint:budget` 77/86 (nenhum aviso novo);
+suite **716/716**; `grep -rn '.range(' src/` agora devolve ocorrencias (o exemplo de uso no comentario do hook).
+Sem consumidor, nao ha mudanca de comportamento nas telas — reversao por `git revert`.
 
 ### Registro - etapa 201 (2026-11-25) - achado B-10 (`fetch-with-timeout`)
 
