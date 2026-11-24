@@ -7,6 +7,7 @@ import {
   ROTULOS_ENTREGA,
   TRANSICOES_COLETA,
   TRANSICOES_ENTREGA,
+  faltaNfRemessa,
   podeTransicionarColeta,
   mensagemRecusaTransicao,
   podeTransicionarEntrega,
@@ -160,5 +161,99 @@ describe("TRANSICOES_COLETA", () => {
     expect(podeTransicionarColeta("aguardando_liberacao", "solicitada")).toBe(true);
     expect(podeTransicionarColeta("solicitada", "em_transito")).toBe(true);
     expect(podeTransicionarColeta("em_transito", "chegou_expedicao")).toBe(true);
+  });
+});
+
+// Casos de negocio do achado C-01 (etapa 276). Um teste por familia: caminho
+// feliz, salto, retrocesso e a regra da NF, o caso que o negocio mais teme.
+describe("fluxo permitido de entrega (caminho completo)", () => {
+  const CAMINHO: [EntregaStatus, EntregaStatus][] = [
+    ["aguardando_producao", "pronto_despacho"],
+    ["pronto_despacho", "cotacao_frete"],
+    ["cotacao_frete", "nf_emitida"],
+    ["nf_emitida", "despachado"],
+    ["despachado", "em_transito"],
+    ["em_transito", "saiu_entrega"],
+    ["saiu_entrega", "entregue"],
+    ["entregue", "finalizado"],
+  ];
+
+  it.each(CAMINHO)("%s -> %s e valido", (de, para) => {
+    expect(podeTransicionarEntrega(de, para)).toBe(true);
+  });
+});
+
+describe("salto de etapa e recusado", () => {
+  const SALTOS: [EntregaStatus, EntregaStatus][] = [
+    ["pronto_despacho", "entregue"],
+    ["aguardando_producao", "despachado"],
+    ["nf_emitida", "em_transito"],
+    ["pronto_despacho", "finalizado"],
+  ];
+
+  it.each(SALTOS)("%s -> %s e invalido", (de, para) => {
+    expect(podeTransicionarEntrega(de, para)).toBe(false);
+  });
+});
+
+describe("retrocesso de etapa e recusado", () => {
+  const RETROCESSOS: [EntregaStatus, EntregaStatus][] = [
+    ["entregue", "despachado"],
+    ["despachado", "nf_emitida"],
+    ["finalizado", "entregue"],
+    ["em_transito", "pronto_despacho"],
+  ];
+
+  it.each(RETROCESSOS)("%s -> %s e invalido", (de, para) => {
+    expect(podeTransicionarEntrega(de, para)).toBe(false);
+  });
+});
+
+describe("faltaNfRemessa", () => {
+  it("recusa nf_emitida -> despachado sem NF de remessa", () => {
+    expect(faltaNfRemessa("nf_emitida", "despachado", null)).toBe(true);
+  });
+
+  it("recusa tambem NF em branco, nao so ausente", () => {
+    expect(faltaNfRemessa("nf_emitida", "despachado", "   ")).toBe(true);
+  });
+
+  it("aceita nf_emitida -> despachado com NF preenchida", () => {
+    expect(faltaNfRemessa("nf_emitida", "despachado", "NF-123")).toBe(false);
+  });
+
+  it("nao se aplica a transicao que nao despacha", () => {
+    expect(faltaNfRemessa("cotacao_frete", "nf_emitida", null)).toBe(false);
+  });
+
+  it("nao se aplica a transicao invalida (quem recusa e o mapa)", () => {
+    expect(faltaNfRemessa("pronto_despacho", "despachado", null)).toBe(false);
+  });
+});
+
+describe("fluxo permitido de coleta (caminho completo)", () => {
+  const CAMINHO: [ColetaStatus, ColetaStatus][] = [
+    ["aguardando_liberacao", "solicitada"],
+    ["solicitada", "em_transito"],
+    ["em_transito", "chegou_expedicao"],
+    ["chegou_expedicao", "conferencia_ok"],
+    ["conferencia_ok", "finalizada"],
+  ];
+
+  it.each(CAMINHO)("%s -> %s e valido", (de, para) => {
+    expect(podeTransicionarColeta(de, para)).toBe(true);
+  });
+});
+
+describe("salto e retrocesso de coleta sao recusados", () => {
+  const INVALIDAS: [ColetaStatus, ColetaStatus][] = [
+    ["aguardando_liberacao", "finalizada"],
+    ["solicitada", "conferencia_ok"],
+    ["finalizada", "conferencia_ok"],
+    ["em_transito", "solicitada"],
+  ];
+
+  it.each(INVALIDAS)("%s -> %s e invalido", (de, para) => {
+    expect(podeTransicionarColeta(de, para)).toBe(false);
   });
 });
