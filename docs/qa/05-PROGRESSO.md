@@ -245,7 +245,7 @@
 - [x] **167** — `lgpd-erase-user`: parar de devolver o erro do Postgres — onda 5 — Alta
 - [x] **168** — `execute-protocol`: parar de devolver o erro do Postgres — onda 5 — Alta
 - [x] **169** — `lalamove-api`: parar de repassar a resposta de erro da Lalamove — onda 5 — Alta
-- [ ] **170** — `rodonaves-api`: parar de transformar o erro do **login** da Rodonaves em mensagem — onda 5 — **Crítica**
+- [x] **170** — `rodonaves-api`: parar de transformar o erro do **login** da Rodonaves em mensagem — onda 5 — **Crítica**
 - [ ] **171** — `rodonaves-api`: erro genérico na resposta e detalhe só no log — onda 5 — Alta
 - [ ] **172** — `resend-email`: parar de repassar o erro do provedor de e-mail — onda 5 — Alta
 - [ ] **173** — `db-health-weekly-report`: parar de repassar o erro do terceiro no relatório — onda 5 — Média
@@ -434,6 +434,34 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapa 170 (2026-11-25) - achado B-06 (`rodonaves-api`, login)
+
+**Causa:** `:130-134` promovia o corpo de erro do **login** da Rodonaves a mensagem de excecao:
+`throw new RTEError(`Auth failed [${response.status}]: ${text}`, ...)`. Esse `message` atravessa ate
+`:1710-1714`, que devolve `error: error.message` ao chamador — ou seja, status HTTP do parceiro, corpo cru
+(possivel eco de credencial ou URL com chave) e texto do RTE saiam no corpo da resposta HTTP desta funcao. E o
+pior ponto de B-06 do arquivo: e o login, exatamente onde a resposta do parceiro costuma trazer credencial.
+
+**Correcao (so o arquivo da etapa):**
+
+- `:129-143` — o corpo e o status do parceiro passaram a ir **apenas** para o log
+  (`log.error("[rodonaves-api] Falha no login na RTE:", { gateway, status: response.status, body: text.slice(0, 500) })`,
+  corte de 500 chars) e o `throw` usa mensagem fixa `"Falha de autenticacao na transportadora"`, sem
+  interpolar nada do parceiro. `code` (`RTE_AUTH_FAILED`), `httpStatus` (502) e `gateway` continuam iguais, e
+  a resposta ao chamador mantem o mesmo formato (`success: false`, `code`, `gateway`, `error`).
+- **Nao tocado:** o resto do arquivo — `:189`, `:222`, `:637` e `:1710-1714` sao a etapa **171**; o fluxo de
+  obtencao/renovacao de token, o cache (`tokenCache`, 290 min) e a exigencia de credencial ficaram intactos.
+  Nenhuma filtragem por palavra-chave no corpo do parceiro: ele simplesmente nao e repassado.
+
+**Verificado de verdade:** `tests/contracts/rodonaves-api-auth-erro.spec.ts` (5 casos) — 5/5. Prova por
+mutacao: A volta a interpolar status+corpo -> 3 falhas; B remove o `log.error` -> 2; C remove o
+`slice(0, 500)` -> 1; D troca o codigo para `RTE_UPSTREAM_ERROR` -> 1; E quebra o cache do token -> 1;
+restaurado -> 5/5. `deno check` 6 = baseline 6; `deno lint` 1 = baseline 1; `deno fmt --check` = baseline
+(1 arquivo, diff herdado nas ternarias de `:1710-1714`). `tsc` 0; `lint:budget` 77/86; suite 68 arquivos / 515
+testes. Verificacao pedida pelo plano (`sed -n '125,140p'`): executada — a mensagem lancada nao interpola
+nada do parceiro e o corpo aparece so no `log.error`. Deploy: EXECUTADO (Edge Functions sobe no merge).
+Falha de login forcada: nao executada (exigiria mexer em credencial de producao) — RASTREADO pelo codigo.
 
 ### Registro - etapa 169 (2026-11-25) - achado B-06 (`lalamove-api`)
 
