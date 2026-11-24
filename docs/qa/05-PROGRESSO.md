@@ -131,15 +131,15 @@
 - [x] **079** — Teste unitário da validação de assinatura de arquivo — onda 4 — Média
 - [x] **080** — Provar, arquivo por arquivo, quais dos oito "hooks sem importador" estão realmente mortos — onda 4 — Baixa
   <!-- Veredictos (261123):
-                  1. components/accessibility/index.ts — VIVO por caminho direto (SkipLinks, LiveRegionProvider, ReducedMotionProvider importados em MainLayout.tsx:13, LazyProviders.tsx:8-9)
-                  2. components/common/index.ts — VIVO (barril; exports EmptyState, ConfirmDialog, Pagination… em uso por caminhos diretos)
-                  3. components/pwa/index.ts — VIVO por caminho direto (OfflineBanner, InstallPrompt, UpdatePrompt em MainLayout.tsx:14,47,52)
-                  4. hooks/gamification/useGamification.ts — VIVO (importado por GamificationPanel, LevelUpModal, AppSidebar, Header, FavoriteMetricsBar via caminho sem extensão)
-                     hooks/gamification/useGamification.tsx — INDEFINIDO: 349 linhas vs .ts 259, implementações divergem; comentário P18 em authService.ts:43 indica .tsx como schema em uso; aguarda decisão do dono
-                  5. hooks/rodonaves/index.ts — VIVO por caminho direto (useSLOTargets, useSLOSnapshots, useGatewayHealth importados em RTEGateway* panels)
-                  6. hooks/ai/useNexusSimulator.ts — REMOVIDO em etapa 069 (PR #300)
-                  7. hooks/security/useSelfHealing.ts — REMOVIDO em etapa 068 (PR #300)
-                  8. utils/performance.ts — MORTO: useRenderingMonitor e measureAction sem nenhum importador (grep -rn "useRenderingMonitor\|measureAction" src/ → vazio) -->
+                      1. components/accessibility/index.ts — VIVO por caminho direto (SkipLinks, LiveRegionProvider, ReducedMotionProvider importados em MainLayout.tsx:13, LazyProviders.tsx:8-9)
+                      2. components/common/index.ts — VIVO (barril; exports EmptyState, ConfirmDialog, Pagination… em uso por caminhos diretos)
+                      3. components/pwa/index.ts — VIVO por caminho direto (OfflineBanner, InstallPrompt, UpdatePrompt em MainLayout.tsx:14,47,52)
+                      4. hooks/gamification/useGamification.ts — VIVO (importado por GamificationPanel, LevelUpModal, AppSidebar, Header, FavoriteMetricsBar via caminho sem extensão)
+                         hooks/gamification/useGamification.tsx — INDEFINIDO: 349 linhas vs .ts 259, implementações divergem; comentário P18 em authService.ts:43 indica .tsx como schema em uso; aguarda decisão do dono
+                      5. hooks/rodonaves/index.ts — VIVO por caminho direto (useSLOTargets, useSLOSnapshots, useGatewayHealth importados em RTEGateway* panels)
+                      6. hooks/ai/useNexusSimulator.ts — REMOVIDO em etapa 069 (PR #300)
+                      7. hooks/security/useSelfHealing.ts — REMOVIDO em etapa 068 (PR #300)
+                      8. utils/performance.ts — MORTO: useRenderingMonitor e measureAction sem nenhum importador (grep -rn "useRenderingMonitor\|measureAction" src/ → vazio) -->
 - [x] **081** — Remover só o que a etapa 080 provou morto — onda 4 — Baixa
   <!-- Removido: src/utils/performance.ts (useRenderingMonitor + measureAction, zero importadores) -->
 - [x] **082** — Remover `_shared/service-wrapper.ts`, que nenhuma função usa — onda 4 — Baixa
@@ -372,8 +372,8 @@
 - [x] **276** — Teste da validação de transição de status (trava a correção de C-01) — onda 8 — Crítica
 - [ ] **277** — Teste da checagem de `count` no controle de concorrência (trava a correção de C-03) — onda 8 — Alta
 - [x] **278** — Teste da confirmação em exclusão em massa (trava a correção de D-01) — onda 8 — Crítica
-- [ ] **279** — Teste do fail-closed de assinatura de webhook (trava a correção de S-01) — onda 8 — Crítica
-- [ ] **280** — Teste da idempotência atômica dos webhooks (trava a correção de B-01) — onda 8 — Crítica
+- [x] **279** — Teste do fail-closed de assinatura de webhook (trava a correção de S-01) — onda 8 — Crítica
+- [x] **280** — Teste da idempotência atômica dos webhooks (trava a correção de B-01) — onda 8 — Crítica
 - [ ] **281** — Teste do caminho de criar coleta — onda 8 — Alta
 - [ ] **282** — Teste do caminho de mover entrega de status — onda 8 — Alta
 - [~] **283** — Resolver o usuário semeado do `tests/e2e/` e dizer por que ele não roda na CI — onda 8 — Média · **aguarda o dono**
@@ -438,6 +438,20 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapas 279 e 280 (2026-11-26) - os dois caminhos críticos de webhook ganham teste
+
+**Como rodar** (o `vitest.config.ts` cobre `src/**` e `tests/**`; `supabase/functions/**` só roda no `deno test`):
+`deno test -A supabase/functions/_shared/webhookSignature.test.ts supabase/functions/_shared/idempotency.test.ts`.
+
+| etapa | arquivo novo                                  | o que trava                                                                                                                                                                                                                                                                                                                                                                       |
+| ----- | --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 279   | `_shared/webhookSignature.test.ts` (6 testes) | Segredo ausente → `false` mesmo com assinatura plausível (é o que o `if (Deno.env.get(...))` removido na etapa 001 tornava inútil); assinatura errada/trocada/curta → `false`; assinatura correta → `true`. Mais duas varreduras de fonte: nenhum receptor condiciona `verifyWebhookHmac` à existência do segredo, e o bypass de test-mode exige `ALLOW_TEST_MODE='true'` (S-05). |
+| 280   | `_shared/idempotency.test.ts` (5 testes)      | `insert` bem-sucedido → primeira vez, com POST em `idempotency_keys` (o helper grava, não consulta); `23505` → duplicata sem erro; erro 500 → não é confundido com duplicata e não lança (fail-open); chave sem identificador não ganha valor de reserva (B-02).                                                                                                                  |
+
+**Verificado.** `deno test -A` nos dois arquivos → **11/11** (saída registrada no corpo da PR). HMAC calculado de
+verdade com `crypto.subtle`, sem mockar `verifyWebhookHmac`; o duplo de banco é um servidor HTTP local que
+responde `23505`/500 — nenhum arquivo de produção foi tocado.
 
 ### Registro - etapas 020, 021 e 022 (2026-11-26) - o gerador de contexto para de afirmar "sem RLS" no que ele não viu
 
