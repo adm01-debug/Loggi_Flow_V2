@@ -116,28 +116,27 @@ const analyzeTrackingData = (points: TrackingPoint[]): TrackingMetrics | null =>
 
 // `rastreamento_historico` e a tabela de maior crescimento do sistema: uma linha por consulta
 // de rastreio. Sem teto, /analytics baixa a tabela inteira. 5000 e o mesmo teto de
-// ExportacaoDados/AuditTrail; a janela de data (dateFrom/dateTo) e opcional.
+// ExportacaoDados/AuditTrail. O teto nao substitui a janela de data: um intervalo largo
+// ainda traz milhares de linhas, entao a janela e obrigatoria.
 const TRACKING_POINTS_LIMIT = 5000;
 
-export const useTrackingAnalytics = (dateFrom?: Date, dateTo?: Date) => {
+export interface TrackingDateRange {
+  from: Date;
+  to: Date;
+}
+
+export const useTrackingAnalytics = ({ from, to }: TrackingDateRange) => {
   const { user } = useAuth();
   return useQuery({
-    queryKey: ['tracking-analytics', user?.id, dateFrom?.toISOString(), dateTo?.toISOString()],
+    queryKey: ['tracking-analytics', user?.id, from.toISOString(), to.toISOString()],
     queryFn: async (): Promise<AnalyticsSummary> => {
-      let query = supabase
+      const { data, error } = await supabase
         .from('rastreamento_historico')
         .select('*')
+        .gte('recorded_at', from.toISOString())
+        .lte('recorded_at', to.toISOString())
         .order('recorded_at', { ascending: false })
         .limit(TRACKING_POINTS_LIMIT);
-
-      if (dateFrom) {
-        query = query.gte('recorded_at', dateFrom.toISOString());
-      }
-      if (dateTo) {
-        query = query.lte('recorded_at', dateTo.toISOString());
-      }
-
-      const { data, error } = await query;
 
       if (error) throw error;
 

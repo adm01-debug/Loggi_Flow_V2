@@ -5,11 +5,11 @@ import { join } from "node:path";
 const PAGINA = join(process.cwd(), "src/pages/Analytics.tsx");
 const src = readFileSync(PAGINA, "utf8");
 
-/** O trecho da chamada de `useTrackingAnalytics`, do nome ate o `);`. */
-function chamadaTracking(): string {
-  const inicio = src.indexOf("useTrackingAnalytics(");
+/** O bloco que monta a janela de datas entregue ao hook. */
+function janelaDaTela(): string {
+  const inicio = src.indexOf("const trackingRange = {");
   expect(inicio).toBeGreaterThan(-1);
-  const fim = src.indexOf(");", inicio);
+  const fim = src.indexOf("};", inicio);
   expect(fim).toBeGreaterThan(inicio);
   return src.slice(inicio, fim);
 }
@@ -19,14 +19,14 @@ describe("Analytics.tsx: passa o intervalo de datas da tela para useTrackingAnal
     expect(src).not.toContain("useTrackingAnalytics();");
   });
 
-  it("passa o inicio do periodo selecionado", () => {
-    const trecho = chamadaTracking();
-    expect(trecho).toContain("dateRange?.from");
+  it("entrega a janela da tela ao hook", () => {
+    expect(src).toContain("useTrackingAnalytics(trackingRange)");
+    expect(janelaDaTela()).toContain("from: dateRange?.from");
   });
 
   it("usa o inicio como fim quando o periodo so tem uma ponta", () => {
     // o mesmo fallback que `useAnalytics` usa logo acima, no mesmo arquivo
-    expect(chamadaTracking()).toContain("dateRange?.to || dateRange?.from");
+    expect(janelaDaTela()).toContain("to: dateRange?.to || dateRange?.from");
     expect(src).toContain("dateRange.to || dateRange.from!");
   });
 

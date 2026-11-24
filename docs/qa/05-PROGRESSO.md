@@ -284,7 +284,7 @@
 - [x] **203** — Documentar o contrato de paginação e marcar `usePagination` como "só memória" — onda 6 — Alta
 - [x] **204** — `useTrackingAnalytics`: pôr teto no servidor na leitura de `rastreamento_historico` — onda 6 — Crítica
 - [x] **205** — `Analytics.tsx`: passar o intervalo de datas que a tela já tem para `useTrackingAnalytics` — onda 6 — Crítica
-- [ ] **206** — `useTrackingAnalytics`: tornar a janela de datas obrigatória na assinatura — onda 6 — Alta
+- [x] **206** — `useTrackingAnalytics`: tornar a janela de datas obrigatória na assinatura — onda 6 — Alta
 - [ ] **207** — `useLogisticsCalendar`: pôr teto na leitura de `coletas` — onda 6 — Alta
 - [ ] **208** — `useLogisticsCalendar`: pôr teto na leitura de `entregas` — onda 6 — Alta
 - [ ] **209** — `useLogisticsCalendar`: filtrar no servidor pelo mês que está na tela — onda 6 — Alta
@@ -434,6 +434,32 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapa 206 (2026-11-25) - achado P-01 (janela de datas obrigatoria no hook)
+
+**Causa:** a assinatura `(dateFrom?: Date, dateTo?: Date)` mantinha vivo o caminho sem filtro: qualquer tela nova
+que chamasse o hook sem argumentos voltaria a varrer `rastreamento_historico`, e o typecheck aprovaria. Foi
+exatamente o que aconteceu em `Analytics.tsx:71`, corrigido so na etapa 205 — parametro opcional e o defeito, a
+etapa 205 tratou o sintoma.
+
+**Entrega:** `useTrackingAnalytics({ from, to }: TrackingDateRange)` -- janela obrigatoria com **tipo
+exportado**. Os dois filtros foram para a cadeia do servidor (`.gte('recorded_at', from.toISOString())` /
+`.lte('recorded_at', to.toISOString())`), sem `if`, e a `queryKey` passou a usar `from.toISOString()` /
+`to.toISOString()`. O teto de 5000 da etapa 204 **permanece**: janela de data nao substitui teto, porque um
+intervalo largo ainda traz milhares de linhas. Unico chamador adaptado: `Analytics.tsx` monta `trackingRange`
+(com fallback de ultimos 30 dias quando o seletor esta vazio) e o repassa. Nao foi usado `console.warn` como
+guarda -- `npm run validate:no-console` existe justamente porque console nao e mecanismo de controle; o guarda
+agora e o tipo.
+
+**Verificacao:** `grep -rn 'useTrackingAnalytics' src/` confirma `Analytics.tsx` como unico chamador (o
+`hooks/index.ts:126` e so re-export). Spec de contrato novo `tests/contracts/tracking-janela-obrigatoria.spec.ts`
+(6 casos), com **prova de tipo** checada por `tsc --noEmit`: `@ts-expect-error` em
+`TrackingDateRange = { from: new Date(0) }` -- removida a diretiva, o tsc acusa
+`TS2741: Property 'to' is missing in type '{ from: Date; }'`. 7 mutacoes (`Partial<TrackingDateRange>`, sem
+filtro de inicio, sem filtro de fim, sem teto, chamador sem a janela, janela ignorando o periodo escolhido e fim
+sem fallback) falham **1/1/1/3/2/1/2**; o spec da etapa 205 foi adaptado a nova forma (passa a observar o bloco
+`trackingRange`) e a versao correta passa 16/16 nos tres specs. `eslint` limpo nos 4 arquivos, `tsc` 0,
+`lint:budget` 77/86 com 0 erros, suite **736/736** (87 arquivos).
 
 ### Registro - etapa 205 (2026-11-25) - achado P-01 (`Analytics.tsx` nao passava o periodo)
 
