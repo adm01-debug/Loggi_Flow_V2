@@ -77,9 +77,9 @@
 - [~] **037** — Traduzir a recusa do banco em mensagem que o operador entende — onda 3 — Média · **código neste PR; verificação em runtime depende da 033 (dono)**
 - [x] **038** — `CotacaoMultiCanal`: a tabela da tela passa a ler do banco, não do `useState` — onda 3 — Crítica
 - [~] **039** — Registrar a resposta da transportadora no banco, não na memória — onda 3 — Crítica — **código no PR da 038; aguarda verificação em runtime (registrar resposta e conferir `valor_cotado`/`responded_at` no banco)**
-- [ ] **040** — Marcar no banco qual cotação foi a escolhida — onda 3 — Alta
-- [ ] **041** — "Nexus Blast" e o envio por e-mail passam a criar a cotação no banco — onda 3 — Alta
-- [ ] **042** — Mostrar carregando, erro e vazio na tela de cotação multicanal — onda 3 — Média
+- [x] **040** — Marcar no banco qual cotação foi a escolhida — onda 3 — Alta
+- [~] **041** — "Nexus Blast" e o envio por e-mail passam a criar a cotação no banco — onda 3 — Alta — **código já entregue na 038; verificação em runtime depende de credencial de transportadora (dono)**
+- [x] **042** — Mostrar carregando, erro e vazio na tela de cotação multicanal — onda 3 — Média
 - [~] **043** — Decidir com o dono o que fazer com as duas telas de cotação — onda 3 — Alta · **aguarda o dono**
 - [ ] **044** — `Despachos`: avisar quando o avanço de status não gravou — onda 3 — Alta
 - [ ] **045** — `Despachos`: avisar quando a autorização de despacho final não gravou — onda 3 — Alta
@@ -438,6 +438,33 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapas 040, 041 e 042 (2026-11-26) - escolher a cotação, gravar o disparo e mostrar carregando/erro/vazio
+
+**040 fechada.** A tabela de resultados ganhou a ação **Escolher** nas linhas `respondido`, ligada a
+`selectCotacao` do hook (`useCotacoesMulticanal`), que grava `status = 'selecionado'` na linha do banco. Antes só
+existia o toast "Cotação selecionada!" no card de recomendação, sem chamada de banco — a escolha se perdia ao
+recarregar. Junto veio a correção que a etapa exigia: a lista `respondidas` filtrava apenas `status === "respondido"`,
+então **no instante em que a linha virava `selecionado` ela saía da lista** e `melhorCotacao`, `savings`,
+`averageValue` e `currentStep` voltavam ao estado anterior (a tela "esquecia" a escolha recém-feita). O filtro passou
+a aceitar `respondido` **ou** `selecionado` (`src/pages/CotacaoMultiCanal.tsx`).
+
+**041 verificada, sem código novo.** A criação no banco já havia sido fechada na 038: `grep -n 'setCotacoes\|addCotacao'`
+em `src/pages/CotacaoMultiCanal.tsx` não retorna nada, e todos os caminhos de criação passam pelo hook —
+`createCotacao.mutate` em `:164`, `:336` (`registrarCotacaoPendente`), `:451`, `:474` e `createCotacao.mutateAsync`
+em `:423` (caminho da API, com `await` dentro do laço do Blast, então falha de criação não derruba o lote).
+O que **não** foi tocado de propósito: a contagem de sucesso do Blast usa `mutate` (sem `await`) nos caminhos de
+WhatsApp/e-mail, então uma falha de insert ali não entra em `falhas` — é o achado **R-03**, com etapa própria.
+
+**042 fechada.** A tela não distinguia "carregando", "falhou" e "não há nada": durante o carregamento inicial a área
+de resultados simplesmente não existia e, com a query em erro, o operador via a tela vazia como se não houvesse
+cotação. Agora: `SkeletonTable` enquanto `isLoading && cotacoes.length === 0`, card de erro com `error.message` e
+botão **Tentar novamente** (`void refetchCotacoes()`) quando a query falha, e `EmptyState` explicando o próximo passo
+("busque rotas e dispare uma cotação") quando a leitura terminou sem nenhuma cotação.
+
+**NÃO VERIFICADO (runtime).** Escolher uma cotação e conferir `status = 'selecionado'` no banco exige sessão
+autenticada com credencial de transportadora; a evidência desta PR é leitura de código, `tsc`, `eslint`, `vitest`
+(6 casos em `CotacaoResultsTable.test.tsx`), `lint:budget` e `build`.
 
 ### Registro - etapa 037 (2026-11-26) - a recusa de transição vira frase de operação, e a 034 fecha a contabilidade
 
