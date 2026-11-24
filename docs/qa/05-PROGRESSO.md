@@ -274,7 +274,7 @@
 - [x] **196** — `nexus-auto-healing`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Média
 - [x] **197** — `accuracy-weekly-digest`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Baixa dentro do grupo, mas manipula dado
 - [x] **198** — `geocode-address`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Média
-- [ ] **199** — `ingest-biosync`: deduplicar a telemetria do dispositivo — onda 5 — Média
+- [x] **199** — `ingest-biosync`: deduplicar a telemetria do dispositivo — onda 5 — Média
 - [ ] **200** — `push-send`: tempo limite no envio ao provedor de push — onda 5 — Média
 - [ ] **201** — Corrigir o comentário de `fetch-with-timeout.ts` que promete retentativa inexistente — onda 5 — Baixa
 
@@ -435,6 +435,50 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 
 ## Registro de execução
 
+### Registro - etapa 199 (2026-11-25) - achado B-08 (`ingest-biosync`)
+
+**Causa:** `ingest-biosync:39-50` inseria em `bio_sync_telemetry` (e `:63` em `nexus_tactical_logs`, `:72` no
+Bitrix24) **sem chave de evento**. O dispositivo de biometria reenvia a leitura quando perde a resposta: o
+mesmo batimento virava duas linhas e o alerta disparava de novo para o mesmo motorista.
+
+**Correcao:** `claimIdempotencyKey` de `_shared/idempotency.ts:28`, reivindicado depois do parse e **antes** de
+qualquer efeito. A chave vem de `buildEventKey` com `["biosync", vehicle_id, driver_id, identidade]`:
+`eventTime` (o `event_time`/`timestamp` que o **corpo** traz) ou, quando o dispositivo nao manda horario,
+`sha256-<hash canonico do corpo>` de `bodyHash` (etapa 138). Relogio do servidor (`new Date()`) nao entra — e
+exatamente o defeito de B-02, o horario de recebimento muda a cada reenvio e a dedupe nunca casa. Duplicata
+responde **200** `{ success: true, duplicate: true }`, como `carrier-webhook-receiver`, para o dispositivo nao
+ficar reenviando. O valor medido **nao** entra em texto claro na chave (LGPD): quando aparece, vai dentro do
+hash.
+
+**Um detalhe que o desenho ingenuo erraria:** passar o corpo apenas como `fallbackBody` do `buildEventKey` nao
+funciona aqui — o fallback so age quando **nenhuma** parte tem valor, e `vehicle_id`/`driver_id` sao
+obrigatorios (`parse.ts`), logo ele nunca seria usado: toda leitura daquele motorista viraria duplicata da
+primeira. Por isso o hash entra como **parte** da chave e so no lugar do horario ausente.
+
+**Teste novo:** `tests/contracts/ingest-biosync-dedupe.spec.ts` (**7 casos**) — helper compartilhado em vez de
+dedupe caseiro; chave com identificadores estaveis e horario do evento (e sem `new Date`); sem horario cai no
+hash do corpo, com reenvio casando e batimento diferente nao casando; reivindicacao **antes** da telemetria, do
+log tatico e do Bitrix24; duplicata em 200; nenhum valor medido em texto claro na chave; telemetria continua
+gravada e devolvida.
+
+**Spec herdado ajustado:** `ingest-biosync-input.spec.ts:99` fixava o literal
+`parseBioSyncInput((await req.json())`; o corpo agora vive em `body` (o hash precisa dele) — as duas assercoes
+passaram a `parseBioSyncInput(body)` e a comparacao de ordem (parse antes dos limiares) continua igual. A tabela
+de `tests/contracts/cors-onda5.spec.ts` foi de **2 para 4** respostas em `ingest-biosync`: as duas novas (400 e
+200-duplicata) tambem levam CORS resolvido.
+
+**Verificado de verdade:**
+- Prova por mutacao (A-E): A claim removida -> **2** falhas; B claim depois do insert -> **2**; C relogio do
+  servidor na chave -> **2**; D valor medido em texto claro -> **2**; E duplicata com 409 -> **1**. Restaurado
+  -> **7/7**.
+- `deno check` nesta funcao **0 erros** (igual ao baseline); `deno lint` **4 = 4** problemas herdados
+  (`no-import-prefix` dos imports remotos, mesmos arquivos e locais); `deno fmt --check` acusa **7 linhas antes
+  e 7 depois** — nenhuma violacao nova.
+- `tsc --noEmit` 0; `npm run lint:budget` **ok**; suite **700/700** (80 arquivos).
+
+**Nao coberto (segue em aberto):** a restricao unica que impediria duplicata por corrida simultanea nasce de
+`idempotency_keys`, nao de `bio_sync_telemetry` — nao foi preciso DDL.
+
 ### Registro - fechamento do achado B-07 (2026-11-25) - 5 funcoes sem etapa no plano
 
 **Causa:** o B-07 lista **25** funcoes com o curinga e as etapas 179-198 cobrem 20. As outras cinco — `health`,
@@ -524,7 +568,7 @@ mesma, logo o navegador dela nao casa. O bloqueio esta valendo em producao.
 origem (usam `getCorsHeaders(req)` numa constante local de mesmo nome) — o nome engana, o comportamento esta
 certo.
 
-**Proximo:** etapa 199 — `ingest-biosync`: deduplicar a telemetria do dispositivo.
+**Proximo:** etapa 199 — `ingest-biosync`: deduplicar a telemetria do dispositivo (feita na PR seguinte).
 
 ### Registro - etapa 179 (2026-11-25) - achado B-07 (`secure-store`)
 

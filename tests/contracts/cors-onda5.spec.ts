@@ -20,7 +20,7 @@ const FUNCOES: Record<string, number> = {
   "check-password-breach": 5,
   "bitrix24-integration": 18,
   "execute-protocol": 5,
-  "ingest-biosync": 2,
+  "ingest-biosync": 4,
   "ocr-receipt-processor": 4,
   "webhook-status": 5,
   "normalize-freight-response": 4,
