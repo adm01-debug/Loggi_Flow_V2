@@ -7,7 +7,8 @@
 #   - sem-commit: "nada mudou" no publicar significa que nenhuma das tres fontes mudou desde a ultima publicacao
 #   - metricas: metricas/manifests do banco aguardam 60 min desde a coleta publicada; commits de codigo nao reiniciam o prazo
 #   - banco-pulado: sem o secret SUPABASE_DB_URL (repo) nem DESTINO_URL (environment banco-leitura) o job do banco
-#     sai verde com aviso e a pasta supabase/ fica como estava
+#     sai verde com aviso e a pasta supabase/ fica como estava, mas publica supabase/README.md com a causa e a data
+#     (etapa 266) - o estado deixa de ser invisivel sem pintar 144 runs/dia de vermelho
 name: Contexto para agentes de IA (10 min)
 
 # UM workflow, TRES produtores independentes (um job cada), UM indice, UMA branch:
@@ -242,10 +243,34 @@ jobs:
             # Sem o secret nao ha o que coletar. No agendamento sai verde com aviso para nao pintar
             # 144 runs/dia de vermelho; no dispatch manual falha para a pessoa ver.
             echo "::warning::Sem SUPABASE_DB_URL (repo) nem DESTINO_URL (environment banco-leitura) - snapshot pulado (ver scripts/supabase_snapshot/README.md)"
+            # Etapa 266: o pulo deixa de ser invisivel. A causa e a data vao para a branch contexto, no mesmo
+            # lugar onde os agentes leem o snapshot; a pasta ja foi restaurada no passo acima, entao o publicar
+            # troca o conjunto pelo snapshot anterior + este aviso.
+            cat > "$SNAPSHOT_DIR/README.md" <<EOF
+          # supabase/ sem fonte - snapshot do banco real ausente
+
+          Estado publicado em $(date -u +%Y-%m-%dT%H:%MZ) pelo job \`banco\` do workflow \`contexto-ia.yml\`.
+
+          Esta pasta deveria ter o snapshot do banco OFICIAL (tabelas, RLS, funcoes, triggers, cron, lints),
+          gerado por \`scripts/supabase_snapshot/snapshot.py\`. Neste run a coleta foi pulada: falta o secret
+          \`SUPABASE_DB_URL\` (repo) e tambem \`DESTINO_URL\` (environment \`banco-leitura\`).
+
+          Enquanto o secret nao existir, esta pasta fica como estava e este arquivo e o unico sinal do estado -
+          o agendamento sai verde de proposito para nao pintar 144 runs/dia de vermelho, e os jobs do codigo e
+          das regras continuam publicando normalmente.
+
+          Como resolver: cadastre \`SUPABASE_DB_URL\` em Settings > Secrets and variables > Actions (repo) ou
+          \`DESTINO_URL\` no environment \`banco-leitura\`. Passo a passo: \`scripts/supabase_snapshot/README.md\`.
+
+          Quando a coleta voltar, o workflow apaga este arquivo automaticamente (etapa 266 de
+          \`docs/qa/04-PLANO.md\`).
+          EOF
             echo "SNAPSHOT_SKIPPED=1" >> "$GITHUB_ENV"
             if [ "$EVENTO" = "workflow_dispatch" ]; then exit 1; fi
             exit 0
           fi
+          # Coleta ok: o aviso de fonte ausente perde a validade.
+          rm -f "$SNAPSHOT_DIR/README.md"
           python3 scripts/supabase_snapshot/snapshot.py
 
       - name: Guard - nenhum segredo na saida
@@ -264,7 +289,8 @@ jobs:
           fi
 
       - name: Guardar para o publicar
-        if: env.SNAPSHOT_SKIPPED != '1'
+        # Sem snapshot o artefato leva so o README de fonte ausente (etapa 266); o publicar troca a pasta pelo
+        # que ja estava na branch mais esse aviso, entao a causa chega a branch contexto em vez de sumir.
         id: upload
         uses: actions/upload-artifact@v7
         with:
