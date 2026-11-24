@@ -69,6 +69,14 @@ test(".range(), .single() e .maybeSingle() contam como teto", () => {
   assert.equal(r.status, 0, r.stdout + r.stderr);
 });
 
+test("consulta só de contagem (head: true) não é listagem", () => {
+  const alvo = repo({
+    "src/a.tsx": 'await supabase.from("notifications").select("id", { count: "exact", head: true }).eq("user_id", id);\n',
+  });
+  const r = run(alvo);
+  assert.equal(r.status, 0, r.stdout + r.stderr);
+});
+
 test("teto adiado na variável conta: await query.order(...).limit(100)", () => {
   const alvo = repo({
     "src/a.tsx": [

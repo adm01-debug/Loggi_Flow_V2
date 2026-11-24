@@ -28,7 +28,6 @@
     "src/features/db-observability/hooks/useSloDaily.ts:db_slo_daily": 1,
     "src/hooks/analytics/useKPIBenchmark.tsx:ocorrencias": 1,
     "src/hooks/auth/useDeviceSessions.ts:user_sessions": 1,
-    "src/hooks/auth/useNewDeviceDetection.tsx:known_devices": 1,
     "src/hooks/auth/useRole.ts:user_roles": 2,
     "src/hooks/auth/useWebAuthn.tsx:webauthn_credentials": 2,
     "src/hooks/common/useComments.tsx:comments": 1,

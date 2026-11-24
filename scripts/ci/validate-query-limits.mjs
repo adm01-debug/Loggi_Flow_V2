@@ -25,6 +25,9 @@ const NOT_A_QUERY = new Set(["Array", "Buffer", "Object", "String", "Uint8Array"
 // Fim de cadeia aceito. `.single()`/`.maybeSingle()` devolvem no máximo uma linha; `.csv()` e
 // `.explain()` não são usados no repositório.
 const CAPS = [".limit(", ".range(", ".single(", ".maybeSingle("];
+// `select(<colunas>, { count: "exact", head: true })` pede so o numero de linhas: o servidor nao devolve
+// dado nenhum, entao nao e listagem e nao precisa de teto.
+const HEAD_ONLY = /head\s*:\s*true/;
 
 const args = process.argv.slice(2);
 const has = (name) => args.includes(name);
@@ -146,7 +149,7 @@ for (const path of walk(ROOT)) {
     const chain = text.slice(start, end);
     if (!chain.includes(".select")) continue;
     chains += 1;
-    if (CAPS.some((cap) => chain.includes(cap))) continue;
+    if (CAPS.some((cap) => chain.includes(cap)) || HEAD_ONLY.test(chain)) continue;
     if (hasDeferredCap(text, queryVariable(text, start), end)) continue;
     const literal = /^\.from\s*\(\s*(['"])(.+?)\1/.exec(chain);
     const table = literal ? literal[2] : "<dinamica>";

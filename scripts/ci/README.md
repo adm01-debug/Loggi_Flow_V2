@@ -200,7 +200,7 @@ e 5000 e ainda 61 cadeias sem teto nenhum — a regra existia só na cabeça de 
 
 Varre `src/` (ignora `*.test.*`, `*.spec.*`, `*.d.ts`), encontra cada `.from(<tabela>)` cuja cadeia tem
 `.select` e considera **com teto** quando a cadeia termina em `.limit(`, `.range(`, `.single(` ou
-`.maybeSingle(`, **ou** quando o teto entra depois na variável que recebeu a consulta
+`.maybeSingle(`, quando a consulta so pede contagem (`head: true`, o servidor nao devolve linha), **ou** quando o teto entra depois na variável que recebeu a consulta
 (`let query = supabase.from(...); ... await query.order(...).limit(500)`), padrão legítimo de
 `useSecurityEvents.ts` e `useConciliacao.tsx`. A busca do teto adiado é sintática, com janela de 2000
 caracteres: um `.limit()` de outro fluxo, mais adiante no arquivo, não conta.
