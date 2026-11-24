@@ -276,7 +276,7 @@
 - [x] **198** — `geocode-address`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Média
 - [x] **199** — `ingest-biosync`: deduplicar a telemetria do dispositivo — onda 5 — Média
 - [x] **200** — `push-send`: tempo limite no envio ao provedor de push — onda 5 — Média
-- [ ] **201** — Corrigir o comentário de `fetch-with-timeout.ts` que promete retentativa inexistente — onda 5 — Baixa
+- [x] **201** — Corrigir o comentário de `fetch-with-timeout.ts` que promete retentativa inexistente — onda 5 — Baixa
 
 ### Onda 6
 
@@ -434,6 +434,34 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapa 201 (2026-11-25) - achado B-10 (`fetch-with-timeout`)
+
+**Causa:** o cabecalho de `_shared/fetch-with-timeout.ts` afirmava "built-in timeout and retry logic". O corpo
+(`:5-28`) tem só tempo limite: `AbortController`, `setTimeout`, `AbortError` virando erro de tempo limite.
+Nenhuma das 44 funcoes do repositorio faz retentativa com espera progressiva. Comentario que promete o que o
+codigo nao faz e pior que silencio: o proximo agente le "tem retry", confia, e deixa de implementar onde
+precisaria. A segunda linha citava "Dimension 19: Availability (Audit 10/10)", mesma familia de afirmacao sem
+lastro (H-05).
+
+**Correcao:** **apenas comentario** — o corpo nao foi tocado, porque este helper e consumido por
+`_shared/safeFetch.ts:107-110`, que atende as **36 chamadas a terceiro** do repositorio (Resend, Lalamove,
+Rodonaves, Melhor Envio, Bitrix24, Evolution, Mapbox, ViaCEP, OpenWeather, Google AI, HIBP, Slack). Diff: 1
+insercao e 2 remocoes, so o bloco de abertura, que passou a dizer "per-request timeout (default 10s); it does
+NOT retry".
+
+**Retentativa nao foi implementada**, de proposito: com a idempotencia de B-01/B-02, cada nova tentativa grava
+o evento de novo. A ordem e idempotencia primeiro, e so depois **avaliar** retentativa — decisao do dono, fora
+desta etapa. Nenhum ponto concreto do repositorio foi identificado como carente de retentativa.
+
+**Spec:** `tests/contracts/fetch-with-timeout-comentario.spec.ts`, 4 casos, que amarram texto e codigo: o
+comentario nao promete retentativa; o tempo limite declarado (10 s) bate com o `options` do codigo (10000 ms);
+sem "Audit 10/10"/"Dimension 19"; e o corpo nao faz segunda tentativa (uma unica chamada a `fetch`).
+
+**Verificacao:** prova por mutacao A-E -> 3/1/1/2/2 falhas, restaurado 4/4; `deno check` 0 erros; `deno lint`
+limpo; `deno fmt --check` acusa o mesmo arquivo antes e depois (aspas simples herdadas em `:22`, baseline de
+`origin/main` falha igual); `tsc` 0; `lint:budget` ok; suite **704/704**. Merge republica as funcoes que
+importam o helper — deploy conferido depois.
 
 ### Registro - etapa 200 (2026-11-25) - achado B-09 (`push-send`)
 
