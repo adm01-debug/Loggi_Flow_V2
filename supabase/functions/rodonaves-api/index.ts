@@ -12,6 +12,11 @@ import { getCircuitBreaker } from "../_shared/circuitBreaker.ts";
 import { getRedisClient } from "../_shared/redis.ts";
 import { log } from "../_shared/logger.ts";
 import { internalErrorResponse } from "../_shared/httpError.ts";
+import {
+  blockedPayload,
+  mapWithLimit,
+  withFallback,
+} from "./fallback.ts";
 
 // Rodonaves API Gateways
 const TRACKING_GATEWAY = "https://tracking-apigateway.rte.com.br";
@@ -557,17 +562,27 @@ async function trackBatch(p: Record<string, unknown>) {
   });
 }
 
-// NEW: Batch with pagination metadata (amountPages, totalRegisters)
+// NEW: Batch with pagination metadata (amountPages, totalRegisters).
+// batchPagination responde 403 no nosso escopo; o lote simples responde os
+// mesmos registros (sem os totais de página).
 async function trackBatchPagination(p: Record<string, unknown>) {
-  return apiGet(TRACKING_GATEWAY, "/api/v1/tracking/batchPagination", {
-    TaxIdRegistration: p.taxIdRegistration as string,
-    StartDate: p.startDate as string,
-    EndDate: p.endDate as string,
-    Page: p.page as number,
-    AmountByPage: p.amountByPage as number,
-    OperationType: p.operationType as number,
-    CTeNumber: p.cTeNumber as number,
-  });
+  return withFallback(
+    () =>
+      apiGet(TRACKING_GATEWAY, "/api/v1/tracking/batchPagination", {
+        TaxIdRegistration: p.taxIdRegistration as string,
+        StartDate: p.startDate as string,
+        EndDate: p.endDate as string,
+        Page: p.page as number,
+        AmountByPage: p.amountByPage as number,
+        OperationType: p.operationType as number,
+        CTeNumber: p.cTeNumber as number,
+      }),
+    {
+      fallback: "track-batch",
+      note: "batchPagination responde 403: registros devolvidos sem os totais de página.",
+    },
+    () => trackBatch(p),
+  );
 }
 
 // NEW: Batch by params (no date required)
@@ -616,66 +631,133 @@ async function getDeliveryProof(p: Record<string, unknown>) {
   });
 }
 
-// NEW: High-quality delivery receipt (without image compression)
+// NEW: High-quality delivery receipt (without image compression).
+// Rota bloqueada: cai para o comprovante padrão, que é liberado.
 async function getDeliveryProofHQ(p: Record<string, unknown>) {
-  return apiGet(
-    TRACKING_GATEWAY,
-    "/api/v1/deliveryreceipt/withoutImageCompression",
+  return withFallback(
+    () =>
+      apiGet(
+        TRACKING_GATEWAY,
+        "/api/v1/deliveryreceipt/withoutImageCompression",
+        {
+          TaxIdRegistration: p.taxIdRegistration as string,
+          InvoiceNumber: p.invoiceNumber as string,
+          InvoiceKey: p.invoiceKey as string,
+          ProtocolNumber: p.protocolNumber as string,
+          CTeNumber: p.cTeNumber as number,
+        },
+      ),
     {
-      TaxIdRegistration: p.taxIdRegistration as string,
-      InvoiceNumber: p.invoiceNumber as string,
-      InvoiceKey: p.invoiceKey as string,
-      ProtocolNumber: p.protocolNumber as string,
-      CTeNumber: p.cTeNumber as number,
+      fallback: "delivery-proof",
+      note: "Comprovante sem compressão responde 403: devolvido o comprovante padrão.",
     },
+    () => getDeliveryProof(p),
   );
 }
 
 async function getDeliveryInfo(p: Record<string, unknown>) {
-  return apiGet(
-    TRACKING_GATEWAY,
-    "/api/v1/deliveryreceipt/deliveryInformation",
+  return withFallback(
+    () =>
+      apiGet(
+        TRACKING_GATEWAY,
+        "/api/v1/deliveryreceipt/deliveryInformation",
+        {
+          TaxIdRegistration: p.taxIdRegistration as string,
+          InvoiceNumber: p.invoiceNumber as string,
+          InvoiceKey: p.invoiceKey as string,
+          ProtocolNumber: p.protocolNumber as string,
+          CTeNumber: p.cTeNumber as number,
+        },
+      ),
     {
-      TaxIdRegistration: p.taxIdRegistration as string,
-      InvoiceNumber: p.invoiceNumber as string,
-      InvoiceKey: p.invoiceKey as string,
-      ProtocolNumber: p.protocolNumber as string,
-      CTeNumber: p.cTeNumber as number,
+      fallback: "tracking-steps",
+      note: "deliveryInformation responde 403: destino detalhado pelas etapas de rastreio.",
     },
+    () =>
+      trackingSteps({
+        taxIdRegistration: p.taxIdRegistration,
+        invoiceNumber: p.invoiceNumber,
+        invoiceKey: p.invoiceKey,
+        protocolNumber: p.protocolNumber,
+        cTeNumber: p.cTeNumber,
+      }),
   );
 }
 
-// NEW: Batch delivery receipts → returns S3 zip URL
+// NEW: Batch delivery receipts → returns S3 zip URL.
+// receipt-key-list responde 403: com protocolos informados, os comprovantes
+// são obtidos pela rota de protocolos liberada.
 async function getDeliveryReceiptBatch(p: Record<string, unknown>) {
-  return apiMutate(
-    TRACKING_GATEWAY,
-    "POST",
-    "/api/v1/deliveryreceipt/receipt-key-list",
-    p.body,
+  const protocols = Array.isArray(p.protocols) ? (p.protocols as string[]) : [];
+  return withFallback(
+    () =>
+      apiMutate(
+        TRACKING_GATEWAY,
+        "POST",
+        "/api/v1/deliveryreceipt/receipt-key-list",
+        p.body,
+      ),
+    {
+      fallback: protocols.length ? "delivery-receipt-by-protocols" : "local",
+      note: protocols.length
+        ? "receipt-key-list responde 403: comprovantes obtidos por protocolo."
+        : "receipt-key-list responde 403 e exige liberação comercial da RTE.",
+    },
+    protocols.length
+      ? () => getDeliveryReceiptByProtocols({ protocols })
+      : undefined,
   );
 }
 
-// NEW: Batch delivery receipts by protocols array
+// NEW: Batch delivery receipts by protocols array.
+// A rota em lote responde 403 neste escopo: cada protocolo é consultado
+// individualmente no comprovante liberado, com no máximo 5 chamadas paralelas.
 async function getDeliveryReceiptByProtocols(p: Record<string, unknown>) {
-  const protocols = p.protocols as string[];
-  const qs = new URLSearchParams();
-  protocols?.forEach((proto) => qs.append("requestProtocols", proto));
-  const token = await getToken(TRACKING_GATEWAY);
-  const res = await safeFetch(
-    `${TRACKING_GATEWAY}/api/v1/deliveryreceipt/batchdeliveryreceiptsbyprotocols?${qs}`,
+  const protocols = (p.protocols as string[]) ?? [];
+  return withFallback(
+    async () => {
+      const qs = new URLSearchParams();
+      protocols.forEach((proto) => qs.append("requestProtocols", proto));
+      const token = await getToken(TRACKING_GATEWAY);
+      const res = await safeFetch(
+        `${TRACKING_GATEWAY}/api/v1/deliveryreceipt/batchdeliveryreceiptsbyprotocols?${qs}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      if (!res.ok) {
+        const body = await res.text();
+        log.error("[rodonaves-api] Falha ao buscar comprovantes por protocolos:", {
+          status: res.status,
+          body: body.slice(0, 500),
+        });
+        throw new RTEError(
+          "Falha ao buscar comprovantes por protocolos",
+          classifyStatus(res.status),
+          res.status,
+          TRACKING_GATEWAY,
+        );
+      }
+      return res.json();
+    },
     {
-      headers: { Authorization: `Bearer ${token}` },
+      fallback: "delivery-proof",
+      note: "batchdeliveryreceiptsbyprotocols responde 403: comprovantes buscados um a um.",
+    },
+    async () => {
+      const receipts = await mapWithLimit(protocols, 5, async (protocol) => {
+        try {
+          return await getDeliveryProof({ ...p, protocolNumber: protocol });
+        } catch (error) {
+          return {
+            protocolNumber: protocol,
+            _error: error instanceof Error ? error.message : String(error),
+          };
+        }
+      });
+      return { data: receipts, _requested: protocols.length };
     },
   );
-  if (!res.ok) {
-    const body = await res.text();
-    log.error("[rodonaves-api] Falha ao buscar comprovantes por protocolos:", {
-      status: res.status,
-      body: body.slice(0, 500),
-    });
-    throw new Error("Falha ao buscar comprovantes por protocolos");
-  }
-  return res.json();
 }
 
 // NEW: OCCURRENCE RECEIPTS (3 endpoints)
@@ -704,20 +786,42 @@ async function getOccurrenceReceiptImageUrl(p: Record<string, unknown>) {
 }
 
 // ORDERS
+// ordersbydaterangepagination responde 403: o período é lido pelo rastreio
+// em lote (a doc oficial do MCP indica essa rota como alternativa).
 async function getOrders(p: Record<string, unknown>) {
-  return apiGet(
-    TRACKING_GATEWAY,
-    "/api/v1/orders/ordersbydaterangepagination",
+  const hasRange = Boolean(p.startDate) && Boolean(p.endDate);
+  return withFallback(
+    () =>
+      apiGet(
+        TRACKING_GATEWAY,
+        "/api/v1/orders/ordersbydaterangepagination",
+        {
+          TaxIdRegistration: p.taxIdRegistration as string,
+          CustomerType: p.customerType as number,
+          StartDate: p.startDate as string,
+          EndDate: p.endDate as string,
+          Page: p.page as number,
+          AmountByPage: p.amountByPage as number,
+          InvoiceNumber: p.invoiceNumber as string,
+          CTeNumber: p.cTeNumber as number,
+        },
+      ),
     {
-      TaxIdRegistration: p.taxIdRegistration as string,
-      CustomerType: p.customerType as number,
-      StartDate: p.startDate as string,
-      EndDate: p.endDate as string,
-      Page: p.page as number,
-      AmountByPage: p.amountByPage as number,
-      InvoiceNumber: p.invoiceNumber as string,
-      CTeNumber: p.cTeNumber as number,
+      fallback: hasRange ? "track-batch" : "local",
+      note: hasRange
+        ? "orders responde 403: fretes do período listados pelo rastreio em lote."
+        : "orders responde 403: informe startDate e endDate para listar pelo rastreio em lote.",
     },
+    hasRange
+      ? () =>
+          trackBatch({
+            taxIdRegistration: p.taxIdRegistration,
+            startDate: p.startDate,
+            endDate: p.endDate,
+            page: p.page,
+            amountByPage: p.amountByPage,
+          })
+      : undefined,
   );
 }
 
@@ -782,10 +886,22 @@ async function updateQuotationInvoiceKey(p: Record<string, unknown>) {
 }
 
 async function getCubageFactor(taxId: string, companyId?: string) {
-  return apiGet(QUOTATION_GATEWAY, "/api/v1/peso-cubado", {
-    taxIdRegistration: taxId,
-    companyId: companyId as string,
-  });
+  return withFallback(
+    () =>
+      apiGet(QUOTATION_GATEWAY, "/api/v1/peso-cubado", {
+        taxIdRegistration: taxId,
+        companyId: companyId as string,
+      }),
+    {
+      fallback: "local",
+      note: "peso-cubado responde 403: aplicado o fator padrão de mercado 300 kg/m³; confirme antes de faturar.",
+    },
+    async () => ({
+      CubageFactor: 300,
+      TaxIdRegistration: taxId,
+      CompanyId: companyId ?? null,
+    }),
+  );
 }
 
 async function getDeadline(cepOrigem: string, cepDestino: string) {
@@ -897,21 +1013,34 @@ async function getAvailablePickupDates(protocol: number) {
   });
 }
 
+// getavaliablepickupdatebyparms responde 403: com protocolo informado, as
+// datas vêm da rota por protocolo, que é liberada.
 async function getAvailablePickupDatesByParams(p: Record<string, unknown>) {
-  return apiGet(
-    PICKUP_GATEWAY,
-    "/api/v1/pickup/getavaliablepickupdatebyparms",
+  const protocol = Number(p.protocol ?? 0);
+  return withFallback(
+    () =>
+      apiGet(
+        PICKUP_GATEWAY,
+        "/api/v1/pickup/getavaliablepickupdatebyparms",
+        {
+          OriginUnit: p.originUnit as number,
+          PersonId: p.personId as number,
+          Cep: p.cep as string,
+          Address: p.address as string,
+          Number: p.number as string,
+          Supplement: p.supplement as string,
+          District: p.district as string,
+          City: p.city as string,
+          UnitFederationCode: p.unitFederationCode as string,
+        },
+      ),
     {
-      OriginUnit: p.originUnit as number,
-      PersonId: p.personId as number,
-      Cep: p.cep as string,
-      Address: p.address as string,
-      Number: p.number as string,
-      Supplement: p.supplement as string,
-      District: p.district as string,
-      City: p.city as string,
-      UnitFederationCode: p.unitFederationCode as string,
+      fallback: protocol > 0 ? "pickup-available-dates" : "local",
+      note: protocol > 0
+        ? "getavaliablepickupdatebyparms responde 403: datas obtidas pelo protocolo da coleta."
+        : "getavaliablepickupdatebyparms responde 403: informe o protocolo da coleta para ver as datas.",
     },
+    protocol > 0 ? () => getAvailablePickupDates(protocol) : undefined,
   );
 }
 
@@ -979,46 +1108,95 @@ async function generateAutomaticPickup(p: Record<string, unknown>) {
 // SELFATTENDANCE GATEWAY ACTIONS (ALL NEW)
 // ==========================================
 
+// city/description responde 403: a busca é feita pelo CEP.
 async function searchCityByDescription(description: string, uf?: string) {
-  return apiGet(SELFATTENDANCE_GATEWAY, "/webapi/city/description", {
-    description,
-    uf: uf as string,
-  });
+  return withFallback(
+    () =>
+      apiGet(SELFATTENDANCE_GATEWAY, "/webapi/city/description", {
+        description,
+        uf: uf as string,
+      }),
+    {
+      fallback: "city-by-zipcode",
+      note: "A busca de cidade por nome responde 403: use o CEP (city-by-zipcode).",
+    },
+  );
 }
 
 async function searchCityByZipCode(zipCode: string) {
   return apiGet(SELFATTENDANCE_GATEWAY, "/webapi/city/zipcode", { zipCode });
 }
 
+// city/zipcodeaddress responde 403: o endereço é resolvido pela cadeia
+// local (SelfAttendance address → ViaCEP → BrasilAPI), que marca a fonte.
 async function getAddressByZipCode(zipCode: string) {
-  return apiGet(SELFATTENDANCE_GATEWAY, "/webapi/city/zipcodeaddress", {
-    zipCode,
-  });
-}
-
-async function trackingStepsBot(p: Record<string, unknown>) {
-  return apiGet(
-    SELFATTENDANCE_GATEWAY,
-    "/webapi/tracking/v1/tracking-steps-bot",
+  return withFallback(
+    () =>
+      apiGet(SELFATTENDANCE_GATEWAY, "/webapi/city/zipcodeaddress", {
+        zipCode,
+      }),
     {
-      TaxIdRegistration: p.taxIdRegistration as string,
-      InvoiceNumber: p.invoiceNumber as string,
-      InvoiceKey: p.invoiceKey as string,
-      ProtocolNumber: p.protocolNumber as string,
+      fallback: "resolve-address",
+      note: "city/zipcodeaddress responde 403: endereço resolvido pela cadeia local de CEP.",
     },
+    () => resolveAddressByZip(zipCode),
   );
 }
 
-async function trackingLastStepsBot(p: Record<string, unknown>) {
-  return apiGet(
-    SELFATTENDANCE_GATEWAY,
-    "/webapi/tracking/v1/tracking-last-steps-bot",
+// tracking-steps-bot responde 403: as etapas vêm do gateway de rastreio.
+async function trackingStepsBot(p: Record<string, unknown>) {
+  return withFallback(
+    () =>
+      apiGet(
+        SELFATTENDANCE_GATEWAY,
+        "/webapi/tracking/v1/tracking-steps-bot",
+        {
+          TaxIdRegistration: p.taxIdRegistration as string,
+          InvoiceNumber: p.invoiceNumber as string,
+          InvoiceKey: p.invoiceKey as string,
+          ProtocolNumber: p.protocolNumber as string,
+        },
+      ),
     {
-      TaxIdRegistration: p.taxIdRegistration as string,
-      InvoiceNumber: p.invoiceNumber as string,
-      InvoiceKey: p.invoiceKey as string,
-      ProtocolNumber: p.protocolNumber as string,
+      fallback: "tracking-steps",
+      note: "tracking-steps-bot responde 403: etapas obtidas pelo gateway de rastreio.",
     },
+    () =>
+      trackingSteps({
+        taxIdRegistration: p.taxIdRegistration,
+        invoiceNumber: p.invoiceNumber,
+        invoiceKey: p.invoiceKey,
+        protocolNumber: p.protocolNumber,
+      }),
+  );
+}
+
+// tracking-last-steps-bot responde 403: devolve a trilha completa e o
+// último item é a etapa atual do frete.
+async function trackingLastStepsBot(p: Record<string, unknown>) {
+  return withFallback(
+    () =>
+      apiGet(
+        SELFATTENDANCE_GATEWAY,
+        "/webapi/tracking/v1/tracking-last-steps-bot",
+        {
+          TaxIdRegistration: p.taxIdRegistration as string,
+          InvoiceNumber: p.invoiceNumber as string,
+          InvoiceKey: p.invoiceKey as string,
+          ProtocolNumber: p.protocolNumber as string,
+        },
+      ),
+    {
+      fallback: "tracking-steps",
+      note: "tracking-last-steps-bot responde 403: devolvida a trilha completa (último item = etapa atual).",
+    },
+    () =>
+      trackingSteps({
+        taxIdRegistration: p.taxIdRegistration,
+        invoiceNumber: p.invoiceNumber,
+        invoiceKey: p.invoiceKey,
+        protocolNumber: p.protocolNumber,
+      }),
   );
 }
 
@@ -1245,7 +1423,10 @@ Deno.serve(async (req) => {
       }
 
       case "delivery-receipt-batch": {
-        result = await getDeliveryReceiptBatch({ body: params.body });
+        result = await getDeliveryReceiptBatch({
+          body: params.body,
+          protocols: params.protocols,
+        });
         break;
       }
 
