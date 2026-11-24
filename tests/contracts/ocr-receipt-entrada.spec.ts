@@ -114,7 +114,7 @@ describe("ocr-receipt-processor/index.ts", () => {
     const trecho = src.slice(
       src.indexOf("if (error instanceof ValidationError)"),
     );
-    expect(trecho).toContain("validationErrorResponse(error, corsHeaders)");
+    expect(trecho).toContain("validationErrorResponse(error, headers)");
     expect(trecho.indexOf("validationErrorResponse")).toBeLessThan(
       trecho.indexOf("error.message"),
     );

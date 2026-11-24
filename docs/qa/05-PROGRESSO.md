@@ -255,25 +255,25 @@
 - [x] **177** — `smart-carrier-selection`: erro genérico na resposta da cotação — onda 5 — Média
 - [x] **178** — Varredura final de `error.message`: as onze funções restantes de B-06 — onda 5 — Média
 - [x] **179** — `secure-store`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — **Crítica**
-- [ ] **180** — `get-mapbox-token`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — **Crítica**
-- [ ] **181** — `resend-email`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Alta
-- [ ] **182** — `whatsapp-notification`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Alta
-- [ ] **183** — `push-send`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Alta
-- [ ] **184** — `new-device-alert`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Alta
-- [ ] **185** — `send-password-reset`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Alta
-- [ ] **186** — `validate-login`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Alta
-- [ ] **187** — `log-login-attempt`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Média
-- [ ] **188** — `log-security-event`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Média
-- [ ] **189** — `check-password-breach`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Média
-- [ ] **190** — `bitrix24-integration`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Alta
-- [ ] **191** — `execute-protocol`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Alta
-- [ ] **192** — `ingest-biosync`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Alta
-- [ ] **193** — `ocr-receipt-processor`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Média
-- [ ] **194** — `webhook-status`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Alta
-- [ ] **195** — `normalize-freight-response`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Média
-- [ ] **196** — `nexus-auto-healing`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Média
-- [ ] **197** — `accuracy-weekly-digest`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Baixa dentro do grupo, mas manipula dado
-- [ ] **198** — `geocode-address`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Média
+- [x] **180** — `get-mapbox-token`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — **Crítica**
+- [x] **181** — `resend-email`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Alta
+- [x] **182** — `whatsapp-notification`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Alta
+- [x] **183** — `push-send`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Alta
+- [x] **184** — `new-device-alert`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Alta
+- [x] **185** — `send-password-reset`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Alta
+- [x] **186** — `validate-login`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Alta
+- [x] **187** — `log-login-attempt`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Média
+- [x] **188** — `log-security-event`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Média
+- [x] **189** — `check-password-breach`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Média
+- [x] **190** — `bitrix24-integration`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Alta
+- [x] **191** — `execute-protocol`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Alta
+- [x] **192** — `ingest-biosync`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Alta
+- [x] **193** — `ocr-receipt-processor`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Média
+- [x] **194** — `webhook-status`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Alta
+- [x] **195** — `normalize-freight-response`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Média
+- [x] **196** — `nexus-auto-healing`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Média
+- [x] **197** — `accuracy-weekly-digest`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Baixa dentro do grupo, mas manipula dado
+- [x] **198** — `geocode-address`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — Média
 - [ ] **199** — `ingest-biosync`: deduplicar a telemetria do dispositivo — onda 5 — Média
 - [ ] **200** — `push-send`: tempo limite no envio ao provedor de push — onda 5 — Média
 - [ ] **201** — Corrigir o comentário de `fetch-with-timeout.ts` que promete retentativa inexistente — onda 5 — Baixa
@@ -434,6 +434,62 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapas 180 a 198 (2026-11-25) - achado B-07 (onda 5 de CORS)
+
+**Causa:** dezenove edge functions escreviam `Access-Control-Allow-Origin: *` a mao num bloco `const
+corsHeaders = {...}` no topo do arquivo. Com o curinga, **qualquer pagina da internet** pode chamar a funcao
+com a sessao do visitante logado e **ler a resposta** — inclusive as que devolvem dado de usuario
+(`get-mapbox-token` entregava o token do Mapbox; `send-password-reset`, `validate-login`, `log-login-attempt`,
+`check-password-breach` e `new-device-alert` trafegam e-mail, IP e resultado de login).
+
+**Por que uma PR unica para as 19 etapas:** e a **mesma causa raiz**, a **mesma receita** e nenhuma das 19 se
+sobrepoe a outra em arquivo. Uma PR por etapa custaria 19 filas de CI e 19 rebases concorrentes entre si, sem
+ganho de seguranca — o defeito so deixa de existir quando todas param de responder o curinga.
+
+**Correcao (so os 19 arquivos listados nas etapas):** cada arquivo passou a importar `getCorsHeaders` de
+`../_shared/cors.ts`, o bloco literal foi removido e o handler calcula `const headers = getCorsHeaders(req)`
+**antes** do preflight. Total: **118 respostas** — **99** espalham `...headers` e as **19** do `OPTIONS` usam
+`{ headers }`. Em `accuracy-weekly-digest` o helper tambem entrou no `handlePreview(req)`, que responde por
+conta propria; em `new-device-alert` o alvo foi o `handler`, que e o que o `serve` recebe. Nenhuma linha de
+regra de negocio mudou: o diff e o import, a linha do helper e a troca da constante pelos cabecalhos
+resolvidos. `_shared/cors.ts` **nao** foi tocado (16 funcoes dependem dele).
+
+**Specs herdados ajustados (sem isso a suite quebrava):** oito specs de contrato asseguram por texto o corpo
+do `catch` e das respostas de validacao dessas funcoes; **10 assercoes** esperavam `corsHeaders` e passaram a
+esperar `headers` (a unica que exigia o literal `"Access-Control-Allow-Origin": "*"` virou a exigencia do
+contrato novo, `const headers = getCorsHeaders(req);`). Nada de comportamento foi afrouxado — a assercao
+continua apontando para o mesmo ponto do codigo.
+
+**Teste novo:** `tests/contracts/cors-onda5.spec.ts` (**78 casos**) — por funcao: nenhum literal
+`Access-Control-Allow-*`; o helper em vez da constante; helper **antes** do `OPTIONS`; contagem exata de
+respostas e de `...headers`. Mais dois casos de varredura: o preflight responde com `{ headers }` (e nunca
+`...headers`) e nenhuma das 19 ficou com curinga em qualquer cabecalho.
+
+**Verificado de verdade:**
+- Prova por mutacao (A-G): A `get-mapbox-token` revertido ao original -> **4** falhas; B curinga literal de
+  volta numa resposta -> **3**; C uma resposta perde o CORS -> **1**; D helper calculado depois do `OPTIONS`
+  -> **2**; E a constante antiga volta numa resposta -> **2**; F helper nao usado -> **2**; G tres respostas
+  sem CORS -> **1**. Restaurado -> **78/78**.
+- `deno check` nas 19: **16 erros somados, identicos ao baseline** medido funcao por funcao em `origin/main`;
+  `deno lint` **43 problemas / 19 arquivos**, igual ao baseline; `deno fmt --check` acusa **os mesmos 17
+  arquivos herdados** antes e depois — nenhum arquivo entrou ou saiu da lista do `fmt`.
+- `tsc --noEmit` 0; `npm run lint:budget` **ok** (0/0); suite **671/671** (79 arquivos) depois do rebase na
+  179: 586 da base, +78 deste spec e +7 do spec da 179.
+
+**Fechamento da etapa 179 (mesma PR anterior):** o deploy subiu (`deploy-functions.yml` **completed success**)
+e o teste pos-deploy foi feito no proprio `secure-store` por HTTP real:
+`OPTIONS` com `Origin: https://exemplo-malicioso.test` devolveu
+`access-control-allow-origin: https://logiflow-nexus.lovable.app` — a origem maliciosa **nao** recebe a si
+mesma, logo o navegador dela nao casa. O bloqueio esta valendo em producao.
+
+**Nao coberto pelo plano (divida remanescente do B-07):** `health`, `rodonaves-webhook`,
+`carrier-webhook-receiver`, `nexus-webhook-receiver` e `get-weather-data` ainda definem a constante com
+curinga e **nao tem etapa de CORS** no `04-PLANO.md`. `melhor-envio-api` e `rodonaves-api` ja resolviam pela
+origem (usam `getCorsHeaders(req)` numa constante local de mesmo nome) — o nome engana, o comportamento esta
+certo.
+
+**Proximo:** etapa 199 — `ingest-biosync`: deduplicar a telemetria do dispositivo.
 
 ### Registro - etapa 179 (2026-11-25) - achado B-07 (`secure-store`)
 

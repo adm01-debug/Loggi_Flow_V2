@@ -1,17 +1,13 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { log } from "../_shared/logger.ts";
 import { safeFetch } from "../_shared/safeFetch.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
+import { getCorsHeaders } from "../_shared/cors.ts";
 
 serve(async (req: Request) => {
+  const headers = getCorsHeaders(req);
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers });
   }
 
   try {
@@ -23,7 +19,7 @@ serve(async (req: Request) => {
     if (!prefix || typeof prefix !== "string" || !/^[0-9A-Fa-f]{5}$/.test(prefix)) {
       return new Response(
         JSON.stringify({ error: "Valid 5-hex prefix is required" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        { status: 400, headers: { ...headers, "Content-Type": "application/json" } },
       );
     }
 
@@ -40,7 +36,7 @@ serve(async (req: Request) => {
       // fail open: sem lista, sem parecer pwned
       return new Response(
         JSON.stringify({ hashes: [] }),
-        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        { status: 200, headers: { ...headers, "Content-Type": "application/json" } },
       );
     }
 
@@ -57,7 +53,7 @@ serve(async (req: Request) => {
 
     return new Response(
       JSON.stringify({ hashes }),
-      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      { status: 200, headers: { ...headers, "Content-Type": "application/json" } },
     );
   } catch (error: unknown) {
     const errorMessage =
@@ -65,7 +61,7 @@ serve(async (req: Request) => {
     log.error("Unexpected error", { error: String(error) });
     return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...headers, "Content-Type": "application/json" },
     });
   }
 });

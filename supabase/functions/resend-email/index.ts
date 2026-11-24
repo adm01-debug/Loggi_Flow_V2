@@ -5,16 +5,12 @@ import { ValidationError, validationErrorResponse } from "../_shared/validate.ts
 import { log } from "../_shared/logger.ts";
 import { internalErrorResponse } from "../_shared/httpError.ts";
 import { parseEmailRequest } from "./parse.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
+import { getCorsHeaders } from "../_shared/cors.ts";
 
 serve(async (req) => {
+  const headers = getCorsHeaders(req);
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers });
   }
 
   try {
@@ -26,7 +22,7 @@ serve(async (req) => {
           JSON.stringify({ success: false, error: "Unauthorized" }),
           {
             status: 401,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            headers: { ...headers, "Content-Type": "application/json" },
           },
         );
       }
@@ -66,13 +62,13 @@ serve(async (req) => {
     }
 
     return new Response(JSON.stringify({ success: true, id: data.id }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...headers, "Content-Type": "application/json" },
     });
   } catch (error) {
     if (error instanceof ValidationError) {
-      return validationErrorResponse(error, corsHeaders);
+      return validationErrorResponse(error, headers);
     }
 
-    return internalErrorResponse(error, corsHeaders, "resend-email");
+    return internalErrorResponse(error, headers, "resend-email");
   }
 });

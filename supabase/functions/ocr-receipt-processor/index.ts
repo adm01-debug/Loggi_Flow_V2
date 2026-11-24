@@ -4,15 +4,12 @@ import { validateContract } from "../_shared/contract-validator.ts";
 import { ValidationError, validationErrorResponse } from "../_shared/validate.ts";
 import { parseReceiptRequest } from "./parse.ts";
 import { log } from "../_shared/logger.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+import { getCorsHeaders } from "../_shared/cors.ts";
 
 serve(async (req) => {
+  const headers = getCorsHeaders(req);
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+    return new Response("ok", { headers });
   }
 
   try {
@@ -35,7 +32,7 @@ serve(async (req) => {
 
     if (!isValid) {
       return new Response(JSON.stringify({ error: "Invalid Contract", details: errors }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...headers, "Content-Type": "application/json" },
         status: 400,
       });
     }
@@ -75,19 +72,19 @@ serve(async (req) => {
       .eq("storage_path", storagePath);
 
     return new Response(JSON.stringify({ success: true, data: extractedData }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...headers, "Content-Type": "application/json" },
       status: 200,
     });
 
   } catch (error: any) {
     if (error instanceof ValidationError) {
-      return validationErrorResponse(error, corsHeaders);
+      return validationErrorResponse(error, headers);
     }
     log.error("OCR processing failed:", {
       error: error instanceof Error ? error.message : String(error),
     });
     return new Response(JSON.stringify({ error: "INTERNAL_ERROR" }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...headers, "Content-Type": "application/json" },
       status: 400,
     });
   }

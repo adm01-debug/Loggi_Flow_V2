@@ -4,15 +4,12 @@ import { log } from "../_shared/logger.ts";
 import { invokeFunction } from "../_shared/invokeFunction.ts";
 import { internalErrorResponse } from "../_shared/httpError.ts";
 import { parseBioSyncInput } from "./parse.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+import { getCorsHeaders } from "../_shared/cors.ts";
 
 serve(async (req) => {
+  const headers = getCorsHeaders(req);
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+    return new Response("ok", { headers });
   }
 
   try {
@@ -89,10 +86,10 @@ serve(async (req) => {
     }
 
     return new Response(JSON.stringify(telemetry), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...headers, "Content-Type": "application/json" },
       status: 200,
     });
   } catch (error) {
-    return internalErrorResponse(error, corsHeaders, "ingest-biosync");
+    return internalErrorResponse(error, headers, "ingest-biosync");
   }
 });

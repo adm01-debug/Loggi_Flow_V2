@@ -1,12 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { log } from "../_shared/logger.ts";
 import { safeFetch } from "../_shared/safeFetch.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
+import { getCorsHeaders } from "../_shared/cors.ts";
 
 /**
  * Geocodificacao por OpenStreetMap (Nominatim) com apoio do ViaCEP e fallback Photon.
@@ -122,14 +117,15 @@ async function viaPhoton(address: string): Promise<GeocodeHit | null> {
 }
 
 serve(async (req) => {
+  const headers = getCorsHeaders(req);
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers });
   }
 
   const json = (body: unknown, status = 200) =>
     new Response(JSON.stringify(body), {
       status,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...headers, "Content-Type": "application/json" },
     });
 
   try {
