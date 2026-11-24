@@ -54,8 +54,8 @@ Um agente que encontre um `.sql` chamado "remediação" ou "cleanup" e conclua q
 tarefa pendente está errado: o registro está aqui, com data e projeto.
 
 **DDL novo não vira script avulso.** Vai para `supabase/migrations/` e segue a ordem
-da primeira regra abaixo (arquivo → PR → merge → deploy do código → apply). Não existe
-workflow que aplique DDL: quem aplica é o dono, pelo MCP.
+da primeira regra abaixo (arquivo → PR → merge → deploy do código → apply). Quem **autoriza** o
+apply é o dono; quem aplica é `.github/workflows/aplicar-migration.yml` (`workflow_dispatch`), não o MCP.
 
 ## Regras de migration
 
