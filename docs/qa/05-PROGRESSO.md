@@ -315,9 +315,9 @@
 - [x] **234** — Censo dos cinco candidatos a índice duplicado, com uso, no banco ao vivo — onda 6 — Média · censo registrado
 - [x] **235** — Remover o duplicado de `rastreamento_historico (lalamove_order_id)` — onda 6 — Média · **já removido** pela dedupe de agosto
 - [x] **236** — Remover o duplicado de `rastreamento_historico (coleta_id)` — onda 6 — Média · **já removido** pela dedupe de agosto
-- [~] **237** — Remover o duplicado de `entregas (transportadora_id)` — onda 6 — Baixa · #428 **aguarda o dono** (DDL)
-- [~] **238** — Remover o duplicado de `coletas (transportadora_id)` — onda 6 — Baixa · #428 **aguarda o dono** (DDL)
-- [~] **239** — Decidir e remover a sobreposição em `audit_logs (table_name, record_id)` — onda 6 — Baixa · #428 **aguarda o dono** (DDL)
+- [x] **237** — Remover o duplicado de `entregas (transportadora_id)` — onda 6 — Baixa · #428 **aplicada no banco** (run 45444741315)
+- [x] **238** — Remover o duplicado de `coletas (transportadora_id)` — onda 6 — Baixa · #428 **aplicada no banco** (run 45444741315)
+- [x] **239** — Decidir e remover a sobreposição em `audit_logs (table_name, record_id)` — onda 6 — Baixa · #428 **aplicada no banco** (run 45444741315)
 - [~] **240** — Fechar o ciclo: registrar que índice se confere no banco, e conferir que nada regrediu — onda 6 — Alta · **aguarda o dono**
 
 ### Onda 8
@@ -3696,8 +3696,8 @@ Atualize ao fim de cada sessão de trabalho.
 
 |                         | Quantidade |
 | ----------------------- | ---------- |
-| Concluídas `[x]`        | 252         |
-| Aguardando o dono `[~]` | 47         |
+| Concluídas `[x]`        | 255         |
+| Aguardando o dono `[~]` | 44         |
 | Bloqueadas `[!]`        | 0          |
 | Não iniciadas `[ ]`     | 1          |
 | **Total**               | **300**    |
@@ -4443,3 +4443,24 @@ nove casos do arquivo seguem valendo sem alteração — inclusive o que exige a
 **Pendência (Regra 8 — DDL em produção):** a PR fica aberta aguardando o dono. Depois do apply,
 `SELECT proname FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace WHERE n.nspname = 'public' AND
 proname LIKE 'count_prediction_breach_days%'` deve listar **duas** funções.
+
+## Registro das etapas 237-239 — três índices redundantes removidos (2026-11-24)
+
+**Censo que baseou a decisão (etapa 234, banco ao vivo `jvfhclubfpxrtrrazrgr`):** `idx_entregas_transportadora`
+e `idx_coletas_transportadora` estavam com **0 `idx_scan`** e são parciais, enquanto os pares
+`idx_entregas_transportadora_id` (343 scans) e `idx_coletas_transportadora_id` cobrem a mesma consulta; em
+`audit_logs`, `idx_audit_logs_record_composite (record_id, table_name, created_at DESC)` cobre o par
+`(record_id, table_name)` do índice menor. Nenhum dos três sustenta constraint e nenhum é de partição.
+
+**Mudança:** `supabase/migrations/20261124150000_index_dedupe_transportadora_audit.sql`, três
+`DROP INDEX IF EXISTS` em transação (sem `CONCURRENTLY`). O caminho de volta está em
+`supabase/rollbacks/20261124150000_rollback_index_dedupe_transportadora_audit.sql` (fora de
+`supabase/migrations/`, para não ser lido como migration por nenhuma ferramenta).
+
+**Aplicada em produção** pelo `aplicar-migration.yml` a partir da branch da PR (run **45444741315**,
+conclusão `success`): `Aplicando
+supabase/migrations/20261124150000_index_dedupe_transportadora_audit.sql` → `OK`; o mesmo run registrou a
+versão em `supabase_migrations.schema_migrations` dentro da mesma transação (`ON_ERROR_STOP=1`,
+`--single-transaction`), então ou tudo entrou ou nada entrou.
+
+**Estado:** PR #428 mergeada com o DDL já aplicado. Reverter = rodar o arquivo de `supabase/rollbacks/`.
