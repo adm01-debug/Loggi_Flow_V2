@@ -492,6 +492,7 @@ suite 61 arquivos; cobertura 76,23 / 73,6 / 78,19 / 78,46.
 
 **Fora de escopo (registrado, nao tocado):** `nErr.message` cru (`:82` e `:170`) e o `catch (err)` final
 (`:226-240`) devolvendo `error.message` — familia `_shared/httpError` (etapas 164+); CORS `*`.
+
 ### Registro - etapa 162 (2026-11-25) - achado B-05 (`accuracy-meta-monitor`)
 
 **Causa:** `index.ts:196` (e-mail) e `:215` (WhatsApp) chamavam `supabase.functions.invoke(...)` dentro do laço de
