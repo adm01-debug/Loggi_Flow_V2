@@ -5399,40 +5399,6 @@ export type Database = {
         }
         Relationships: []
       }
-
-      user_panel_preferences: {
-        Row: {
-          created_at: string
-          id: string
-          sla_alto_horas: number
-          sla_critico_horas: number
-          sla_medio_horas: number
-          sla_meta_on_time_pct: number
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          sla_alto_horas?: number
-          sla_critico_horas?: number
-          sla_medio_horas?: number
-          sla_meta_on_time_pct?: number
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          sla_alto_horas?: number
-          sla_critico_horas?: number
-          sla_medio_horas?: number
-          sla_meta_on_time_pct?: number
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       user_onboarding: {
         Row: {
           completed_at: string | null
@@ -5463,6 +5429,39 @@ export type Database = {
           updated_at?: string
           user_id?: string
           xp_earned?: number | null
+        }
+        Relationships: []
+      }
+      user_panel_preferences: {
+        Row: {
+          created_at: string
+          id: string
+          sla_alto_horas: number
+          sla_critico_horas: number
+          sla_medio_horas: number
+          sla_meta_on_time_pct: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          sla_alto_horas?: number
+          sla_critico_horas?: number
+          sla_medio_horas?: number
+          sla_meta_on_time_pct?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          sla_alto_horas?: number
+          sla_critico_horas?: number
+          sla_medio_horas?: number
+          sla_meta_on_time_pct?: number
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -5834,6 +5833,20 @@ export type Database = {
       execute_nexus_protocol: {
         Args: { protocol_name: string; vehicle_id: string }
         Returns: Json
+      }
+      fn_valida_transicao_coleta: {
+        Args: {
+          p_de: Database["public"]["Enums"]["coleta_status"]
+          p_para: Database["public"]["Enums"]["coleta_status"]
+        }
+        Returns: boolean
+      }
+      fn_valida_transicao_entrega: {
+        Args: {
+          p_de: Database["public"]["Enums"]["entrega_status"]
+          p_para: Database["public"]["Enums"]["entrega_status"]
+        }
+        Returns: boolean
       }
       get_active_sessions_summary: {
         Args: never
