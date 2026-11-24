@@ -128,8 +128,14 @@ async function getToken(gateway: string): Promise<string> {
 
   if (!response.ok) {
     const text = await response.text();
+    // O corpo do erro de login vem do parceiro: fica no log, nunca na mensagem.
+    log.error("[rodonaves-api] Falha no login na RTE:", {
+      gateway,
+      status: response.status,
+      body: text.slice(0, 500),
+    });
     throw new RTEError(
-      `Auth failed [${response.status}]: ${text}`,
+      "Falha de autenticacao na transportadora",
       "RTE_AUTH_FAILED",
       502,
       gateway,
