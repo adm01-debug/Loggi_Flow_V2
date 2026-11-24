@@ -8,17 +8,14 @@ import { buildEventKey, claimIdempotencyKey } from "../_shared/idempotency.ts";
 import { log, redact } from "../_shared/logger.ts";
 import { invokeFunction } from "../_shared/invokeFunction.ts";
 import { internalErrorResponse } from "../_shared/httpError.ts";
+import { getCorsHeaders } from "../_shared/cors.ts";
 
 const NORMALIZE_TIMEOUT_MS = 5_000;
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
-
 serve(async (req) => {
+  const headers = getCorsHeaders(req);
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers });
   }
 
   try {
@@ -31,7 +28,7 @@ serve(async (req) => {
     if (!rl.allowed) {
       return new Response(JSON.stringify({ error: "rate_limited" }), {
         status: 429,
-        headers: { ...corsHeaders, "Content-Type": "application/json", "Retry-After": String(rl.retryAfter ?? 60) },
+        headers: { ...headers, "Content-Type": "application/json", "Retry-After": String(rl.retryAfter ?? 60) },
       });
     }
 
@@ -41,7 +38,7 @@ serve(async (req) => {
     if (!(await verifyWebhookHmac(raw, signature, "NEXUS_WEBHOOK_SECRET"))) {
       return new Response(JSON.stringify({ error: "Invalid signature" }), {
         status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...headers, "Content-Type": "application/json" },
       });
     }
 
@@ -73,7 +70,7 @@ serve(async (req) => {
         details: errors,
         nexus_protocol: "CORE_GATE_REJECTION"
       }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...headers, "Content-Type": "application/json" },
         status: 400,
       });
     }
@@ -99,13 +96,13 @@ serve(async (req) => {
       log.error('Nexus webhook sem identificador estavel, recusando', { payload: redact(body) });
       return new Response(JSON.stringify({ error: 'Event without stable identifier' }), {
         status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...headers, 'Content-Type': 'application/json' },
       });
     }
 
     const idem = await claimIdempotencyKey(eventKey.provider, eventKey.id);
     if (idem.duplicate) {
-      return new Response(JSON.stringify({ success: true, duplicate: true }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ success: true, duplicate: true }), { headers: { ...headers, "Content-Type": "application/json" } });
     }
 
     // 1. Identify source (WhatsApp Evolution API usually sends 'messages-upsert')
@@ -115,14 +112,14 @@ serve(async (req) => {
       const text = message?.conversation || message?.extendedTextMessage?.text;
 
       if (!text || !remoteJid) {
-        return new Response(JSON.stringify({ success: false, error: 'No text or remoteJid' }), { headers: corsHeaders });
+        return new Response(JSON.stringify({ success: false, error: 'No text or remoteJid' }), { headers });
       }
 
       const phone = remoteJid.split('@')[0];
 
       // E.164 validation (014) — digits only, no PostgREST interpolation
       if (!/^\+?\d{6,15}$/.test(phone)) {
-        return new Response(JSON.stringify({ success: false, error: 'Invalid phone' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+        return new Response(JSON.stringify({ success: false, error: 'Invalid phone' }), { status: 400, headers: { ...headers, 'Content-Type': 'application/json' } });
       }
 
       // 2. Find transportadora by phone — jsonb EXACT eq; no .or() interpolation (014)
@@ -143,7 +140,7 @@ serve(async (req) => {
 
       if (!carrier) {
         log.info('No carrier found for phone:', redact(phone));
-        return new Response(JSON.stringify({ success: false, error: 'Carrier not found' }), { headers: corsHeaders });
+        return new Response(JSON.stringify({ success: false, error: 'Carrier not found' }), { headers });
       }
 
       // 3. Find latest pending quote for this carrier
@@ -158,7 +155,7 @@ serve(async (req) => {
 
       if (!cotacao) {
         log.info('No pending quote for carrier:', carrier.nome_fantasia);
-        return new Response(JSON.stringify({ success: false, error: 'No pending quote' }), { headers: corsHeaders });
+        return new Response(JSON.stringify({ success: false, error: 'No pending quote' }), { headers });
       }
 
       // 4. Normalize response
@@ -175,7 +172,7 @@ serve(async (req) => {
 
       return new Response(
         JSON.stringify({ success: true, carrier: carrier.nome_fantasia, normalization: normalizacao.ok ? normalizacao.data : null }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { headers: { ...headers, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -192,15 +189,15 @@ serve(async (req) => {
             log.warn('Normalization unavailable; event already claimed:', { reason: normalizacao.reason });
         }
 
-        return new Response(JSON.stringify({ success: true, data: normalizacao.ok ? normalizacao.data : null }), { headers: corsHeaders });
+        return new Response(JSON.stringify({ success: true, data: normalizacao.ok ? normalizacao.data : null }), { headers });
     }
 
-    return new Response(JSON.stringify({ success: true, message: 'Webhook ignored or not handled' }), { headers: corsHeaders });
+    return new Response(JSON.stringify({ success: true, message: 'Webhook ignored or not handled' }), { headers });
 
   } catch (error: any) {
     log.error('[nexus-webhook-receiver] Webhook processing error:', {
       message: error instanceof Error ? error.message : String(error),
     });
-    return internalErrorResponse(error, corsHeaders, "nexus-webhook-receiver");
+    return internalErrorResponse(error, headers, "nexus-webhook-receiver");
   }
 });

@@ -435,6 +435,41 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 
 ## Registro de execução
 
+### Registro - fechamento do achado B-07 (2026-11-25) - 5 funcoes sem etapa no plano
+
+**Causa:** o B-07 lista **25** funcoes com o curinga e as etapas 179-198 cobrem 20. As outras cinco — `health`,
+`rodonaves-webhook`, `carrier-webhook-receiver`, `nexus-webhook-receiver`, `get-weather-data` — **nao tinham
+etapa** no `04-PLANO.md` e continuavam respondendo `Access-Control-Allow-Origin: *`. Sem elas o achado seguia
+aberto mesmo com as 20 etapas concluidas.
+
+**Correcao (mesma receita das 179-198, so nestes 5 arquivos):** import de `getCorsHeaders`, remocao do bloco
+literal, `const headers = getCorsHeaders(req)` antes do preflight e a troca da constante no resto do handler.
+**+47 -64**. Nenhuma linha de regra de negocio mudou.
+
+**Specs herdados ajustados:** `nexus-webhook-receiver-erro-generico.spec.ts:29` e
+`rodonaves-webhook-erro-generico.spec.ts:27` asseguravam por texto
+`internalErrorResponse(error, corsHeaders, ...)` e passaram a exigir `headers`. Em `nexus-webhook-receiver` sao
+**13 respostas** e so **7** com CORS (as outras sao internas), por isso a tabela do spec novo guarda
+`{ respostas, comHeaders }` por funcao em vez de um numero unico.
+
+**Teste novo:** `tests/contracts/cors-restantes.spec.ts` (**22 casos**) — 20 por funcao (nenhum literal
+`Access-Control-Allow-*`, helper em vez da constante, helper antes do `OPTIONS`, contagem exata) + o preflight
+respondendo com `{ headers }` + varredura agregada de curinga.
+
+**Verificado de verdade:**
+- Prova por mutacao (A-E): A `health` revertido ao original -> **4** falhas; B curinga literal de volta numa
+  resposta -> **1**; C uma resposta perde o CORS -> **2**; D helper calculado depois do `OPTIONS` -> **1**;
+  E a constante antiga volta -> **1**. Restaurado -> **22/22**.
+- `deno check`: `carrier-webhook-receiver` **1** e `nexus-webhook-receiver` **2** erros, **identicos ao
+  baseline** de `origin/main`; `deno lint` **17 = 17**; `deno fmt --check` acusa **os mesmos 5 arquivos** antes
+  e depois.
+- `tsc --noEmit` 0; `npm run lint:budget` **ok**; suite **693/693** (80 arquivos) depois do rebase na `main` que
+  ja contem a #384.
+
+**Estado do achado:** com as 20 etapas + estas 5, **nenhuma das 25 funcoes do B-07 fixa o curinga**.
+`melhor-envio-api` e `rodonaves-api` nunca estiveram erradas — ja resolviam pela origem numa constante local
+com o mesmo nome.
+
 ### Registro - etapas 180 a 198 (2026-11-25) - achado B-07 (onda 5 de CORS)
 
 **Causa:** dezenove edge functions escreviam `Access-Control-Allow-Origin: *` a mao num bloco `const
@@ -483,9 +518,9 @@ e o teste pos-deploy foi feito no proprio `secure-store` por HTTP real:
 `access-control-allow-origin: https://logiflow-nexus.lovable.app` — a origem maliciosa **nao** recebe a si
 mesma, logo o navegador dela nao casa. O bloqueio esta valendo em producao.
 
-**Nao coberto pelo plano (divida remanescente do B-07):** `health`, `rodonaves-webhook`,
-`carrier-webhook-receiver`, `nexus-webhook-receiver` e `get-weather-data` ainda definem a constante com
-curinga e **nao tem etapa de CORS** no `04-PLANO.md`. `melhor-envio-api` e `rodonaves-api` ja resolviam pela
+**Fechado em seguida:** `health`, `rodonaves-webhook`, `carrier-webhook-receiver`,
+`nexus-webhook-receiver` e `get-weather-data` nao tinham etapa no `04-PLANO.md`; a PR seguinte fechou as cinco
+(ver registro do fechamento do B-07, acima). `melhor-envio-api` e `rodonaves-api` ja resolviam pela
 origem (usam `getCorsHeaders(req)` numa constante local de mesmo nome) — o nome engana, o comportamento esta
 certo.
 
