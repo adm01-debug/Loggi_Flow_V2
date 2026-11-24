@@ -68,7 +68,10 @@ export default function Analytics() {
       : undefined,
   );
   const kpiBenchmarkResult = useKPIBenchmark();
-  const trackingResult = useTrackingAnalytics();
+  const trackingResult = useTrackingAnalytics(
+    dateRange?.from,
+    dateRange?.to || dateRange?.from,
+  );
 
   const { summaryMetrics, monthlyData, isLoading, isError, error } =
     analyticsResult;
