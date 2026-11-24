@@ -1,6 +1,7 @@
 /* eslint-disable max-lines */
 import { useState } from "react";
 import { SortIcon } from "@/components/common/SortIcon";
+import { EmptyState } from "@/components/common/EmptyState";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -15,7 +16,6 @@ import {
   Trash2,
   Clock,
   Loader2,
-  AlertCircle,
   User,
   FileText,
   Calendar,
@@ -208,6 +208,7 @@ export default function Clientes() {
     data: list = [],
     isLoading,
     error,
+    refetch,
   } = useQuery({
     queryKey: ["clientes"],
     queryFn: async () => {
@@ -397,9 +398,16 @@ export default function Clientes() {
   if (error)
     return (
       <MainLayout>
-        <div className="flex flex-col items-center py-12">
-          <AlertCircle className="w-12 h-12 text-destructive mb-4" />
-          <p className="text-destructive">Erro: {error.message}</p>
+        <div className="flex min-h-[60vh] items-center justify-center">
+          <EmptyState
+            variant="error"
+            title="Erro ao carregar clientes"
+            description={
+              error?.message ||
+              "Não foi possível carregar clientes. Tente novamente."
+            }
+            action={{ label: "Tentar novamente", onClick: () => refetch() }}
+          />
         </div>
       </MainLayout>
     );
