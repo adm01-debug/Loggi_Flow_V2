@@ -104,7 +104,7 @@
 ### Onda 8
 
 - [~] **060** — Tirar os dois SQL históricos do lugar onde parecem tarefa pendente — onda 8 — Média · **aguarda o dono**
-- [ ] **061** — Registrar, em um lugar só, qual SQL avulso já foi aplicado e onde — onda 8 — Média
+- [x] **061** — Registrar, em um lugar só, qual SQL avulso já foi aplicado e onde — onda 8 — Média
 
 ### Onda 2
 
@@ -3742,42 +3742,87 @@ do banco no alto.
 
 ---
 
-### Registro - etapa 211 (2026-11-25) - achado P-01 (guard de teto na CI)
+### Registro - etapas 062 e 063 (2026-11-24) - ja estavam na main
 
-**Causa:** as etapas 204 a 210 consertaram cinco consultas sem teto e nada impedia a sexta. A varredura nova
-mostra o tamanho real da divida: **248 consultas de listagem em `src/`, 61 delas sem `.limit`/`.range`** (52
-pares arquivo:tabela). A regra existia so na cabeca de quem revisa.
+As duas estavam implementadas e nao marcadas. A marcacao faltando fazia o caminho
+parecer trabalho perdido de outro agente.
 
-**Entrega:** `scripts/ci/validate-query-limits.mjs` (Node puro, sem dependencia) percorre `src/`, acha cada
-`.from(<tabela>)` com `.select` e considera **com teto** quem termina em `.limit(`, `.range(`, `.single(` ou
-`.maybeSingle(`, **ou** quando o teto entra depois na variavel da consulta (`let query = supabase.from(...);
-... await query.order(...).limit(500)`). O fim da cadeia e calculado respeitando string, template com `${}` e
-comentario, entao `select("a; b")` nao corta a cadeia no meio. Duas listas de excecao em
-`scripts/ci/query-limits.allowlist.json`: `tabelas` (as 9 tabelas de dominio pequeno que o plano descartou,
-cada uma com o motivo numa linha) e `baseline` (divida congelada por par arquivo:tabela, no formato de
-catraca -- a contagem pode cair, nunca subir). Ligado como `validate:query-limits` no `package.json` e como
-passo `Validate Query Limits (listing caps)` no job `quality-gate` do `ci-nexus.yml`, depois do
-`validate:no-console`. Documentado em `scripts/ci/README.md`.
+**062 - abrir a edicao pelo cartao.** `src/pages/Coletas.tsx:851-864`: botao `Pencil`
+com `e.stopPropagation()` (necessario, porque o `onClick` do `Card` em `:752-756` abre
+os detalhes), chamando `setSelectedPickup(c)` e depois `setIsDialogOpen(true)`. O
+`<PickupDialog>` em `:938-943` ja recebia `pickup={selectedPickup}` - essa linha nao
+faltava. O `onClick` do cartao continua abrindo **detalhes**, como a etapa exige: as
+duas portas existem.
 
-**Por que catraca e nao "zero de divida":** ligar em modo falha contra as 61 cadeias existentes reprovaria
-toda PR -- exatamente o risco que o plano descreve. A catraca entrega o efeito pretendido hoje (consulta nova
-sem teto reprova) sem travar o repositorio, e cada conserto aperta o baseline com `--update-baseline`.
+**063 - editar de dentro dos detalhes.** `src/pages/Coletas.tsx:951-955`: o
+`PickupDetailsDialog` recebe `onEdit`, que fecha os detalhes, seleciona o item e abre o
+dialogo de edicao.
 
-**Verificacao:** saida limpa na `main` do commit: `643 arquivos, 248 consultas, 61 cadeias sem teto (divida
-congelada 52), 0 nova(s)`, codigo 0. **Zero falso positivo na lista de 16 listagens corretas do plano** --
-duas delas caem no padrao de teto adiado e foram conferidas na pratica: `useSecurityEvents.ts:33-57`
-(`query = query.limit(filters?.limit || 100)`) e `useConciliacao.tsx:123` (`await query.order(...).limit(2000)`),
-igual a `useDrillDown.tsx:67,82`. Teste de sabotagem do plano executado: tirar o `.limit(500)` de
-`Envios.tsx` faz o script reprovar apontando `src/pages/Envios.tsx:351` com codigo 1; `git checkout` devolve
-codigo 0. `node --test scripts/ci/validate-query-limits.unit.mjs` 17/17 (repositorio sintetico em
-`os.tmpdir()`: teto inline, sem teto, `.range`/`.single`/`.maybeSingle`, teto adiado que conta e que nao conta,
-`select` com `;` na string, `Array.from`, arquivo de teste, allowlist de tabela, catraca igual/acima/abaixo,
-`--update-baseline`, `--warn` com saida 0, `src/` ausente, `--json`). `node --test scripts/ci/*.unit.mjs
-scripts/lib/*.unit.mjs` 432/432. `npm run automation:test` 103/103 (contrato exigido por mexer em `scripts/`).
-`actionlint` no workflow 0. `act -j quality-gate -n` simula o job inteiro, incluindo o passo novo.
+Nenhuma alteracao de codigo nas duas.
 
-**Nao verificado:** o passo rodando no runner do GitHub (so a simulacao com `act`); e quais das 61 cadeias
-realmente devolvem volume hoje -- sem credencial de banco nesta sessao. As 61 cadeias sao achado novo em
-relacao ao plano (que falava em 5): ficam como divida congelada e viram etapas futuras da onda 6.
+**Verificacao**
+- `grep -n 'setSelectedPickup(c)' -A2 src/pages/Coletas.tsx` -> os tres pontos
+  (`:754` detalhes, `:860` edicao, `:953` onEdit) chamam `setSelectedPickup` antes de
+  abrir o dialogo correspondente
+- `grep -n 'pickup={selectedPickup}' src/pages/Coletas.tsx` -> `:942` (PickupDialog) e
+  `:948` (PickupDetailsDialog)
 
-**Merge:** autorizado pelo dono; entra pelo PR #398 junto do passo novo no `ci-nexus.yml`.
+### Registro - etapa 061 (2026-11-24)
+
+Depois da 060 os dois SQL historicos estao no lugar certo, mas a informacao de **o que foi
+aplicado, quando e em qual projeto** continuava dispersa entre o cabecalho de cada arquivo,
+uma linha de `banco.md` e uma de `scripts/audit/README.md`. Sem um lugar unico, um agente
+encontra "remediacao" e conclui que e pendente.
+
+Acrescentada a `docs/agentes/banco.md` - o documento que o `AGENTS.md` manda ler antes de
+qualquer SQL, migration ou deploy - uma secao "SQL avulso ja aplicado", com tabela de
+caminho, data, projeto e situacao, mais a frase que fecha a duvida para o futuro: DDL novo
+vai para `supabase/migrations/`, nunca como script avulso.
+
+Nao foi criado documento novo de proposito: o repositorio ja tem documentacao que contradiz
+documentacao, e a informacao tem de entrar onde o protocolo ja obriga a olhar.
+
+As linhas de `banco.md:32-41` sobre os projetos que nao sao o destino ficaram intactas - sao
+a protecao contra escrever no banco errado.
+
+**Verificacao**
+- `node scripts/ci/check-claude-md-integrity.mjs` -> exit 0
+- `grep -n 'historico/\|nao reexecutar' -i docs/agentes/banco.md` -> os dois arquivos listados
+  (`:50-51`) com data, projeto e marca de nao reexecutar
+
+### Registro - etapa 060 (2026-11-24) - implementada e mergeada (#340)
+
+Dois `.sql` pontuais de agosto/2026 estavam soltos na raiz de `scripts/`, entre
+utilitarios que sao para rodar. Alteram banco, nao tem runner, e o aviso de
+"HISTORICO - NAO REEXECUTAR" so aparecia para quem abrisse o arquivo - a listagem
+da pasta dizia o contrario.
+
+Movidos com `git mv` (historico preservado) para `scripts/historico/`, com
+`README.md` curto declarando que ali so entra SQL ja aplicado e que nada ali se executa.
+
+Os tres pontos de referencia atualizados:
+
+- `scripts/audit/sql.unit.mjs:26-27` (constantes `cleanup` e `remediacao`)
+- `scripts/audit/README.md:58`
+- `docs/agentes/banco.md:35`
+
+Conteudo SQL **nao** foi tocado - a revisao de 2026-11-09 ja os deixou replay-safe,
+e qualquer edicao invalidaria os testes que verificam o conteudo.
+
+**Verificacao**
+- `node --test scripts/audit/sql.unit.mjs` -> **28 testes, 0 falhas, 0 pulados**; o
+  Postgres descartavel subiu e os dois arquivos foram executados de verdade no novo caminho
+- `npm run automation:test` -> **103 testes, 0 falhas**
+- `node scripts/ci/check-claude-md-integrity.mjs` -> exit 0
+- `grep` nao encontra nenhuma referencia apontando para a raiz de `scripts/`
+
+Uma linha por etapa concluída. A coluna **Evidência** é o que diferencia etapa concluída de etapa
+"deveria funcionar": cole o comando e o resultado, ou a consulta e o retorno.
+
+| Etapa | PR  | Mergeada? | Deploy confirmado? | Evidência da verificação |
+| ----- | --- | --------- | ------------------ | ------------------------ |
+|       |     |           |                    |                          |
+
+---
+
+

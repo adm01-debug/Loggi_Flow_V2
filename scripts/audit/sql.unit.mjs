@@ -1,5 +1,5 @@
 // Testes dos SQL de scripts/audit/ (manifest_full, manifest_detail, manifest_data) e dos dois scripts
-// históricos da raiz (scripts/cleanup_triggers_source.sql, scripts/origem_remediacao_2026-08-31.sql).
+// históricos de scripts/historico/ (cleanup_triggers_source.sql, origem_remediacao_2026-08-31.sql).
 // Rodam de verdade num Postgres DESCARTÁVEL, com fixture que imita o Supabase (roles, schemas auth/
 // storage/supabase_migrations, cron.job de mentira). Nunca apontam para banco do projeto:
 //   - AUDIT_TEST_PG_URL=postgres://postgres@127.0.0.1:5432/postgres  → usa esse servidor (superuser),
@@ -23,8 +23,8 @@ const SQL = {
   full: path.join(AQUI, 'manifest_full.sql'),
   detail: path.join(AQUI, 'manifest_detail.sql'),
   data: path.join(AQUI, 'manifest_data.sql'),
-  cleanup: path.resolve(AQUI, '../cleanup_triggers_source.sql'),
-  remediacao: path.resolve(AQUI, '../origem_remediacao_2026-08-31.sql'),
+  cleanup: path.resolve(AQUI, '../historico/cleanup_triggers_source.sql'),
+  remediacao: path.resolve(AQUI, '../historico/origem_remediacao_2026-08-31.sql'),
   estadoFnEntrega: path.resolve(AQUI, '../../supabase/migrations/20261124090000_fn_valida_transicao_entrega.sql'),
   estadoTrgEntrega: path.resolve(AQUI, '../../supabase/migrations/20261124090100_trigger_valida_transicao_entrega.sql'),
   estadoFnColeta: path.resolve(AQUI, '../../supabase/migrations/20261124090200_fn_valida_transicao_coleta.sql'),
