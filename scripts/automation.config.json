@@ -166,6 +166,22 @@
       "reason": "Legado sem chamador literal no inventário; execução manual controlada após revisar parâmetros e ambiente. O dispatcher não executa esta operação."
     },
     {
+      "id": "legacy-3d5b7c19a4e8206f",
+      "kind": "legacy",
+      "files": ["scripts/ci/check-env-not-tracked.mjs"],
+      "manual": ["node", "scripts/ci/check-env-not-tracked.mjs"],
+      "triggers": ["manual"],
+      "reason": "Legado mantido no fluxo existente; referências literais: .github/workflows/ci.yml. O dispatcher não executa esta operação."
+    },
+    {
+      "id": "legacy-8a41f60e2c7d93b5",
+      "kind": "legacy",
+      "files": ["scripts/ci/check-env-not-tracked.unit.mjs"],
+      "manual": ["node", "--test", "scripts/ci/check-env-not-tracked.unit.mjs"],
+      "triggers": ["manual"],
+      "reason": "Legado sem chamador literal no inventário; execução manual controlada após revisar parâmetros e ambiente. O dispatcher não executa esta operação."
+    },
+    {
       "id": "legacy-5b2e8d17c3a94f60",
       "kind": "legacy",
       "files": ["scripts/ci/check-dedupe-keys.mjs"],

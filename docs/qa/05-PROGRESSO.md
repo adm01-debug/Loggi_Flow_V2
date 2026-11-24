@@ -46,7 +46,7 @@
 - [x] **015** — Tirar o `.env` do controle de versão, sem reescrever histórico — onda 1 — Alta
 - [~] **016** — Corrigir o `AGENTS.md` e o comentário da CI que afirmam que o repositório é privado — onda 1 — Alta · **aguarda o dono**
 - [~] **017** — Levar ao dono a decisão sobre a visibilidade do repositório — onda 1 — Alta · **aguarda o dono**
-- [~] **018** — Transformar "não commite `.env`" em teste automático — onda 1 — Média · **aguarda o dono**
+- [~] **018** — Transformar "não commite `.env`" em teste automático — onda 1 — Média · **PR #438 aberta; aguarda o dono (acrescenta gate à CI)**
 - [~] **019** — Mapbox: confirmar a restrição do token e remover a variável que ninguém mais usa — onda 1 — Média · **aguarda o dono**
 
 ### Onda 0
@@ -4331,3 +4331,30 @@ segue `manual`).
 **Estado:** PR aberta, **não mergeada** — a spec marca "precisa de aprovação humana antes do merge" e a
 mudança altera gate de segurança da CI (regra 8). Reverter = `git revert` (uma linha para reintroduzir
 cada entrada).
+
+## Registro da etapa 018 — o "não commite .env" virou gate de CI (2026-11-25)
+
+**O que mudou.** `scripts/ci/check-env-not-tracked.mjs` reprova (exit 1) quando `git ls-files` devolve
+qualquer caminho cujo **nome** comece com `.env` e não seja `.env.example`; olha o índice, não o disco, então
+`.env` na máquina de quem desenvolve, ignorado pelo git, não reprova. Exit 2 quando não consegue ler o índice
+(fora de repositório git, `git` fora do PATH) — falha do próprio gate, não verde falso. Sem dependência
+externa. Entrou no job `Security Scan` do `ci.yml`, ao lado do `audit-gate.mjs` e do gitleaks: o gitleaks
+procura *padrão de segredo* no diff e um `.env` só com a chave `anon` passa limpo — foi exatamente assim que
+o arquivo ficou meses no repositório (achado S-07).
+
+**Arquivos:** `scripts/ci/check-env-not-tracked.mjs` (novo), `scripts/ci/check-env-not-tracked.unit.mjs`
+(novo, 9 casos), `scripts/ci/README.md` (seção nova), `scripts/automation.config.json` (2 registros `legacy`,
+de 94 para 96) e `.github/workflows/ci.yml` (1 passo).
+
+**Evidência**
+- `node scripts/ci/check-env-not-tracked.mjs` com a árvore limpa -> `OK: nenhum arquivo de ambiente
+  rastreado (1712 caminhos conferidos; permitido apenas .env.example).` / `exit=0`
+- com um `.env` de teste no índice (`git add -f .env`) -> `::error::.env esta rastreado pelo git. ... Tire do
+  indice com \`git rm --cached ".env"\` ...` / `exit=1`; desfeito com `git rm --cached .env` e `rm .env`,
+  índice conferido depois com `git status --porcelain`
+- `node --test scripts/ci/check-env-not-tracked.unit.mjs` -> `pass 9`, `fail 0`
+- `npm run automation:test` -> `pass 103`, `fail 0`
+- `npx eslint scripts/ci/check-env-not-tracked.mjs scripts/ci/check-env-not-tracked.unit.mjs` -> `exit=0`
+- `actionlint .github/workflows/ci.yml` -> `exit=0`
+
+**Pendência do dono:** acrescenta um gate à CI (regra 8) — PR #438 fica aberta.
