@@ -396,10 +396,10 @@
 
 - [~] **295** — Fechar no banco ao vivo os seis achados marcados HIPÓTESE — onda 8 — Alta · **aguarda o dono**
 - [ ] **296** — Regerar a branch `contexto` para que as fontes reflitam o código corrigido — onda 8 — Média
-- [ ] **297** — Atualizar `03-ACHADOS.md` e `05-PROGRESSO.md` com o estado final de cada achado — onda 8 — Alta
-- [ ] **298** — Reler o plano inteiro e registrar o que ficou sem etapa executada — onda 8 — Alta
+- [x] **297** — Atualizar `03-ACHADOS.md` e `05-PROGRESSO.md` com o estado final de cada achado — onda 8 — Alta
+- [x] **298** — Reler o plano inteiro e registrar o que ficou sem etapa executada — onda 8 — Alta
 - [~] **299** — Rodar a bateria completa de gates e comparar com os números do começo — onda 8 — Alta · **aguarda o dono**
-- [ ] **300** — Relatório final de uma página para o dono — onda 8 — Alta
+- [x] **300** — Relatório final de uma página para o dono — onda 8 — Alta
 
 ---
 
@@ -414,6 +414,18 @@ Problema novo **não se corrige na hora** (regra 4). Anote aqui, com `arquivo:li
 | A-03 | O teto unico para os seis meses tambem vale para as metricas executivas (6000/6000/3000): se a soma dos seis meses passar disso, o PostgREST corta sem ordem definida e qualquer mes pode perder registros (antes o corte era por mes -- 1000/1000/500)                                                                                                                                                                                                                          | `src/hooks/analytics/useExecutiveMetrics.tsx:55,62,68`                                                                                   | 221                 | Media              |
 | A-04 | **Produção não tem `public.user_panel_preferences`**: a migration `20261121153649` da #248 nunca foi aplicada (último dispatch do `aplicar-migration.yml` é de 20/11, anterior ao arquivo) e o `types.ts` foi editado à mão. Efeito: `useSLAMetas` lança erro ao ler e `PainelSLA.tsx:242-244` mostra `toast.success` incondicional sem persistir nada - o usuário vê "salvo" e as metas de SLA não são gravadas. É também a causa do `types-sync` vermelho desde 23/11 (Gate 1) | `src/hooks/sla/useSLAMetas.ts:31-36`, `src/pages/PainelSLA.tsx:242-244`, `supabase/migrations/20261121153649_user_panel_preferences.sql` | 222                 | **Alta**           |
 | A-05 | `LogisticsService.getDeliveries` (`src/features/logistics/services/LogisticsService.ts:8`) mantém `select('*')` porque **não tem chamador**: a classe não é importada em nenhum arquivo de `src/`. Cortar colunas de código morto não economiza banda; o que resolve é apagar ou usar o serviço                                                                                                                                                                                  | `src/features/logistics/services/LogisticsService.ts:5-14`                                                                               | 227                 | Baixa              |
+
+| A-06 | As mutacoes de status vivem duplicadas por tela (`Despachos.tsx` e `KanbanEntregas.tsx`), sem hook comum: regra nova de transicao precisa ser aplicada duas vezes | `src/pages/Despachos.tsx:216-320`, `src/pages/KanbanEntregas.tsx:328` | 282 | Media |
+| A-07 | `KanbanEntregas.tsx` move entrega para `despachado` sem exigir `nf_remessa` e sem confirmacao; `Despachos.tsx` exige as duas coisas | `src/pages/KanbanEntregas.tsx:328`, `src/pages/Despachos.tsx:256-274` | 282 | **Alta** |
+| A-08 | O dialogo do despacho final diz "esta acao e irreversivel", mas `despachado` ainda aceita `em_transito`: o texto promete mais do que a maquina de estados permite | `src/lib/statusTransitions.ts:17`, `src/pages/Despachos.tsx:596-607` | 282 | Baixa |
+
+**Consolidacao (2026-11-24).** Fechamento da tabela: **A-01 resolvido** na etapa 220; **A-02, A-03, A-04,
+A-05, A-06, A-07 e A-08 seguem abertos** e sao o insumo da proxima auditoria - nenhum foi corrigido (regra 4).
+Ordem de dano para quem pegar: **A-04** (producao sem `public.user_panel_preferences`: o Painel SLA mostra
+"salvo" e nao grava, e e a causa do `types-sync` vermelho), **A-07** (despacho sem NF pelo Kanban), depois
+**A-08**, **A-02/A-03** (teto unico de 6000 linhas cobrindo seis meses) e **A-05** (servico de logistica sem
+chamador). Notas de etapa que citam "achado novo" sem passar por esta tabela continuam validas no texto
+original; esta tabela e a lista canonica.
 
 ## Etapas que não correspondiam mais ao código
 
@@ -3650,3 +3662,82 @@ verdade depende do gatilho de versao no banco.
    autorizacao. Divergencia entre as duas telas, para decisao do dono (etapa 283/297).
 3. O despacho final pede "esta acao e irreversivel" no texto, mas o status `despachado` ainda aceita
    `em_transito` (`statusTransitions.ts:17`): o texto do dialogo promete mais do que o banco garante.
+
+## O que sobrou (etapa 298) - medido em 2026-11-24, `main` em `c7fc18ae`
+
+Travessia de 001 a 300 contra este arquivo: **219 concluidas**, **61 parciais**, **20 nao iniciadas**
+(219 + 61 + 20 = 300; nenhuma etapa sem marca). Achado por achado, o estado final esta em `03-ACHADOS.md`
+(35 resolvidos / 15 parciais / 15 abertos).
+
+### Esperando o dono (61 etapas `[~]`)
+
+| Assunto                                                      | Etapas                                                                                                                              | O que trava                                                                   |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
+| Banco: DDL, RLS, unicidade e indices                         | 024, 025, 027-033, 037, 055, 056, 058, 222, 228, 229, 234, 240, 263, 265, 266, 290, 295                                              | nada disso roda sem sua autorizacao (regra 8)                                  |
+| Segredo e ambiente de producao                               | 002, 010, 011, 014, 019, 270, 285, 286                                                                                                | confirmar o estado do segredo, ou remover o que ficou obsoleto                 |
+| Decisao de negocio (o que existe e o que morre)               | 006, 008, 009, 016, 017, 018, 039, 041, 043, 060, 070-076, 120, 142, 211, 248, 255, 257, 272, 273, 274, 283, 288                       | escolher entre corrigir, remover ou aceitar                                    |
+| Fechamento do proprio plano                                  | 284, 299                                                                                                                              | pisos de cobertura e bateria final de gates: os dois mexem em gate de CI       |
+
+### Aberta por falta de acesso ao banco (13)
+
+023, 026, 230, 231, 232, 233, 235, 236, 237, 238, 239, 264, 287 - todas exigem consulta ao banco ao vivo para
+decidir (RLS real, unicidade, uso de indice, existencia de tabela). Nenhuma e codigo pronto esperando merge.
+
+### Nao executada (7)
+
+- **057, 061** - dependem da decisao de 056 e 060 (exclusao logica de `fretes_internos` e o registro unico de
+  SQL avulso).
+- **218** - a variante da RPC so faz sentido depois de decidir o destino da `reconcile_pending_freights` (070).
+- **264, 265** - bloqueadas pelo secret `SUPABASE_DB_URL` (263).
+- **275** - base de teste de hook e de tela: a unica etapa de codigo que ainda nao comecou.
+- **277** - teste do `count` fora da tela: a versao de tela esta coberta desde a 282, falta a de hook.
+- **289, 296** - mostrar as falhas de webhook numa tela e regerar a branch `contexto`; as duas dependem das
+  tabelas do banco que ninguem conseguiu confirmar (287) e do snapshot (263).
+
+### PRs abertas (2, nenhuma mergeavel sem voce)
+
+| PR                                                    | Assunto                                                              | Por que espera                                    |
+| ----------------------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------- |
+| [#398](https://github.com/adm01-debug/Loggi_Flow_V2/pull/398) | guard de CI para consulta de listagem sem teto (etapa 211)           | mexe em workflow (regra 8)                        |
+| [#340](https://github.com/adm01-debug/Loggi_Flow_V2/pull/340) | tira dois SQL historicos da raiz de `scripts/` (etapa 060)           | a etapa 060 pede a sua decisao                    |
+
+---
+
+### Registro - etapas 297, 298 e 300 (2026-11-24) - fechamento da documentacao do QA
+
+**297 - estado final de cada achado.** Nao reescrevi nenhum achado: cada um dos 65 blocos de
+`03-ACHADOS.md` ganhou uma unica linha `**Estado (2026-11-24):**` logo depois do `-> Etapas`, e o topo do
+arquivo ganhou o bloco de fechamento (data, commit da `main`, banco e a contagem). A classificacao nao veio
+da memoria: um script cruzou o campo `-> Etapas NNN` de cada achado com as marcas de `05-PROGRESSO.md` -
+`RESOLVIDO` somente quando **todas** as etapas do achado estao `[x]`.
+
+| Resultado | Achados | IDs |
+| --- | --- | --- |
+| RESOLVIDO | 35 | S-02, F-01, C-03, D-01, D-03, A-07, A-11, A-12, A-13, R-01 a R-06 (exceto R-07), R-08, R-09, B-01, B-03 a B-10, P-02, P-03, H-01, H-05, H-06, H-07, H-08, H-10, H-15 |
+| PARCIAL | 15 | S-01, S-03, S-06, S-07, C-02, D-02, A-08, R-07, B-02, P-01, P-04, H-02, H-03, H-04, H-12 |
+| ABERTO | 15 | S-04, S-05, S-08, F-02, F-03, C-01, D-04, A-09, A-10, P-05, P-06, H-09, H-11, H-13, H-14 |
+
+Verificacao da etapa (esperado: os dois numeros iguais): `grep -c '^## [A-Z]-[0-9]'` = **65** e
+`grep -c '^\*\*Estado ('` = **65**. Nenhum achado ficou sem fechamento e nenhum recebeu dois.
+
+Tambem consolidei a secao "Achados novos": A-06, A-07 e A-08 entraram na tabela (achados das etapas 281/282)
+e um paragrafo novo diz quais dos oito seguem abertos e em que ordem de dano.
+
+**298 - o que sobrou.** Secao nova no fim deste arquivo, com as tres listas que o plano pede (esperando o
+dono, aberta por falta de acesso, nao executada) e as 2 PRs abertas agrupadas por assunto. A travessia
+001-300 fechou **219 + 61 + 20**. Nenhuma PR foi mergeada nesta etapa e nenhum codigo foi tocado.
+
+**300 - relatorio de uma pagina.** `docs/qa/06-RELATORIO-FINAL.md`, datado, com o commit da `main` e o nome
+do banco no alto.
+
+**Verificacao executada**
+
+- `grep -c '^## [A-Z]-[0-9]' docs/qa/03-ACHADOS.md` -> 65; `grep -c '^\*\*Estado (' docs/qa/03-ACHADOS.md` -> 65
+- `grep -c '^- [x]' docs/qa/05-PROGRESSO.md` -> 219; `- [ ]` -> 20; `- [~]` -> 61
+- `wc -l docs/qa/06-RELATORIO-FINAL.md` -> dentro da faixa de uma pagina
+- `grep -n 'jvfhclubfpxrtrrazrgr' docs/qa/06-RELATORIO-FINAL.md` -> presente
+
+**Nao verificado.** Nenhuma das 13 etapas que dependem do banco ao vivo foi executada: o estado delas e
+"aberta por falta de acesso", nao "correta". Nada aqui foi validado contra producao.
+
+---
