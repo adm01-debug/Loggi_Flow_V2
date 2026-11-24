@@ -25,6 +25,10 @@ const SQL = {
   data: path.join(AQUI, 'manifest_data.sql'),
   cleanup: path.resolve(AQUI, '../historico/cleanup_triggers_source.sql'),
   remediacao: path.resolve(AQUI, '../historico/origem_remediacao_2026-08-31.sql'),
+  estadoFnEntrega: path.resolve(AQUI, '../../supabase/migrations/20261124090000_fn_valida_transicao_entrega.sql'),
+  estadoTrgEntrega: path.resolve(AQUI, '../../supabase/migrations/20261124090100_trigger_valida_transicao_entrega.sql'),
+  estadoFnColeta: path.resolve(AQUI, '../../supabase/migrations/20261124090200_fn_valida_transicao_coleta.sql'),
+  estadoNfEntrega: path.resolve(AQUI, '../../supabase/migrations/20261124090300_trigger_entrega_nf_obrigatoria.sql'),
 };
 
 // ── servidor de teste ────────────────────────────────────────────────────────────────────────────
@@ -452,3 +456,75 @@ for (const [nome, arq] of [['cleanup_triggers_source', 'cleanup'], ['origem_reme
     assert.equal(r.status, 0, r.stderr);
   });
 }
+
+// ── maquina de estados no banco: etapas 028-031 ──────────────────────────────────────────────────
+const ESTADOS = `
+CREATE TYPE public.entrega_status AS ENUM ('aguardando_producao','pronto_despacho','cotacao_frete','nf_emitida','despachado','em_transito','saiu_entrega','entregue','ocorrencia','finalizado');
+CREATE TYPE public.coleta_status AS ENUM ('aguardando_liberacao','solicitada','em_transito','chegou_expedicao','conferencia_ok','divergencia','finalizada');
+CREATE TABLE public.entregas (id serial PRIMARY KEY, status public.entrega_status NOT NULL DEFAULT 'aguardando_producao', nf_remessa text);
+CREATE TABLE public.coletas (id serial PRIMARY KEY, status public.coleta_status NOT NULL DEFAULT 'aguardando_liberacao');
+`;
+const MIGRACOES_ESTADO = [SQL.estadoFnEntrega, SQL.estadoTrgEntrega, SQL.estadoFnColeta, SQL.estadoNfEntrega];
+
+caso('maquina de estados (028-031): transicao valida passa; salto invalido e despacho sem NF sao recusados', () => {
+  const b = banco(ESTADOS);
+  const aplica = psql(b, { arquivos: MIGRACOES_ESTADO });
+  assert.equal(aplica.status, 0, aplica.stderr);
+
+  // A funcao responde o mapa, inclusive p_de = p_para (update que nao muda status).
+  assert.deepEqual(
+    consulta(
+      b,
+      `SELECT public.fn_valida_transicao_entrega('nf_emitida','despachado'),
+              public.fn_valida_transicao_entrega('pronto_despacho','entregue'),
+              public.fn_valida_transicao_entrega('em_transito','em_transito'),
+              public.fn_valida_transicao_entrega('em_transito','entregue'),
+              public.fn_valida_transicao_entrega('finalizado','entregue')`,
+    ),
+    ['t|f|t|t|f'],
+  );
+
+  // Os dois triggers existem, so nas tabelas certas e com nome que ordena antes da auditoria.
+  assert.deepEqual(
+    consulta(
+      b,
+      "SELECT c.relname || ':' || t.tgname FROM pg_trigger t JOIN pg_class c ON c.oid = t.tgrelid WHERE NOT t.tgisinternal AND c.relname IN ('entregas','coletas') ORDER BY 1",
+    ),
+    ['coletas:a_valida_transicao_coletas', 'entregas:a_valida_transicao_entregas'],
+  );
+
+  // Despacho sem NF (nulo e vazio) e recusado com a mensagem de operacao.
+  psql(b, { comandos: ["INSERT INTO public.entregas (status) VALUES ('nf_emitida')"] });
+  const semNf = psql(b, { comandos: ["UPDATE public.entregas SET status = 'despachado' WHERE id = 1"] });
+  assert.notEqual(semNf.status, 0);
+  assert.match(semNf.stderr, /NF de simples remessa obrigatória para despachar/);
+
+  psql(b, { comandos: ["INSERT INTO public.entregas (status, nf_remessa) VALUES ('nf_emitida', '')"] });
+  const nfVazia = psql(b, { comandos: ["UPDATE public.entregas SET status = 'despachado' WHERE id = 2"] });
+  assert.notEqual(nfVazia.status, 0);
+  assert.match(nfVazia.stderr, /NF de simples remessa obrigatória para despachar/);
+
+  // Com NF o mesmo despacho passa.
+  assert.equal(psql(b, { comandos: ["UPDATE public.entregas SET nf_remessa = 'NF-1' WHERE id = 1", "UPDATE public.entregas SET status = 'despachado' WHERE id = 1"] }).status, 0);
+
+  // Salto invalido e recusado; update que nao muda status continua passando.
+  psql(b, { comandos: ["INSERT INTO public.entregas (status) VALUES ('aguardando_producao')"] });
+  const salto = psql(b, { comandos: ["UPDATE public.entregas SET status = 'entregue' WHERE id = 3"] });
+  assert.notEqual(salto.status, 0);
+  assert.match(salto.stderr, /Transição de status inválida: aguardando_producao -> entregue/);
+  assert.equal(psql(b, { comandos: ["UPDATE public.entregas SET status = 'aguardando_producao', nf_remessa = NULL WHERE id = 3"] }).status, 0);
+
+  // Passivo: entrega ja despachada sem NF continua avancando (a regra so olha a entrada em despachado).
+  psql(b, { comandos: ["INSERT INTO public.entregas (status) VALUES ('despachado')"] });
+  assert.equal(psql(b, { comandos: ["UPDATE public.entregas SET status = 'em_transito' WHERE id = 4"] }).status, 0);
+
+  // Coletas: o salto que o lalamove-webhook pratica passa; pular a conferencia nao.
+  psql(b, { comandos: ["INSERT INTO public.coletas (status) VALUES ('solicitada')"] });
+  assert.equal(psql(b, { comandos: ["UPDATE public.coletas SET status = 'chegou_expedicao' WHERE id = 1"] }).status, 0);
+  const coletaInvalida = psql(b, { comandos: ["UPDATE public.coletas SET status = 'finalizada' WHERE id = 1"] });
+  assert.notEqual(coletaInvalida.status, 0);
+  assert.match(coletaInvalida.stderr, /Transição de status inválida: chegou_expedicao -> finalizada/);
+
+  // Reaplicar as quatro migrations e seguro (idempotencia do aplicar-migration.yml).
+  assert.equal(psql(b, { arquivos: MIGRACOES_ESTADO }).status, 0);
+});

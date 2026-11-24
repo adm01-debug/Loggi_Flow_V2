@@ -1,21 +1,21 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { log, redact } from "../_shared/logger.ts";
+import { invokeFunction } from "../_shared/invokeFunction.ts";
+import { getCorsHeaders } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
+// Curto de proposito: a tela do admin espera a resposta.
+const SEND_EMAIL_TIMEOUT_MS = 5_000;
 
 interface SendResetRequest {
   requestId: string;
 }
 
 serve(async (req: Request) => {
+  const headers = getCorsHeaders(req);
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers });
   }
 
   try {
@@ -36,7 +36,7 @@ serve(async (req: Request) => {
       log.error("No authorization header provided");
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...headers, "Content-Type": "application/json" },
       });
     }
 
@@ -50,7 +50,7 @@ serve(async (req: Request) => {
       log.error("Auth error:", authError);
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...headers, "Content-Type": "application/json" },
       });
     }
 
@@ -67,7 +67,7 @@ serve(async (req: Request) => {
         JSON.stringify({ error: "Forbidden - Admin access required" }),
         {
           status: 403,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...headers, "Content-Type": "application/json" },
         },
       );
     }
@@ -77,7 +77,7 @@ serve(async (req: Request) => {
     if (!requestId) {
       return new Response(JSON.stringify({ error: "Request ID is required" }), {
         status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...headers, "Content-Type": "application/json" },
       });
     }
 
@@ -96,7 +96,7 @@ serve(async (req: Request) => {
         JSON.stringify({ error: "Reset request not found" }),
         {
           status: 404,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...headers, "Content-Type": "application/json" },
         },
       );
     }
@@ -106,7 +106,7 @@ serve(async (req: Request) => {
         JSON.stringify({ error: "Request has already been processed" }),
         {
           status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...headers, "Content-Type": "application/json" },
         },
       );
     }
@@ -140,7 +140,7 @@ serve(async (req: Request) => {
         }),
         {
           status: 500,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...headers, "Content-Type": "application/json" },
         },
       );
     }
@@ -148,30 +148,22 @@ serve(async (req: Request) => {
     const actionLink = linkData.properties.action_link;
 
     log.info(`Sending password reset email to: ${redact(resetRequest.email)}`);
-    const { error: sendError } = await supabaseAdmin.functions.invoke(
+    const envio = await invokeFunction(
       "resend-email",
       {
-        body: {
-          to: resetRequest.email,
-          subject: "Redefinição de senha — LogiFlow",
-          html: `<p>Você solicitou a redefinição de senha da sua conta LogiFlow.</p>
+        to: resetRequest.email,
+        subject: "Redefinição de senha — LogiFlow",
+        html: `<p>Você solicitou a redefinição de senha da sua conta LogiFlow.</p>
 <p><a href="${actionLink}">Clique aqui para definir uma nova senha</a>.</p>
 <p>Se você não solicitou isso, ignore este e-mail.</p>`,
-        },
       },
+      { timeoutMs: SEND_EMAIL_TIMEOUT_MS },
     );
 
-    if (sendError) {
-      log.error("Error sending reset email:", sendError);
-      return new Response(
-        JSON.stringify({
-          error: `Failed to send reset email: ${sendError.message}`,
-        }),
-        {
-          status: 500,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        },
-      );
+    // Falha no envio nao volta para a tela: seria oraculo de existencia de
+    // conta e prenderia o admin. O motivo fica no log e o fluxo segue.
+    if (!envio.ok) {
+      log.error("Error sending reset email:", { reason: envio.reason });
     }
 
     // Update the request status
@@ -189,14 +181,14 @@ serve(async (req: Request) => {
     }
 
     log.info(
-      `Password reset approved and email sent for request: ${requestId}`,
+      `Password reset approved for request: ${requestId}`,
     );
 
     return new Response(
       JSON.stringify({ success: true, message: "Password reset email sent" }),
       {
         status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...headers, "Content-Type": "application/json" },
       },
     );
   } catch (error: unknown) {
@@ -205,7 +197,7 @@ serve(async (req: Request) => {
     log.error("Unexpected error:", error);
     return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...headers, "Content-Type": "application/json" },
     });
   }
 });

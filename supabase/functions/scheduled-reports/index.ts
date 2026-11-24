@@ -5,6 +5,16 @@ import { log } from "../_shared/logger.ts";
 import { withCircuitBreaker } from "../_shared/circuitBreaker.ts";
 import { requireUser } from "../_shared/auth.ts";
 import { safeFetch } from "../_shared/safeFetch.ts";
+import {
+  requireString,
+  ValidationError,
+} from "../_shared/validate.ts";
+import { internalErrorResponse } from "../_shared/httpError.ts";
+import {
+  asRecord,
+  buildReportFields,
+  isAllowedAction,
+} from "./fields.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -25,31 +35,54 @@ export const handler = async (req: Request) => {
   const userId = auth.claims.sub;
 
   try {
-    const { action, reportId, reportData } = await req.json();
+    const body = asRecord(await req.json());
+    const { action, reportData } = body;
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+
+    // Ação fora da allowlist é erro do cliente (400), nunca do servidor (500).
+    if (!isAllowedAction(action)) {
+      return new Response(
+        JSON.stringify({ success: false, error: `Unknown action: ${String(action)}` }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
 
     log.info(`[Scheduled Reports] Action: ${action}`);
 
     // Handle different actions
     switch (action) {
       case "create": {
+        const campos = buildReportFields(reportData, { exigirObrigatorios: true });
+        // Etapas 143/144: só campos da allowlist; user_id vem das claims.
         const { data, error } = await supabase
           .from("scheduled_reports")
-          .insert([{ ...reportData, user_id: userId }])
+          .insert([{ ...campos, user_id: userId }])
           .select()
           .single();
 
-        if (error) throw error;
+        if (error) {
+          // O texto do PostgREST (tabela, coluna, restrição) fica no log; a resposta é genérica.
+          log.error("[Scheduled Reports] Falha ao criar relatório:", {
+            code: error.code,
+            message: error.message,
+          });
+          throw new Error("Falha ao criar relatório");
+        }
         return new Response(JSON.stringify({ success: true, report: data }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
 
       case "update": {
+        const id = requireString(body, "reportId", { maxLength: 64 });
+        const campos = buildReportFields(reportData, { exigirObrigatorios: false });
+        if (Object.keys(campos).length === 0) {
+          throw new ValidationError("reportData", "reportData has no updatable field");
+        }
         const { data, error } = await supabase
           .from("scheduled_reports")
-          .update(reportData)
-          .eq("id", reportId)
+          .update(campos)
+          .eq("id", id)
           .eq("user_id", userId)
           .select()
           .single();
@@ -61,10 +94,11 @@ export const handler = async (req: Request) => {
       }
 
       case "delete": {
+        const id = requireString(body, "reportId", { maxLength: 64 });
         const { error } = await supabase
           .from("scheduled_reports")
           .delete()
-          .eq("id", reportId)
+          .eq("id", id)
           .eq("user_id", userId);
 
         if (error) throw error;
@@ -87,20 +121,27 @@ export const handler = async (req: Request) => {
       }
 
       case "generate": {
+        const geracao = asRecord(reportData);
         // Generate report data based on type
         const report = await generateReportData(
           supabase,
-          reportData.report_type,
-          reportData.filters,
+          requireString(geracao, "report_type", { maxLength: 64 }),
+          geracao.filters,
         );
 
+        const destinatarios = Array.isArray(geracao.recipients)
+          ? geracao.recipients.filter(
+            (r): r is string => typeof r === "string" && r.trim().length > 0,
+          )
+          : [];
+
         // Send email if recipients are provided
-        if (reportData.recipients && reportData.recipients.length > 0) {
+        if (destinatarios.length > 0) {
           const resendApiKey = Deno.env.get("RESEND_API_KEY");
           if (resendApiKey) {
             await withCircuitBreaker("resend-api", async () => {
               await sendReportEmail(
-                reportData.recipients,
+                destinatarios,
                 report,
                 resendApiKey,
               );
@@ -120,17 +161,8 @@ export const handler = async (req: Request) => {
         );
     }
   } catch (error) {
-    log.error("[Scheduled Reports] Error:", { error });
-    return new Response(
-      JSON.stringify({
-        success: false,
-        error: error instanceof Error ? error.message : "Unknown error",
-      }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      },
-    );
+    // 422 do ValidationError segue com o campo culpado; o resto vira 500 genérico.
+    return internalErrorResponse(error, corsHeaders, "scheduled-reports");
   }
 };
 

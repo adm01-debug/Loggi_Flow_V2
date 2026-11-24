@@ -244,9 +244,16 @@ export default function AdminADR() {
               <Button
                 className="w-full"
                 onClick={() => createMutation.mutate(newAdr)}
-                disabled={!newAdr.title || !newAdr.decision}
+                disabled={
+                  !newAdr.title || !newAdr.decision || createMutation.isPending
+                }
               >
-                <Save className="w-4 h-4 mr-2" /> Salvar ADR
+                {createMutation.isPending ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <Save className="w-4 h-4 mr-2" />
+                )}
+                Salvar ADR
               </Button>
             </CardContent>
           </Card>

@@ -19,6 +19,11 @@ interface BulkAction {
   onClick: (selectedIds: string[]) => void;
   confirmTitle?: string;
   confirmDescription?: string | ((count: number) => string);
+  /**
+   * Palavra que o usuário precisa digitar para liberar a confirmação.
+   * Use nas ações destrutivas que apagam em massa (etapa 051).
+   */
+  confirmTyping?: string;
 }
 
 interface BulkActionsProps {
@@ -68,6 +73,7 @@ export function BulkActions({
       description={confirmDescription}
       confirmText={pendingAction?.label ?? "Confirmar"}
       type="danger"
+      requireTyping={pendingAction?.confirmTyping}
       onConfirm={() => {
         pendingAction?.onClick(selectedIds);
         setPendingAction(null);

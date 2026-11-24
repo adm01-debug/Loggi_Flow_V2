@@ -3,20 +3,21 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import { log } from "../_shared/logger.ts";
 import { safeFetch } from "../_shared/safeFetch.ts";
 import { requireInternalSecret, requireRole } from "../_shared/auth.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
+import {
+  ValidationError,
+  validationErrorResponse,
+} from "../_shared/validate.ts";
+import { parseWebhookStatusInput } from "./parse.ts";
+import { getCorsHeaders } from "../_shared/cors.ts";
 
 /**
  * Webhook Status Edge Function
  * Handles notifying external clients about shipment status changes with HMAC signature validation.
  */
 serve(async (req) => {
+  const headers = getCorsHeaders(req);
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers });
   }
 
   try {
@@ -33,15 +34,17 @@ serve(async (req) => {
       const status = roleAuth && !roleAuth.ok ? roleAuth.status : 401;
       return new Response(JSON.stringify({ error: status === 403 ? "Forbidden" : "Unauthorized" }), {
         status,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...headers, "Content-Type": "application/json" },
       });
     }
     // sub do usuário autenticado (nulo para chamadas internas)
     const callerSub = (!isInternal && roleAuth?.ok) ? roleAuth.claims.sub : undefined;
 
-    const { action, data } = await req.json();
+    const parsed = parseWebhookStatusInput(
+      (await req.json()) as Record<string, unknown>,
+    );
 
-    switch (action) {
+    switch (parsed.action) {
       case "notify_status_change": {
         const {
           entrega_id,
@@ -49,7 +52,7 @@ serve(async (req) => {
           new_status,
           numero_entrega,
           codigo_rastreamento,
-        } = data;
+        } = parsed.data;
 
         // Get active webhooks configured for this specific event (status)
         const { data: webhooks, error: whError } = await supabase
@@ -157,9 +160,9 @@ serve(async (req) => {
         await supabase.from("audit_logs").insert({
           action: "webhook_notify_status_change",
           table_name: "client_webhooks",
-          record_id: data.entrega_id ?? "unknown",
+          record_id: entrega_id,
           user_id: callerSub ?? null,
-          new_data: { processed: relevantWebhooks.length, new_status: data.new_status },
+          new_data: { processed: relevantWebhooks.length, new_status },
         }).then(() => {/* best-effort */});
 
         return new Response(
@@ -170,7 +173,7 @@ serve(async (req) => {
           }),
           {
             status: 200,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            headers: { ...headers, "Content-Type": "application/json" },
           },
         );
       }
@@ -188,23 +191,15 @@ serve(async (req) => {
         if (error) throw error;
         return new Response(JSON.stringify({ success: true, data: webhooks }), {
           status: 200,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...headers, "Content-Type": "application/json" },
         });
       }
 
-      default:
-        return new Response(
-          JSON.stringify({
-            success: false,
-            error: `Action not implemented: ${action}`,
-          }),
-          {
-            status: 400,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          },
-        );
     }
   } catch (error) {
+    if (error instanceof ValidationError) {
+      return validationErrorResponse(error, headers);
+    }
     log.error("Webhook dispatcher critical failure:", error);
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
@@ -212,7 +207,7 @@ serve(async (req) => {
       JSON.stringify({ success: false, error: errorMessage }),
       {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...headers, "Content-Type": "application/json" },
       },
     );
   }

@@ -1,6 +1,5 @@
 /**
- * Fetch utility with built-in timeout and retry logic.
- * Dimension 19: Availability (Audit 10/10).
+ * Fetch utility with a per-request timeout (default 10s); it does NOT retry.
  */
 export async function fetchWithTimeout(
   url: string, 

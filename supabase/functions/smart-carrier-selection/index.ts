@@ -3,6 +3,9 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
 import { log, LogLevel } from "../_shared/logger.ts";
+import { ValidationError, validationErrorResponse } from "../_shared/validate.ts";
+import { internalErrorResponse } from "../_shared/httpError.ts";
+import { parseSmartSelectionInput } from "./parse.ts";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -10,7 +13,9 @@ serve(async (req) => {
   }
 
   try {
-    const { estado_destino, peso_kg, urgencia, tipo_carga } = await req.json();
+    const body = (await req.json()) as Record<string, unknown>;
+    const { estado_destino, peso_kg, urgencia, tipo_carga } =
+      parseSmartSelectionInput(body);
 
     const authHeader = req.headers.get("Authorization");
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -231,20 +236,14 @@ serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
+    if (error instanceof ValidationError) {
+      return validationErrorResponse(error, corsHeaders);
+    }
     log({
       level: LogLevel.ERROR,
       message: "Smart carrier selection function error",
       meta: { error: error.message },
     });
-    return new Response(
-      JSON.stringify({
-        error: "Internal Server Error",
-        message: error.message,
-      }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      },
-    );
+    return internalErrorResponse(error, corsHeaders, "smart-carrier-selection");
   }
 });

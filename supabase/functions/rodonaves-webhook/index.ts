@@ -3,14 +3,10 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { validateContract } from "../_shared/contract-validator.ts";
 import { requireString } from "../_shared/validate.ts";
 import { log, redact } from "../_shared/logger.ts";
+import { internalErrorResponse } from "../_shared/httpError.ts";
 import { verifyWebhookHmac } from "../_shared/webhookSignature.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
+import { getCorsHeaders } from "../_shared/cors.ts";
 
 // Map Rodonaves status codes to system entrega_status enum
 function mapRodonavesStatus(code: string): string | null {
@@ -34,8 +30,9 @@ function mapRodonavesStatus(code: string): string | null {
 }
 
 serve(async (req: Request) => {
+  const headers = getCorsHeaders(req);
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers });
   }
 
   try {
@@ -48,7 +45,7 @@ serve(async (req: Request) => {
         JSON.stringify({ error: rl.message ?? "rate limited" }),
         {
           status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...headers, "Content-Type": "application/json" },
         },
       );
     }
@@ -75,7 +72,7 @@ serve(async (req: Request) => {
         log.warn("Rodonaves webhook: invalid signature");
         return new Response(JSON.stringify({ error: "Invalid signature" }), {
           status: 401,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...headers, "Content-Type": "application/json" },
         });
       }
     }
@@ -104,7 +101,7 @@ serve(async (req: Request) => {
           nexus_protocol: "RODONAVES_GATE_REJECTION",
         }),
         {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...headers, "Content-Type": "application/json" },
           status: 400,
         },
       );
@@ -125,26 +122,6 @@ serve(async (req: Request) => {
       event_id ||
       `rodonaves-${nf_numero || codigo_rastreamento}-${status_code}-${data_evento}`;
 
-    // Idempotency check
-    const { data: existingEvent } = await supabaseAdmin
-      .from("webhook_events_processed")
-      .select("id")
-      .eq("event_id", finalEventId)
-      .eq("provider", "rodonaves")
-      .maybeSingle();
-
-    if (existingEvent) {
-      log.info(
-        `Webhook already processed (eventId: ${finalEventId}), skipping`,
-      );
-      return new Response(
-        JSON.stringify({ success: true, message: "Already processed" }),
-        {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        },
-      );
-    }
-
     // Find the entrega
     let query = supabaseAdmin
       .from("entregas")
@@ -164,7 +141,7 @@ serve(async (req: Request) => {
         JSON.stringify({ success: false, message: "Entrega não encontrada" }),
         {
           status: 404,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...headers, "Content-Type": "application/json" },
         },
       );
     }
@@ -179,7 +156,42 @@ serve(async (req: Request) => {
           success: true,
           message: "Status code não mapeado, ignorado",
         }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        { headers: { ...headers, "Content-Type": "application/json" } },
+      );
+    }
+
+    // Etapa 135 - grava o marcador de idempotencia ANTES do primeiro write de
+    // negocio: o UNIQUE (event_id, provider) resolve a corrida com 23505.
+    // Fica depois das saidas que nao gravam nada ("Entrega nao encontrada" e
+    // status nao mapeado), para nao descartar evento que precisa ser
+    // reprocessado. Fail-open em erro de infraestrutura, igual a
+    // _shared/idempotency.ts.
+    const { error: markerError } = await supabaseAdmin
+      .from("webhook_events_processed")
+      .insert({
+        event_id: finalEventId,
+        provider: "rodonaves",
+        payload: payload,
+      });
+
+    if (markerError) {
+      if (markerError.code === "23505") {
+        log.info(
+          `Webhook already processed (eventId: ${finalEventId}), skipping`,
+        );
+        return new Response(
+          JSON.stringify({
+            success: true,
+            duplicate: true,
+            message: "Already processed",
+          }),
+          {
+            headers: { ...headers, "Content-Type": "application/json" },
+          },
+        );
+      }
+      log.warn(
+        `Falha ao gravar marcador de idempotencia: ${markerError.message}`,
       );
     }
 
@@ -195,7 +207,14 @@ serve(async (req: Request) => {
       .update(updateData)
       .eq("id", entrega.id);
 
-    if (updateError) throw updateError;
+    if (updateError) {
+      log.error("[rodonaves-webhook] Falha ao atualizar a entrega:", {
+        entrega_id: entrega.id,
+        code: updateError.code,
+        message: updateError.message,
+      });
+      throw new Error("Falha ao atualizar a entrega");
+    }
 
     // Register ocorrencia if status is ocorrencia
     if (newStatus === "ocorrencia") {
@@ -210,13 +229,6 @@ serve(async (req: Request) => {
 
     log.info(`Entrega ${entrega.numero_entrega} updated to ${newStatus}`);
 
-    // Mark as processed
-    await supabaseAdmin.from("webhook_events_processed").insert({
-      event_id: finalEventId,
-      provider: "rodonaves",
-      payload: payload,
-    });
-
     return new Response(
       JSON.stringify({
         success: true,
@@ -224,13 +236,12 @@ serve(async (req: Request) => {
         new_status: newStatus,
         event_id: finalEventId,
       }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      { headers: { ...headers, "Content-Type": "application/json" } },
     );
   } catch (error: any) {
-    log.error("Rodonaves webhook error:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    log.error("[rodonaves-webhook] Webhook error:", {
+      message: error instanceof Error ? error.message : String(error),
     });
+    return internalErrorResponse(error, headers, "rodonaves-webhook");
   }
 });

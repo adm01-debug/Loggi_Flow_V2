@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from "@/hooks/auth/useAuth";
@@ -81,6 +81,14 @@ export function useOnboarding() {
   const { unlockAchievement: showAchievementNotification } = useAchievementNotifications();
   const queryClient = useQueryClient();
   const [showWizard, setShowWizard] = useState(false);
+  const achievementTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Cancela a notificacao de conquista pendente ao sair da tela
+  useEffect(() => {
+    return () => {
+      if (achievementTimerRef.current) clearTimeout(achievementTimerRef.current);
+    };
+  }, []);
 
   // Fetch onboarding progress
   const { data: progress, isLoading } = useQuery({
@@ -187,7 +195,8 @@ export function useOnboarding() {
 
       // Show master achievement notification
       if (data.masterAchievement) {
-        setTimeout(() => {
+        if (achievementTimerRef.current) clearTimeout(achievementTimerRef.current);
+        achievementTimerRef.current = setTimeout(() => {
         showAchievementNotification({
           id: data.masterAchievement!.id,
           name: data.masterAchievement!.name,

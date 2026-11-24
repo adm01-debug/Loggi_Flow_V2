@@ -3,6 +3,10 @@
 > Auditoria somente-leitura · `main` em `d37ba30` · 2026-11-22/23
 > Agrupados **por causa raiz**. Um problema com dez ocorrências é **um** achado com dez locais.
 
+> **Fechamento da auditoria · 2026-11-24 · `main` em `c7fc18ae` · banco `jvfhclubfpxrtrrazrgr`**
+> Árvore da auditoria em `d37ba30` (2026-11-22/23). O estado abaixo vem de `05-PROGRESSO.md`, não da memória de quem executou.
+> Contagem: **35 resolvidos / 15 parciais / 15 abertos / 0 refutados** — RESOLVIDO exige todas as etapas do achado concluídas com verificação registrada.
+
 ## Como ler
 
 | Campo          | O que significa                                                                                                                                                                                                                    |
@@ -80,6 +84,8 @@ para corrigir — mas registre o estado do segredo, porque ele diz se houve expo
 
 → Etapas **001**, **002**
 
+**Estado (2026-11-24):** PARCIAL (feito 001; falta 002 — aguarda o dono).
+
 ## S-02 — `webhook-status` aceita qualquer usuário autenticado e dispara POST assinado para todos os clientes
 
 - **Camada:** edge function · **Severidade:** **Crítica** · **Confiança:** confirmado · **Método:** RASTREADO
@@ -103,6 +109,8 @@ status, assinados como se fossem do sistema, para todos os clientes que recebem 
 
 → Etapas **003**, **004**, **005**
 
+**Estado (2026-11-24):** RESOLVIDO (etapas 003, 004, 005).
+
 ## S-03 — Qualquer usuário autenticado envia WhatsApp para qualquer número
 
 - **Camada:** edge function · **Severidade:** **Alta** · **Confiança:** confirmado · **Método:** RASTREADO
@@ -121,6 +129,8 @@ número oficial da empresa — gasto no provedor e risco de bloqueio do número 
 
 → Etapas **006**, **007**
 
+**Estado (2026-11-24):** PARCIAL (feito 007; falta 006 — aguarda o dono).
+
 ## S-04 — Qualquer usuário autenticado cota na Melhor Envio, e o ambiente (produção/sandbox) vem do corpo
 
 - **Camada:** edge function · **Severidade:** **Alta** · **Confiança:** confirmado · **Método:** RASTREADO
@@ -137,6 +147,8 @@ ir para o ambiente errado, gerando cotação ou etiqueta inválida.
 **Locais:** `supabase/functions/melhor-envio-api/index.ts:43-49`, `:59-61`
 
 → Etapas **008**, **009**
+
+**Estado (2026-11-24):** ABERTO (008, 009 — aguarda o dono).
 
 ## S-05 — Modo de teste dos webhooks pula o HMAC e grava de verdade
 
@@ -159,6 +171,8 @@ nas entregas mandando um header.
 
 → Etapas **010**, **011**
 
+**Estado (2026-11-24):** ABERTO (010, 011 — aguarda o dono).
+
 ## S-06 — Duas funções públicas usam `service_role` para responder a anônimos
 
 - **Camada:** edge function · **Severidade:** **Média** · **Confiança:** confirmado · **Método:** RASTREADO
@@ -177,6 +191,8 @@ serviço.
 **Locais:** `supabase/functions/health/index.ts:23-31`, `:48`; `supabase/functions/health-check/index.ts:12`, `:24`
 
 → Etapas **012**, **013**, **014**
+
+**Estado (2026-11-24):** PARCIAL (feito 012, 013; falta 014 — aguarda o dono).
 
 ## S-07 — Repositório é público, a documentação diz que é privado, e o `.env` está versionado
 
@@ -209,6 +225,8 @@ As chaves são `anon`; o ganho não paga o risco. O que resolve é: corrigir o `
 
 → Etapas **015**, **016**, **017**, **018**
 
+**Estado (2026-11-24):** PARCIAL (feito 015; falta 016, 017, 018 — aguarda o dono).
+
 ## S-08 — O token do Mapbox no `.env` é dívida morta: nada no sistema o usa
 
 - **Camada:** infra/integração · **Severidade:** **Baixa** · **Confiança:** confirmado · **Método:** EXECUTADO
@@ -235,6 +253,8 @@ a etapa de CORS correspondente deixa de ser necessária — resolva a remoção 
 
 → Etapa **019**
 
+**Estado (2026-11-24):** ABERTO (019 — aguarda o dono).
+
 ---
 
 # Grupo F — Fonte de verdade: o que a auditoria não pôde decidir
@@ -246,6 +266,10 @@ Este grupo existe porque o projeto Supabase oficial não ficou acessível nesta 
 ## F-01 — A fonte de contexto afirma que 36 tabelas estão sem RLS; ao menos 32 têm
 
 - **Camada:** banco / ferramentas de contexto · **Severidade:** **Alta** · **Confiança:** confirmado · **Método:** EXECUTADO
+
+> **Corrigido nas etapas 020-022** (`scripts/ai-context/gerar.mjs`): o gerador não afirma mais "sem RLS"
+> nesse cenário — publica `sem_rls: 'desconhecido'`, `tabelas_rls_indeterminado` e a consulta ao catálogo que
+> decide. No repositório atual: 12 partições `audit_logs_y*` indeterminadas e 0 tabelas "sem RLS" confirmadas.
 
 **Problema hoje.** `docs/contexto/codigo/banco.json` (branch `contexto`) marca `rls: false` em 36 tabelas.
 Dessas, 32 são partições mensais de `audit_logs` e `rastreamento_historico` — e o RLS **é** habilitado nelas
@@ -277,6 +301,8 @@ Esta auditoria gastou parte do tempo exatamente nisso antes de descartar.
 A correção é no gerador e/ou no aviso que ele emite.
 
 → Etapas **020**, **021**, **022**
+
+**Estado (2026-11-24):** RESOLVIDO (etapas 020, 021, 022).
 
 ## F-02 — Três tabelas recebem `CREATE POLICY` e nenhuma migration habilita RLS nelas
 
@@ -337,6 +363,8 @@ conferir as policies, só então habilitar — e é por isso que isso é uma eta
 
 → Etapas **023**, **024**, **025**
 
+**Estado (2026-11-24):** ABERTO (023 — não executada; 024, 025 — aguarda o dono).
+
 ## F-03 — A unicidade está garantida nos números de coleta e entrega; falta no código de rastreio reverso
 
 - **Camada:** banco · **Severidade:** **Média** · **Confiança:** confirmado · **Método:** RASTREADO
@@ -374,6 +402,8 @@ de outra pessoa, ou a própria operação perde de vista qual é qual.
 sobre dado duplicado **falha**, e a migration quebra no meio.
 
 → Etapas **026**, **027**
+
+**Estado (2026-11-24):** ABERTO (026 — não executada; 027 — aguarda o dono).
 
 ---
 
@@ -431,6 +461,8 @@ inteiro de pé, só mais difícil de perceber, porque a tela passa a parecer con
 
 → Etapas **028** a **037**
 
+**Estado (2026-11-24):** ABERTO (028, 037 — aguarda o dono).
+
 ## C-02 — A tela de cotação multicanal não lê nem grava no banco: a negociação vive na memória do navegador
 
 - **Camada:** interface + hook · **Severidade:** **Crítica** · **Confiança:** confirmado · **Método:** RASTREADO
@@ -466,6 +498,8 @@ então não há registro de por que aquele frete foi contratado — e a negocia�
 
 → Etapas **038** a **043**
 
+**Estado (2026-11-24):** PARCIAL (feito 038; falta 043 — aguarda o dono).
+
 ## C-03 — Travas de concorrência que não avisam quando bloqueiam
 
 - **Camada:** interface + hook · **Severidade:** **Alta** · **Confiança:** confirmado · **Método:** RASTREADO
@@ -499,6 +533,8 @@ mandar `version + 1` do cliente é redundante (o `BEFORE UPDATE` sobrescreve) e 
 front controla a versão.
 
 → Etapas **044** a **048**
+
+**Estado (2026-11-24):** RESOLVIDO (etapas 044, 048).
 
 ---
 
@@ -543,6 +579,8 @@ próxima tela que usar o componente desprotegida de novo.
 
 → Etapas **049**, **050**, **051**, **052**
 
+**Estado (2026-11-24):** RESOLVIDO (etapas 049, 050, 051, 052).
+
 ## D-02 — Dois cadastros apagam o registro de verdade, contra a política escrita do repositório
 
 - **Camada:** interface + banco · **Severidade:** **Alta** · **Confiança:** confirmado · **Método:** RASTREADO
@@ -572,6 +610,8 @@ listas — um defeito pior que o atual, porque parece que a exclusão não funci
 
 → Etapas **053** a **058**
 
+**Estado (2026-11-24):** PARCIAL (feito 053; falta 058 — aguarda o dono).
+
 ## D-03 — Cancelar uma logística reversa é um clique de menu, sem confirmação
 
 - **Camada:** interface · **Severidade:** **Média** · **Confiança:** confirmado · **Método:** RASTREADO
@@ -593,6 +633,8 @@ recebeu tratamento diferente.
 **Padrão de referência:** `src/pages/Despachos.tsx:546-553`.
 
 → Etapa **059**
+
+**Estado (2026-11-24):** RESOLVIDO (etapas 059).
 
 ## D-04 — Dois arquivos SQL de remediação parados na pasta, sem registro de aplicação
 
@@ -621,6 +663,8 @@ cuidado, porque não há convenção nem lugar definido.
 **Locais:** `scripts/origem_remediacao_2026-08-31.sql`, `scripts/cleanup_triggers_source.sql`
 
 → Etapas **060**, **061**
+
+**Estado (2026-11-24):** ABERTO (060 — aguarda o dono; 061 — não executada).
 
 ---
 
@@ -653,6 +697,8 @@ resolve a edição. A exclusão deve ser lógica (`deleted_at`), seguindo `src/p
 `ConfirmDialog` — **e** com o filtro `deleted_at IS NULL` na consulta da lista, no mesmo passo (ver D-02).
 
 → Etapas **062** a **067**
+
+**Estado (2026-11-24):** RESOLVIDO (etapas 062, 067).
 
 ## A-08 — "Nexus Self-Healing": uma funcionalidade que finge trabalhar
 
@@ -695,6 +741,8 @@ sucesso" sem ter feito nada.
 
 → Etapas **068**, **069**, **070**
 
+**Estado (2026-11-24):** PARCIAL (feito 068, 069; falta 070 — aguarda o dono).
+
 ## A-09 — Duas edge functions publicadas que ninguém chama
 
 - **Camada:** edge function · **Severidade:** **Média** · **Confiança:** confirmado · **Método:** RASTREADO
@@ -716,6 +764,8 @@ função que ninguém no sistema usa.
 etapa é **decidir** (ligar ou remover) com o dono, não limpar por conta própria.
 
 → Etapas **071**, **072**, **073**
+
+**Estado (2026-11-24):** ABERTO (071, 072, 073 — aguarda o dono).
 
 ## A-10 — Três buckets de storage criados e nunca usados pelo código
 
@@ -740,6 +790,8 @@ policies dos dois podem ser diferentes.
 **Locais:** buckets no banco; ausência de uso em `src/`
 
 → Etapas **074**, **075**, **076**
+
+**Estado (2026-11-24):** ABERTO (074, 075, 076 — aguarda o dono).
 
 ## A-11 — Dois caminhos de upload com padrões de segurança diferentes
 
@@ -768,6 +820,8 @@ tipo e tamanho para o mesmo bucket dos documentos.
 
 → Etapas **077**, **078**, **079**
 
+**Estado (2026-11-24):** RESOLVIDO (etapas 077, 078, 079).
+
 ## A-12 — Oito arquivos de hook que ninguém importa
 
 - **Camada:** hooks · **Severidade:** **Baixa** · **Confiança:** confirmado (de `hooks.json`, campo `usado_por: 0`) · **Método:** RASTREADO
@@ -793,6 +847,8 @@ Os dois casos realmente mortos e confirmados são `useSelfHealing` e `useNexusSi
 
 → Etapas **080**, **081**
 
+**Estado (2026-11-24):** RESOLVIDO (etapas 080, 081).
+
 ## A-13 — `_shared/service-wrapper.ts` existe e nenhuma função o usa
 
 - **Camada:** edge function · **Severidade:** **Baixa** (mas é a causa raiz de B-02) · **Confiança:** confirmado · **Método:** EXECUTADO
@@ -804,6 +860,8 @@ errado (B-02).
 **Locais:** `supabase/functions/_shared/service-wrapper.ts`
 
 → Etapa **082**
+
+**Estado (2026-11-24):** RESOLVIDO (etapas 082).
 
 ---
 
@@ -864,6 +922,8 @@ aviso e manteve o laço. Não repita.
 
 → Etapas **083** a **096**
 
+**Estado (2026-11-24):** RESOLVIDO (etapas 083, 096).
+
 ## R-01 — Cinco telas mostram erro como texto solto; uma não mostra nada
 
 - **Camada:** interface · **Severidade:** **Alta** · **Confiança:** confirmado · **Método:** RASTREADO
@@ -895,6 +955,8 @@ aplicado como em `src/pages/Coletas.tsx:258`.
 
 → Etapas **097** a **103**
 
+**Estado (2026-11-24):** RESOLVIDO (etapas 097, 103).
+
 ## R-06 — Cinco gravações de configuração descartam o erro, e a tela mostra o contrário do banco
 
 - **Camada:** interface + hook · **Severidade:** **Alta** · **Confiança:** confirmado · **Método:** RASTREADO
@@ -923,6 +985,8 @@ ligado.
 sucesso e `onError` com `toast.error(...)` contendo a mensagem.
 
 → Etapas **104** a **109**
+
+**Estado (2026-11-24):** RESOLVIDO (etapas 104, 109).
 
 ## R-04 — Sincronização com a Rodonaves: erro invisível e lista que não atualiza
 
@@ -967,6 +1031,8 @@ Quando a sincronização falha, não aparece nada e ele acha que deu certo.
 
 → Etapas **110** a **114**
 
+**Estado (2026-11-24):** RESOLVIDO (etapas 110, 114).
+
 ## R-03 — "Nexus Blast" marca 100% mesmo com todas as transportadoras falhando
 
 - **Camada:** interface · **Severidade:** **Média** · **Confiança:** confirmado · **Método:** RASTREADO
@@ -981,6 +1047,8 @@ que 7 falharam — segue para a decisão de frete com três preços achando que 
 **Locais:** `src/pages/CotacaoMultiCanal.tsx:321-326`
 
 → Etapas **115**, **116**
+
+**Estado (2026-11-24):** RESOLVIDO (etapas 115, 116).
 
 ## R-07 — Importação em massa não diz quais linhas falharam, e conta o lote inteiro como erro
 
@@ -1006,6 +1074,8 @@ não tem como corrigir e reimportar só o que faltou. Na prática ele refaz a pl
 
 → Etapas **117** a **120**
 
+**Estado (2026-11-24):** PARCIAL (feito 117; falta 120 — aguarda o dono).
+
 ## R-05 — Nenhuma proteção verificada contra duplo clique em formulário de criação
 
 - **Camada:** interface · **Severidade:** **Média** · **Confiança:** **HIPÓTESE — NÃO VERIFICADO** · **Método:** RASTREADO
@@ -1023,6 +1093,8 @@ achado como improcedente e registrar isso** — é um resultado legítimo.
 que a unicidade do número não pôde ser confirmada, as duas podem até receber o mesmo número.
 
 → Etapas **121**, **122**
+
+**Estado (2026-11-24):** RESOLVIDO (etapas 121, 122).
 
 ## R-08 — Dez temporizadores sem cancelamento no desmonte
 
@@ -1045,6 +1117,8 @@ hora. Não perde dado nem vaza conexão.
 
 → Etapas **123** a **127**
 
+**Estado (2026-11-24):** RESOLVIDO (etapas 123, 127).
+
 ## R-09 — Quatro canais de tempo real com nome fixo global
 
 - **Camada:** hooks · **Severidade:** **Média** · **Confiança:** confirmado · **Método:** RASTREADO
@@ -1065,6 +1139,8 @@ das duas para de receber atualização em silêncio.
 nomeado por `user.id`.
 
 → Etapas **128** a **131**
+
+**Estado (2026-11-24):** RESOLVIDO (etapas 128, 131).
 
 ---
 
@@ -1119,6 +1195,8 @@ vezes**. O cliente vê o mesmo evento repetido no rastreio, e os indicadores de 
 
 → Etapas **132** a **137**
 
+**Estado (2026-11-24):** RESOLVIDO (etapas 132, 137).
+
 ## B-02 — Chave de deduplicação com valor de reserva que anula a própria deduplicação
 
 - **Camada:** edge function · **Severidade:** **Alta** · **Confiança:** confirmado · **Método:** RASTREADO
@@ -1147,6 +1225,8 @@ rastreio do cliente.
 **Padrão de referência:** `supabase/functions/rodonaves-webhook/index.ts:124-127`.
 
 → Etapas **138** a **142**
+
+**Estado (2026-11-24):** PARCIAL (feito 138; falta 142 — aguarda o dono).
 
 ## B-03 — `scheduled-reports` deixa o cliente gravar qualquer coluna da tabela
 
@@ -1179,6 +1259,8 @@ revisa — incluindo qualquer coluna de controle que a tabela tenha.
 
 → Etapas **143**, **144**, **145**
 
+**Estado (2026-11-24):** RESOLVIDO (etapas 143, 144, 145).
+
 ## B-04 — Validação de entrada existe como helper e é usada por 8 de 32 funções
 
 - **Camada:** edge function · **Severidade:** **Alta** · **Confiança:** confirmado · **Método:** RASTREADO
@@ -1206,6 +1288,8 @@ usa o sistema, é a diferença entre corrigir sozinho e abrir chamado.
 **Padrão de referência:** `supabase/functions/external-db-bridge/index.ts:4`.
 
 → Etapas **146** a **155**
+
+**Estado (2026-11-24):** RESOLVIDO (etapas 146, 155).
 
 ## B-05 — Chamadas internas entre funções sem tempo limite, inclusive dentro do webhook
 
@@ -1238,6 +1322,8 @@ rastreamento duplicado no pedido do cliente.
 chance de reenvio e, portanto, de duplicação.
 
 → Etapas **156** a **163**
+
+**Estado (2026-11-24):** RESOLVIDO (etapas 156, 163).
 
 ## B-06 — Vinte e duas funções devolvem a mensagem de erro interna ao cliente
 
@@ -1277,6 +1363,8 @@ resposta estruturada, qualquer outro vira `{"error":"INTERNAL_ERROR"}` com o det
 corretos: `secure-store/index.ts:91`, `carrier-webhook-receiver/index.ts:221-227`. São **3 de 44**.
 
 → Etapas **164** a **178**
+
+**Estado (2026-11-24):** RESOLVIDO (etapas 164, 178).
 
 ## B-07 — Vinte e cinco funções fixam `Access-Control-Allow-Origin: "*"` e ignoram a lista de origens
 
@@ -1319,6 +1407,8 @@ sistema e ler o retorno — inclusive o que guarda segredo e o que entrega o tok
 
 → Etapas **179** a **198**
 
+**Estado (2026-11-24):** RESOLVIDO (etapas 179, 198).
+
 ## B-08 — `ingest-biosync` grava telemetria de dispositivo sem nenhuma deduplicação
 
 - **Camada:** edge function · **Severidade:** **Média** · **Confiança:** confirmado · **Método:** RASTREADO
@@ -1334,6 +1424,8 @@ para o mesmo motorista.
 
 → Etapa **199**
 
+**Estado (2026-11-24):** RESOLVIDO (etapas 199).
+
 ## B-09 — `push-send` chama o provedor de push sem tempo limite nem disjuntor
 
 - **Camada:** edge function · **Severidade:** **Média** · **Confiança:** confirmado · **Método:** RASTREADO
@@ -1344,6 +1436,8 @@ biblioteca, que fala com FCM/APNs internamente e não passa por `safeFetch`.
 **Impacto no negócio.** Lentidão do Google ou da Apple trava o envio do lote de notificações.
 
 → Etapa **200**
+
+**Estado (2026-11-24):** RESOLVIDO (etapas 200).
 
 ## B-10 — Comentário promete retentativa que o código não tem
 
@@ -1363,6 +1457,8 @@ A etapa aqui é **corrigir o comentário**, não acrescentar a funcionalidade.
 **Locais:** `supabase/functions/_shared/fetch-with-timeout.ts:3`
 
 → Etapa **201**
+
+**Estado (2026-11-24):** RESOLVIDO (etapas 201).
 
 ---
 
@@ -1410,6 +1506,8 @@ que a implementar define o padrão, e por isso deve ser feita com cuidado e cita
 
 → Etapas **202** a **211**
 
+**Estado (2026-11-24):** PARCIAL (feito 202; falta 211 — aguarda o dono).
+
 ## P-02 — Notificações baixa o histórico inteiro e pagina no navegador, e o tempo real rebaixa tudo a cada aviso
 
 - **Camada:** interface + hook · **Severidade:** **Alta** · **Confiança:** confirmado · **Método:** RASTREADO
@@ -1429,6 +1527,8 @@ notificações passa a demorar — e cada aviso novo que chega recarrega a lista
 **Locais:** `src/pages/Notificacoes.tsx:79`, `:88-93`, `:105`
 
 → Etapas **212** a **216**
+
+**Estado (2026-11-24):** RESOLVIDO (etapas 212, 216).
 
 ## P-03 — Consulta por item de lista em três hooks de indicadores
 
@@ -1453,6 +1553,8 @@ padrão **correto** e deve ser copiado, não mexido. Também descartados: `Nexus
 número de períodos comparados.
 
 → Etapas **217** a **221**
+
+**Estado (2026-11-24):** RESOLVIDO (etapas 217, 221).
 
 ## P-04 — `select("*")` em tabelas largas
 
@@ -1480,6 +1582,8 @@ dela é a ausência de teto (P-01).
 (inclusive campos `jsonb`) — mais lento para quem usa 4G ou internet ruim.
 
 → Etapas **222** a **227**
+
+**Estado (2026-11-24):** PARCIAL (feito 227; falta 222 — aguarda o dono).
 
 ## P-05 — Dois filtros muito usados sem índice que sirva
 
@@ -1519,6 +1623,8 @@ SELECT indexname, indexdef FROM pg_indexes WHERE tablename IN ('entregas','colet
 minutos fazendo o banco ordenar a lista inteira em memória.
 
 → Etapas **228** a **233**
+
+**Estado (2026-11-24):** ABERTO (228 — aguarda o dono; 233 — não executada).
 
 ## P-06 — Índices duplicados: a maior parte **já foi removida**; sobram cinco candidatos
 
@@ -1570,6 +1676,8 @@ confirme também o uso (`pg_stat_user_indexes`) antes de remover.
 
 → Etapas **234** a **240**
 
+**Estado (2026-11-24):** ABERTO (234, 240 — aguarda o dono).
+
 ---
 
 # Grupo H — Higiene, CI e documentação que engana
@@ -1611,6 +1719,8 @@ resolve é um aviso no alto, com data, commit, **qual banco** e o que já não v
 
 → Etapas **241**, **242**, **243**
 
+**Estado (2026-11-24):** RESOLVIDO (etapas 241, 242, 243).
+
 ## H-02 — `DOCUMENTATION.md` cita 29 caminhos errados e 10 componentes que não existem
 
 - **Camada:** documentação · **Severidade:** **Alta** · **Confiança:** confirmado · **Método:** RASTREADO
@@ -1637,6 +1747,8 @@ existe — e **cria um segundo componente duplicado ao lado**. É assim que nasc
 ninguém sabe qual é a boa.
 
 → Etapas **244** a **248**
+
+**Estado (2026-11-24):** PARCIAL (feito 244; falta 248 — aguarda o dono).
 
 ## H-03 — `AGENTS.md` erra em quatro pontos, um deles é a regra de merge
 
@@ -1673,6 +1785,8 @@ todos os scripts npm citados existem; `bun.lock`/`bun.lockb` realmente não são
 
 → Etapas **249** a **255**
 
+**Estado (2026-11-24):** PARCIAL (feito 249; falta 255 — aguarda o dono).
+
 ## H-04 — `docs/prod-readiness.md` afirma paridade que já não existe
 
 - **Camada:** documentação · **Severidade:** **Alta** · **Confiança:** confirmado · **Método:** RASTREADO
@@ -1690,6 +1804,8 @@ mais recente e mais confiável do repositório, e duas contagens já caducaram:
 confiando nisso, e a produção está três funções e cinco migrations atrás.
 
 → Etapas **256**, **257**
+
+**Estado (2026-11-24):** PARCIAL (feito 256; falta 257 — aguarda o dono).
 
 ## H-05 — Dois documentos declaram "perfeição 10/10" enquanto a dívida está congelada
 
@@ -1709,6 +1825,8 @@ pendente — e é justamente o que esta auditoria encontrou.
 
 → Etapa **258**
 
+**Estado (2026-11-24):** RESOLVIDO (etapas 258).
+
 ## H-06 — `docs/MELHORIAS.md` e `PLANO_MELHORIAS_2026.md`: o aviso está no alto, o erro está no meio
 
 - **Camada:** documentação · **Severidade:** **Média** · **Confiança:** confirmado · **Método:** RASTREADO
@@ -1724,6 +1842,8 @@ tabela errada.
 
 → Etapas **259**, **260**
 
+**Estado (2026-11-24):** RESOLVIDO (etapas 259, 260).
+
 ## H-07 — `TEMPLATE_STRUCTURE.md` ensina a violar a convenção do próprio repositório
 
 - **Camada:** documentação · **Severidade:** **Baixa** · **Confiança:** confirmado · **Método:** RASTREADO
@@ -1738,6 +1858,8 @@ que manda criar `src/hooks/usePagination.ts`, `useFilters.ts`, `useSorting.ts`, 
 
 → Etapa **261**
 
+**Estado (2026-11-24):** RESOLVIDO (etapas 261).
+
 ## H-08 — Imprecisão menor nos planos de etapas
 
 - **Camada:** documentação · **Severidade:** **Baixa** · **Confiança:** confirmado · **Método:** RASTREADO
@@ -1751,6 +1873,8 @@ Nenhuma etapa executada"_, além de uma seção "Não verificado" (`PLANO_BRASPR
 A única imprecisão: `PLANO_FRONTEND_CONTRATOS_190_ETAPAS.md:3` diz "43 edge functions"; hoje são 44.
 
 → Etapa **262**
+
+**Estado (2026-11-24):** RESOLVIDO (etapas 262).
 
 ## H-09 — A fonte que o protocolo manda ler como dona do fato "banco" nunca foi gerada
 
@@ -1787,6 +1911,8 @@ num vazio justamente na camada mais perigosa de errar. E, sem essa fonte, o agen
 
 → Etapas **263** a **266**
 
+**Estado (2026-11-24):** ABERTO (263, 266 — aguarda o dono).
+
 ## H-10 — Orçamento de avisos de lint no teto exato: a próxima etapa que gerar um aviso quebra a CI
 
 - **Camada:** CI · **Severidade:** **Alta** (para a execução deste plano) · **Confiança:** confirmado · **Método:** EXECUTADO
@@ -1819,6 +1945,8 @@ dono e esconde dívida nova no meio da velha.
 
 → Etapas **267**, **268**, **269**
 
+**Estado (2026-11-24):** RESOLVIDO (etapas 267, 268, 269).
+
 ## H-11 — Allowlist de vulnerabilidades com três entradas obsoletas
 
 - **Camada:** CI · **Severidade:** **Baixa** · **Confiança:** confirmado · **Método:** EXECUTADO
@@ -1833,6 +1961,8 @@ nova nesses mesmos pacotes sem ninguém notar.
 **Locais:** `scripts/audit-gate.mjs`
 
 → Etapa **270**
+
+**Estado (2026-11-24):** ABERTO (270 — aguarda o dono).
 
 ## H-12 — Arquivos versionados que não deveriam estar lá
 
@@ -1851,6 +1981,8 @@ nova nesses mesmos pacotes sem ninguém notar.
 
 → Etapas **271** a **274**
 
+**Estado (2026-11-24):** PARCIAL (feito 271; falta 274 — aguarda o dono).
+
 ## H-13 — Nenhuma tela tem teste, e 96,6% dos arquivos de hook também não
 
 - **Camada:** testes · **Severidade:** **Alta** · **Confiança:** confirmado · **Método:** RASTREADO
@@ -1868,6 +2000,8 @@ Consequência direta para este plano: **a suíte existente não cobre nenhuma da
 a razão pela qual cada etapa adiante traz um comando concreto de verificação em vez de "rode os testes".
 
 → Etapas **275** a **284**
+
+**Estado (2026-11-24):** ABERTO (275 — não executada; 284 — aguarda o dono).
 
 ## H-14 — Observabilidade: o que existe e o que ninguém vê
 
@@ -1890,6 +2024,8 @@ cron, portanto, não têm destino verificável no repositório — e com 28 cron
 bastante coisa acontecendo sem lugar para olhar.
 
 → Etapas **285** a **290**
+
+**Estado (2026-11-24):** ABERTO (285, 290 — aguarda o dono).
 
 ## H-15 — Dois pontos de `innerHTML` com interpolação, e links externos sem `noopener`
 
@@ -1915,6 +2051,8 @@ interface).
 **Locais:** `src/components/map/MapboxMap.tsx:469`, `:446-447`, `:488`
 
 → Etapas **291** a **294**
+
+**Estado (2026-11-24):** RESOLVIDO (etapas 291, 294).
 
 ---
 

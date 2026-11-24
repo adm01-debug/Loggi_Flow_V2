@@ -1,13 +1,10 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { getCorsHeaders } from "../_shared/cors.ts";
 
 serve(async (req) => {
+  const headers = getCorsHeaders(req);
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers });
   }
 
   try {
@@ -16,19 +13,19 @@ serve(async (req) => {
     if (!token) {
       return new Response(
         JSON.stringify({ error: 'Mapbox token not configured' }),
-        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 404, headers: { ...headers, 'Content-Type': 'application/json' } }
       );
     }
 
     return new Response(
       JSON.stringify({ token }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { headers: { ...headers, 'Content-Type': 'application/json' } }
     );
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
       JSON.stringify({ error: message }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...headers, 'Content-Type': 'application/json' } }
     );
   }
 });

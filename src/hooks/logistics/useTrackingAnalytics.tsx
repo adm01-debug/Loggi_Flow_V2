@@ -114,29 +114,37 @@ const analyzeTrackingData = (points: TrackingPoint[]): TrackingMetrics | null =>
   };
 };
 
-export const useTrackingAnalytics = (dateFrom?: Date, dateTo?: Date) => {
+// `rastreamento_historico` e a tabela de maior crescimento do sistema: uma linha por consulta
+// de rastreio. Sem teto, /analytics baixa a tabela inteira. 5000 e o mesmo teto de
+// ExportacaoDados/AuditTrail. O teto nao substitui a janela de data: um intervalo largo
+// ainda traz milhares de linhas, entao a janela e obrigatoria.
+const TRACKING_POINTS_LIMIT = 5000;
+
+export interface TrackingDateRange {
+  from: Date;
+  to: Date;
+}
+
+export const useTrackingAnalytics = ({ from, to }: TrackingDateRange) => {
   const { user } = useAuth();
   return useQuery({
-    queryKey: ['tracking-analytics', user?.id, dateFrom?.toISOString(), dateTo?.toISOString()],
+    queryKey: ['tracking-analytics', user?.id, from.toISOString(), to.toISOString()],
     queryFn: async (): Promise<AnalyticsSummary> => {
-      let query = supabase
+      const { data, error } = await supabase
         .from('rastreamento_historico')
         .select('*')
-        .order('recorded_at', { ascending: true });
-
-      if (dateFrom) {
-        query = query.gte('recorded_at', dateFrom.toISOString());
-      }
-      if (dateTo) {
-        query = query.lte('recorded_at', dateTo.toISOString());
-      }
-
-      const { data, error } = await query;
+        .gte('recorded_at', from.toISOString())
+        .lte('recorded_at', to.toISOString())
+        .order('recorded_at', { ascending: false })
+        .limit(TRACKING_POINTS_LIMIT);
 
       if (error) throw error;
 
+      // O teto corta os pontos mais antigos, entao o cliente reinverte para ordem cronologica.
+      const orderedPoints = [...(data || [])].reverse();
+
       const groupedByOrder: Record<string, TrackingPoint[]> = {};
-      (data || []).forEach((point) => {
+      orderedPoints.forEach((point) => {
         if (!groupedByOrder[point.lalamove_order_id]) {
           groupedByOrder[point.lalamove_order_id] = [];
         }

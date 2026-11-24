@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useState } from 'react';
+import { useEffect, useCallback, useState, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from "@/hooks/auth/useAuth";
 import { toast } from 'sonner';
@@ -18,6 +18,16 @@ export function useSecurityPushNotifications() {
   const { user, isAdmin } = useAuth();
   const [isEnabled, setIsEnabled] = useState(false);
   const [permission, setPermission] = useState<NotificationPermission>('default');
+  const autoCloseTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  // Cancela os fechamentos automaticos pendentes quando o hook desmonta
+  useEffect(() => {
+    const timers = autoCloseTimersRef.current;
+    return () => {
+      timers.forEach(clearTimeout);
+      timers.length = 0;
+    };
+  }, []);
 
   // Check notification permission on mount
   useEffect(() => {
@@ -108,7 +118,7 @@ export function useSecurityPushNotifications() {
 
       // Auto-close non-critical notifications after 10 seconds
       if (event.severity !== 'critical') {
-        setTimeout(() => notification.close(), 10000);
+        autoCloseTimersRef.current.push(setTimeout(() => notification.close(), 10000));
       }
     } catch {
       // Silent fail - notification display is non-critical

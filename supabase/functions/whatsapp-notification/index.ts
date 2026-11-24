@@ -2,12 +2,7 @@ import { safeFetch } from "../_shared/safeFetch.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { log } from "../_shared/logger.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
+import { getCorsHeaders } from "../_shared/cors.ts";
 
 interface WhatsAppRequest {
   action:
@@ -25,8 +20,9 @@ interface WhatsAppRequest {
 }
 
 serve(async (req) => {
+  const headers = getCorsHeaders(req);
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers });
   }
 
   try {
@@ -45,7 +41,7 @@ serve(async (req) => {
         }),
         {
           status: 500,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...headers, "Content-Type": "application/json" },
         },
       );
     }
@@ -58,7 +54,7 @@ serve(async (req) => {
         JSON.stringify({ success: false, error: "Phone number is required" }),
         {
           status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...headers, "Content-Type": "application/json" },
         },
       );
     }
@@ -79,7 +75,7 @@ serve(async (req) => {
             }),
             {
               status: 400,
-              headers: { ...corsHeaders, "Content-Type": "application/json" },
+              headers: { ...headers, "Content-Type": "application/json" },
             },
           );
         }
@@ -97,7 +93,7 @@ serve(async (req) => {
             JSON.stringify({ success: false, error: "Delivery not found" }),
             {
               status: 404,
-              headers: { ...corsHeaders, "Content-Type": "application/json" },
+              headers: { ...headers, "Content-Type": "application/json" },
             },
           );
         }
@@ -137,7 +133,7 @@ serve(async (req) => {
             JSON.stringify({ success: false, error: "entrega_id required" }),
             {
               status: 400,
-              headers: { ...corsHeaders, "Content-Type": "application/json" },
+              headers: { ...headers, "Content-Type": "application/json" },
             },
           );
         }
@@ -155,7 +151,7 @@ serve(async (req) => {
             JSON.stringify({ success: false, error: "Delivery not found" }),
             {
               status: 404,
-              headers: { ...corsHeaders, "Content-Type": "application/json" },
+              headers: { ...headers, "Content-Type": "application/json" },
             },
           );
         }
@@ -176,7 +172,7 @@ serve(async (req) => {
             JSON.stringify({ success: false, error: "coleta_id required" }),
             {
               status: 400,
-              headers: { ...corsHeaders, "Content-Type": "application/json" },
+              headers: { ...headers, "Content-Type": "application/json" },
             },
           );
         }
@@ -194,7 +190,7 @@ serve(async (req) => {
             JSON.stringify({ success: false, error: "Collection not found" }),
             {
               status: 404,
-              headers: { ...corsHeaders, "Content-Type": "application/json" },
+              headers: { ...headers, "Content-Type": "application/json" },
             },
           );
         }
@@ -238,7 +234,7 @@ serve(async (req) => {
             }),
             {
               status: 400,
-              headers: { ...corsHeaders, "Content-Type": "application/json" },
+              headers: { ...headers, "Content-Type": "application/json" },
             },
           );
         }
@@ -255,7 +251,7 @@ serve(async (req) => {
           }),
           {
             status: 400,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            headers: { ...headers, "Content-Type": "application/json" },
           },
         );
     }
@@ -288,7 +284,7 @@ serve(async (req) => {
         }),
         {
           status: 502,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...headers, "Content-Type": "application/json" },
         },
       );
     }
@@ -310,15 +306,15 @@ serve(async (req) => {
         success: true,
         messageId: evolutionData.key?.id || evolutionData.key?.remoteJid,
       }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      { headers: { ...headers, "Content-Type": "application/json" } },
     );
   } catch (error) {
     log.error("WhatsApp notification error:", error);
     return new Response(
-      JSON.stringify({ success: false, error: error.message }),
+      JSON.stringify({ success: false, error: "INTERNAL_ERROR" }),
       {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...headers, "Content-Type": "application/json" },
       },
     );
   }

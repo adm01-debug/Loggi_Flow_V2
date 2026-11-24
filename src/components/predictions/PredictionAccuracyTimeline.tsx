@@ -86,7 +86,7 @@ export function PredictionAccuracyTimeline() {
   useDebouncedEffect(
     () => {
       if (targetInput !== target || daysInput !== consecutiveAlert) {
-        settings.save({ target_pct: targetInput, consecutive_days_alert: daysInput }).catch(() => undefined);
+        void settings.save({ target_pct: targetInput, consecutive_days_alert: daysInput });
       }
     },
     600,
@@ -177,7 +177,7 @@ export function PredictionAccuracyTimeline() {
             <Switch
               id="notify-email"
               checked={settings.data?.notify_email ?? false}
-              onCheckedChange={(v) => settings.save({ notify_email: v }).catch(() => undefined)}
+              onCheckedChange={(v) => void settings.save({ notify_email: v })}
             />
             <Label htmlFor="notify-email" className="text-xs">Email</Label>
             <Input
@@ -187,7 +187,7 @@ export function PredictionAccuracyTimeline() {
               onBlur={(e) => {
                 const v = e.target.value.trim() || null;
                 if (v !== (settings.data?.email ?? null)) {
-                  settings.save({ email: v }).catch(() => undefined);
+                  void settings.save({ email: v });
                 }
               }}
               className="h-8 w-56"
@@ -199,7 +199,7 @@ export function PredictionAccuracyTimeline() {
             <Switch
               id="notify-wa"
               checked={settings.data?.notify_whatsapp ?? false}
-              onCheckedChange={(v) => settings.save({ notify_whatsapp: v }).catch(() => undefined)}
+              onCheckedChange={(v) => void settings.save({ notify_whatsapp: v })}
             />
             <Label htmlFor="notify-wa" className="text-xs">WhatsApp</Label>
             <Input
@@ -209,7 +209,7 @@ export function PredictionAccuracyTimeline() {
               onBlur={(e) => {
                 const v = e.target.value.trim() || null;
                 if (v !== (settings.data?.whatsapp_phone ?? null)) {
-                  settings.save({ whatsapp_phone: v }).catch(() => undefined);
+                  void settings.save({ whatsapp_phone: v });
                 }
               }}
               className="h-8 w-48"

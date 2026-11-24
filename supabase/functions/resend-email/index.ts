@@ -1,23 +1,16 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { requireInternalSecret, requireUser } from "../_shared/auth.ts";
 import { safeFetch } from "../_shared/safeFetch.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
-
-interface EmailRequest {
-  to: string | string[];
-  subject: string;
-  html: string;
-  from?: string;
-}
+import { ValidationError, validationErrorResponse } from "../_shared/validate.ts";
+import { log } from "../_shared/logger.ts";
+import { internalErrorResponse } from "../_shared/httpError.ts";
+import { parseEmailRequest } from "./parse.ts";
+import { getCorsHeaders } from "../_shared/cors.ts";
 
 serve(async (req) => {
+  const headers = getCorsHeaders(req);
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers });
   }
 
   try {
@@ -29,7 +22,7 @@ serve(async (req) => {
           JSON.stringify({ success: false, error: "Unauthorized" }),
           {
             status: 401,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            headers: { ...headers, "Content-Type": "application/json" },
           },
         );
       }
@@ -40,7 +33,9 @@ serve(async (req) => {
       throw new Error("RESEND_API_KEY not configured");
     }
 
-    const { to, subject, html, from }: EmailRequest = await req.json();
+    const { to, subject, html, from } = parseEmailRequest(
+      (await req.json()) as Record<string, unknown>,
+    );
 
     const response = await safeFetch("https://api.resend.com/emails", {
       method: "POST",
@@ -50,7 +45,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         from: from || "LogiFlow <notificacoes@promobrindes.com.br>",
-        to: Array.isArray(to) ? to : [to],
+        to,
         subject,
         html,
       }),
@@ -58,19 +53,22 @@ serve(async (req) => {
 
     const data = await response.json();
     if (data.error) {
-      throw new Error(data.error.message || "Failed to send email");
+      // A resposta do Resend carrega destino, dominio e id da chave: fica no log.
+      log.error("[resend-email] Provedor recusou o envio:", {
+        status: response.status,
+        body: JSON.stringify(data).slice(0, 500),
+      });
+      throw new Error("Falha ao enviar o e-mail pelo provedor");
     }
 
     return new Response(JSON.stringify({ success: true, id: data.id }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...headers, "Content-Type": "application/json" },
     });
   } catch (error) {
-    return new Response(
-      JSON.stringify({ success: false, error: error.message }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      },
-    );
+    if (error instanceof ValidationError) {
+      return validationErrorResponse(error, headers);
+    }
+
+    return internalErrorResponse(error, headers, "resend-email");
   }
 });

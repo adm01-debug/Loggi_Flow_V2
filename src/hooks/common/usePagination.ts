@@ -1,3 +1,5 @@
+// Paginacao em memoria: recorta um array ja carregado (`data.slice`). Nao busca no servidor — para lista
+// longa vinda do banco use `useServerPagination` (./useServerPagination.ts, etapa 202).
 import { useState, useMemo } from "react";
 
 interface UsePaginationOptions {

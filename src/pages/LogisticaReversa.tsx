@@ -1,6 +1,7 @@
 /* eslint-disable max-lines */
 import { useState } from "react";
 import { EmptyState } from "@/components/common/EmptyState";
+import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { useLogisticaReversaReal } from "@/hooks/logistics/useLogisticaReversaReal";
 import { type LogisticaReversa } from "@/hooks";
@@ -69,6 +70,7 @@ export default function LogisticaReversa() {
   const [selectedItem, setSelectedItem] = useState<LogisticaReversa | null>(
     null,
   );
+  const [cancelItem, setCancelItem] = useState<LogisticaReversa | null>(null);
 
   const getStatusBadge = (status: LogisticaReversa["status"]) => {
     const variants: Record<
@@ -462,12 +464,7 @@ export default function LogisticaReversa() {
                               <DropdownMenuSeparator />
                               <DropdownMenuItem
                                 className="gap-2 text-red-500"
-                                onClick={() =>
-                                  updateStatus.mutate({
-                                    id: item.id,
-                                    status: "cancelado",
-                                  })
-                                }
+                                onClick={() => setCancelItem(item)}
                               >
                                 <XCircle className="w-4 h-4" /> Cancelar
                               </DropdownMenuItem>
@@ -662,6 +659,26 @@ export default function LogisticaReversa() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        <ConfirmDialog
+          open={!!cancelItem}
+          onOpenChange={(open) => {
+            if (!open) setCancelItem(null);
+          }}
+          type="danger"
+          title="Cancelar esta devolução?"
+          description={`A devolução ${cancelItem?.codigo_rastreio_reverso ?? cancelItem?.motivo ?? ""} será marcada como cancelada e não poderá voltar ao fluxo. Confirme apenas se o cliente desistiu da devolução.`}
+          confirmText="Cancelar devolução"
+          cancelText="Voltar"
+          isLoading={updateStatus.isPending}
+          onConfirm={() => {
+            if (!cancelItem) return;
+            updateStatus.mutate(
+              { id: cancelItem.id, status: "cancelado" },
+              { onSettled: () => setCancelItem(null) },
+            );
+          }}
+        />
       </div>
     </MainLayout>
   );

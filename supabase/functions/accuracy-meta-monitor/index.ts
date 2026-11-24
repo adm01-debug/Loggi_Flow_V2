@@ -5,7 +5,12 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
 import { log } from "../_shared/logger.ts";
+import { invokeFunction } from "../_shared/invokeFunction.ts";
 import { decideEscalation, DEFAULT_ESCALATION, HistoricalNotification } from "./escalation.ts";
+
+// Etapa 162 (achado B-05): as duas chamadas externas do monitor passam pelo
+// helper com tempo limite — sem ele um provedor lento segurava o cron inteiro.
+const DISPATCH_TIMEOUT_MS = 10_000;
 
 interface SettingsRow {
   user_id: string;
@@ -192,46 +197,44 @@ export const handler = async (req: Request): Promise<Response> => {
       const dispatched: Record<string, string> = {};
 
       if (channels.email) {
-        try {
-          const { error: eErr } = await supabase.functions.invoke("resend-email", {
-            body: {
-              to: channels.email,
-              subject: payload.title,
-              html: `<p>${payload.message}</p><p><a href="${Deno.env.get("APP_URL") ?? ""}/painel-sla">Abrir Painel SLA</a></p>`,
-            },
-          });
-          dispatched.email = eErr ? `error:${eErr.message}` : "ok";
-        } catch (e) {
-          dispatched.email = `throw:${e instanceof Error ? e.message : String(e)}`;
-        }
+        const envioEmail = await invokeFunction(
+          "resend-email",
+          {
+            to: channels.email,
+            subject: payload.title,
+            html: `<p>${payload.message}</p><p><a href="${Deno.env.get("APP_URL") ?? ""}/painel-sla">Abrir Painel SLA</a></p>`,
+          },
+          { timeoutMs: DISPATCH_TIMEOUT_MS },
+        );
+        dispatched.email = envioEmail.ok ? "ok" : `error:${envioEmail.reason}`;
       }
 
       const whatsappTarget = channels.whatsapp ?? (shouldEscalateWhatsapp ? phoneDigits : null);
       if (whatsappTarget) {
-        try {
-          const escalationSuffix = shouldEscalateWhatsapp
-            ? ` [ESCALONADO: ${decision.ignoredCount} email(s) não lido(s) em ${DEFAULT_ESCALATION.windowHours}h]`
-            : "";
-          const { error: wErr } = await supabase.functions.invoke("whatsapp-notification", {
-            body: {
-              action: "send_custom",
-              phone: whatsappTarget,
-              template: "accuracy_meta_alert",
-              variables: {
-                title: payload.title + escalationSuffix,
-                message: payload.message,
-                carrier: carrierLabel,
-                target: String(s.target_pct),
-                days: String(days),
-              },
+        const escalationSuffix = shouldEscalateWhatsapp
+          ? ` [ESCALONADO: ${decision.ignoredCount} email(s) não lido(s) em ${DEFAULT_ESCALATION.windowHours}h]`
+          : "";
+        const envioWhatsapp = await invokeFunction(
+          "whatsapp-notification",
+          {
+            action: "send_custom",
+            phone: whatsappTarget,
+            template: "accuracy_meta_alert",
+            variables: {
+              title: payload.title + escalationSuffix,
+              message: payload.message,
+              carrier: carrierLabel,
+              target: String(s.target_pct),
+              days: String(days),
             },
-          });
-          dispatched.whatsapp = wErr
-            ? `error:${wErr.message}`
-            : shouldEscalateWhatsapp ? "ok:escalated" : "ok";
-        } catch (e) {
-          dispatched.whatsapp = `throw:${e instanceof Error ? e.message : String(e)}`;
-        }
+          },
+          { timeoutMs: DISPATCH_TIMEOUT_MS },
+        );
+        dispatched.whatsapp = !envioWhatsapp.ok
+          ? `error:${envioWhatsapp.reason}`
+          : shouldEscalateWhatsapp
+            ? "ok:escalated"
+            : "ok";
       }
 
       if (Object.keys(dispatched).length > 0 || shouldEscalateWhatsapp) {

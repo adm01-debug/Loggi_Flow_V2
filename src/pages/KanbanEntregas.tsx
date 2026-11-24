@@ -3,7 +3,11 @@ import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { TRANSICOES_ENTREGA } from "@/lib/statusTransitions";
+import {
+  TRANSICOES_ENTREGA,
+  mensagemRecusaTransicao,
+} from "@/lib/statusTransitions";
+import { assertAtualizou } from "@/lib/conflitoVersao";
 import { EmptyState } from "@/components/common/EmptyState";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Badge } from "@/components/ui/badge";
@@ -326,10 +330,7 @@ export default function KanbanEntregas() {
         .eq("id", id)
         .eq("version", version);
       if (error) throw error;
-      if (count === 0)
-        throw new Error(
-          "Conflito de versão — registro alterado por outro usuário, por favor recarregue",
-        );
+      assertAtualizou(count);
 
       await onStatusChange("entrega", id, { status });
     },
@@ -340,7 +341,7 @@ export default function KanbanEntregas() {
     },
     onError: (err: Error) => {
       toast.error("Erro crítico na transição de status", {
-        description: err.message,
+        description: mensagemRecusaTransicao(err, "entrega") ?? err.message,
       });
       playError();
     },

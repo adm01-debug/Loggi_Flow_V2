@@ -36,39 +36,59 @@ export function useExecutiveMetrics() {
     queryKey: ["exec-trends", user?.id],
     queryFn: async (): Promise<MonthlyTrend[]> => {
       const now = new Date();
+      const periodsBack = 6;
+      // Os seis intervalos sao contiguos: o mes de cada linha sai do proprio `created_at` no cliente, entao
+      // uma consulta por tabela cobre todos os meses (P-03, etapa 221). Eram 18 consultas, agora 3.
+      const inicio = startOfMonth(subMonths(now, periodsBack - 1));
+      const fim = endOfMonth(now);
 
-      const monthsPromises = Array.from({ length: 6 }).map(async (_, i) => {
-        const monthDate = subMonths(now, 5 - i); // Reversed order to build chronologically
-        const start = startOfMonth(monthDate).toISOString();
-        const end = endOfMonth(monthDate).toISOString();
-        const label = format(monthDate, "MMM/yy");
-
-        const [entregas, coletas, ocorrencias] = await Promise.all([
+      const [{ data: entregas }, { data: coletas }, { data: ocorrencias }] =
+        await Promise.all([
           supabase
             .from("entregas")
             .select(
-              "status, valor_frete, previsao_entrega, data_entrega_efetiva",
+              "status, valor_frete, previsao_entrega, data_entrega_efetiva, created_at",
             )
             .is("deleted_at", null)
-            .gte("created_at", start)
-            .lte("created_at", end)
-            .limit(1000),
+            .gte("created_at", inicio.toISOString())
+            .lte("created_at", fim.toISOString())
+            .limit(periodsBack * 1000),
           supabase
             .from("coletas")
-            .select("id")
+            .select("id, created_at")
             .is("deleted_at", null)
-            .gte("created_at", start)
-            .lte("created_at", end)
-            .limit(1000),
+            .gte("created_at", inicio.toISOString())
+            .lte("created_at", fim.toISOString())
+            .limit(periodsBack * 1000),
           supabase
             .from("ocorrencias")
-            .select("id")
-            .gte("created_at", start)
-            .lte("created_at", end)
-            .limit(500),
+            .select("id, created_at")
+            .gte("created_at", inicio.toISOString())
+            .lte("created_at", fim.toISOString())
+            .limit(periodsBack * 500),
         ]);
 
-        const entregasList = entregas.data || [];
+      // A chave do mes e local, o mesmo criterio que o servidor ja filtrava (`startOfMonth`/`endOfMonth`).
+      const agruparPorMes = <T extends { created_at: string }>(linhas: T[]) => {
+        const porMes: Record<string, T[]> = {};
+        linhas.forEach((linha) => {
+          const chave = format(new Date(linha.created_at), "yyyy-MM");
+          if (!porMes[chave]) porMes[chave] = [];
+          porMes[chave].push(linha);
+        });
+        return porMes;
+      };
+
+      const entregasPorMes = agruparPorMes(entregas || []);
+      const coletasPorMes = agruparPorMes(coletas || []);
+      const ocorrenciasPorMes = agruparPorMes(ocorrencias || []);
+
+      return Array.from({ length: periodsBack }).map((_, i) => {
+        const monthDate = subMonths(now, periodsBack - 1 - i); // Reversed order to build chronologically
+        const chave = format(monthDate, "yyyy-MM");
+        const label = format(monthDate, "MMM/yy");
+
+        const entregasList = entregasPorMes[chave] || [];
         const delivered = entregasList.filter(
           (e) => e.status === "entregue" || e.status === "finalizado",
         );
@@ -88,14 +108,12 @@ export function useExecutiveMetrics() {
         return {
           month: label,
           entregas: entregasList.length,
-          coletas: coletas.data?.length || 0,
-          ocorrencias: ocorrencias.data?.length || 0,
+          coletas: (coletasPorMes[chave] || []).length,
+          ocorrencias: (ocorrenciasPorMes[chave] || []).length,
           custoFrete,
           otif: Math.round(otif * 10) / 10,
         };
       });
-
-      return await Promise.all(monthsPromises);
     },
     staleTime: QUERY_STALE_TIME.DASHBOARD * 5,
     refetchInterval: QUERY_REFETCH_INTERVAL.DASHBOARD * 2,

@@ -6,7 +6,7 @@
  * @description Importação de CSV e Excel com validação Zod
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { z } from 'zod';
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
@@ -49,6 +49,14 @@ export function useImportData<T>(options: UseImportDataOptions<T>) {
   const [status, setStatus] = useState<ImportStatus>('idle');
   const [progress, setProgress] = useState(0);
   const [result, setResult] = useState<ImportResult<T> | null>(null);
+  const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Cancela o reset pendente ao desmontar
+  useEffect(() => {
+    return () => {
+      if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+    };
+  }, []);
 
   // Parsear CSV
   const parseCSV = useCallback(async (file: File): Promise<unknown[]> => {
@@ -186,7 +194,8 @@ export function useImportData<T>(options: UseImportDataOptions<T>) {
       toast.success(`${result.success.length} registros importados com sucesso!`);
       
       // Reset após 2 segundos
-      setTimeout(() => {
+      if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+      resetTimerRef.current = setTimeout(() => {
         setStatus('idle');
         setResult(null);
         setProgress(0);

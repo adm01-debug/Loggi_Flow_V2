@@ -60,3 +60,7 @@ export async function claimIdempotencyKey(
     return { duplicate: false, key };
   }
 }
+
+// Etapa 138 - chave deterministica de evento, compartilhada pelos webhooks.
+export { bodyHash, buildEventKey } from "./eventKey.ts";
+export type { EventKey, EventKeyPart } from "./eventKey.ts";

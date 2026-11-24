@@ -3,6 +3,8 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { withCircuitBreaker } from "../_shared/circuitBreaker.ts";
 import { log } from "../_shared/logger.ts";
 import { corsHeaders } from "../_shared/cors.ts";
+import { ValidationError, validationErrorResponse } from "../_shared/validate.ts";
+import { parseDriverId, parseOrderId } from "./parse.ts";
 
 const LALAMOVE_SANDBOX_URL = "https://rest.sandbox.lalamove.com";
 const LALAMOVE_PRODUCTION_URL = "https://rest.lalamove.com";
@@ -90,9 +92,9 @@ serve(async (req) => {
   try {
     const body = await req.json();
     action = body.action;
-    const { orderId, driverId, useSandbox = true } = body;
+    const { useSandbox = true } = body;
 
-    log.info(`Lalamove tracking action: ${action}, orderId: ${orderId}`);
+    log.info(`Lalamove tracking action: ${action}`);
 
     switch (action) {
       case "test":
@@ -101,6 +103,8 @@ serve(async (req) => {
         });
 
       case "getOrderDetails": {
+        const orderId = parseOrderId(body);
+
         const result = await withCircuitBreaker("lalamove-api", async () => {
           const response = await lalamoveRequest(
             "GET",
@@ -123,15 +127,8 @@ serve(async (req) => {
       }
 
       case "getDriverLocation": {
-        if (!driverId) {
-          return new Response(
-            JSON.stringify({ error: "driverId is required" }),
-            {
-              status: 400,
-              headers: { ...corsHeaders, "Content-Type": "application/json" },
-            },
-          );
-        }
+        const orderId = parseOrderId(body);
+        const driverId = parseDriverId(body);
 
         const result = await withCircuitBreaker("lalamove-api", async () => {
           const response = await lalamoveRequest(
@@ -163,6 +160,10 @@ serve(async (req) => {
         });
     }
   } catch (error: unknown) {
+    if (error instanceof ValidationError) {
+      return validationErrorResponse(error, corsHeaders);
+    }
+
     const message = error instanceof Error ? error.message : "Unknown error";
     const isCircuitOpen = message.includes("Circuit Breaker");
 

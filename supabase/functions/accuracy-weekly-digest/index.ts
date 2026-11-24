@@ -8,18 +8,18 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { log } from "../_shared/logger.ts";
+import { invokeFunction } from "../_shared/invokeFunction.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import {
   buildDigest,
   DigestNotification,
   renderDigestEmail,
 } from "./digest.ts";
+import { getCorsHeaders } from "../_shared/cors.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
+// Etapa 163 (achado B-05): o envio do digest passa pelo helper com tempo
+// limite — sem ele um resend-email lento prendia a funcao por destinatario.
+const DIGEST_EMAIL_TIMEOUT_MS = 10_000;
 
 interface Recipient {
   user_id: string;
@@ -33,6 +33,7 @@ interface DispatchResult {
 }
 
 async function handlePreview(req: Request): Promise<Response> {
+  const headers = getCorsHeaders(req);
   const authHeader = req.headers.get("Authorization") ?? "";
   const token = authHeader.replace(/^Bearer\s+/i, "").trim();
   if (!token) {
@@ -40,7 +41,7 @@ async function handlePreview(req: Request): Promise<Response> {
       JSON.stringify({ ok: false, error: "Missing Authorization header" }),
       {
         status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...headers, "Content-Type": "application/json" },
       },
     );
   }
@@ -55,7 +56,7 @@ async function handlePreview(req: Request): Promise<Response> {
       JSON.stringify({ ok: false, error: "Invalid session" }),
       {
         status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...headers, "Content-Type": "application/json" },
       },
     );
   }
@@ -74,10 +75,17 @@ async function handlePreview(req: Request): Promise<Response> {
     .limit(500);
 
   if (nErr) {
-    return new Response(JSON.stringify({ ok: false, error: nErr.message }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    log.error("accuracy-weekly-digest: falha ao ler notificacoes", {
+      code: nErr.code,
+      message: nErr.message,
     });
+    return new Response(
+      JSON.stringify({ ok: false, error: "INTERNAL_ERROR" }),
+      {
+        status: 500,
+        headers: { ...headers, "Content-Type": "application/json" },
+      },
+    );
   }
 
   const report = buildDigest((notifs ?? []) as DigestNotification[], now);
@@ -93,14 +101,15 @@ async function handlePreview(req: Request): Promise<Response> {
     }),
     {
       status: 200,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...headers, "Content-Type": "application/json" },
     },
   );
 }
 
 serve(async (req) => {
+  const headers = getCorsHeaders(req);
   if (req.method === "OPTIONS")
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers });
 
   // Modo preview — não envia email, retorna HTML pro usuário chamador.
   if (req.method === "POST") {
@@ -175,40 +184,31 @@ serve(async (req) => {
         continue;
       }
 
-      try {
-        const { error: eErr } = await supabase.functions.invoke(
-          "resend-email",
-          {
-            body: { to: r.email, subject: email.subject, html: email.html },
-          },
-        );
-        if (eErr) {
-          results.push({
-            user_id: r.user_id,
-            status: "error",
-            detail: eErr.message,
-          });
-        } else {
-          results.push({ user_id: r.user_id, status: "sent" });
-          await supabase.from("notifications").insert({
-            user_id: r.user_id,
-            title: email.subject,
-            message: `Digest semanal com ${report.totalAlerts} alerta(s) enviado para ${r.email}`,
-            type: "info",
-            metadata: {
-              source: "accuracy-weekly-digest",
-              alerts: report.totalAlerts,
-              carriers: report.carriers.length,
-              window_start: report.windowStart,
-              window_end: report.windowEnd,
-            },
-          });
-        }
-      } catch (e) {
+      const envio = await invokeFunction(
+        "resend-email",
+        { to: r.email, subject: email.subject, html: email.html },
+        { timeoutMs: DIGEST_EMAIL_TIMEOUT_MS },
+      );
+      if (!envio.ok) {
         results.push({
           user_id: r.user_id,
           status: "error",
-          detail: e instanceof Error ? e.message : String(e),
+          detail: envio.reason,
+        });
+      } else {
+        results.push({ user_id: r.user_id, status: "sent" });
+        await supabase.from("notifications").insert({
+          user_id: r.user_id,
+          title: email.subject,
+          message: `Digest semanal com ${report.totalAlerts} alerta(s) enviado para ${r.email}`,
+          type: "info",
+          metadata: {
+            source: "accuracy-weekly-digest",
+            alerts: report.totalAlerts,
+            carriers: report.carriers.length,
+            window_start: report.windowStart,
+            window_end: report.windowEnd,
+          },
         });
       }
     }
@@ -224,7 +224,7 @@ serve(async (req) => {
       }),
       {
         status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...headers, "Content-Type": "application/json" },
       },
     );
   } catch (err) {
@@ -234,11 +234,11 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         ok: false,
-        error: err instanceof Error ? err.message : String(err),
+        error: "INTERNAL_ERROR",
       }),
       {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...headers, "Content-Type": "application/json" },
       },
     );
   }

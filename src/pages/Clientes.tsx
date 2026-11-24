@@ -719,6 +719,7 @@ export default function Clientes() {
                 confirmTitle: "Excluir clientes selecionados?",
                 confirmDescription: (count) =>
                   `Você está prestes a excluir ${count} cliente(s). Esta ação não pode ser desfeita.`,
+                confirmTyping: "EXCLUIR",
               },
             ]}
           />

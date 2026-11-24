@@ -1,5 +1,6 @@
 /* eslint-disable max-lines */
 import { useState } from "react";
+import { EmptyState } from "@/components/common/EmptyState";
 import { SortIcon } from "@/components/common/SortIcon";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,7 +18,6 @@ import {
   AlertTriangle,
   XCircle,
   Loader2,
-  AlertCircle,
   Star,
 } from "lucide-react";
 import { MainLayout } from "@/components/layout/MainLayout";
@@ -158,6 +158,7 @@ export default function FretesInternos() {
     data: fretes = [],
     isLoading,
     error,
+    refetch,
   } = useQuery({
     queryKey: ["fretes-internos"],
     queryFn: async () => {
@@ -320,9 +321,16 @@ export default function FretesInternos() {
   if (error)
     return (
       <MainLayout>
-        <div className="flex flex-col items-center py-12">
-          <AlertCircle className="w-12 h-12 text-destructive mb-4" />
-          <p className="text-destructive">Erro: {error.message}</p>
+        <div className="flex min-h-[60vh] items-center justify-center">
+          <EmptyState
+            variant="error"
+            title="Erro ao carregar fretes internos"
+            description={
+              error?.message ||
+              "Não foi possível carregar fretes internos. Tente novamente."
+            }
+            action={{ label: "Tentar novamente", onClick: () => refetch() }}
+          />
         </div>
       </MainLayout>
     );

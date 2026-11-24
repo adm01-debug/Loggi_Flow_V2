@@ -7,14 +7,24 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 import * as webpush from "https://esm.sh/web-push@3.6.7?target=deno";
 import { log } from "../_shared/logger.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
+import { getCorsHeaders } from "../_shared/cors.ts";
 
 const MAX_BATCH = 100;
+
+// B-09 (etapa 200): o `web-push` fala com FCM/APNs por conta propria e nao passa
+// por `safeFetch`, entao nao tinha tempo limite nenhum - provedor lento prendia o
+// laco e o lote inteiro morria no limite de execucao da funcao. `options.timeout`
+// existe na biblioteca (web-push@3.6.7, `web-push-lib.js:222`) e destroi o socket;
+// mesmo valor de `_shared/fetch-with-timeout.ts:9`. O estouro e falha DA INSCRICAO
+// (o `catch` do laco ja segue com as outras) e NAO se retenta: cada reenvio seria
+// uma notificacao repetida no celular do usuario (B-10).
+const PUSH_TIMEOUT_MS = 10000;
+
+function isPushTimeout(e: unknown): boolean {
+  const err = e as { statusCode?: number; code?: string; message?: string };
+  if (err?.statusCode) return false;
+  return err?.code === "ETIMEDOUT" || /timeout/i.test(err?.message ?? "");
+}
 
 // Validação se as credenciais VAPID existem sem quebrar import em ambiente sem secret.
 function getVapid() {
@@ -33,8 +43,9 @@ function bearerToken(req: Request): string {
 }
 
 serve(async (req) => {
+  const headers = getCorsHeaders(req);
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+    return new Response("ok", { headers });
   }
   try {
     const rl = await checkRateLimit(req, "push-send", {
@@ -45,7 +56,7 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: "rate_limited" }), {
         status: 429,
         headers: {
-          ...corsHeaders,
+          ...headers,
           "Content-Type": "application/json",
           "Retry-After": "60",
         },
@@ -56,7 +67,7 @@ serve(async (req) => {
     if (!authHeader.startsWith("Bearer ")) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...headers, "Content-Type": "application/json" },
       });
     }
 
@@ -80,7 +91,7 @@ serve(async (req) => {
       if (authErr || !user) {
         return new Response(JSON.stringify({ error: "Unauthorized" }), {
           status: 401,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...headers, "Content-Type": "application/json" },
         });
       }
       targetUserId = user.id;
@@ -97,7 +108,7 @@ serve(async (req) => {
         JSON.stringify({ error: "title and body (string) are required" }),
         {
           status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...headers, "Content-Type": "application/json" },
         },
       );
     }
@@ -112,7 +123,7 @@ serve(async (req) => {
         }),
         {
           status: 503,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...headers, "Content-Type": "application/json" },
         },
       );
     }
@@ -129,7 +140,7 @@ serve(async (req) => {
     if (subErr) {
       return new Response(JSON.stringify({ error: subErr.message }), {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...headers, "Content-Type": "application/json" },
       });
     }
     if (!subs || subs.length === 0) {
@@ -137,7 +148,7 @@ serve(async (req) => {
         JSON.stringify({ success: true, sent: 0, total: 0 }),
         {
           status: 200,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...headers, "Content-Type": "application/json" },
         },
       );
     }
@@ -163,11 +174,13 @@ serve(async (req) => {
             keys: { p256dh: sub.p256dh, auth: sub.auth },
           },
           payload,
+          { timeout: PUSH_TIMEOUT_MS },
         );
         sent++;
       } catch (e) {
         failed++;
         const err = e as { statusCode?: number };
+        const estourou = isPushTimeout(e);
         if (err.statusCode === 404 || err.statusCode === 410) {
           // Inscrição expirada/inválida: limpa para não reaparecer.
           await supabase
@@ -178,7 +191,12 @@ serve(async (req) => {
         errors.push({
           endpoint: sub.endpoint,
           statusCode: err.statusCode,
-          error: err?.statusCode ? undefined : (e as Error)?.message,
+          // tempo limite nao e inscricao invalida: so o 404/410 do provedor e.
+          error: estourou
+            ? "timeout"
+            : err?.statusCode
+            ? undefined
+            : (e as Error)?.message,
         });
       }
     }
@@ -197,13 +215,13 @@ serve(async (req) => {
       }),
       {
         status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...headers, "Content-Type": "application/json" },
       },
     );
   } catch (e) {
     return new Response(JSON.stringify({ error: (e as Error)?.message }), {
       status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...headers, "Content-Type": "application/json" },
     });
   }
 });

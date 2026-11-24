@@ -525,6 +525,9 @@ const parseCols = (body, table) => {
   }
 };
 secao('banco-sql', () => {
+  // Corpos de DDL dinamico (EXECUTE format/...): o gerador nao os interpreta, mas precisa
+  // saber que existem para nao afirmar "sem RLS" sobre o que ele nao conseguiu ver.
+  banco.ddl_dinamico_blocos = [];
   const sqlFiles = migDir ? ALL.filter((f) => f.startsWith(migDir + '/') && isCurrentSql(f)).sort() : ALL.filter((f) => isCurrentSql(f) && !/supabase\/tests|\/tests?\//.test(f)).sort();
   if (!sqlFiles.length) return;
   banco.migrations = sqlFiles.length; banco.fonte.push(migDir || '*.sql');
@@ -534,7 +537,7 @@ secao('banco-sql', () => {
     const bodies = []; const sqlNoBody = sql.replace(/\$(\w*)\$[\s\S]*?\$\1\$/g, (m0) => { bodies.push(m0); return "''"; });
     allSql.push(sql.toLowerCase());
     // DO $$ ... $$ e corpos de função: statements literais (CREATE/DROP POLICY, ALTER TABLE) também valem; DDL dinâmico (EXECUTE format) é só sinalizado
-    const bodyStatements = bodies.flatMap((b) => { const inner = b.replace(/^\$\w*\$|\$\w*\$$/g, '').replace(/\$(\w*)\$[\s\S]*?\$\1\$/g, "''"); if (/\bexecute\s+(format|'|\$|[a-z_]+\s*\()/i.test(inner)) banco.ddl_dinamico++; return splitStatements(inner).map((x) => { const m0 = /\b(create|drop|alter)\s[\s\S]*$/i.exec(x); return m0 ? m0[0] : ''; }).filter(Boolean); });
+    const bodyStatements = bodies.flatMap((b) => { const inner = b.replace(/^\$\w*\$|\$\w*\$$/g, '').replace(/\$(\w*)\$[\s\S]*?\$\1\$/g, "''"); if (/\bexecute\s+(format|'|\$|[a-z_]+\s*\()/i.test(inner)) { banco.ddl_dinamico++; banco.ddl_dinamico_blocos.push(inner.toLowerCase()); } return splitStatements(inner).map((x) => { const m0 = /\b(create|drop|alter)\s[\s\S]*$/i.exec(x); return m0 ? m0[0] : ''; }).filter(Boolean); });
     for (const stRaw of [...splitStatements(sqlNoBody), ...bodyStatements]) {
       const st = stRaw.trim(); if (!st) continue; let m;
       if ((m = /^create\s+(?:unlogged\s+)?table\s+(?:if\s+not\s+exists\s+)?((?:"?\w+"?\.)?"?\w+"?)\s*\(/i.exec(st))) {
@@ -625,17 +628,36 @@ secao('banco-types', () => {
 });
 for (const [t, cols] of Object.entries(tabelasTypes)) T(t).colunas_types = cols;
 const EDGE_DIR = ['supabase/functions', 'functions', 'netlify/functions', 'edge-functions'].find((d) => exists(d)) || 'supabase/functions';
+// RLS em tres estados: habilitado literal (t.rls), sem RLS comprovado (sem_rls: true) ou
+// indeterminado (sem_rls: 'desconhecido') quando um bloco dinamico do conjunto liga RLS sobre nomes
+// calculados (EXECUTE format('... %I ...')) que alcancam a tabela. Sem isso o gerador afirmava
+// "sem RLS" para particoes protegidas dentro de DO $$.
+const rlsDinamicoExato = new Set();
+const rlsDinamicoFilhos = new Set();
+for (const b of banco.ddl_dinamico_blocos || []) {
+  if (!/enable\s+row\s+level\s+security/i.test(b)) continue;
+  for (const m of b.matchAll(/public\.([a-z0-9_]+)/g)) rlsDinamicoExato.add(m[1]);
+  for (const m of b.matchAll(/'([a-z0-9_]+)_y%'/g)) rlsDinamicoFilhos.add(m[1]);
+}
+const semRlsLiteral = (n, t) => !t.rls && !n.includes('.') && !!t.criada_em && /\.sql$/.test(t.criada_em);
+const rlsIndeterminadoDe = (n, t) => {
+  if (!semRlsLiteral(n, t)) return false;
+  if ([...rlsDinamicoExato].some((b) => b === n || n.startsWith(`${b}_`))) return true;
+  return [...rlsDinamicoFilhos].some((b) => n.startsWith(`${b}_`));
+};
+const semRlsConfirmado = Object.keys(banco.tabelas).filter((n) => semRlsLiteral(n, banco.tabelas[n]));
+const rlsIndeterminado = Object.keys(banco.tabelas).filter((n) => rlsIndeterminadoDe(n, banco.tabelas[n]));
 const tabelasUsadas = new Map();
 for (const [f, d] of appFiles) for (const t of d.tabelas) { if (!tabelasUsadas.has(t)) tabelasUsadas.set(t, { front: [], edges: [] }); (f.startsWith(EDGE_DIR) ? tabelasUsadas.get(t).edges : tabelasUsadas.get(t).front).push(f); }
 const bancoOut = {
-  fonte: uniq(banco.fonte), migrations: banco.migrations, seeds: banco.seeds, avisos: banco.ddl_dinamico ? [`${banco.ddl_dinamico} bloco(s) com DDL dinâmico (EXECUTE format/...) não modelado — policies/colunas criadas dinamicamente podem faltar; confira no banco vivo`] : [], extensoes: [...banco.extensoes].sort(), enums: sortObj(banco.enums), views: [...banco.views].sort(), funcoes: [...banco.funcoes].sort(),
+  fonte: uniq(banco.fonte), migrations: banco.migrations, seeds: banco.seeds, avisos: [...(banco.ddl_dinamico ? [`${banco.ddl_dinamico} bloco(s) com DDL dinâmico (EXECUTE format/...) não modelado — policies/colunas criadas dinamicamente podem faltar; confira no banco vivo`] : []), ...(rlsIndeterminado.length ? [`${rlsIndeterminado.length} tabela(s) com RLS indeterminado: a migration que as criou não traz ENABLE literal e há bloco dinâmico de RLS no conjunto — não são "sem RLS"; decida no banco vivo com SELECT c.relname FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = 'public' AND c.relkind = 'r' AND NOT c.relrowsecurity ORDER BY 1;`] : [])], extensoes: [...banco.extensoes].sort(), enums: sortObj(banco.enums), views: [...banco.views].sort(), funcoes: [...banco.funcoes].sort(),
   triggers: banco.triggers.sort((a, b) => a.tabela.localeCompare(b.tabela, 'en') || a.nome.localeCompare(b.nome, 'en')),
   cron_jobs: banco.cron.sort((a, b) => a.nome.localeCompare(b.nome, 'en')),
   buckets: uniq([...banco.buckets_sql, ...appFiles.flatMap(([, d]) => d.buckets)]).map((b) => ({ nome: b, criado_em_sql: banco.buckets_sql.has(b), usado_em: appFiles.filter(([, d]) => d.buckets.includes(b)).length })),
   tabelas: sortObj(Object.fromEntries(Object.entries(banco.tabelas).map(([n, t]) => {
     const uso = tabelasUsadas.get(n) || { front: [], edges: [] };
     const cols = Object.keys(t.colunas); const colsT = t.colunas_types ? Object.keys(t.colunas_types) : null;
-    return [n, { ...t, colunas: sortObj(t.colunas), colunas_types: t.colunas_types ? sortObj(t.colunas_types) : undefined, drift: colsT && cols.length ? { so_na_migration: cols.filter((cc) => !colsT.includes(cc)), so_no_types: colsT.filter((cc) => !cols.includes(cc)) } : undefined, policies: t.policies.sort((a, b) => a.nome.localeCompare(b.nome, 'en')), indices: t.indices.sort((a, b) => a.nome.localeCompare(b.nome, 'en')), fks: uniq(t.fks.map((x) => `${x.coluna}->${x.ref}`)), usada_no_front: uniq(uso.front).length, usada_em_edges: uniq(uso.edges.map((f) => f.split('/').slice(-2)[0])), triggers: banco.triggers.filter((tr) => tr.tabela === n).map((tr) => tr.nome), sem_rls: !t.rls && !n.includes('.') && !!t.criada_em && /\.sql$/.test(t.criada_em), nao_usada: !uso.front.length && !uso.edges.length }];
+    return [n, { ...t, colunas: sortObj(t.colunas), colunas_types: t.colunas_types ? sortObj(t.colunas_types) : undefined, drift: colsT && cols.length ? { so_na_migration: cols.filter((cc) => !colsT.includes(cc)), so_no_types: colsT.filter((cc) => !cols.includes(cc)) } : undefined, policies: t.policies.sort((a, b) => a.nome.localeCompare(b.nome, 'en')), indices: t.indices.sort((a, b) => a.nome.localeCompare(b.nome, 'en')), fks: uniq(t.fks.map((x) => `${x.coluna}->${x.ref}`)), usada_no_front: uniq(uso.front).length, usada_em_edges: uniq(uso.edges.map((f) => f.split('/').slice(-2)[0])), triggers: banco.triggers.filter((tr) => tr.tabela === n).map((tr) => tr.nome), sem_rls: rlsIndeterminadoDe(n, t) ? 'desconhecido' : semRlsLiteral(n, t), rls_indeterminado: rlsIndeterminadoDe(n, t) || undefined, nao_usada: !uso.front.length && !uso.edges.length }];
   }))),
   tabelas_usadas_no_codigo_sem_definicao: uniq([...tabelasUsadas.keys()]).filter((t) => !banco.tabelas[t] && !banco.views.has(t)),
   rpcs_usadas_no_codigo: uniq(appFiles.flatMap(([, d]) => d.rpcs)).map((r) => ({ nome: r, definida: banco.funcoes.has(r), usada_em: appFiles.filter(([, d]) => d.rpcs.includes(r)).length })),
@@ -721,7 +743,9 @@ const permissoes = secao('permissoes', () => ({
   guards: uniq([...FILE.entries()].filter(([, d]) => d.componente && /Protected|Guard|RequireAuth|RequireRole|PrivateRoute|Authorized/.test(d.exports.join(' '))).map(([f]) => f)),
   rotas_protegidas: rotasEnriched.filter((r) => r.protegida).length, rotas_publicas: rotasEnriched.filter((r) => !r.protegida && r.tipo === 'tela').map((r) => r.caminho),
   menu_com_papeis: menuUniq.filter((m) => m.papeis.length).map((m) => ({ rotulo: m.rotulo, papeis: m.papeis })),
-  tabelas_sem_rls: Object.entries(bancoOut.tabelas).filter(([, t]) => t.sem_rls).map(([n]) => n),
+  tabelas_sem_rls: Object.entries(bancoOut.tabelas).filter(([, t]) => t.sem_rls === true).map(([n]) => n),
+  tabelas_rls_indeterminado: Object.entries(bancoOut.tabelas).filter(([, t]) => t.sem_rls === 'desconhecido').map(([n]) => n),
+  tabelas_rls_indeterminado_como_decidir: "SELECT c.relname FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = 'public' AND c.relkind = 'r' AND NOT c.relrowsecurity ORDER BY 1;",
 }), {});
 const flags = secao('flags', () => { const all = byCount(appFiles.flatMap(([, d]) => d.flags)); return { total: all.length, flags: all.map(([f, n]) => ({ flag: f, arquivos: n })), tabelas_de_flag: Object.keys(bancoOut.tabelas).filter((t) => /flag|feature|toggle|setting/i.test(t)) }; }, { total: 0, flags: [], tabelas_de_flag: [] });
 const providers = secao('providers', () => { const entry = ALL.find((f) => /^(?:src\/)?(main|index)\.[tj]sx$/.test(f)) || ALL.find((f) => /^(?:src\/)?(App|app|root|_app)\.[tj]sx$/.test(f)) || ALL.find((f) => /^(?:src\/)?app\/layout\.tsx$/.test(f)); if (!entry) return { entrada: null, providers: [] }; const files = [entry, ...closure(entry).filter((f) => /App\.[tj]sx$|providers?\//i.test(f)).slice(0, 10)]; return { entrada: entry, providers: uniq(files.flatMap((f) => allMatches(/<([A-Z]\w*(?:Provider|Context|Boundary|Router|Client|Store)\b[\w.]*)/g, FILE.get(f)?.conteudo || ''))) }; }, { entrada: null, providers: [] });
@@ -862,7 +886,8 @@ const baseline = {
     menu_sem_destino: menuUniq.filter((m) => !resolveDestino(m.destino)).map((m) => `${m.rotulo} -> ${m.destino}`),
     edges_orfas: edges.filter((e) => e.orfa).map((e) => e.nome),
     edges_chamadas_sem_pasta: edgesSemPasta,
-    tabelas_sem_rls: Object.entries(bancoOut.tabelas).filter(([, t]) => t.sem_rls).map(([n]) => n),
+    tabelas_sem_rls: Object.entries(bancoOut.tabelas).filter(([, t]) => t.sem_rls === true).map(([n]) => n),
+    tabelas_rls_indeterminado: Object.entries(bancoOut.tabelas).filter(([, t]) => t.sem_rls === 'desconhecido').map(([n]) => n),
     tabelas_usadas_sem_definicao: bancoOut.tabelas_usadas_no_codigo_sem_definicao,
     tabelas_com_drift_migration_vs_types: Object.entries(bancoOut.tabelas).filter(([, t]) => t.drift && (t.drift.so_na_migration.length || t.drift.so_no_types.length)).map(([n]) => n),
     rpcs_sem_definicao: bancoOut.rpcs_usadas_no_codigo.filter((r) => !r.definida).map((r) => r.nome),

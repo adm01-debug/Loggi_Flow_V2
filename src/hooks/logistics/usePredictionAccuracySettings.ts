@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export interface AccuracySettings {
   target_pct: number;
@@ -74,28 +75,33 @@ export function usePredictionAccuracySettings(carrier: string | null) {
 
   const save = useCallback(
     async (patch: Partial<AccuracySettings>) => {
-      const { data: userRes } = await supabase.auth.getUser();
-      const uid = userRes.user?.id;
-      if (!uid) return;
-      const current = query.data ?? DEFAULT;
-      const next: AccuracySettings = { ...current, ...patch };
-      const { error } = await supabase
-        .from("prediction_accuracy_settings" as never)
-        .upsert(
-          {
-            user_id: uid,
-            transportadora: carrier,
-            target_pct: next.target_pct,
-            consecutive_days_alert: next.consecutive_days_alert,
-            notify_email: next.notify_email,
-            notify_whatsapp: next.notify_whatsapp,
-            email: next.email,
-            whatsapp_phone: next.whatsapp_phone,
-          } as never,
-          { onConflict: "user_id,transportadora" },
-        );
-      if (error) throw error;
-      qc.setQueryData(keyFor(carrier), next);
+      try {
+        const { data: userRes } = await supabase.auth.getUser();
+        const uid = userRes.user?.id;
+        if (!uid) return;
+        const current = query.data ?? DEFAULT;
+        const next: AccuracySettings = { ...current, ...patch };
+        const { error } = await supabase
+          .from("prediction_accuracy_settings" as never)
+          .upsert(
+            {
+              user_id: uid,
+              transportadora: carrier,
+              target_pct: next.target_pct,
+              consecutive_days_alert: next.consecutive_days_alert,
+              notify_email: next.notify_email,
+              notify_whatsapp: next.notify_whatsapp,
+              email: next.email,
+              whatsapp_phone: next.whatsapp_phone,
+            } as never,
+            { onConflict: "user_id,transportadora" },
+          );
+        if (error) throw error;
+        qc.setQueryData(keyFor(carrier), next);
+      } catch (e) {
+        toast.error("N\u00e3o foi poss\u00edvel salvar: " + (e as Error).message);
+        throw e;
+      }
     },
     [carrier, qc, query.data],
   );

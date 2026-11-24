@@ -1,6 +1,8 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { safeFetch } from "../_shared/safeFetch.ts";
+import { log } from "../_shared/logger.ts";
+import { internalErrorResponse } from "../_shared/httpError.ts";
 
 // Sprint 43 — Envia um relatório semanal (HTML) de saúde do banco para todos os admins.
 // Consolida: SLO diário (últimos 7d), anomalias, sugestões de remediação e forecast.
@@ -222,8 +224,12 @@ Deno.serve(async (req) => {
     });
 
     if (!response.ok) {
-      const errBody = await response.text();
-      throw new Error(`Resend error [${response.status}]: ${errBody}`);
+      // A resposta do Resend carrega destinatarios e dominio: fica no log, nao no corpo.
+      log.error("[db-health-weekly-report] Provedor recusou o envio:", {
+        status: response.status,
+        body: (await response.text()).slice(0, 500),
+      });
+      throw new Error("Falha ao enviar o relatorio pelo provedor");
     }
 
     const data = await response.json();
@@ -232,10 +238,6 @@ Deno.serve(async (req) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    return new Response(JSON.stringify({ ok: false, error: msg }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return internalErrorResponse(err, corsHeaders, "db-health-weekly-report");
   }
 });

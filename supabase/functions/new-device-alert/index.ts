@@ -3,12 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { log, redact } from "../_shared/logger.ts";
 import { safeFetch } from "../_shared/safeFetch.ts";
 import { requireUser } from "../_shared/auth.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
+import { getCorsHeaders } from "../_shared/cors.ts";
 
 interface NewDeviceAlertRequest {
   user_id: string;
@@ -24,16 +19,17 @@ interface NewDeviceAlertRequest {
 }
 
 const handler = async (req: Request): Promise<Response> => {
+  const headers = getCorsHeaders(req);
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers });
   }
 
   const auth = await requireUser(req);
   if (!auth.ok) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
-      headers: { "Content-Type": "application/json", ...corsHeaders },
+      headers: { "Content-Type": "application/json", ...headers },
     });
   }
   const userId = auth.claims.sub ?? "";
@@ -195,13 +191,13 @@ const handler = async (req: Request): Promise<Response> => {
 
     return new Response(JSON.stringify({ success: true, emailResult }), {
       status: 200,
-      headers: { "Content-Type": "application/json", ...corsHeaders },
+      headers: { "Content-Type": "application/json", ...headers },
     });
   } catch (error: any) {
     log.error("Error in new-device-alert function:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: "INTERNAL_ERROR" }), {
       status: 500,
-      headers: { "Content-Type": "application/json", ...corsHeaders },
+      headers: { "Content-Type": "application/json", ...headers },
     });
   }
 };

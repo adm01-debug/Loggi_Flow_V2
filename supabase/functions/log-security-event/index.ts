@@ -4,12 +4,7 @@ import { log } from "../_shared/logger.ts";
 import { requireUser } from "../_shared/auth.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
 import { safeFetch } from "../_shared/safeFetch.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
+import { getCorsHeaders } from "../_shared/cors.ts";
 
 interface SecurityEventRequest {
   user_id?: string;
@@ -22,8 +17,9 @@ interface SecurityEventRequest {
 }
 
 serve(async (req: Request) => {
+  const headers = getCorsHeaders(req);
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers });
   }
 
   try {
@@ -35,7 +31,7 @@ serve(async (req: Request) => {
       return new Response(JSON.stringify({ error: "rate_limited" }), {
         status: 429,
         headers: {
-          ...corsHeaders,
+          ...headers,
           "Content-Type": "application/json",
           "Retry-After": "60",
         },
@@ -46,7 +42,7 @@ serve(async (req: Request) => {
     if (!auth.ok) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...headers, "Content-Type": "application/json" },
       });
     }
 
@@ -70,7 +66,7 @@ serve(async (req: Request) => {
         JSON.stringify({ error: "event_type and description are required" }),
         {
           status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...headers, "Content-Type": "application/json" },
         },
       );
     }
@@ -162,7 +158,7 @@ serve(async (req: Request) => {
 
     return new Response(JSON.stringify({ success: true, event_id: data.id }), {
       status: 200,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...headers, "Content-Type": "application/json" },
     });
   } catch (error: unknown) {
     const errorMessage =
@@ -170,7 +166,7 @@ serve(async (req: Request) => {
     log.error("Security event logging error:", error);
     return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...headers, "Content-Type": "application/json" },
     });
   }
 });

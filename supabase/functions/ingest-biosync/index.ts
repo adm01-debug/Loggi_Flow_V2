@@ -1,15 +1,20 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
 import { log } from "../_shared/logger.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+import { invokeFunction } from "../_shared/invokeFunction.ts";
+import { internalErrorResponse } from "../_shared/httpError.ts";
+import {
+  bodyHash,
+  buildEventKey,
+  claimIdempotencyKey,
+} from "../_shared/idempotency.ts";
+import { parseBioSyncInput } from "./parse.ts";
+import { getCorsHeaders } from "../_shared/cors.ts";
 
 serve(async (req) => {
+  const headers = getCorsHeaders(req);
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+    return new Response("ok", { headers });
   }
 
   try {
@@ -18,7 +23,59 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    const { driver_id, vehicle_id, heart_rate, fatigue_index } = await req.json();
+    const body = (await req.json()) as Record<string, unknown>;
+    const { driver_id, vehicle_id, heart_rate, fatigue_index } =
+      parseBioSyncInput(body);
+
+    // Dedupe (etapa 199, achado B-08): o reenvio do mesmo batimento duplicava a
+    // telemetria e repetia o alerta ao motorista. A chave usa identificadores
+    // estaveis e o horario DO EVENTO quando o dispositivo manda; sem ele, o hash
+    // canonico do corpo. O valor medido nao entra em texto claro (LGPD): so dentro
+    // do hash. Relogio do servidor aqui anularia a dedupe (B-02).
+    const eventTime =
+      typeof body.event_time === "string" && body.event_time.trim()
+        ? body.event_time.trim()
+        : typeof body.timestamp === "string" && body.timestamp.trim()
+        ? body.timestamp.trim()
+        : null;
+    // Sem horario de evento a identidade do batimento e o proprio conteudo: o
+    // hash entra como PARTE da chave. Deixa-lo no fallback do helper nao serviria
+    // - com veiculo e motorista sempre presentes, o fallback nunca seria usado e
+    // toda leitura daquele motorista viraria duplicata da primeira.
+    const identidade = eventTime ?? `sha256-${await bodyHash(body)}`;
+    const eventKey = await buildEventKey("biosync", [
+      vehicle_id,
+      driver_id,
+      identidade,
+    ]);
+
+    if (!eventKey) {
+      log.error(
+        "[ingest-biosync] Leitura sem identificador de dispositivo/veiculo",
+      );
+      return new Response(
+        JSON.stringify({ error: "Event without stable identifier" }),
+        {
+          status: 400,
+          headers: { ...headers, "Content-Type": "application/json" },
+        },
+      );
+    }
+
+    const idem = await claimIdempotencyKey(eventKey.provider, eventKey.id);
+    if (idem.duplicate) {
+      return new Response(
+        JSON.stringify({
+          success: true,
+          duplicate: true,
+          message: "already processed",
+        }),
+        {
+          status: 200,
+          headers: { ...headers, "Content-Type": "application/json" },
+        },
+      );
+    }
 
     // 1. Fetch Alert Rules
     const { data: rules } = await supabaseClient
@@ -40,15 +97,22 @@ serve(async (req) => {
       .insert({
         driver_id,
         vehicle_id,
-        heart_rate: heart_rate ?? null, // sem leitura = null (antes: valor aleatório 60-90)
-        fatigue_index: fatigue_index || "LOW",
+        heart_rate, // validado: número na faixa fisiológica (20-300)
+        fatigue_index, // validado: "LOW" quando ausente
         severity,
         timestamp: new Date().toISOString()
       })
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      // O detalhe do Postgres (tabela, coluna, restrição) fica no log; a resposta ao chamador é genérica.
+      log.error("[ingest-biosync] Falha ao gravar telemetria:", {
+        code: error.code,
+        message: error.message,
+      });
+      throw new Error("Falha ao gravar telemetria");
+    }
 
     // 3. Proactive Tactical Log
     if (severity !== "info") {
@@ -61,37 +125,27 @@ serve(async (req) => {
 
       // 4. Proactive Bitrix24 Integration (only for critical)
       if (severity === "crit") {
-        try {
-          await fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/bitrix24-integration`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`
-            },
-            body: JSON.stringify({
-              action: "notify_alert",
-              deal_data: {
-                message: `CRITICAL HEART RATE DETECTED: ${heart_rate} BPM`,
-                severity: "crit",
-                vehicle_id,
-                driver_id
-              }
-            })
-          });
-        } catch (e) {
-          log.error("Failed to notify Bitrix24:", e);
+        const aviso = await invokeFunction("bitrix24-integration", {
+          action: "notify_alert",
+          deal_data: {
+            message: `CRITICAL HEART RATE DETECTED: ${heart_rate} BPM`,
+            severity: "crit",
+            vehicle_id,
+            driver_id,
+          },
+        });
+
+        if (!aviso.ok) {
+          log.error("Failed to notify Bitrix24:", { reason: aviso.reason });
         }
       }
     }
 
     return new Response(JSON.stringify(telemetry), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...headers, "Content-Type": "application/json" },
       status: 200,
     });
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 400,
-    });
+    return internalErrorResponse(error, headers, "ingest-biosync");
   }
 });

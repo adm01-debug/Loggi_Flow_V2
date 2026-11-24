@@ -63,9 +63,12 @@ function showBrowserNotification(
     };
 
     // Auto-close after 30 seconds
-    setTimeout(() => notification.close(), 30000);
+    const autoCloseTimer = setTimeout(() => notification.close(), 30000);
 
-    return notification;
+    return () => {
+      clearTimeout(autoCloseTimer);
+      notification.close();
+    };
   } catch {
     return null;
   }
@@ -77,49 +80,70 @@ interface WindowWithWebkit extends Window {
   webkitAudioContext?: typeof AudioContext;
 }
 
-function playAlertSound(type: "critical" | "warning") {
+function playAlertSound(type: "critical" | "warning"): () => void {
+  let cancelar = () => undefined;
+
   try {
     const AudioContextClass = window.AudioContext || (window as WindowWithWebkit).webkitAudioContext;
-    if (!AudioContextClass) return;
+    if (!AudioContextClass) return cancelar;
     const audioContext = new AudioContextClass();
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    let encerrado = false;
 
     oscillator.connect(gainNode);
     gainNode.connect(audioContext.destination);
+
+    // Fecha o AudioContext: so parar o timer deixaria o contexto aberto
+    const encerrarSom = () => {
+      if (encerrado) return;
+      encerrado = true;
+      try {
+        oscillator.stop();
+      } catch {
+        // ja parado pelo temporizador que encerra o som
+      }
+      void audioContext.close().catch(() => undefined);
+    };
 
     if (type === "critical") {
       // Urgent beep pattern
       oscillator.frequency.value = 880;
       gainNode.gain.value = 0.3;
       oscillator.start();
-      
-      setTimeout(() => {
-        oscillator.frequency.value = 660;
-      }, 150);
-      
-      setTimeout(() => {
-        oscillator.frequency.value = 880;
-      }, 300);
-      
-      setTimeout(() => {
-        oscillator.stop();
-        audioContext.close();
-      }, 450);
+
+      timers.push(
+        setTimeout(() => {
+          oscillator.frequency.value = 660;
+        }, 150)
+      );
+
+      timers.push(
+        setTimeout(() => {
+          oscillator.frequency.value = 880;
+        }, 300)
+      );
+
+      timers.push(setTimeout(encerrarSom, 450));
     } else {
       // Gentle notification
       oscillator.frequency.value = 523;
       gainNode.gain.value = 0.2;
       oscillator.start();
-      
-      setTimeout(() => {
-        oscillator.stop();
-        audioContext.close();
-      }, 200);
+
+      timers.push(setTimeout(encerrarSom, 200));
     }
+
+    cancelar = () => {
+      timers.forEach(clearTimeout);
+      encerrarSom();
+    };
   } catch {
     // Silent fail on sound playback error
   }
+
+  return cancelar;
 }
 
 export function useSLANotifications() {
@@ -134,6 +158,16 @@ export function useSLANotifications() {
     }
   });
   const processedIds = useRef<Set<string>>(new Set());
+  const cancelamentosRef = useRef<(() => void)[]>([]);
+
+  // Cancela som e avisos pendentes quando o componente sai da tela
+  useEffect(() => {
+    const cancelamentos = cancelamentosRef.current;
+    return () => {
+      cancelamentos.forEach((cancelar) => cancelar());
+      cancelamentos.length = 0;
+    };
+  }, []);
 
   // Check current permission status
   useEffect(() => {
@@ -240,12 +274,12 @@ export function useSLANotifications() {
 
     // Play sound
     if (config.soundEnabled) {
-      playAlertSound(alertType);
+      cancelamentosRef.current.push(playAlertSound(alertType));
     }
 
     // Show browser notification
     if (permission === "granted") {
-      showBrowserNotification(
+      const cancelarAviso = showBrowserNotification(
         alertType === "critical" ? "🚨 Alerta Crítico de SLA" : "⚠️ Aviso de SLA",
         {
           body: message,
@@ -255,6 +289,7 @@ export function useSLANotifications() {
           },
         }
       );
+      if (cancelarAviso) cancelamentosRef.current.push(cancelarAviso);
     }
 
     // Also show in-app toast

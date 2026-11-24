@@ -1,11 +1,13 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { log } from "../_shared/logger.ts";
+import { log, redact } from "../_shared/logger.ts";
 import { corsHeaders } from "../_shared/cors.ts";
+import { internalErrorResponse } from "../_shared/httpError.ts";
 import { validateContract } from "../_shared/contract-validator.ts";
 import { verifyWebhookHmac } from "../_shared/webhookSignature.ts";
 import { requireString } from "../_shared/validate.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
+import { bodyHash, buildEventKey } from "../_shared/idempotency.ts";
 
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -94,22 +96,57 @@ serve(async (req) => {
     }
 
     const { eventType, data, eventId } = webhookData;
-    const finalEventId = eventId || data?.orderId || crypto.randomUUID();
+
+    // Etapa 139 (B-02): chave aleatoria anula a dedupe. `eventId` isolado e o
+    // identificador forte; sem ele, orderId + status + momento do evento ainda
+    // identificam - e o `status` entra porque duas mudancas de status do MESMO
+    // pedido sao dois eventos legitimos. `eventType` sozinho nao identifica nada
+    // (dois eventos do mesmo tipo colidiriam), entao sem orderId recusamos.
+    const partesEvento: Array<string | undefined> = [eventId];
+    if (!eventId && data?.orderId) {
+      const quando = data?.timestamp || (await bodyHash(data));
+      partesEvento.push(`${data.orderId}-${data.status ?? ""}-${quando}`);
+    }
+
+    const eventKey = await buildEventKey('lalamove', partesEvento);
+
+    if (!eventKey) {
+      log.error('Lalamove webhook sem identificador estavel, recusando', {
+        eventType,
+        payload: redact(webhookData),
+      });
+      return new Response(JSON.stringify({ error: 'Event without stable identifier' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const finalEventId = eventKey.id;
 
     log.info('Processing Lalamove webhook', { eventType, eventId: finalEventId });
 
-    // Idempotency check
-    const { data: existingEvent } = await supabase
+    // Etapa 133 - grava o marcador ANTES de processar: o UNIQUE
+    // (event_id, provider) resolve a corrida entre duas entregas simultaneas
+    // do mesmo evento com 23505. Fail-open em erro de infraestrutura, igual a
+    // _shared/idempotency.ts.
+    const { error: markerError } = await supabase
       .from('webhook_events_processed')
-      .select('id')
-      .eq('event_id', finalEventId)
-      .eq('provider', 'lalamove')
-      .maybeSingle();
+      .insert({
+        event_id: finalEventId,
+        provider: 'lalamove',
+        payload: webhookData
+      });
 
-    if (existingEvent) {
-      log.info('Webhook already processed, skipping', { eventId: finalEventId });
-      return new Response(JSON.stringify({ success: true, message: 'Already processed' }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    if (markerError) {
+      if (markerError.code === '23505') {
+        log.info('Webhook already processed, skipping', { eventId: finalEventId });
+        return new Response(JSON.stringify({ success: true, duplicate: true, message: 'Already processed' }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      log.warn('Falha ao gravar marcador de idempotencia, seguindo', {
+        eventId: finalEventId,
+        error: markerError.message,
       });
     }
 
@@ -185,22 +222,14 @@ serve(async (req) => {
       }
     }
 
-    // Mark as processed
-    await supabase.from('webhook_events_processed').insert({
-      event_id: finalEventId,
-      provider: 'lalamove',
-      payload: webhookData
-    });
-
     return new Response(JSON.stringify({ success: true, eventType }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
   } catch (error: any) {
-    log.error('Webhook processing error', { error: error.message });
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    log.error('[lalamove-webhook] Webhook processing error:', {
+      message: error instanceof Error ? error.message : String(error),
     });
+    return internalErrorResponse(error, corsHeaders, 'lalamove-webhook');
   }
 });

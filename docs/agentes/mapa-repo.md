@@ -33,6 +33,22 @@ Ler quando precisar saber onde fica algo antes de buscar por texto.
 | `docs/` | ADRs, runbooks, auditorias, `api/openapi.yaml`, `data/dicionario.md`, `ops/cron_jobs_origem.json`, `agentes/` (esta pasta) |
 | `docs/contexto/` | na `main` existe só `regras/manual/` (regras de negócio escritas por humano, entram no contexto gerado). O conteúdo gerado vive na branch **`contexto`** — ver `docs/agentes/contexto-ia.md` |
 
+## Listagens: teto e paginação
+
+Três decisões, na ordem — use a primeira que servir ao caso:
+
+| Caso | O que fazer | Referência |
+|---|---|---|
+| Lista **curta** de domínio fechado (`transportadoras`, `clientes`, `feature_flags`) | leitura inteira, sem teto; se a tela precisar paginar, `usePagination` recorta em memória | `src/hooks/common/usePagination.ts` |
+| Lista **longa** que a tela só exibe (feed, log, telemetria) | teto no servidor com `.limit()` | `src/hooks/notifications/useNotifications.tsx:35` (`.limit(50)` + `.eq("user_id", ...)`) |
+| Lista longa que o usuário **navega página por página** | `useServerPagination`, com `.range(from, to)` e `count: "exact"` | `src/hooks/common/useServerPagination.ts` |
+
+Regras do `useServerPagination`: `from = (page - 1) * pageSize` e `to = from + pageSize - 1` (nunca `.range()`
+junto com `.limit()`); o total vem do `count` do servidor, não de `rows.length`; trocar filtro volta para a
+página 1; `placeholderData` mantém as linhas durante a troca; a ordenação tem de ser estável (com desempate) —
+`.range()` sem ordem determinística repete e some linhas entre páginas.
+
+`src/hooks/common/usePagination.ts` recorta um array **já carregado** (`data.slice`): não busca no servidor.
 ## Testes — onde o vitest realmente olha
 
 `vitest.config.ts` é a configuração válida: `include` cobre `src/**/*.{test,spec}.*` e `tests/**/*.{test,spec}.*`,

@@ -67,7 +67,7 @@ serve(async (req) => {
   } catch (error) {
     log({ level: 'ERROR', message: 'System health check critical failure', meta: { error: error.message } })
     return new Response(
-      JSON.stringify({ status: "unhealthy", error: error.message }),
+      JSON.stringify({ status: "unhealthy", error: "INTERNAL_ERROR" }),
       { headers: { ...getCorsHeaders(req), "Content-Type": "application/json" }, status: 503 }
     )
   }

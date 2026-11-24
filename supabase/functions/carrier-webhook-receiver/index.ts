@@ -4,8 +4,9 @@ import { validateContract } from "../_shared/contract-validator.ts";
 import { requireString } from "../_shared/validate.ts";
 import { verifyWebhookHmac } from "../_shared/webhookSignature.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
-import { claimIdempotencyKey } from "../_shared/idempotency.ts";
+import { bodyHash, buildEventKey, claimIdempotencyKey } from "../_shared/idempotency.ts";
 import { log, redact } from "../_shared/logger.ts";
+import { getCorsHeaders } from "../_shared/cors.ts";
 
 /**
  * Mapeia status/evento livre de um webhook genérico para o enum entrega_status.
@@ -52,15 +53,10 @@ export function mapCarrierStatus(raw: string): string | null {
   return null;
 }
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
-
 serve(async (req) => {
+  const headers = getCorsHeaders(req);
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+    return new Response("ok", { headers });
   }
 
   try {
@@ -77,7 +73,7 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: "rate_limited" }), {
         status: 429,
         headers: {
-          ...corsHeaders,
+          ...headers,
           "Content-Type": "application/json",
           "Retry-After": "60",
         },
@@ -91,7 +87,7 @@ serve(async (req) => {
     if (!(await verifyWebhookHmac(raw, signature, "CARRIER_WEBHOOK_SECRET"))) {
       return new Response(JSON.stringify({ error: "Invalid signature" }), {
         status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...headers, "Content-Type": "application/json" },
       });
     }
 
@@ -117,24 +113,38 @@ serve(async (req) => {
           nexus_protocol: "SHIELD_GATE_REJECTION",
         }),
         {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...headers, "Content-Type": "application/json" },
           status: 400,
         },
       );
     }
 
     // Idempotency guard: dedupe by (carrier_id + event_id|timestamp)
-    const eventId = String(
-      payload.event_id ??
-        payload.id ??
-        `${payload.carrier_id}:${payload.event_type}:${
-          payload.timestamp ?? ""
-        }`,
-    );
-    const idem = await claimIdempotencyKey(
+    // Etapa 141 (B-02): sem `timestamp` a chave antiga virava
+    // `carrier_id:event_type:` - a MESMA para todos os eventos daquele tipo, e o
+    // segundo evento legitimo era descartado como duplicata. O hash do corpo entra
+    // no lugar do vazio, entao payloads diferentes voltam a se distinguir.
+    const identificador = payload.event_id || payload.id;
+    const eventKey = await buildEventKey(
       `carrier:${payload.carrier_id}`,
-      eventId,
+      identificador
+        ? [identificador]
+        : [payload.event_type, payload.timestamp || (await bodyHash(payload))],
+      payload,
     );
+
+    if (!eventKey) {
+      log.error('Carrier webhook sem identificador estavel, recusando', {
+        carrier_id: payload.carrier_id,
+        event_type: payload.event_type,
+      });
+      return new Response(
+        JSON.stringify({ error: 'Event without stable identifier' }),
+        { status: 400, headers: { ...headers, 'Content-Type': 'application/json' } },
+      );
+    }
+
+    const idem = await claimIdempotencyKey(eventKey.provider, eventKey.id);
     if (idem.duplicate) {
       return new Response(
         JSON.stringify({
@@ -142,7 +152,7 @@ serve(async (req) => {
           duplicate: true,
           message: "already processed",
         }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        { headers: { ...headers, "Content-Type": "application/json" } },
       );
     }
 
@@ -216,12 +226,12 @@ serve(async (req) => {
         message: "Carrier Webhook processed via Nexus Shield",
         entrega_atualizada: Boolean(trackingCode || numeroEntrega),
       }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      { headers: { ...headers, "Content-Type": "application/json" } },
     );
   } catch (error: any) {
     log.error("[carrier-webhook-receiver] Error:", error.message);
     return new Response(JSON.stringify({ error: "Internal Server Error" }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...headers, "Content-Type": "application/json" },
       status: 500,
     });
   }

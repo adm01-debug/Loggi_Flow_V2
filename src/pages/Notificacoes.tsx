@@ -1,5 +1,5 @@
-import { useState, useCallback } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Bell,
@@ -27,20 +27,14 @@ import { Pagination } from "@/components/common/Pagination";
 import { FilterBar } from "@/components/common/FilterBar";
 import { BulkActions } from "@/components/common/BulkActions";
 import { useSelection } from "@/hooks/common/useSelection";
-import { usePagination } from "@/hooks/common/usePagination";
-import { useFilters, FilterConfig } from "@/hooks/common/useFilters";
-import { useRealtime } from "@/hooks/data/useRealtime";
+import {
+  useNotificacoesPage,
+  TIPOS_NOTIFICACAO,
+} from "@/hooks/data/useNotificacoesPage";
+import { useNotificacoesRealtime } from "@/hooks/data/useNotificacoesRealtime";
+import { useDebounce } from "@/hooks/common/useDebounce";
+import { useAuth } from "@/hooks/auth/useAuth";
 import { PushNotificationCard } from "@/components/notifications/PushNotificationCard";
-
-interface Notification {
-  id: string;
-  title: string;
-  message: string;
-  type: string;
-  read: boolean;
-  created_at: string;
-  user_id: string;
-}
 
 const typeConfig: Record<string, { icon: LucideIcon; color: string }> = {
   info: { icon: Info, color: "text-info" },
@@ -51,67 +45,36 @@ const typeConfig: Record<string, { icon: LucideIcon; color: string }> = {
   entrega: { icon: Truck, color: "text-info" },
 };
 
-const filterConfig: FilterConfig<Notification> = {
-  search: {
-    fields: ["title", "message"],
-    placeholder: "Buscar...",
-  },
-};
+const PAGE_SIZE_OPTIONS = [10, 15, 25, 50];
 
 export default function Notificacoes() {
   const qc = useQueryClient();
   const [typeFilter, setTypeFilter] = useState("all");
   const [readFilter, setReadFilter] = useState("all");
 
-  const {
-    data: list = [],
-    isLoading,
-    error,
-    refetch,
-  } = useQuery({
-    queryKey: ["notifications"],
-    queryFn: async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) return [];
-      const { data, error } = await supabase
-        .from("notifications")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(200);
-      if (error) throw error;
-      return data as Notification[];
-    },
+  const { user } = useAuth();
+  const userId = user?.id ?? "";
+  const [searchInput, setSearchInput] = useState("");
+  const termo = useDebounce(searchInput, 350);
+
+  // Recorte, filtro, busca e contagem acontecem no banco (etapas 213-215): a tela so pede a pagina
+  // que exibe. A consulta vive em src/hooks/data/useNotificacoesPage.ts.
+  const pagination = useNotificacoesPage(userId, {
+    tipo: typeFilter,
+    leitura: readFilter,
+    busca: termo,
+  });
+  const rows = pagination.rows;
+  const stats = pagination.stats;
+
+  // Etapa 216 (P-02): o agrupamento dos avisos de tempo real vive em src/hooks/data/useNotificacoesRealtime.ts.
+  // Manter aqui as ~60 linhas do agrupamento estouraria o orcamento de 400 linhas deste arquivo.
+  useNotificacoesRealtime({
+    filtroAtivo: typeFilter !== "all" || readFilter !== "all" || termo.trim() !== "",
   });
 
-  // Referencia estavel: cada notificacao nova disparava refetch -> render -> canal
-  // novo -> refetch (contrato em src/hooks/data/useRealtime.tsx).
-  const onNotificationChange = useCallback(() => {
-    refetch();
-  }, [refetch]);
-
-  useRealtime({
-    table: "notifications",
-    onInsert: onNotificationChange,
-    onUpdate: onNotificationChange,
-    onDelete: onNotificationChange,
-  });
-
-  // Apply custom filters
-  const customFiltered = list.filter((n) => {
-    if (typeFilter !== "all" && n.type !== typeFilter) return false;
-    if (readFilter === "unread" && n.read) return false;
-    if (readFilter === "read" && !n.read) return false;
-    return true;
-  });
-
-  const { filteredData, filters, setSearch, clearFilters, hasActiveFilters } =
-    useFilters(customFiltered, filterConfig);
-  const pagination = usePagination(filteredData, { initialPageSize: 15 });
   const { selectedIds, toggle, selectAll, clearSelection, isSelected } =
-    useSelection(pagination.paginatedData);
+    useSelection(rows);
 
   const markReadMut = useMutation({
     mutationFn: async (id: string) => {
@@ -187,23 +150,18 @@ export default function Notificacoes() {
     }
   };
 
-  const stats = {
-    total: list.length,
-    unread: list.filter((n) => !n.read).length,
-  };
-
   const handleClearFilters = () => {
-    clearFilters();
+    setSearchInput("");
     setTypeFilter("all");
     setReadFilter("all");
   };
 
-  if (error)
+  if (pagination.isError)
     return (
       <MainLayout>
         <div className="flex flex-col items-center py-12">
           <AlertCircle className="w-12 h-12 text-destructive mb-4" />
-          <p>Erro: {(error as Error).message}</p>
+          <p>Erro: {(pagination.error as Error | null)?.message}</p>
         </div>
       </MainLayout>
     );
@@ -235,18 +193,16 @@ export default function Notificacoes() {
         </div>
 
         <FilterBar
-          search={filters.search}
-          onSearchChange={setSearch}
+          search={searchInput}
+          onSearchChange={setSearchInput}
           searchPlaceholder="Buscar..."
           extraFilters={[
             {
               key: "type",
               label: "Tipo",
               value: typeFilter,
-              options: Object.keys(typeConfig).map((t) => ({
-                value: t,
-                label: t,
-              })),
+              // Enum do banco: opcao fora dele faz o PostgREST recusar a consulta.
+              options: TIPOS_NOTIFICACAO.map((t) => ({ value: t, label: t })),
               onChange: setTypeFilter,
             },
             {
@@ -262,16 +218,16 @@ export default function Notificacoes() {
           ]}
           onClearFilters={handleClearFilters}
           hasActiveFilters={
-            hasActiveFilters || typeFilter !== "all" || readFilter !== "all"
+            searchInput.trim() !== "" || typeFilter !== "all" || readFilter !== "all"
           }
-          totalFiltered={filteredData.length}
-          totalOriginal={list.length}
+          totalFiltered={pagination.total}
+          totalOriginal={stats.total}
         />
 
         {selectedIds.length > 0 && (
           <BulkActions
             selectedIds={selectedIds}
-            totalCount={pagination.paginatedData.length}
+            totalCount={rows.length}
             onClearSelection={clearSelection}
             onSelectAll={selectAll}
             actions={[
@@ -292,15 +248,15 @@ export default function Notificacoes() {
           />
         )}
 
-        {isLoading && (
+        {pagination.isLoading && (
           <div className="flex justify-center py-12">
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
           </div>
         )}
 
-        {!isLoading && (
+        {!pagination.isLoading && (
           <div className="space-y-2">
-            {pagination.paginatedData.map((n) => {
+            {rows.map((n) => {
               const config = typeConfig[n.type] || typeConfig.info;
               const Icon = config.icon;
               return (
@@ -368,29 +324,37 @@ export default function Notificacoes() {
           </div>
         )}
 
-        {!isLoading && filteredData.length === 0 && (
+        {!pagination.isLoading && rows.length === 0 && (
           <div className="card-base flex flex-col items-center py-12">
             <Bell className="w-12 h-12 text-muted-foreground/30 mb-4" />
             <p className="text-muted-foreground">Nenhuma notificação</p>
           </div>
         )}
-        {!isLoading && filteredData.length > 0 && (
+        {!pagination.isLoading && rows.length > 0 && (
           <Pagination
             currentPage={pagination.currentPage}
             totalPages={pagination.totalPages}
             pageSize={pagination.pageSize}
-            totalItems={pagination.totalItems}
-            startIndex={pagination.startIndex}
-            endIndex={pagination.endIndex}
-            hasNextPage={pagination.hasNextPage}
-            hasPrevPage={pagination.hasPrevPage}
-            pageSizeOptions={pagination.pageSizeOptions}
+            // "X de Y" vem do servidor: `rows.length` e sempre o tamanho da pagina.
+            totalItems={pagination.total}
+            startIndex={
+              pagination.total > 0
+                ? (pagination.currentPage - 1) * pagination.pageSize + 1
+                : 0
+            }
+            endIndex={Math.min(
+              pagination.currentPage * pagination.pageSize,
+              pagination.total,
+            )}
+            hasNextPage={pagination.currentPage < pagination.totalPages}
+            hasPrevPage={pagination.currentPage > 1}
+            pageSizeOptions={PAGE_SIZE_OPTIONS}
             onPageChange={pagination.setPage}
             onPageSizeChange={pagination.setPageSize}
             onNextPage={pagination.nextPage}
             onPrevPage={pagination.prevPage}
-            onFirstPage={pagination.firstPage}
-            onLastPage={pagination.lastPage}
+            onFirstPage={() => pagination.setPage(1)}
+            onLastPage={() => pagination.setPage(pagination.totalPages)}
           />
         )}
       </div>

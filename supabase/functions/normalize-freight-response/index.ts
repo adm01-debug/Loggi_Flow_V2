@@ -5,16 +5,13 @@ import { requireString } from "../_shared/validate.ts";
 import { log } from "../_shared/logger.ts";
 import { parseLocaleNumber } from "../_shared/number.ts";
 import { safeFetch } from "../_shared/safeFetch.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
+import { invokeFunction } from "../_shared/invokeFunction.ts";
+import { getCorsHeaders } from "../_shared/cors.ts";
 
 serve(async (req) => {
+  const headers = getCorsHeaders(req);
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+    return new Response("ok", { headers });
   }
 
   try {
@@ -49,7 +46,7 @@ serve(async (req) => {
           nexus_protocol: "NORMALIZE_GATE_REJECTION",
         }),
         {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...headers, "Content-Type": "application/json" },
           status: 400,
         },
       );
@@ -121,8 +118,7 @@ serve(async (req) => {
             messages: [
               {
                 role: "system",
-                content:
-                  config.ai_prompt ||
+                content: config.ai_prompt ||
                   'Extract freight price and delivery days from the text. Return JSON: {"price": number, "days": number}',
               },
               { role: "user", content: text },
@@ -161,7 +157,7 @@ serve(async (req) => {
     }
 
     return new Response(JSON.stringify({ success: true, price, days }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...headers, "Content-Type": "application/json" },
     });
   } catch (error: any) {
     log.error("Normalization error", { error: error.message });
@@ -189,33 +185,42 @@ serve(async (req) => {
           if (s.whatsapp_phone) phoneByUser.set(s.user_id, s.whatsapp_phone);
         }
 
+        let falhas = 0;
         for (const user of usersToNotify) {
           const phone = phoneByUser.get(user.user_id);
-          if (phone) {
-            await fetch(`${supabaseUrl}/functions/v1/whatsapp-notification`, {
-              method: "POST",
-              headers: {
-                Authorization: `Bearer ${supabaseKey}`,
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                action: "send_normalization_alert",
-                phone,
-                variables: {
-                  transportadora: "Nexus Engine",
-                  cotacao_id: "Internal",
-                },
-              }),
+          if (!phone) continue;
+
+          const envio = await invokeFunction("whatsapp-notification", {
+            action: "send_normalization_alert",
+            phone,
+            variables: {
+              transportadora: "Nexus Engine",
+              cotacao_id: "Internal",
+            },
+          });
+
+          if (!envio.ok) {
+            falhas += 1;
+            log.warn("Falha ao avisar usuário sobre erro de normalização", {
+              userId: user.user_id,
+              reason: envio.reason,
             });
           }
+        }
+
+        if (falhas > 0) {
+          log.warn("Alertas de normalização não entregues", {
+            falhas,
+            total: usersToNotify.length,
+          });
         }
       }
     } catch (alertError) {
       log.error("Failed to send failure alert:", alertError);
     }
 
-    return new Response(JSON.stringify({ error: error.message }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    return new Response(JSON.stringify({ error: "INTERNAL_ERROR" }), {
+      headers: { ...headers, "Content-Type": "application/json" },
       status: 500,
     });
   }

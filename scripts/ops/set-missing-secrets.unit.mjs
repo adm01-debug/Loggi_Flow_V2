@@ -162,7 +162,7 @@ for (const shell of SHELLS) {
         BITRIX24_WEBHOOK_URL: 'https://x.bitrix24.com.br/rest/1/abc=def==/?a=1&b=2',
         RESEND_API_KEY: '* ? [a] ~ ! ; | > < \\n \\\\ #nao-e-comentario',
         EVOLUTION_API_KEY: '--parece-flag',
-        ATICKET_API_KEY: 'çãõ-ünïcödé',
+        CARRIER_WEBHOOK_SECRET: 'çãõ-ünïcödé',
         NEXUS_WEBHOOK_SECRET: '<nao fecha',
         GOOGLE_API_KEY: 'fecha sem abrir>',
       };

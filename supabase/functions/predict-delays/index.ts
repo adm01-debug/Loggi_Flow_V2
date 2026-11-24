@@ -6,6 +6,7 @@ import { withCircuitBreaker } from "../_shared/circuitBreaker.ts";
 import { safeFetch } from "../_shared/safeFetch.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
 import { getWeatherForRoutes } from "../_shared/weather.ts";
+import { invokeFunction } from "../_shared/invokeFunction.ts";
 
 const GOOGLE_API_KEY = Deno.env.get("GOOGLE_API_KEY")!;
 
@@ -342,6 +343,8 @@ export const handler = async (req: Request) => {
           if (s.whatsapp_phone) phoneByUser.set(s.user_id, s.whatsapp_phone);
         }
 
+        let falhasAlerta = 0;
+
         for (const prediction of criticals) {
           const originalItem =
             prediction.tipo === "entrega"
@@ -351,22 +354,26 @@ export const handler = async (req: Request) => {
           for (const user of usersToNotify) {
             const phone = phoneByUser.get(user.user_id);
             if (phone) {
-              await supabase.functions.invoke("whatsapp-notification", {
-                body: {
-                  action: "send_delay_alert",
-                  phone,
-                  entrega_id:
-                    prediction.tipo === "entrega" ? prediction.id : undefined,
-                  coleta_id:
-                    prediction.tipo === "coleta" ? prediction.id : undefined,
-                  variables: {
-                    numero: prediction.numero,
-                    transportadora: originalItem?.transportadora || "N/A",
-                  },
+              const envio = await invokeFunction("whatsapp-notification", {
+                action: "send_delay_alert",
+                phone,
+                entrega_id:
+                  prediction.tipo === "entrega" ? prediction.id : undefined,
+                coleta_id:
+                  prediction.tipo === "coleta" ? prediction.id : undefined,
+                variables: {
+                  numero: prediction.numero,
+                  transportadora: originalItem?.transportadora || "N/A",
                 },
               });
+
+              if (!envio.ok) falhasAlerta += 1;
             }
           }
+        }
+
+        if (falhasAlerta > 0) {
+          log("WARN", "Delay alerts not delivered", { falhas: falhasAlerta });
         }
       }
     }
@@ -386,7 +393,7 @@ export const handler = async (req: Request) => {
   } catch (error) {
     log("ERROR", "Predict-delays failure", { error: error.message });
     return new Response(
-      JSON.stringify({ success: false, message: error.message }),
+      JSON.stringify({ success: false, message: "INTERNAL_ERROR" }),
       {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },

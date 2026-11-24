@@ -4,6 +4,11 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders } from "../_shared/cors.ts";
 import { log } from "../_shared/logger.ts";
 import { requireInternalSecret, requireUser } from "../_shared/auth.ts";
+import { invokeFunction } from "../_shared/invokeFunction.ts";
+
+// O cron roda a cada 30 min e ninguem esta esperando: limite folgado,
+// mas finito — sem ele a execucao agendada morria sem deixar rastro.
+const PREDICT_TIMEOUT_MS = 30_000;
 
 interface PredictionItem {
   id: string;
@@ -67,17 +72,30 @@ export const handler = async (req: Request): Promise<Response> => {
     );
 
     // Invoca a função principal
-    const { data: predResp, error: predErr } = await supabase.functions.invoke(
+    const predResp = await invokeFunction(
       "predict-delays",
-      { body: {} },
+      {},
+      { timeoutMs: PREDICT_TIMEOUT_MS },
     );
 
-    if (predErr) {
-      log("ERROR", "Scheduled invocation of predict-delays failed", predErr);
-      throw predErr;
+    if (!predResp.ok) {
+      log("ERROR", "Scheduled invocation of predict-delays failed", {
+        reason: predResp.reason,
+        status: predResp.status,
+        falhas: 1,
+      });
+      return new Response(
+        JSON.stringify({ success: false, reason: predResp.reason }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
     }
 
-    const predictions: PredictionItem[] = predResp?.predictions ?? [];
+    const predictions: PredictionItem[] =
+      (predResp.data as { predictions?: PredictionItem[] } | null)
+        ?.predictions ?? [];
     const highRisk = predictions.filter(
       (p) => p.risco === "critico" || p.risco === "alto",
     );

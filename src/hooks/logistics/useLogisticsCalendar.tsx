@@ -22,11 +22,14 @@ export interface CalendarFilters {
   status: string[];
   transportadoraId: string | null;
   type: 'all' | 'coleta' | 'entrega';
+  from: Date;
+  to: Date;
 }
 
-export const useLogisticsCalendar = (filters: CalendarFilters) => {
+export const useLogisticsCalendar = ({ from, to, ...filters }: CalendarFilters) => {
   return useQuery({
-    queryKey: ['logistics-calendar', filters],
+    // from/to na chave: trocar de mes muda a consulta, entao tem que mudar o cache
+    queryKey: ['logistics-calendar', filters, from.toISOString(), to.toISOString()],
     queryFn: async () => {
       const events: CalendarEvent[] = [];
 
@@ -44,7 +47,13 @@ export const useLogisticsCalendar = (filters: CalendarFilters) => {
             transportadoras!fk_coletas_transportadora (nome_fantasia),
             fornecedores!fk_coletas_fornecedor (razao_social)
           `)
-          .not('data_prevista_coleta', 'is', null);
+          .not('data_prevista_coleta', 'is', null)
+          // recorte pelo mes exibido (etapa 209); o teto abaixo segue como rede
+          .gte('data_prevista_coleta', from.toISOString())
+          .lte('data_prevista_coleta', to.toISOString())
+          // teto operacional (mesmo de Coletas.tsx/Envios.tsx); a ordem evita corte arbitrario
+          .order('data_prevista_coleta', { ascending: true })
+          .limit(500);
 
         if (filters.status.length > 0) {
           const coletaStatuses = filters.status.filter(s => 
@@ -106,7 +115,13 @@ export const useLogisticsCalendar = (filters: CalendarFilters) => {
             transportadoras (nome_fantasia),
             clientes (razao_social)
           `)
-          .not('previsao_entrega', 'is', null);
+          .not('previsao_entrega', 'is', null)
+          // recorte pelo mes exibido (etapa 209); o teto abaixo segue como rede
+          .gte('previsao_entrega', from.toISOString())
+          .lte('previsao_entrega', to.toISOString())
+          // teto operacional (mesmo de Coletas.tsx/Envios.tsx); a ordem evita corte arbitrario
+          .order('previsao_entrega', { ascending: true })
+          .limit(500);
 
         if (filters.status.length > 0) {
           const entregaStatuses = filters.status.filter(s => 

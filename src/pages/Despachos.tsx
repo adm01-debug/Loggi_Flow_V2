@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { useRealtime } from "@/hooks/data/useRealtime";
 import { FilterBar } from "@/components/common/FilterBar";
+import { EmptyState } from "@/components/common/EmptyState";
 import { useFilters, FilterConfig } from "@/hooks/common/useFilters";
 import { cn } from "@/lib/utils";
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -34,7 +35,11 @@ import { ExpeditionDetailsDialog } from "@/components/shipping/ExpeditionDetails
 import { useAudioFeedback } from "@/hooks/notifications/useAudioFeedback";
 import { useAuth } from "@/hooks/auth/useAuth";
 import { useRuleTriggers } from "@/hooks/logistics/useRuleTriggers";
-import { TRANSICOES_ENTREGA } from "@/lib/statusTransitions";
+import {
+  TRANSICOES_ENTREGA,
+  mensagemRecusaTransicao,
+} from "@/lib/statusTransitions";
+import { assertAtualizou } from "@/lib/conflitoVersao";
 
 interface Despacho {
   id: string;
@@ -115,6 +120,8 @@ export default function Despachos() {
   const {
     data: despachos = [],
     isLoading,
+    isError,
+    error,
     refetch,
   } = useQuery({
     queryKey: ["despachos"],
@@ -217,10 +224,7 @@ export default function Despachos() {
         .eq("id", item.id)
         .eq("version", item.version);
       if (error) throw error;
-      if (count === 0)
-        throw new Error(
-          "Conflito de versão — registro alterado por outro usuário, por favor recarregue",
-        );
+      assertAtualizou(count);
 
       await onStatusChange("entrega", item.id, { status: nextStatus });
 
@@ -245,7 +249,8 @@ export default function Despachos() {
       );
       refetch();
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) =>
+      toast.error(mensagemRecusaTransicao(error, "entrega") ?? error.message),
   });
 
   const moveToNext = (item: Despacho) => {
@@ -281,10 +286,7 @@ export default function Despachos() {
         .eq("id", item.id)
         .eq("version", item.version);
       if (error) throw error;
-      if (count === 0)
-        throw new Error(
-          "Conflito de versão — registro alterado por outro usuário, por favor recarregue",
-        );
+      assertAtualizou(count);
 
       await onStatusChange("entrega", item.id, { status: "despachado" });
 
@@ -305,13 +307,35 @@ export default function Despachos() {
       setConfirmItem(null);
       refetch();
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: (error: Error) =>
+      toast.error(mensagemRecusaTransicao(error, "entrega") ?? error.message),
   });
 
   const confirmDispatch = () => {
     if (!confirmItem) return;
     confirmDispatchMutation.mutate(confirmItem);
   };
+
+  if (isError) {
+    return (
+      <MainLayout>
+        <div className="flex min-h-[60vh] items-center justify-center">
+          <EmptyState
+            variant="error"
+            title="Erro ao carregar despachos"
+            description={
+              error?.message ||
+              "Nao foi possivel carregar a fila de despacho. Tente novamente."
+            }
+            action={{
+              label: "Tentar novamente",
+              onClick: () => refetch(),
+            }}
+          />
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>

@@ -2,12 +2,7 @@ import { safeFetch } from "../_shared/safeFetch.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { log } from "../_shared/logger.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
+import { getCorsHeaders } from "../_shared/cors.ts";
 
 interface BitrixRequest {
   action:
@@ -26,8 +21,9 @@ interface BitrixRequest {
 }
 
 serve(async (req) => {
+  const headers = getCorsHeaders(req);
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers });
   }
 
   try {
@@ -55,7 +51,7 @@ serve(async (req) => {
         }),
         {
           status: 500,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...headers, "Content-Type": "application/json" },
         },
       );
     }
@@ -85,14 +81,14 @@ serve(async (req) => {
             }),
             {
               status: 400,
-              headers: { ...corsHeaders, "Content-Type": "application/json" },
+              headers: { ...headers, "Content-Type": "application/json" },
             },
           );
         }
 
         return new Response(
           JSON.stringify({ success: true, connected: true, total: data.total }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          { headers: { ...headers, "Content-Type": "application/json" } },
         );
       }
 
@@ -125,7 +121,7 @@ serve(async (req) => {
             }),
             {
               status: 400,
-              headers: { ...corsHeaders, "Content-Type": "application/json" },
+              headers: { ...headers, "Content-Type": "application/json" },
             },
           );
         }
@@ -136,7 +132,7 @@ serve(async (req) => {
             deals: data.result?.items || [],
             total: data.total,
           }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          { headers: { ...headers, "Content-Type": "application/json" } },
         );
       }
 
@@ -149,7 +145,7 @@ serve(async (req) => {
             }),
             {
               status: 400,
-              headers: { ...corsHeaders, "Content-Type": "application/json" },
+              headers: { ...headers, "Content-Type": "application/json" },
             },
           );
         }
@@ -177,13 +173,13 @@ serve(async (req) => {
             }),
             {
               status: 400,
-              headers: { ...corsHeaders, "Content-Type": "application/json" },
+              headers: { ...headers, "Content-Type": "application/json" },
             },
           );
         }
 
         return new Response(JSON.stringify({ success: true, updated: true }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...headers, "Content-Type": "application/json" },
         });
       }
 
@@ -193,7 +189,7 @@ serve(async (req) => {
             JSON.stringify({ success: false, error: "deal_data is required" }),
             {
               status: 400,
-              headers: { ...corsHeaders, "Content-Type": "application/json" },
+              headers: { ...headers, "Content-Type": "application/json" },
             },
           );
         }
@@ -217,14 +213,14 @@ serve(async (req) => {
             }),
             {
               status: 400,
-              headers: { ...corsHeaders, "Content-Type": "application/json" },
+              headers: { ...headers, "Content-Type": "application/json" },
             },
           );
         }
 
         return new Response(
           JSON.stringify({ success: true, deal_id: data.result?.item?.id }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          { headers: { ...headers, "Content-Type": "application/json" } },
         );
       }
 
@@ -314,7 +310,7 @@ serve(async (req) => {
         });
 
         return new Response(JSON.stringify({ success: true, ...syncResults }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { ...headers, "Content-Type": "application/json" },
         });
       }
 
@@ -326,7 +322,7 @@ serve(async (req) => {
             JSON.stringify({ success: false, error: "webhook_data required" }),
             {
               status: 400,
-              headers: { ...corsHeaders, "Content-Type": "application/json" },
+              headers: { ...headers, "Content-Type": "application/json" },
             },
           );
         }
@@ -341,7 +337,7 @@ serve(async (req) => {
 
         return new Response(
           JSON.stringify({ success: true, processed: true }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          { headers: { ...headers, "Content-Type": "application/json" } },
         );
       }
 
@@ -376,7 +372,7 @@ serve(async (req) => {
         const data = await response.json();
         return new Response(
           JSON.stringify({ success: !data.error, result: data.result }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          { headers: { ...headers, "Content-Type": "application/json" } },
         );
       }
 
@@ -388,17 +384,17 @@ serve(async (req) => {
           }),
           {
             status: 400,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            headers: { ...headers, "Content-Type": "application/json" },
           },
         );
     }
   } catch (error) {
     log.error("Bitrix24 integration error:", error);
     return new Response(
-      JSON.stringify({ success: false, error: error.message }),
+      JSON.stringify({ success: false, error: "INTERNAL_ERROR" }),
       {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...headers, "Content-Type": "application/json" },
       },
     );
   }

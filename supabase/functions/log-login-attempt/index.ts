@@ -1,12 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { log, redact } from "../_shared/logger.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
+import { getCorsHeaders } from "../_shared/cors.ts";
 
 interface LogAttemptRequest {
   email: string;
@@ -17,9 +12,10 @@ interface LogAttemptRequest {
 }
 
 serve(async (req: Request) => {
+  const headers = getCorsHeaders(req);
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers });
   }
 
   try {
@@ -45,7 +41,7 @@ serve(async (req: Request) => {
     if (!email) {
       return new Response(JSON.stringify({ error: "Email is required" }), {
         status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...headers, "Content-Type": "application/json" },
       });
     }
 
@@ -66,7 +62,7 @@ serve(async (req: Request) => {
 
     return new Response(JSON.stringify({ logged: true }), {
       status: 200,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...headers, "Content-Type": "application/json" },
     });
   } catch (error: unknown) {
     const errorMessage =
@@ -74,7 +70,7 @@ serve(async (req: Request) => {
     log.error("Unexpected error:", error);
     return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...headers, "Content-Type": "application/json" },
     });
   }
 });
