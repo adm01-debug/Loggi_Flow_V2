@@ -393,7 +393,7 @@ export const handler = async (req: Request) => {
   } catch (error) {
     log("ERROR", "Predict-delays failure", { error: error.message });
     return new Response(
-      JSON.stringify({ success: false, message: error.message }),
+      JSON.stringify({ success: false, message: "INTERNAL_ERROR" }),
       {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },

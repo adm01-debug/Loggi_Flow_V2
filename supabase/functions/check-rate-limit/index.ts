@@ -141,7 +141,7 @@ serve(async (req: Request) => {
   } catch (error) {
     log('ERROR', 'Rate limit function error', { error: error.message });
     return new Response(
-      JSON.stringify({ error: "Internal Server Error", message: error.message }),
+      JSON.stringify({ error: "INTERNAL_ERROR" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
