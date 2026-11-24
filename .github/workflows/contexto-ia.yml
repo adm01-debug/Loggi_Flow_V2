@@ -20,7 +20,7 @@ name: Contexto para agentes de IA (10 min)
 #   00-INDEX.md <- scripts/regras_negocio/indice.py (le o manifest.json de cada pasta; diz quem e dono de cada fato)
 #
 # Cada fato tem um dono: schema real = supabase/; onde fica o codigo = codigo/; o que pode/nao pode = regras/.
-# Onde fica: branch `contexto` (gerada, com historico; nunca abra PR dela). Push com GITHUB_TOKEN nao dispara
+# Onde fica: branch `contexto` (gerada, 1 commit - so o HEAD e consumido; nunca abra PR dela). Push com GITHUB_TOKEN nao dispara
 # outros workflows (anti-loop) e os CIs deste repo so escutam main/master/develop.
 # Como ler: git fetch origin contexto && git show origin/contexto:docs/contexto/00-INDEX.md, ou MCP
 # get_file(ref=contexto), ou raw.githubusercontent.com/adm01-debug/Loggi_Flow_V2/contexto/docs/contexto/00-INDEX.md.
@@ -445,6 +445,10 @@ jobs:
               echo "So metricas/manifests mudaram (referencia publicada ha ${AGE_MIN} min) - aguardando."; exit 0
             fi
           fi
-          git commit --quiet -m "chore(contexto): $novos fonte(s) regerada(s) @ main ${HEAD_MAIN:0:7} [skip ci]"
-          git push --force --quiet "$REMOTE" "HEAD:refs/heads/$CONTEXTO_BRANCH"
-          echo "Publicado em $CONTEXTO_BRANCH: $(git rev-parse --short HEAD) (fontes novas: $novos)"
+          # Commit sem pai de proposito: esta branch e um retrato do estado atual e todos os
+          # consumidores leem apenas o HEAD (git archive FETCH_HEAD, git show HEAD:...). Manter a
+          # cadeia so somava ~15 commits e ~235 MB por ano sem nenhum uso.
+          MSG="chore(contexto): $novos fonte(s) regerada(s) @ main ${HEAD_MAIN:0:7} [skip ci]"
+          SNAP="$(git commit-tree "$(git write-tree)" -m "$MSG")"
+          git push --force --quiet "$REMOTE" "$SNAP:refs/heads/$CONTEXTO_BRANCH"
+          echo "Publicado em $CONTEXTO_BRANCH: $(git rev-parse --short "$SNAP") (fontes novas: $novos)"
