@@ -11,6 +11,21 @@ import { getCorsHeaders } from "../_shared/cors.ts";
 
 const MAX_BATCH = 100;
 
+// B-09 (etapa 200): o `web-push` fala com FCM/APNs por conta propria e nao passa
+// por `safeFetch`, entao nao tinha tempo limite nenhum - provedor lento prendia o
+// laco e o lote inteiro morria no limite de execucao da funcao. `options.timeout`
+// existe na biblioteca (web-push@3.6.7, `web-push-lib.js:222`) e destroi o socket;
+// mesmo valor de `_shared/fetch-with-timeout.ts:9`. O estouro e falha DA INSCRICAO
+// (o `catch` do laco ja segue com as outras) e NAO se retenta: cada reenvio seria
+// uma notificacao repetida no celular do usuario (B-10).
+const PUSH_TIMEOUT_MS = 10000;
+
+function isPushTimeout(e: unknown): boolean {
+  const err = e as { statusCode?: number; code?: string; message?: string };
+  if (err?.statusCode) return false;
+  return err?.code === "ETIMEDOUT" || /timeout/i.test(err?.message ?? "");
+}
+
 // Validação se as credenciais VAPID existem sem quebrar import em ambiente sem secret.
 function getVapid() {
   const subject = Deno.env.get("VAPID_SUBJECT");
@@ -159,11 +174,13 @@ serve(async (req) => {
             keys: { p256dh: sub.p256dh, auth: sub.auth },
           },
           payload,
+          { timeout: PUSH_TIMEOUT_MS },
         );
         sent++;
       } catch (e) {
         failed++;
         const err = e as { statusCode?: number };
+        const estourou = isPushTimeout(e);
         if (err.statusCode === 404 || err.statusCode === 410) {
           // Inscrição expirada/inválida: limpa para não reaparecer.
           await supabase
@@ -174,7 +191,12 @@ serve(async (req) => {
         errors.push({
           endpoint: sub.endpoint,
           statusCode: err.statusCode,
-          error: err?.statusCode ? undefined : (e as Error)?.message,
+          // tempo limite nao e inscricao invalida: so o 404/410 do provedor e.
+          error: estourou
+            ? "timeout"
+            : err?.statusCode
+            ? undefined
+            : (e as Error)?.message,
         });
       }
     }
