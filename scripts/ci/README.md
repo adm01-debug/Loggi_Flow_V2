@@ -45,6 +45,41 @@ Sem dependências (Node puro). No CI roda no job `Agents Docs Integrity` do `.gi
 - Encolhimento legítimo e desejado (limpeza grande aprovada pelo dono) → faça em PR própria, com o motivo no
   corpo, e o dono decide; não contorne o guard.
 
+## `check-dedupe-keys.mjs` — chave de dedupe sem valor aleatório nem relógio
+
+Impede que volte o achado **B-02** da etapa 142: a chave do evento construída com `crypto.randomUUID()`
+ou `Date.now()` faz cada entrega repetida parecer evento novo — a dedupe nunca casa e o webhook
+reprocessa. Varre `supabase/functions/**/index.ts` e reprova quando um nome que contenha
+`event_id`/`eventId`/`event_key`/`idempot*` aparece seguido de `:` ou `=` e, na mesma expressão (até o
+`;` ou 300 caracteres), chama `crypto.randomUUID(` ou `Date.now(`.
+
+Comentários são mascarados antes da busca (um `// antes era Date.now()` não reprova código limpo) e o
+alvo é estreito de propósito: `Date.now()` em `startedAt`/`expiresAt`/`timestamp` e o `crypto.randomUUID()`
+do `Request-ID` de `lalamove-tracking` continuam válidos. Proibir a chamada no repositório inteiro viraria
+ruído e alguém desligaria o gate.
+
+```sh
+npm run validate:dedupe-keys                            # confere o repositório em que o script está
+node scripts/ci/check-dedupe-keys.mjs --root .          # mesmo efeito, raiz explícita
+node --test scripts/ci/check-dedupe-keys.unit.mjs
+```
+
+Exit: `0` limpo (imprime quantos `index.ts` conferiu); `1` com uma linha `::error::` por ocorrência;
+`2` em uso inválido, `supabase/functions/` ausente ou nenhum `index.ts` encontrado — falha do próprio
+gate, nunca verde falso.
+
+**Ainda não está ligado a nenhum workflow**: a etapa 142 proíbe mexer na CI (é decisão do dono). A
+sugestão registrada em `docs/qa/05-PROGRESSO.md` é ligá-lo a um job, como `validate:query-limits` no
+`quality-gate` do `ci-nexus.yml`.
+
+### Quando ele falha
+
+- Você montou a chave com campo instável → use o id do provedor ou o hash do corpo
+  (`_shared/idempotency.ts`, `buildEventKey`/`bodyHash`).
+- É falso positivo (o nome não é chave de dedupe, ou a chamada é de outro campo) → o achado é **um
+  nome** com `idempot`/`event_key` no meio; renomeie a variável ou abra discussão no PR em vez de afrouxar
+  o padrão.
+
 ## `github-settings-guard.mjs` — perímetro do GitHub contra o baseline
 
 Compara branch protection da `main`, visibilidade e opções de merge do repo, permissões do Actions, rulesets e

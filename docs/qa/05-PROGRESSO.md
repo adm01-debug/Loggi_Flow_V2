@@ -214,7 +214,7 @@
 - [x] **139** — `lalamove-webhook`: eliminar o `crypto.randomUUID()` da chave de dedupe — onda 3 — Alta
 - [x] **140** — `nexus-webhook-receiver`: eliminar o `Date.now()` da chave de dedupe — onda 3 — Alta
 - [x] **141** — `carrier-webhook-receiver`: chave estável demais está engolindo evento verdadeiro — onda 3 — Alta
-- [~] **142** — Gate de `grep`: nenhuma chave de dedupe pode conter valor aleatório ou relógio — onda 3 — Média · **aguarda o dono**
+- [x] **142** — Gate de `grep`: nenhuma chave de dedupe pode conter valor aleatório ou relógio — onda 3 — Média · gate `npm run validate:dedupe-keys` criado (PR #439); **não ligado à CI por decisão da própria etapa**
 - [x] **143** — `scheduled-reports`: lista de campos permitidos no `insert` — onda 3 — Crítica
 - [x] **144** — `scheduled-reports`: a mesma lista de campos permitidos no `update` — onda 3 — Crítica
 - [x] **145** — `scheduled-reports`: validar `action` e `reportId`, e testar o descarte de campo não permitido — onda 3 — Alta
@@ -4201,3 +4201,35 @@ ordem de migration proíbe.
   `exit=0`
 - `grep -n "banco.json" AGENTS.md docs/agentes/banco.md docs/agentes/contexto-ia.md` -> 5 ocorrências, todas
   com a ressalva (AGENTS.md:97, banco.md:93, contexto-ia.md:66,69,71)
+
+## Registro da etapa 142 — gate contra chave de dedupe aleatória (2026-11-25)
+
+**O que mudou.** `scripts/ci/check-dedupe-keys.mjs` varre `supabase/functions/**/index.ts` e reprova
+(exit 1) quando um nome com `event_id`/`eventId`/`event_key`/`idempot*` é seguido de `:` ou `=` e, na mesma
+expressão, chama `crypto.randomUUID(` ou `Date.now(`. Comentários são mascarados antes da busca; `Date.now()`
+em `startedAt`/`expiresAt`/`timestamp` e o `crypto.randomUUID()` do `Request-ID` de `lalamove-tracking`
+seguem válidos — o alvo é estreito de propósito, proibir a chamada no repositório inteiro viraria ruído.
+Exit 2 quando `supabase/functions/` não existe ou nenhum `index.ts` foi lido (nada validado ≠ verde).
+
+**Arquivos:** `scripts/ci/check-dedupe-keys.mjs` (novo), `scripts/ci/check-dedupe-keys.unit.mjs` (novo, 12
+casos), `scripts/ci/README.md` (seção nova), `package.json` (`validate:dedupe-keys`) e
+`scripts/automation.config.json` (2 registros `legacy`, de 92 para 94).
+
+**Evidência**
+- `node scripts/ci/check-dedupe-keys.mjs` -> `OK: 44 arquivos index.ts conferidos; nenhuma chave com
+  crypto.randomUUID() ou Date.now().` / `exit=0`
+- prova no defeito real: `buildEventKey('lalamove', [...partesEvento, crypto.randomUUID()])` reintroduzido
+  em `supabase/functions/lalamove-webhook/index.ts:111` -> `::error::Chave de dedupe construida com valor
+  aleatorio ou relogio: supabase/functions/lalamove-webhook/index.ts:111 ...` / `exit=1`; arquivo restaurado,
+  `git status --porcelain supabase/` vazio e gate de volta a `exit=0`
+- `node --test scripts/ci/check-dedupe-keys.unit.mjs` -> `pass 12`, `fail 0`
+- `npm run automation:test` -> `pass 103`, `fail 0`
+- `npx eslint scripts/ci/check-dedupe-keys.mjs scripts/ci/check-dedupe-keys.unit.mjs` -> `exit=0`
+
+**Sugestão registrada (não executada nesta etapa, por decisão da própria 142):** ligar
+`npm run validate:dedupe-keys` a um job da CI — o lugar natural é o `quality-gate` do
+`.github/workflows/ci-nexus.yml`, ao lado de `validate:query-limits` — o que exige o ok do dono.
+
+**Decisão:** o gate **não** foi ligado a nenhum workflow (a etapa 142 proíbe mexer na CI e a escolha de
+required check é do dono); entra como `npm run validate:dedupe-keys`, mergeável sem alterar comportamento
+de CI. PR #439.
