@@ -299,7 +299,7 @@
 - [ ] **218** — `count_prediction_breach_days`: variante que responde todas as transportadoras numa chamada — onda 6 — Média
 - [x] **219** — `useKPIBenchmark`: tirar os `await` de dentro do laço — onda 6 — Média
 - [x] **220** — `useKPIBenchmark`: uma consulta por tabela cobrindo todos os períodos — onda 6 — Média
-- [ ] **221** — `useExecutiveMetrics`: mesma consolidação de 18 consultas para 3 — onda 6 — Baixa
+- [x] **221** — `useExecutiveMetrics`: mesma consolidação de 18 consultas para 3 — onda 6 — Baixa
 - [~] **222** — Conferir `types.ts` contra o banco ao vivo e regenerar se houver divergência — onda 6 — Média · **aguarda o dono**
 - [ ] **223** — `Envios.tsx`: trocar `select("*")` por colunas explícitas em `entregas` — onda 6 — Média
 - [x] **224** — `Coletas.tsx`: trocar `select("*")` por colunas explícitas em `coletas` — onda 6 — Média
@@ -411,6 +411,7 @@ Problema novo **não se corrige na hora** (regra 4). Anote aqui, com `arquivo:li
 | --- | ------ | -------------------- | ------------------- | ------------------ |
 | A-01 | **Resolvido na etapa 220**: a consulta de `ocorrencias` do benchmark de KPI nao tinha teto, ao contrario das de `entregas`/`coletas` (`.limit(1000)`); mes com muitas ocorrencias baixava a tabela inteira | `src/hooks/analytics/useKPIBenchmark.tsx:67-71` | 219 -> 220 | Baixa |
 | A-02 | O teto de 6000 do benchmark de KPI e **unico para os seis meses**: se a soma dos seis passar de 6000 linhas, o PostgREST corta sem ordem definida e qualquer mes pode perder registros (antes o corte era de 1000 **por mes**) | `src/hooks/analytics/useKPIBenchmark.tsx:44,49-71` | 220 | Media |
+| A-03 | O teto unico para os seis meses tambem vale para as metricas executivas (6000/6000/3000): se a soma dos seis meses passar disso, o PostgREST corta sem ordem definida e qualquer mes pode perder registros (antes o corte era por mes -- 1000/1000/500) | `src/hooks/analytics/useExecutiveMetrics.tsx:55,62,68` | 221 | Media |
 
 ## Etapas que não correspondiam mais ao código
 
@@ -436,6 +437,49 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 
 ## Registro de execução
 
+
+### Registro - etapa 221 (2026-11-25) - metrica executiva passa de 18 consultas para 3
+
+**Causa:** identica a da 220 no hook gemeo (`src/hooks/analytics/useExecutiveMetrics.tsx`). O bloco `trends`
+pedia a mesma tabela seis vezes, mudando so o intervalo de `created_at`, e os seis intervalos sao contiguos; o
+agrupamento por mes estava no laco do cliente. Achado P-03.
+
+**Entrega:** as 18 consultas viraram **3**, uma por tabela (`:45-69`), com a mesma forma que a 220 deixou no
+`useKPIBenchmark`: janela unica de `startOfMonth(subMonths(now, 5))` ate `endOfMonth(now)`, `agruparPorMes` com
+`Record<string, T[]>` + `forEach` (`:72-84`) e a chave local `format(new Date(linha.created_at), "yyyy-MM")`.
+`created_at` entrou no `select` das tres, porque passou a ser lido no cliente. Tetos escalados na proporcao que o
+plano exige -- `entregas` e `coletas` 1000/mes -> 6000, `ocorrencias` 500/mes -> 3000 (`:55,62,68`). Nao houve
+extracao de hook compartilhado (o plano veta: refatoracao nao pedida, dois arquivos por vez); os dois hooks ficam
+com o mesmo desenho, lado a lado. OTIF (`:91-102`), custo de frete (`:103-106`) e a ordem cronologica dos seis
+meses (`subMonths(now, periodsBack - 1 - i)`) continuam como estavam. As outras duas consultas do arquivo
+(`carrierOtif`, `avgCollectionTime`) nao foram tocadas.
+
+**Mudanca visivel, deliberada:** o teto de `ocorrencias` por mes era 500 e agora e 3000 para os seis meses. Num
+mes com mais de 500 ocorrencias a tela passa a mostrar a contagem real (ate 3000) em vez do 500 cortado -- mesmo
+efeito que a 220 teve em `entregas`/`coletas`, e o que o plano pediu ao mandar escalar a proporcao.
+
+**Verificacao:** spec `tests/contracts/executive-metrics-consulta-unica.spec.ts` (7 casos) sobre
+`tests/contracts/executive-metrics-fixtures.ts` (servidor de mentira que filtra por intervalo como o PostgREST,
+projeta so as colunas pedidas e aplica o `limit` de verdade, mais o **espelho do codigo anterior** de `trends`
+na `4f18e691`). Casos: 3 consultas, uma por tabela; janela unica de seis meses, `created_at` no select das tres e
+tetos 6000/6000/3000; **os seis meses identicos ao codigo anterior, campo por campo**, num cenario com as duas
+bordas do mes (23:30 do ultimo dia -- que em UTC cai no mes seguinte -- e 00:30 do primeiro dia), linha deletada,
+uma ocorrencia deletada (que o codigo antigo **nao** filtra, e continua nao filtrando) e linhas fora da janela em
+cada ponta; o mesmo com 70 linhas espalhadas por oito meses; ordem cronologica com rotulo `MMM/yy`; 9000
+ocorrencias no mes corrente viram 3000 (o teto corta); ausencia de laco `for`, de `monthsPromises` e de
+`.limit(1000)` no bloco, com exatamente 3 `.from("...")`, e as outras duas consultas do arquivo intactas.
+Valores do mes corrente no cenario de bordas conferidos a mao: 5 entregas, 3 entregas/finalizadas com 2 no prazo
+(OTIF 66,7%), 3 coletas, 4 ocorrencias e frete 660.
+`npx tsc --noEmit` 0 erros; `npx eslint` nos tres arquivos 0 avisos / 0 erros; `npx vitest run` **812/812** em 96
+arquivos; o spec tambem passa com `TZ=UTC`.
+**Prova por mutacao: 9/9 capturadas** (teto fixo em 1000; `created_at` fora do select de entregas; janela
+comecando um mes antes; chave do mes em UTC em vez de local; baldes de coletas lendo ocorrencias; filtro de
+deletadas fora de entregas; teto de ocorrencias em 6000; formula do OTIF sobre todas as entregas em vez das
+entregues; meses em ordem invertida).
+
+**Nao verificado:** o volume real por mes no banco (a consulta do plano pede credencial de Supabase, que esta
+sessao nao tem) e a contagem de requisicoes na aba Rede do `/dashboard` executivo, que so da para medir depois do
+deploy. Por isso o risco do teto unico segue anotado como A-03.
 
 ### Registro - etapa 220 (2026-11-25) - benchmark de KPI passa de 18 consultas para 3
 
