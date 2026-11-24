@@ -232,7 +232,7 @@
 - [x] **154** — `evolution-whatsapp`: validar `instance`, `phone` e `message` — onda 5 — Alta
 - [x] **155** — `ocr-receipt-processor`: validar a entrada do comprovante — onda 5 — Média
 - [x] **156** — Criar `_shared/invokeFunction.ts`: chamada entre funções com tempo limite — onda 5 — Alta
-- [ ] **157** — `normalize-freight-response`: trocar o `fetch` nu para `whatsapp-notification` — onda 5 — Alta
+- [x] **157** — `normalize-freight-response`: trocar o `fetch` nu para `whatsapp-notification` — onda 5 — Alta
 - [ ] **158** — `ingest-biosync`: trocar o `fetch` nu para `bitrix24-integration` — onda 5 — Média
 - [ ] **159** — `nexus-webhook-receiver`: tempo limite nas duas chamadas internas dentro do webhook — onda 5 — **Crítica**
 - [ ] **160** — `send-password-reset`: tempo limite na chamada interna — onda 5 — Alta
@@ -434,6 +434,42 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapa 157 (2026-11-25) - achado B-05 (`normalize-freight-response`)
+
+**Causa:** `index.ts:195` chamava `${supabaseUrl}/functions/v1/whatsapp-notification` com `fetch` **nu** dentro do
+laço por usuário a notificar (`:192-194`). Em Deno, `fetch` sem sinal não tem tempo limite: um único usuário com
+envio travado prendia o laço inteiro, a função morria pelo limite de execução e **ninguém** recebia o alerta de falha
+de normalização — justamente o alerta que existe para avisar de um erro.
+
+**Correção:** o bloco passou a usar `invokeFunction("whatsapp-notification", { ... })` (etapa 156), com o **mesmo
+corpo** (`action: "send_normalization_alert"`, `phone`, `variables.transportadora: "Nexus Engine"`,
+`cotacao_id: "Internal"`). A falha é tratada **por usuário**: `if (!envio.ok) { falhas += 1; log.warn(...) }` e o
+laço continua; ao final, um único `log.warn` com `{ falhas, total }` quando houve falha. Nenhum `throw` novo, nenhum
+`Promise.all` (o problema era tempo limite, não paralelismo). O `continue` mantém o comportamento anterior de pular
+usuário sem telefone.
+
+**Mudança de comportamento:** envio interno travado é abandonado em **10 s** e contado como falha, em vez de
+pendurar o laço; os demais usuários continuam sendo avisados na mesma execução.
+
+**Fora de escopo (registrado, não tocado):** `error.message` cru (`:217`, B-06/etapa 178); CORS `*` (`:10`, etapa
+195); montagem de `phoneByUser` (`:188-191`) e o conteúdo da mensagem; os demais `supabase.functions.invoke()` do
+repositório são as etapas 159-163.
+
+**Evidência:**
+- `tests/contracts/normalize-freight-alerta-interno.spec.ts` (novo, 4 casos): nenhum `await fetch(` no arquivo e
+  `invokeFunction("whatsapp-notification"` no lugar; mensagem e variáveis preservadas; falha por usuário contada
+  (`if (!envio.ok) { falhas += 1;`) com `reason` no log e sem `throw`; resumo `if (falhas > 0)` com `total`.
+  É teste de contrato de fonte (o `index.ts` importa `esm.sh`, que o vitest não carrega) — mesmo precedente das
+  etapas 146-155.
+- Mutação A — ramo de falha desligado (`if (false)`): 1/4 falha. B — log sem `reason`: 1/4. C — nome da função
+  interno errado: 1/4. D — `fetch` cru de volta: 1/4. Restaurado: 4/4.
+- `npx vitest run --coverage`: **56 arquivos / 455 testes, todos verdes**; totais 76,23 / 73,6 / 78,19 / 78,46.
+- `deno check` 1 erro = **baseline 1** (herdado, B-06); `deno lint` 6 = baseline 6 (4 `no-import-prefix` + 2 `any`,
+  herdados); `deno fmt --check` limpo; `npx tsc --noEmit` 0; `npm run lint:budget` OK (77/86).
+- `grep -n 'fetch(' .../index.ts` → nenhuma ocorrência; `grep -n invokeFunction` → `:8` (import) e `:197`.
+- **NÃO VERIFICADO:** o alerta real em produção (exige uma normalização que falhe e usuário com WhatsApp ligado).
+  Depois do deploy, o log deve mostrar `invokeFunction: ok` com `durationMs` por usuário.
 
 ### Registro - etapa 156 (2026-11-25) - achado B-05 (`_shared/invokeFunction.ts`)
 
