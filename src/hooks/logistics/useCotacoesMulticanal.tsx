@@ -51,13 +51,27 @@ export const useCotacoesMulticanal = () => {
         .from("cotacoes_multicanal")
         .select(
           `
-          *,
+          id,
+          canal,
+          status,
+          origem_estado,
+          destino_estado,
+          valor_cotado,
+          prazo_dias,
+          expires_at,
+          retry_count,
+          workflow_logs,
+          normalization_data,
           transportadora:transportadoras (
             id, nome_fantasia, razao_social, score_performance
           )
         `,
         )
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        // teto operacional: esta consulta tem refetchInterval de 30s (abaixo), entao a
+        // tabela inteira era rebaixada 120x/hora por usuario. 200 e o teto de
+        // useUnifiedTracking.tsx. Coluna nova lida pela tela entra aqui tambem.
+        .limit(200);
 
       if (error) throw error;
       return data as CotacaoMulticanal[];

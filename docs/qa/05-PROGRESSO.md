@@ -288,7 +288,7 @@
 - [x] **207** — `useLogisticsCalendar`: pôr teto na leitura de `coletas` — onda 6 — Alta
 - [x] **208** — `useLogisticsCalendar`: pôr teto na leitura de `entregas` — onda 6 — Alta
 - [x] **209** — `useLogisticsCalendar`: filtrar no servidor pelo mês que está na tela — onda 6 — Alta
-- [ ] **210** — `useCotacoesMulticanal`: teto no servidor e colunas explícitas — onda 6 — Alta
+- [x] **210** — `useCotacoesMulticanal`: teto no servidor e colunas explícitas — onda 6 — Alta
 - [~] **211** — Guard automatizado: consulta de listagem sem teto reprova a CI — onda 6 — Alta · **aguarda o dono**
 - [x] **212** — `Notificacoes.tsx`: teto imediato na leitura de `notifications` — onda 6 — Alta
 - [ ] **213** — `Notificacoes.tsx`: adotar `useServerPagination` como primeiro consumidor do contrato — onda 6 — Alta
@@ -434,6 +434,38 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapa 210 (2026-11-25) - achados P-01 e P-04 (cotacoes multicanal)
+
+**Causa:** `useCotacoesMulticanal` fazia `.select("*, transportadora:transportadoras(...)")` +
+`.order("created_at", { ascending: false })` **sem teto**, e a consulta tem `refetchInterval: 30000`
+(`:66`, polling porque a tabela saiu do Realtime por seguranca). A pior combinacao de P-01: a unica leitura sem
+teto que tambem se repete sozinha -- a tabela inteira, com join e 23 colunas, era rebaixada **120 vezes por
+hora** por usuario com a tela aberta. Somava-se P-04: `select("*")` trazia as 23 colunas e a tela le 11.
+
+**Entrega:** duas mudancas na mesma consulta. (1) `.limit(200)` depois do `.order(...)` -- 200 e o teto que
+`useUnifiedTracking.tsx:138,167` usa para leitura operacional recorrente e cotacao e fluxo de curto prazo.
+(2) o `*` virou a lista explicita das **11 colunas que a tela realmente le** (`id`, `canal`, `status`,
+`origem_estado`, `destino_estado`, `valor_cotado`, `prazo_dias`, `expires_at`, `retry_count`, `workflow_logs`,
+`normalization_data`), com o join `transportadora:transportadoras (id, nome_fantasia, razao_social,
+score_performance)` intacto. `refetchInterval: 30000` preservado (o plano proibe mexer) e as mutacoes
+(`createCotacao`/`updateCotacao`/`selectCotacao`) intactas -- a de criacao segue com `*`, mas tem
+`.single()`, entao nao e listagem. O tipo `CotacaoMulticanal` **nao** foi alterado: o `as` de `:63` continua
+compilando porque o tipo completo e atribuivel ao objeto reduzido.
+
+**Verificacao:** spec de contrato novo `tests/contracts/cotacoes-multicanal-teto.spec.ts` (6 casos). O caso
+central extrai da **tela** (`DashboardCotacoes.tsx`) todo campo lido via `cotacao.`/`c.`/`selectedCotacao.` e
+exige **igualdade exata** com a lista de colunas do select -- nem a menos (vira `undefined` silencioso) nem a
+mais (payload de volta). Ha guarda contra passar por vacuidade (>= 6 campos) e um caso que confirma que as 11
+colunas descartadas (`user_id`, `transportadora_id`, `origem_cidade`, `destino_cidade`, `peso_kg`, `volumes`,
+`valor_mercadoria`, `observacoes`, `responded_at`, `created_at`, `updated_at`) continuam sem leitura na tela.
+8 mutacoes -- sem `.limit`, `.limit(5000)`, `*` de volta, remover `retry_count` do select, colocar `peso_kg` de
+volta no select, a tela passar a ler `cotacao.peso_kg`, `refetchInterval` para 60000 e tirar o join da
+transportadora -- falham **1/1/2/1/1/2/1/2**; a versao correta passa 6/6. `eslint` limpo, `tsc` 0.
+
+**Nao verificado:** o tamanho em KB da resposta antes/depois (o plano pede) e o numero real de cotacoes no
+banco -- sem credencial de banco e sem deploy nesta sessao. Nao ha filtro de periodo nesta tela, entao 200 e o
+limite escolhido: cotacoes alem das 200 mais recentes nao aparecem no painel.
 
 ### Registro - etapa 209 (2026-11-25) - achado P-01 (recorte pelo mes exibido)
 
