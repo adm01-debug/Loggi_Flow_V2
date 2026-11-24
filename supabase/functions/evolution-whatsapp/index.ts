@@ -6,6 +6,25 @@ import { log } from "../_shared/logger.ts";
 import { corsHeaders } from "../_shared/cors.ts";
 import { requireRole } from "../_shared/auth.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
+import { ValidationError } from "../_shared/validate.ts";
+import {
+  parseCotacaoRequest,
+  parseSendTextRequest,
+  parseStatusRequest,
+} from "./parse.ts";
+
+// Lista fechada de conexões WhatsApp da empresa: antes, `instance` livre escolhia
+// qualquer conexão da conta Evolution. `EVOLUTION_ALLOWED_INSTANCES` (separado por
+// vírgula) estende; `EVOLUTION_INSTANCE_NAME` é a conexão usada por whatsapp-notification.
+const ALLOWED_INSTANCES = Array.from(
+  new Set([
+    ...(Deno.env.get("EVOLUTION_ALLOWED_INSTANCES") ?? "")
+      .split(",")
+      .map((name) => name.trim())
+      .filter(Boolean),
+    Deno.env.get("EVOLUTION_INSTANCE_NAME") || "PRINCIPAL",
+  ]),
+);
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -67,19 +86,10 @@ serve(async (req) => {
 
     switch (action) {
       case "send_text": {
-        const { instance, phone, message } = data;
-        if (!instance || !phone || !message) {
-          return new Response(
-            JSON.stringify({
-              success: false,
-              error: "Campos obrigatórios: instance, phone, message",
-            }),
-            {
-              status: 400,
-              headers: { ...corsHeaders, "Content-Type": "application/json" },
-            },
-          );
-        }
+        const { instance, phone, message } = parseSendTextRequest(
+          data,
+          ALLOWED_INSTANCES,
+        );
 
         const result = await withCircuitBreaker("whatsapp-api", async () => {
           const response = await safeFetch(
@@ -135,19 +145,7 @@ serve(async (req) => {
           peso,
           volumes,
           valor_mercadoria,
-        } = data;
-        if (!instance || !phone) {
-          return new Response(
-            JSON.stringify({
-              success: false,
-              error: "Campos obrigatórios: instance, phone",
-            }),
-            {
-              status: 400,
-              headers: { ...corsHeaders, "Content-Type": "application/json" },
-            },
-          );
-        }
+        } = parseCotacaoRequest(data, ALLOWED_INSTANCES);
 
         const message = [
           `📦 *Solicitação de Cotação de Frete*`,
@@ -202,7 +200,7 @@ serve(async (req) => {
       }
 
       case "check_status": {
-        const { instance } = data;
+        const { instance } = parseStatusRequest(data, ALLOWED_INSTANCES);
         const response = await safeFetch(
           `${EVOLUTION_API_URL}/instance/connectionState/${instance}`,
           {
@@ -230,6 +228,20 @@ serve(async (req) => {
         );
     }
   } catch (error) {
+    if (error instanceof ValidationError) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: error.message,
+          field: error.field,
+        }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
+    }
+
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
     const isCircuitOpen = errorMessage.includes("Circuit Breaker");
