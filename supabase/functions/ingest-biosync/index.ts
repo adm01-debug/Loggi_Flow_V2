@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
 import { log } from "../_shared/logger.ts";
+import { invokeFunction } from "../_shared/invokeFunction.ts";
 import { ValidationError, validationErrorResponse } from "../_shared/validate.ts";
 import { parseBioSyncInput } from "./parse.ts";
 
@@ -64,25 +65,18 @@ serve(async (req) => {
 
       // 4. Proactive Bitrix24 Integration (only for critical)
       if (severity === "crit") {
-        try {
-          await fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/bitrix24-integration`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`
-            },
-            body: JSON.stringify({
-              action: "notify_alert",
-              deal_data: {
-                message: `CRITICAL HEART RATE DETECTED: ${heart_rate} BPM`,
-                severity: "crit",
-                vehicle_id,
-                driver_id
-              }
-            })
-          });
-        } catch (e) {
-          log.error("Failed to notify Bitrix24:", e);
+        const aviso = await invokeFunction("bitrix24-integration", {
+          action: "notify_alert",
+          deal_data: {
+            message: `CRITICAL HEART RATE DETECTED: ${heart_rate} BPM`,
+            severity: "crit",
+            vehicle_id,
+            driver_id,
+          },
+        });
+
+        if (!aviso.ok) {
+          log.error("Failed to notify Bitrix24:", { reason: aviso.reason });
         }
       }
     }
