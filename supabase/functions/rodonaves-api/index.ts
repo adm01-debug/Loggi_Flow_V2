@@ -13,7 +13,6 @@ import { getRedisClient } from "../_shared/redis.ts";
 import { log } from "../_shared/logger.ts";
 import { internalErrorResponse } from "../_shared/httpError.ts";
 import {
-  blockedPayload,
   mapWithLimit,
   withFallback,
 } from "./fallback.ts";
