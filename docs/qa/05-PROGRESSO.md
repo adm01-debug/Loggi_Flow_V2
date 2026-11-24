@@ -285,7 +285,7 @@
 - [x] **204** — `useTrackingAnalytics`: pôr teto no servidor na leitura de `rastreamento_historico` — onda 6 — Crítica
 - [x] **205** — `Analytics.tsx`: passar o intervalo de datas que a tela já tem para `useTrackingAnalytics` — onda 6 — Crítica
 - [x] **206** — `useTrackingAnalytics`: tornar a janela de datas obrigatória na assinatura — onda 6 — Alta
-- [ ] **207** — `useLogisticsCalendar`: pôr teto na leitura de `coletas` — onda 6 — Alta
+- [x] **207** — `useLogisticsCalendar`: pôr teto na leitura de `coletas` — onda 6 — Alta
 - [ ] **208** — `useLogisticsCalendar`: pôr teto na leitura de `entregas` — onda 6 — Alta
 - [ ] **209** — `useLogisticsCalendar`: filtrar no servidor pelo mês que está na tela — onda 6 — Alta
 - [ ] **210** — `useCotacoesMulticanal`: teto no servidor e colunas explícitas — onda 6 — Alta
@@ -434,6 +434,32 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapa 207 (2026-11-25) - achado P-01 (teto na leitura de coletas)
+
+**Causa:** `src/hooks/logistics/useLogisticsCalendar.tsx` montava a consulta de `coletas` com
+`.select(...)` + `.not('data_prevista_coleta', 'is', null)` e **nenhum teto**. Os dois filtros existentes sao
+opcionais (`if (filters.status.length > 0)` / `if (filters.transportadoraId)`), e o unico filtro garantido --
+"data prevista nao nula" -- nao limita nada: com o calendario aberto sem filtro de status/transportadora a tela
+baixa a tabela inteira de coletas.
+
+**Entrega:** teto de **500** (o mesmo ja adotado em `Coletas.tsx:122`, `Envios.tsx:353` e
+`KanbanEntregas.tsx:268`) + `.order('data_prevista_coleta', { ascending: true })` **antes** do corte. A ordem
+e parte do fix, nao enfeite: cortar sem ordenar devolve 500 linhas arbitrarias e o calendario perde justamente
+os meses que seriam exibidos. O teto ficou **incondicional**, colado ao `.not(...)` e portanto antes de qualquer
+filtro opcional -- se estivesse depois, uma tela filtrada continuaria sem teto. Filtros condicionais de status e
+transportadora intactos; o bloco de `entregas` do mesmo arquivo **nao** foi tocado (e a etapa 208).
+
+**Verificacao:** spec de contrato novo `tests/contracts/calendar-teto-coletas.spec.ts` (5 casos), que amarra o
+teto, a ordem-antes-do-corte, o valor de 500 usado no repositorio, a posicao incondicional do corte (indice do
+`.limit(` menor que o do primeiro `if (filters.status.length > 0)`) e a integridade dos filtros condicionais.
+6 mutacoes -- remover `.limit(500)`, remover `.order(...)`, trocar para `.limit(5000)`, inverter para
+`ascending: false`, mover o teto para depois dos filtros condicionais e remover o `.not('data_prevista_coleta')`
+-- falham **4/1/3/1/1/1**; a versao correta passa 5/5. `eslint` limpo nos dois arquivos, `tsc --noEmit` 0,
+`lint:budget` 77/86 com 0 erros, suite **741/741** (88 arquivos).
+
+**Nao verificado:** o numero real de linhas de `coletas` no banco e o efeito "antes/depois" na tela -- sem
+credencial de banco e sem deploy nesta sessao.
 
 ### Registro - etapa 206 (2026-11-25) - achado P-01 (janela de datas obrigatoria no hook)
 

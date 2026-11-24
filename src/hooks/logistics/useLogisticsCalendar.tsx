@@ -44,7 +44,10 @@ export const useLogisticsCalendar = (filters: CalendarFilters) => {
             transportadoras!fk_coletas_transportadora (nome_fantasia),
             fornecedores!fk_coletas_fornecedor (razao_social)
           `)
-          .not('data_prevista_coleta', 'is', null);
+          .not('data_prevista_coleta', 'is', null)
+          // teto operacional (mesmo de Coletas.tsx/Envios.tsx); a ordem evita corte arbitrario
+          .order('data_prevista_coleta', { ascending: true })
+          .limit(500);
 
         if (filters.status.length > 0) {
           const coletaStatuses = filters.status.filter(s => 
