@@ -11,6 +11,7 @@ import {
 import { getCircuitBreaker } from "../_shared/circuitBreaker.ts";
 import { getRedisClient } from "../_shared/redis.ts";
 import { log } from "../_shared/logger.ts";
+import { internalErrorResponse } from "../_shared/httpError.ts";
 
 // Rodonaves API Gateways
 const TRACKING_GATEWAY = "https://tracking-apigateway.rte.com.br";
@@ -64,6 +65,18 @@ class RTEError extends Error {
     this.name = "RTEError";
   }
 }
+
+/**
+ * Mensagem que o front pode mostrar, decidida pelo código que nós lançamos — o
+ * texto do parceiro muda sem aviso e nunca chega à resposta.
+ */
+const MENSAGEM_POR_CODIGO: Record<RTEError["code"], string> = {
+  RTE_AUTH_FAILED: "Falha de autenticacao na transportadora",
+  RTE_SCOPE_BLOCKED: "A transportadora bloqueou o acesso a este recurso",
+  RTE_TIMEOUT: "A transportadora demorou demais para responder",
+  RTE_BAD_REQUEST: "A transportadora recusou a solicitacao",
+  RTE_UPSTREAM_ERROR: "Falha ao chamar a transportadora",
+};
 
 function classifyStatus(status: number): RTEError["code"] {
   if (status === 401) return "RTE_AUTH_FAILED";
@@ -191,8 +204,16 @@ async function apiGet(
       headers: { Authorization: `Bearer ${token}` },
     });
     if (!res.ok) {
+      const body = await res.text();
+      // O corpo do erro vem do parceiro: fica no log, nunca na mensagem.
+      log.error("[rodonaves-api] Falha no gateway RTE (GET):", {
+        gateway,
+        path,
+        status: res.status,
+        body: body.slice(0, 500),
+      });
       throw new RTEError(
-        `GET ${path} failed [${res.status}]: ${await res.text()}`,
+        `GET ${path} failed`,
         classifyStatus(res.status),
         res.status,
         gateway,
@@ -224,8 +245,16 @@ async function apiMutate(
     }
     const res = await fetchWithTimeout(gateway, url, opts);
     if (!res.ok) {
+      const body = await res.text();
+      log.error("[rodonaves-api] Falha no gateway RTE (mutacao):", {
+        gateway,
+        method,
+        path,
+        status: res.status,
+        body: body.slice(0, 500),
+      });
       throw new RTEError(
-        `${method} ${path} failed [${res.status}]: ${await res.text()}`,
+        `${method} ${path} failed`,
         classifyStatus(res.status),
         res.status,
         gateway,
@@ -638,10 +667,14 @@ async function getDeliveryReceiptByProtocols(p: Record<string, unknown>) {
       headers: { Authorization: `Bearer ${token}` },
     },
   );
-  if (!res.ok)
-    throw new Error(
-      `Batch receipts by protocols failed [${res.status}]: ${await res.text()}`,
-    );
+  if (!res.ok) {
+    const body = await res.text();
+    log.error("[rodonaves-api] Falha ao buscar comprovantes por protocolos:", {
+      status: res.status,
+      body: body.slice(0, 500),
+    });
+    throw new Error("Falha ao buscar comprovantes por protocolos");
+  }
   return res.json();
 }
 
@@ -1702,7 +1735,7 @@ Deno.serve(async (req) => {
     if (error instanceof RTEError) {
       log.error(
         `[rodonaves-api] ${error.code} @ ${error.gateway}:`,
-        error.message,
+        { message: error.message },
       );
       const status =
         error.code === "RTE_SCOPE_BLOCKED"
@@ -1717,7 +1750,7 @@ Deno.serve(async (req) => {
           success: false,
           code: error.code,
           gateway: error.gateway,
-          error: error.message,
+          error: MENSAGEM_POR_CODIGO[error.code],
         }),
         {
           status,
@@ -1725,11 +1758,6 @@ Deno.serve(async (req) => {
         },
       );
     }
-    log.error("[rodonaves-api] Error:", error);
-    const message = error instanceof Error ? error.message : "Unknown error";
-    return new Response(JSON.stringify({ success: false, error: message }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return internalErrorResponse(error, corsHeaders, "rodonaves-api");
   }
 });
