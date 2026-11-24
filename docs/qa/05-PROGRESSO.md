@@ -281,7 +281,7 @@
 ### Onda 6
 
 - [x] **202** — Criar `useServerPagination` e **definir** o contrato de paginação no servidor — onda 6 — Crítica
-- [ ] **203** — Documentar o contrato de paginação e marcar `usePagination` como "só memória" — onda 6 — Alta
+- [x] **203** — Documentar o contrato de paginação e marcar `usePagination` como "só memória" — onda 6 — Alta
 - [ ] **204** — `useTrackingAnalytics`: pôr teto no servidor na leitura de `rastreamento_historico` — onda 6 — Crítica
 - [ ] **205** — `Analytics.tsx`: passar o intervalo de datas que a tela já tem para `useTrackingAnalytics` — onda 6 — Crítica
 - [ ] **206** — `useTrackingAnalytics`: tornar a janela de datas obrigatória na assinatura — onda 6 — Alta
@@ -435,6 +435,31 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 
 ## Registro de execução
 
+### Registro - etapa 203 (2026-11-25) - achado P-01 (contrato de paginacao documentado)
+
+**Causa:** `src/hooks/common/usePagination.ts` nao dizia em nenhum lugar que pagina **em memoria** — o nome
+sugere paginacao e a linha 57 e `data.slice(startIndex, endIndex)`. Foi assim que `src/pages/Notificacoes.tsx:105`
+chamou `usePagination(filteredData, { initialPageSize: 15 })` **depois** de baixar a tabela inteira (P-02): o
+desenvolvedor acreditou que estava paginando. Ate a etapa 202 o repositorio tambem nao tinha a peca certa, e sem
+um lugar que diga "qual hook para qual caso" o proximo agente repete a escolha errada.
+
+**Entrega (so documentacao e um comentario de cabecalho, nenhuma mudanca de codigo):**
+
+1. `docs/agentes/mapa-repo.md` ganhou a subsecao **"Listagens: teto e paginacao"**, com as tres decisoes na
+   ordem — lista curta de dominio fechado (leitura inteira; `usePagination` se a tela paginar), lista longa que
+   a tela so exibe (teto com `.limit()`, referencia `useNotifications.tsx:35`), e lista longa que o usuario
+   navega pagina por pagina (`useServerPagination`, com `.range(from, to)` e `count: "exact"`) — mais as cinco
+   regras do hook e a deixa explicita de que `usePagination` recorta array ja carregado.
+2. `src/hooks/common/usePagination.ts` ganhou **duas linhas de comentario** no topo dizendo que o recorte e em
+   memoria e apontando para `useServerPagination` quando os dados vierem do banco. O codigo nao foi tocado: 20
+   arquivos dependem da assinatura atual, e renomear o hook seria churn sem beneficio.
+3. `- [x] **203**` no checklist.
+
+**Verificacao:** `node scripts/ci/check-claude-md-integrity.mjs` OK (8 secoes; 66677 bytes contra base de 65418 —
+o acrescimo e a subsecao nova); `grep -n 'useServerPagination' docs/agentes/mapa-repo.md
+src/hooks/common/usePagination.ts` devolve as ocorrencias esperadas; `eslint` limpo; `tsc` 0; suite **711/711**
+(so comentario e markdown, nenhum caminho de execucao alterado). Diff: 43 insercoes, 1 delecao (a linha do checklist).
+
 ### Registro - etapa 202 (2026-11-25) - achado P-01 (`useServerPagination`)
 
 **Causa:** nao havia paginacao no servidor em nenhum ponto do front — `grep -rn '.range(' src/` devolvia zero. O
@@ -473,7 +498,7 @@ parada na parcial; `initialPage`.
 **Verificacao:** prova por mutacao A-G -> 8/2/1/1/1/1/1 falhas (faixa errada, `total` de `rows.length`, sem
 clamp, `setPageSize` mantendo a pagina, sem reset de filtro, erro nao lancado, `totalPages` sem `count`),
 restaurado 9/9; `eslint` limpo nos dois arquivos novos; `tsc` 0; `lint:budget` 77/86 (nenhum aviso novo);
-suite **716/716**; `grep -rn '.range(' src/` agora devolve ocorrencias (o exemplo de uso no comentario do hook).
+suite **711/711**; `grep -rn '.range(' src/` agora devolve ocorrencias (o exemplo de uso no comentario do hook).
 Sem consumidor, nao ha mudanca de comportamento nas telas — reversao por `git revert`.
 
 ### Registro - etapa 201 (2026-11-25) - achado B-10 (`fetch-with-timeout`)
