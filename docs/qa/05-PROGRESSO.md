@@ -363,7 +363,7 @@
 
 ### Onda 8
 
-- [~] **270** — Remover as três entradas obsoletas da allowlist de vulnerabilidades — onda 8 — Baixa · **aguarda o dono**
+- [~] **270** — Remover as três entradas obsoletas da allowlist de vulnerabilidades — onda 8 — Baixa · **PR #436 aberta; aguarda o dono** (altera gate de segurança da CI)
 - [x] **271** — Remover o arquivo `x` vazio versionado na raiz — onda 8 — Baixa
 - [~] **272** — Decidir com o dono o destino de `bun.lock` e `bun.lockb` — onda 8 — Baixa · **aguarda o dono**
 - [~] **273** — Barrar arquivo acidental na raiz antes do merge — onda 8 — Baixa · **aguarda o dono**
@@ -4285,3 +4285,49 @@ relação com o gate e só poluem a revisão, então ficaram de fora da PR nova.
 
 **Estado:** PR aberta, **não mergeada** — a spec marca "precisa de aprovação humana antes do merge" e o
 piso é limiar de gate da CI. Reverter = `git revert` (uma linha por piso).
+
+## Registro da etapa 270 — allowlist de vulnerabilidades vazia (2026-11-24)
+
+**O que estava errado:** `scripts/audit-gate.mjs` isentava três pacotes (`xlsx`, `vite`, `picomatch`) e o
+próprio gate avisava que a isenção não tinha mais efeito: `⚠️ Allowlist sem efeito para: xlsx, vite,
+picomatch`. Isenção sem efeito é risco puro — um advisory novo nesses mesmos nomes passaria calado.
+
+**Medição antes de mexer (spec da etapa):** `npm audit --json` -> `{"info":0,"low":0,"moderate":0,
+"high":0,"critical":0,"total":0}`; `npm audit --json` também devolve `vulnerabilities: {}` e 0 advisories.
+Por que cada entrada morreu (conferido no repo e no registro, não deduzido):
+
+- `xlsx`: o advisory era do SheetJS `xlsx` (fora do registro npm). O instalado hoje é outro pacote —
+  `package.json` declara `"xlsx": "npm:xlsx-js-style@1.2.0"`, resolvido em `xlsx-js-style@1.2.0`.
+- `vite`: as CVEs eram exclusivas do dev server da linha 5.4.x; o `package-lock.json` resolve
+  `vite@6.4.6`.
+- `picomatch`: GHSA-fc5q-39xc-vjpf (ReDoS em extglob, `<= 4.0.7`) **foi retirado a montante em
+  2026-11-18** — `gh api /advisories/GHSA-fc5q-39xc-vjpf` devolve `summary: "Withdrawn Advisory: ..."` e
+  `withdrawn_at: 2026-11-18T15:38:56Z`. `npm view picomatch version` = `4.0.7` (não existe 4.0.8).
+
+**Mudança:** `ALLOWLIST` passa a `new Set([])`. Os comentários `:6-18` viraram bloco de histórico datado,
+com o motivo da saída de cada nome — o spec proíbe apagá-los, e é o que permite reintroduzir uma entrada
+em uma linha se o advisory voltar. A lógica de `rootsOf`/`justifications` não foi tocada.
+
+**Regressão que a mudança criou e foi corrigida:** `scripts/gates/audit-gate.unit.mjs` tinha 4 casos
+apoiados na lista cheia (high em `xlsx`, critical em `vite`, o aviso de entrada sem efeito e o caso
+transitivo do picomatch) e um quinto que passaria a reprovar. Eles agora injetam a allowlist que querem
+testar numa cópia própria do script (`comAllowlist(...)`, fixture nova por caso), então o mecanismo de
+isenção continua coberto mesmo com a lista publicada vazia. Acrescentado o caso que falha se alguém
+reintroduzir as entradas sem advisory: "allowlist vazia: high em xlsx/vite/picomatch volta a reprovar
+(etapa 270)". O job de CI `scripts-tests.yml` roda `find scripts -name '*.unit.mjs'` — este arquivo está
+coberto por ele. `scripts/automation.config.json` foi conferido e não precisou de mudança (a operação
+segue `manual`).
+
+**Evidência**
+- `npm run security-scan` -> `✅ Sem critical/high fora da allowlist` e **sem** a linha de aviso (antes:
+  aviso presente)
+- `node --test scripts/gates/audit-gate.unit.mjs` -> 32 testes, 0 falha
+- `find scripts -name '*.unit.mjs'` (mesmo comando do job `scripts-tests.yml`) -> 40 arquivos, 1310
+  testes, 1307 pass, 0 fail, 3 skip
+- `npx eslint scripts/audit-gate.mjs scripts/gates/audit-gate.unit.mjs` -> 0 problema
+- `npm run lint:budget` -> dentro do orçamento (`ESLint errors 0/0`, `TypeScript errors 0/0`)
+- `npm run automation:test` -> 103 testes, 0 falha
+
+**Estado:** PR aberta, **não mergeada** — a spec marca "precisa de aprovação humana antes do merge" e a
+mudança altera gate de segurança da CI (regra 8). Reverter = `git revert` (uma linha para reintroduzir
+cada entrada).
