@@ -248,7 +248,7 @@
 - [x] **170** — `rodonaves-api`: parar de transformar o erro do **login** da Rodonaves em mensagem — onda 5 — **Crítica**
 - [x] **171** — `rodonaves-api`: erro genérico na resposta e detalhe só no log — onda 5 — Alta
 - [x] **172** — `resend-email`: parar de repassar o erro do provedor de e-mail — onda 5 — Alta
-- [ ] **173** — `db-health-weekly-report`: parar de repassar o erro do terceiro no relatório — onda 5 — Média
+- [x] **173** — `db-health-weekly-report`: parar de repassar o erro do terceiro no relatório — onda 5 — Média
 - [ ] **174** — `nexus-webhook-receiver`: erro genérico na resposta ao webhook — onda 5 — Média
 - [ ] **175** — `lalamove-webhook`: erro genérico na resposta ao webhook — onda 5 — Média
 - [ ] **176** — `rodonaves-webhook`: erro genérico na resposta ao webhook — onda 5 — Média
@@ -434,6 +434,40 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapa 173 (2026-11-25) - achado B-06 (`db-health-weekly-report`)
+
+**Causa:** `db-health-weekly-report` montava `throw new Error("Resend error [<status>]: <corpo do provedor>")` e o
+`catch` devolvia `{ ok: false, error: msg }` ao chamador. A funcao roda por `pg_cron`
+(`supabase/migrations/20260901000000_cron_jobs_canonical.sql:67`), entao esse corpo ia para a resposta do request
+do cron (registrada em `net._http_response`) — fora do perimetro da funcao, carregando destinatarios, dominio de
+envio e id da chave do provedor.
+
+**Correcao (so o arquivo da etapa):**
+
+- `:226-233` — a resposta do provedor passou a ir **apenas** para o log, com o status HTTP e corte de 500 chars
+  (`log.error("[db-health-weekly-report] Provedor recusou o envio:", { status: response.status, body: (await response.text()).slice(0, 500) })`),
+  e o erro lancado virou mensagem fixa `"Falha ao enviar o relatorio pelo provedor"`.
+- `:240-242` — o `catch` passou a devolver `internalErrorResponse(err, corsHeaders, "db-health-weekly-report")`
+  (etapa 164): 500 generico, sem mensagem interna e sem stack.
+- `:4-5` — imports de `log` (`_shared/logger.ts`) e `internalErrorResponse` (`_shared/httpError.ts`).
+- **Nao tocado:** a funcao continua **sem CORS** (chamada por agendamento; ponto limpo em B-07, como a etapa
+  exige), o conteudo do relatorio (`buildHtml`), a periodicidade (`0 8 * * 1`), o guard de `RESEND_API_KEY` e o
+  caminho de sucesso (`{ ok: true, sent, resend_id }`).
+
+**Quem via o detalhe:** nenhuma tela — o unico chamador e o agendador (`net.http_post` do cron); o texto do
+provedor aparecia no corpo da resposta HTTP que o cron grava. O detalhe completo agora esta no log da edge.
+
+**Verificado de verdade:** `tests/contracts/db-health-weekly-report-erro-provedor.spec.ts` (7 casos) — 7/7.
+Prova por mutacao: A volta a `Resend error [status]: corpo` -> 1 falha; B remove o `log.error` -> 1; C tira o
+`status` do log -> 1; D volta a `{ ok: false, error: err.message }` no catch -> 2; E tira o `slice(0, 500)` -> 1;
+F mexe no caminho de sucesso -> 1; restaurado -> 7/7. `deno check` 0 = baseline 0; `deno lint` 2 = baseline 2
+(`no-import-prefix` dos `npm:` das linhas 1-2, herdado); `deno fmt --check` igual ao baseline (diff herdado nas
+ternarias). `tsc` 0; `lint:budget` sem erro, dentro do orcamento; suite 71 arquivos / 534 testes. Verificacao
+pedida pelo plano (`sed -n '220,230p'`): executada — o `if (!response.ok)` nao tem mais `errBody` e o corpo do
+parceiro so aparece dentro do `log.error`. Execucao real do cron com falha do provedor: NAO EXECUTADO (exigiria
+forcar falha do Resend em producao) — rastreado pelo contrato do codigo.
+
 
 ### Registro - etapa 172 (2026-11-25) - achado B-06 (`resend-email`)
 
