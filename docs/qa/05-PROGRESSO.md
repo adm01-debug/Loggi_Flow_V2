@@ -300,7 +300,7 @@
 - [x] **219** — `useKPIBenchmark`: tirar os `await` de dentro do laço — onda 6 — Média
 - [x] **220** — `useKPIBenchmark`: uma consulta por tabela cobrindo todos os períodos — onda 6 — Média
 - [x] **221** — `useExecutiveMetrics`: mesma consolidação de 18 consultas para 3 — onda 6 — Baixa
-- [~] **222** — Conferir `types.ts` contra o banco ao vivo e regenerar se houver divergência — onda 6 — Média · **aguarda o dono**
+- [~] **222** — Conferir `types.ts` contra o banco ao vivo e regenerar se houver divergência — onda 6 — Média · **aguarda o dono** (aplicar a migration `20261121153649_user_panel_preferences` - A-04)
 - [ ] **223** — `Envios.tsx`: trocar `select("*")` por colunas explícitas em `entregas` — onda 6 — Média
 - [x] **224** — `Coletas.tsx`: trocar `select("*")` por colunas explícitas em `coletas` — onda 6 — Média
 - [ ] **225** — `useDrillDown`: colunas explícitas nas duas leituras — onda 6 — Baixa
@@ -412,6 +412,7 @@ Problema novo **não se corrige na hora** (regra 4). Anote aqui, com `arquivo:li
 | A-01 | **Resolvido na etapa 220**: a consulta de `ocorrencias` do benchmark de KPI nao tinha teto, ao contrario das de `entregas`/`coletas` (`.limit(1000)`); mes com muitas ocorrencias baixava a tabela inteira | `src/hooks/analytics/useKPIBenchmark.tsx:67-71` | 219 -> 220 | Baixa |
 | A-02 | O teto de 6000 do benchmark de KPI e **unico para os seis meses**: se a soma dos seis passar de 6000 linhas, o PostgREST corta sem ordem definida e qualquer mes pode perder registros (antes o corte era de 1000 **por mes**) | `src/hooks/analytics/useKPIBenchmark.tsx:44,49-71` | 220 | Media |
 | A-03 | O teto unico para os seis meses tambem vale para as metricas executivas (6000/6000/3000): se a soma dos seis meses passar disso, o PostgREST corta sem ordem definida e qualquer mes pode perder registros (antes o corte era por mes -- 1000/1000/500) | `src/hooks/analytics/useExecutiveMetrics.tsx:55,62,68` | 221 | Media |
+| A-04 | **Produção não tem `public.user_panel_preferences`**: a migration `20261121153649` da #248 nunca foi aplicada (último dispatch do `aplicar-migration.yml` é de 20/11, anterior ao arquivo) e o `types.ts` foi editado à mão. Efeito: `useSLAMetas` lança erro ao ler e `PainelSLA.tsx:242-244` mostra `toast.success` incondicional sem persistir nada - o usuário vê "salvo" e as metas de SLA não são gravadas. É também a causa do `types-sync` vermelho desde 23/11 (Gate 1) | `src/hooks/sla/useSLAMetas.ts:31-36`, `src/pages/PainelSLA.tsx:242-244`, `supabase/migrations/20261121153649_user_panel_preferences.sql` | 222 | **Alta** |
 
 ## Etapas que não correspondiam mais ao código
 
@@ -437,6 +438,51 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 
 ## Registro de execução
 
+
+### Registro - etapa 222 (2026-11-25) - types.ts contra o banco: a drift é de UMA tabela que não existe em produção
+
+**222 fica ABERTA** - a correção é DDL em produção (Regra 8). Sem MCP do Supabase nesta sessão, a prova
+saiu dos próprios artefatos do `types-sync`:
+
+- `gh run list --workflow types-sync.yml`: o último **sucesso** é do cron de 2026-11-23T05:51; no mesmo dia
+  há **duas falhas** por push (11:04 e 13:58), a run `45189263904`.
+- Nessa run o job "Gates e PR de sincronização" para em `Gate 1 falhou: novos erros de TypeScript
+  introduzidos pelo novo types.ts`, todos em `src/hooks/sla/useSLAMetas.ts` (`:31,33,50,51,53-57,89,91,96`),
+  incluindo `"user_panel_preferences" is not assignable ...` e `'sla_critico_horas' does not exist`: o
+  candidato gerado do banco vivo **não tem** a tabela que o `types.ts` commitado tem (`:5403-5428`).
+- A mesma run registra `Drift: types=true, catalogo=false, manifesto=false`. `supabase/schema-catalog.json` e
+  `supabase/schema-manifest.json` foram gerados do banco vivo nessa run (e são byte-idênticos aos commitados,
+  conferido nas etapas 132-137) e têm **zero** ocorrências de `user_panel_preferences`, contra 14 e 67 de
+  `user_notification_preferences`. Se a tabela existisse em produção, o manifesto a listaria. **Produção não
+  tem `public.user_panel_preferences`.**
+- `git log -S'user_panel_preferences' -- src/integrations/supabase/types.ts` devolve um único commit,
+  `c565d8cf` (PR #248) - o mesmo que criou `supabase/migrations/20261121153649_user_panel_preferences.sql`.
+  A PR **editou o `types.ts` à mão**, exatamente o que o plano proíbe num arquivo gerado, e é por isso que a
+  drift aparece sem que o `types-sync` jamais tenha rodado com sucesso depois.
+- O último dispatch de `.github/workflows/aplicar-migration.yml` foi em 2026-11-20T18:06, **antes** de a
+  migration existir (arquivo de 21/11 15:36, merge em 23/11). A migration nunca foi aplicada.
+
+**Correção de uma leitura anterior:** o registro das etapas 132-137 diz que a run 45189263904 acusa a tabela
+"presente em produção e ausente no arquivo commitado". É o contrário - ela está no arquivo commitado e falta
+em produção, coerente com `types=true` e catálogo/manifesto idênticos. O texto original ficou com nota
+apontando para este registro.
+
+**Impacto em produção:** `PainelSLA.tsx:96` consome `useSLAMetas()`; `useSLAMetas.ts:31-36` faz
+`.from("user_panel_preferences")` e lança o erro (`:36`), sem fallback. Pior: `PainelSLA.tsx:242-244` chama
+`saveMetas(draftMetas)` e mostra `toast.success("Metas de SLA atualizadas")` **sem condição**, enquanto
+`saveError` (`useSLAMetas.ts:119`) não é consumido em nenhum ponto da página - o usuário vê "salvo" e nada é
+persistido. Registrado como **A-04**.
+
+**Compatibilidade migration x types.ts:** conferi coluna por coluna. A migration cria `id`, `user_id`,
+`sla_critico_horas`, `sla_alto_horas`, `sla_medio_horas`, `sla_meta_on_time_pct`, `created_at` e
+`updated_at`, que é exatamente o `Row` de `types.ts:5403-5412`. Aplicar a migration resolve a drift sem
+tocar no arquivo gerado. Resíduo esperado: a tabela nova nasce com os GRANTs padrão do Supabase, então
+`scripts/db-audit/grants-baseline.json` pode acusar diferença e precisar de regeneração (mudança de repo,
+não de banco).
+
+**Nada foi alterado nesta etapa:** nem `types.ts` (gerado), nem a migration, nem o workflow. A correção é
+disparar `aplicar-migration.yml` com `arquivo=supabase/migrations/20261121153649_user_panel_preferences.sql`
+e `confirmacao=APLICAR` (exige o secret `DESTINO_URL` e o environment `banco-leitura`) - Regra 8.
 
 ### Registro - etapa 221 (2026-11-25) - metrica executiva passa de 18 consultas para 3
 
@@ -2718,7 +2764,8 @@ comportamento fica para depois do merge. Não houve teste contra o banco ao vivo
 - `src/integrations/supabase/types.ts` está atrás do banco: a run 45189263904 do `types-sync` acusa
   `user_panel_preferences` (metas de SLA da #248) presente em produção e ausente no arquivo commitado, o
   que derruba o gate de TypeScript do próprio `types-sync` desde 2026-11-23. Drift de tipos, não de
-  restrições.
+  restrições. **[Corrigido na etapa 222: a direção estava invertida - a tabela está no arquivo
+  commitado e falta em produção. Ver "Registro - etapa 222".]**
 - O teste da 137 depende de `serve()` continuar inline nas duas edges; se alguém exportar o handler, o
   teste vira redundante e deve ser trocado por teste de unidade com cliente simulado.
 
