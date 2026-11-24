@@ -6,6 +6,8 @@ import { log } from "../_shared/logger.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
 import { getWeatherForRoutes } from "../_shared/weather.ts";
 import { safeFetch } from "../_shared/safeFetch.ts";
+import { ValidationError } from "../_shared/validate.ts";
+import { parseAssistantRequest } from "./parse.ts";
 
 // Type definitions for contextual data
 interface Transportadora {
@@ -69,22 +71,7 @@ export const handler = async (req: Request) => {
     const userId = auth.claims.sub;
 
     const body = await req.json();
-    const message = body.message || body.prompt;
-    const conversationHistory = body.conversationHistory || [];
-    const stream = body.stream || false;
-
-    if (!message) {
-      return new Response(
-        JSON.stringify({
-          success: false,
-          message: "Por favor, envie uma mensagem.",
-        }),
-        {
-          status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        },
-      );
-    }
+    const { message, conversationHistory, stream } = parseAssistantRequest(body);
 
     const googleApiKey = Deno.env.get("GOOGLE_API_KEY");
     if (!googleApiKey) throw new Error("GOOGLE_API_KEY not configured");
@@ -249,6 +236,20 @@ export const handler = async (req: Request) => {
       },
     );
   } catch (error) {
+    if (error instanceof ValidationError) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          message: error.message,
+          field: error.field,
+        }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
+    }
+
     log.error("Erro no Assistente IA:", { error: String(error) });
     return new Response(
       JSON.stringify({

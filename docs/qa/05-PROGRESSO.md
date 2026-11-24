@@ -228,7 +228,7 @@
 - [x] **150** — `resend-email`: validar `to`, `subject` e `html` antes de entregar ao provedor — onda 5 — Alta
 - [x] **151** — `melhor-envio-api`: validar o corpo da cotação — onda 5 — Média
 - [x] **152** — `lalamove-tracking`: validar o identificador de rastreio — onda 5 — Média
-- [ ] **153** — `ai-logistics-assistant`: validar e limitar o texto que vai para o modelo — onda 5 — Média
+- [x] **153** — `ai-logistics-assistant`: validar e limitar o texto que vai para o modelo — onda 5 — Média
 - [ ] **154** — `evolution-whatsapp`: validar `instance`, `phone` e `message` — onda 5 — Alta
 - [ ] **155** — `ocr-receipt-processor`: validar a entrada do comprovante — onda 5 — Média
 - [ ] **156** — Criar `_shared/invokeFunction.ts`: chamada entre funções com tempo limite — onda 5 — Alta
@@ -434,6 +434,58 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapa 153 (2026-11-24) - achado B-04 (`ai-logistics-assistant`)
+
+**Causa:** `index.ts:70` (`const body = await req.json()`) despejava o corpo em `:71` (`body.message || body.prompt`),
+`:72` (`body.conversationHistory || []`) e `:73` (`body.stream || false`) **sem validar tipo nem tamanho**; o único
+guard era `!message` → 400 (`:75-86`). A pergunta ia inteira para o Gemini: um texto de megabytes (ou um
+`conversationHistory` gigante) virava uma requisição paga ao provedor, e `conversationHistory` não-lista quebrava
+o spread `...conversationHistory.slice(-10)` com 500 genérico. `stream` string (`"false"`) é *truthy* e ligava SSE,
+mudando o formato da resposta.
+
+**Correção:** `parse.ts` novo com `parseAssistantRequest`, chamado em `index.ts:74`. Limites: pergunta
+**4000 caracteres** (`MAX_MESSAGE_LENGTH`, cobre qualquer pergunta real de logística e limita o custo por
+requisição), histórico no máximo **10 itens** (o mesmo corte que o `index.ts` já aplicava com `.slice(-10)`, logo
+nenhuma conversa legítima é recusada) e **8000 caracteres por item** (respostas em Markdown); `role` restrito a
+`user`/`assistant`/`system` via `requireEnum`; `stream` **estritamente booleano**. Erro nomeia campo e índice
+(`conversationHistory[2].role`). Pergunta vazia mantém a resposta em português que o app exibe
+("Por favor, envie uma mensagem."), e o `catch` (`index.ts:239-252`) devolve **400**
+`{ success: false, message, field }` antes do log e do 500 genérico.
+
+**Desvio consciente:** **400**, não 422 como as etapas 146-152, porque `index.test.ts` (teste Deno da própria
+função) exige exatamente 400 com `message === "Por favor, envie uma mensagem."` para corpo vazio — contrato próprio
+da função. `validationErrorResponse` (422) não é usado aqui de propósito. Módulo puro `parse.ts` porque `index.ts`
+importa `deno.land`/`esm.sh` e o vitest não carrega o módulo (mesmo precedente das etapas 146-152).
+
+**Mudança de comportamento:** pergunta acima de 4000 caracteres, histórico com mais de 10 itens ou com item sem
+`role`/`content` válidos e `stream` não-booleano passam a receber 400 **antes** de gastar requisição no provedor.
+Único chamador é `AIAssistant.tsx:85-95`, que já manda `conversationHistory: history.slice(-10)` e
+`stream: true` (booleano) — nenhum caminho do app quebra. O campo de entrada (`:350`) não tem `maxLength` e o
+`!resp.ok` (`:96-101`) só diferencia 429, então o teto aparece para o usuário como o erro genérico já existente
+(mensagem específica na UI ficou fora de escopo, registrada abaixo).
+
+**Fora de escopo (registrado, não tocado):** rate limit (`:41-58`), auth por claim (`:60-68`), `safeFetch`, prompt
+e temperatura; `userId` (`:71`) continua sem uso (`deno lint`, herdado — B-06/etapa 169); a UI não exibe o motivo
+do 400.
+
+**Evidência:**
+- `tests/contracts/ai-logistics-assistant-texto.spec.ts` (novo, 13 casos): pedido mínimo vira `{message, [], false}`;
+  espaços aparados; alias `prompt` preservado; corpo vazio/nulo/lista/texto recusado com a mensagem PT-BR; teto exato
+  aceito e 4001 recusado citando `4000`; `stream` `true`/`false` aceitos e `"true"` recusado; histórico não-lista e
+  com 11 itens recusados; `role` inválido → `conversationHistory[0].role`; conteúdo de 8001 → `[0].content`; histórico
+  válido normalizado; e o contrato da edge (usa `parseAssistantRequest`, não lê `body.message`/`body.stream`, e o
+  `catch` responde 400 com `field` antes do `log.error`).
+- Mutação A — teto da pergunta removido: 1/13 falha. B — `stream` sem checagem de tipo: 1/13. C — `catch` sem o ramo
+  400: 1/13. D — `role` sem `requireEnum`: 1/13. Restaurado: 13/13.
+- `npx vitest run --coverage`: **51 arquivos / 412 testes, todos verdes**; `ai-logistics-assistant/parse.ts`
+  96,55 stmts / 96,15 branch / 100 funcs (linha 69 = `throw error` do rethrow, inalcançável porque os helpers só
+  lançam `ValidationError`); totais 75,57 / 73,22 / 77,89 / 77,69 (antes: 75,29/72,8/77,83/77,42).
+- `deno check`: **0 erros = baseline 0**; `deno lint`: 6 = baseline 6, **0** no `parse.ts`; `deno fmt --check` limpo no
+  `parse.ts`; `npx tsc --noEmit` 0; `npm run lint:budget` OK.
+- **NÃO VERIFICADO:** chamada real ao Gemini (exige `GOOGLE_API_KEY` do dono) e o 400 em produção. Depois do deploy,
+  `POST /functions/v1/ai-logistics-assistant` com `{"message":"a".repeat(4001)}` e JWT válido deve devolver 400 com
+  `field: "message"` **sem** `generativelanguage.googleapis.com` no log.
 
 ### Registro - etapa 152 (2026-11-24) - achado B-04 (`lalamove-tracking`)
 
