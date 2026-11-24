@@ -5,7 +5,7 @@
 
 > **Fechamento da auditoria · 2026-11-24 · `main` em `c7fc18ae` · banco `jvfhclubfpxrtrrazrgr`**
 > Árvore da auditoria em `d37ba30` (2026-11-22/23). O estado abaixo vem de `05-PROGRESSO.md`, não da memória de quem executou.
-> Contagem: **35 resolvidos / 15 parciais / 15 abertos / 0 refutados** — RESOLVIDO exige todas as etapas do achado concluídas com verificação registrada.
+> Contagem: **35 resolvidos / 15 parciais / 14 abertos / 1 refutado** — RESOLVIDO exige todas as etapas do achado concluídas com verificação registrada.
 > **Atualização 2026-11-24 (`main` em `8406f688`): C-01 RESOLVIDO** (etapas 028-037, migrações aplicadas em produção) → **36 resolvidos / 15 parciais / 14 abertos**.
 
 ## Como ler
@@ -364,7 +364,7 @@ conferir as policies, só então habilitar — e é por isso que isso é uma eta
 
 → Etapas **023**, **024**, **025**
 
-**Estado (2026-11-24):** ABERTO (023 — não executada; 024, 025 — aguarda o dono).
+**Estado (2026-11-24):** **REFUTADO** — a etapa 023 foi executada no banco ao vivo (`jvfhclubfpxrtrrazrgr`, somente leitura) e as três tabelas têm `relrowsecurity = true` com policy criada (`geo_blocking_rules` 2, `geo_blocking_settings` 2, `scheduled_reports` 4). O cenário do achado não existe; as etapas 024 e 025 são encerradas como "não se aplica". Saída literal em `05-PROGRESSO.md`, "Registro - etapas 023, 026 e 287".
 
 ## F-03 — A unicidade está garantida nos números de coleta e entrega; falta no código de rastreio reverso
 
@@ -404,7 +404,7 @@ sobre dado duplicado **falha**, e a migration quebra no meio.
 
 → Etapas **026**, **027**
 
-**Estado (2026-11-24):** ABERTO (026 — não executada; 027 — aguarda o dono).
+**Estado (2026-11-24):** PARCIAL — a etapa 026 foi executada no banco ao vivo: `coletas.numero_coleta` e `entregas.numero_entrega` têm `UNIQUE` (`coletas_numero_coleta_key`, `entregas_numero_entrega_key`) e **0 duplicatas** nas três colunas. O que sobra é só o que o achado já apontava — `logistica_reversa.codigo_rastreio_reverso` segue **sem** `UNIQUE` (0 duplicatas hoje, então a etapa 027 pode ser aplicada sem risco de a migration quebrar).
 
 ---
 
@@ -2010,7 +2010,7 @@ a razão pela qual cada etapa adiante traz um comando concreto de verificação 
 
 ## H-14 — Observabilidade: o que existe e o que ninguém vê
 
-- **Camada:** observabilidade · **Severidade:** **Média** · **Confiança:** parcialmente **HIPÓTESE** · **Método:** RASTREADO
+- **Camada:** observabilidade · **Severidade:** **Média** · **Confiança:** parcialmente **HIPÓTESE** (o DSN do Vercel segue não verificado) · **Método:** RASTREADO
 
 **O que está certo (não mexer):**
 
@@ -2024,13 +2024,13 @@ nenhuma** — e o código está correto, então não há nada no repositório qu
 
 **O que não existe.** Procurando `webhook_failures` e `cron_job_logs` na árvore inteira (`supabase/`, `src/`,
 migrations e docs): **zero ocorrências**. Não é o caso de "grava e ninguém lê" — nenhuma função escreve e
-nenhuma tela lê. Se essas tabelas existem no banco ao vivo, são tabelas mortas. Falha de webhook e falha de
+nenhuma tela lê. Se essas tabelas existem no banco ao vivo, são tabelas mortas. **Conferido no banco (etapa 287, 2026-11-24): não existem** — `to_regclass` devolve `null` para as duas, e `webhook_deliveries` (o lado de saída) existe. Falha de webhook e falha de
 cron, portanto, não têm destino verificável no repositório — e com 28 cron jobs e 4 webhooks ativos, é
 bastante coisa acontecendo sem lugar para olhar.
 
 → Etapas **285** a **290**
 
-**Estado (2026-11-24):** ABERTO (285, 290 — aguarda o dono).
+**Estado (2026-11-24):** ABERTO (285, 288, 289 e 290 — aguarda o dono). A etapa 287 foi executada e **confirma no banco**: `webhook_failures` e `cron_job_logs` não existem (`to_regclass` = `null`), enquanto `webhook_deliveries` existe. Portanto não há "tabela morta" a decidir — falta criar o destino da falha de **entrada**, que é DDL.
 
 ## H-15 — Dois pontos de `innerHTML` com interpolação, e links externos sem `noopener`
 

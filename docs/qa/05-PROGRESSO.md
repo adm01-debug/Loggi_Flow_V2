@@ -57,10 +57,10 @@
 
 ### Onda 1
 
-- [ ] **023** — Consultar o banco ao vivo e decidir o estado de RLS das três tabelas suspeitas — onda 1 — Crítica (se confirmado)
-- [~] **024** — Habilitar RLS em `scheduled_reports` — onda 1 — Crítica · **aguarda o dono**
-- [~] **025** — Habilitar RLS nas duas tabelas de geo-blocking, depois de conferir o caminho de escrita da tela — onda 1 — Crítica · **aguarda o dono**
-- [ ] **026** — Confirmar no banco ao vivo a unicidade de `numero_coleta`, `numero_entrega` e do código de rastreio — onda 1 — Alta (se ausente)
+- [x] **023** — Consultar o banco ao vivo e decidir o estado de RLS das três tabelas suspeitas — onda 1 — Crítica (se confirmado) — **F-02 refutado**
+- [x] **024** — Habilitar RLS em `scheduled_reports` — onda 1 — Crítica · **não se aplica: já habilitado (etapa 023)**
+- [x] **025** — Habilitar RLS nas duas tabelas de geo-blocking, depois de conferir o caminho de escrita da tela — onda 1 — Crítica · **não se aplica: já habilitado (etapa 023)**
+- [x] **026** — Confirmar no banco ao vivo a unicidade de `numero_coleta`, `numero_entrega` e do código de rastreio — onda 1 — Alta (se ausente) — **UNIQUE presente nos números; ausente no código de rastreio**
 - [~] **027** — Criar a unicidade que faltar nos números e no código de rastreio — onda 1 — Alta · **aguarda o dono**
 
 ### Onda 3
@@ -380,7 +380,7 @@
 - [~] **284** — Subir os pisos de cobertura para travar o que as etapas 275-282 conquistaram — onda 8 — Média · **aguarda o dono**
 - [~] **285** — Confirmar com o dono se `VITE_SENTRY_DSN` está configurado no Vercel — onda 8 — Média · **aguarda o dono**
 - [~] **286** — Provar que um erro de front chega ao Sentry — onda 8 — Média · **aguarda o dono**
-- [ ] **287** — Verificar no banco ao vivo se `webhook_failures` e `cron_job_logs` existem — onda 8 — Média
+- [x] **287** — Verificar no banco ao vivo se `webhook_failures` e `cron_job_logs` existem — onda 8 — Média — **nenhuma das duas existe**
 - [~] **288** — Dar destino persistente à falha de webhook de entrada — onda 8 — Média · **aguarda o dono**
 - [ ] **289** — Mostrar as falhas de webhook numa tela que já existe — onda 8 — Média
 - [~] **290** — Tornar visível a falha de cron, e decidir o destino das tabelas mortas — onda 8 — Média · **aguarda o dono**
@@ -446,12 +446,65 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | ----- | ------------------------------------------------------------------------------ | --------- | ---- | -------------- |
 | 002   | `NEXUS_WEBHOOK_SECRET` existe nas edge functions                               |           |      |                |
 | 010   | `ALLOW_TEST_MODE` presente em produção                                         |           |      |                |
-| 023   | RLS real de `geo_blocking_rules`, `geo_blocking_settings`, `scheduled_reports` |           |      |                |
-| 026   | `UNIQUE` em `logistica_reversa.codigo_rastreio_reverso`                        |           |      |                |
+| 023   | RLS real de `geo_blocking_rules`, `geo_blocking_settings`, `scheduled_reports` | `relrowsecurity = true` nas três (2, 2 e 4 policies) — F-02 refutado | 2026-11-24 | agente (SQL read-only no `jvfhclubfpxrtrrazrgr`) |
+| 026   | `UNIQUE` em `logistica_reversa.codigo_rastreio_reverso`                        | ausente (`coletas.numero_coleta` e `entregas.numero_entrega` com `UNIQUE`, 0 duplicatas) | 2026-11-24 | agente (SQL read-only no `jvfhclubfpxrtrrazrgr`) |
 | 285   | `VITE_SENTRY_DSN` configurado no Vercel                                        |           |      |                |
-| 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
+| 287   | `webhook_failures` e `cron_job_logs` existem no banco                           | não existem (`to_regclass` = `null`; `webhook_deliveries` existe) | 2026-11-24 | agente (SQL read-only no `jvfhclubfpxrtrrazrgr`) |
+| 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           | F-02 refutado e F-03 resolvida nos números (etapas 023/026) | 2026-11-24 | agente (SQL read-only no `jvfhclubfpxrtrrazrgr`) |
 
 ## Registro de execução
+
+### Registro - etapas 023, 026 e 287 (2026-11-24) - o banco ao vivo responde: RLS já estava ligado, os números são únicos e as tabelas de log não existem
+
+**Banco consultado:** `jvfhclubfpxrtrrazrgr` (o de produção). **Método:** SQL **somente leitura** pelo
+endpoint de consulta do Supabase Management API (`POST /v1/projects/jvfhclubfpxrtrrazrgr/database/query`),
+com o token da CLI já autenticada nesta máquina — a consulta de identificação devolveu
+`current_database() = postgres`. Nenhum `ALTER`, `CREATE` ou `DROP` foi enviado. **Data:** 2026-11-24.
+
+**Etapa 023 — F-02 refutado.** Consulta ao catálogo (`pg_class` + `pg_policies`, a mesma fonte que o
+`get_rls_audit` usa):
+
+| tabela                  | `relrowsecurity` | `relforcerowsecurity` | policies |
+| ----------------------- | ---------------- | --------------------- | -------- |
+| `geo_blocking_rules`    | `true`           | `false`               | 2        |
+| `geo_blocking_settings` | `true`           | `false`               | 2        |
+| `scheduled_reports`     | `true`           | `false`               | 4        |
+
+As três têm RLS **habilitado** e policy criada. O cenário do achado — `CREATE POLICY` numa tabela sem RLS,
+aceito pelo Postgres e **não aplicado** — não existe no banco de hoje. F-02 é **refutado**, e as etapas
+**024** e **025** são encerradas como "não se aplica": não há RLS para habilitar. As policies que o
+repositório declara (`20260901000001_remediacao_destino.sql:56-70` e
+`20260317224939_faf0aac9-...sql:27-34`) estão de fato ativas.
+
+```sql
+SELECT c.relname, c.relrowsecurity, c.relforcerowsecurity,
+       (SELECT count(*) FROM pg_policies p
+         WHERE p.schemaname = 'public' AND p.tablename = c.relname) AS policies
+FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+WHERE n.nspname = 'public'
+  AND c.relname IN ('geo_blocking_rules','geo_blocking_settings','scheduled_reports');
+```
+
+**Etapa 026 — a unicidade existe onde importava.** `pg_constraint` (`contype IN ('u','p')`), `pg_indexes`
+com `indexdef ILIKE '%unique%'` e a contagem de duplicatas:
+
+| coluna                                      | `UNIQUE` no banco | duplicatas hoje |
+| ------------------------------------------- | ----------------- | --------------- |
+| `coletas.numero_coleta`                     | **presente** (`coletas_numero_coleta_key`) | 0 |
+| `entregas.numero_entrega`                   | **presente** (`entregas_numero_entrega_key`) | 0 |
+| `logistica_reversa.codigo_rastreio_reverso` | **ausente** | 0 |
+
+A suspeita original de F-03 nos números está derrubada **no banco**, não só na leitura das migrations: as
+duas restrições existem e não há uma linha repetida. O que sobra é o que o achado já apontava — o código de
+rastreio da logística reversa não tem restrição nenhuma. A **etapa 027** continua com trabalho real (criar a
+`UNIQUE`), e agora pode ser aplicada sem o risco de a migration quebrar por dado duplicado: as três
+contagens vieram **0**.
+
+**Etapa 287 — as duas tabelas não existem.** `to_regclass('public.webhook_failures')` e
+`to_regclass('public.cron_job_logs')` devolveram `null`; `to_regclass('public.webhook_deliveries')` devolveu
+a própria tabela. Ou seja, **não** há tabela morta a decidir: o que falta é criar o destino da falha de
+entrada (etapa 288), que é DDL e é decisão do dono. O lado de saída de webhook tem onde gravar; o de
+entrada, não.
 
 ### Registro - etapas 279 e 280 (2026-11-26) - os dois caminhos críticos de webhook ganham teste
 
@@ -3520,13 +3573,15 @@ Atualize ao fim de cada sessão de trabalho.
 
 |                         | Quantidade |
 | ----------------------- | ---------- |
-| Concluídas `[x]`        | 0          |
-| Aguardando o dono `[~]` | 0          |
+| Concluídas `[x]`        | 234         |
+| Aguardando o dono `[~]` | 50         |
 | Bloqueadas `[!]`        | 0          |
-| Não iniciadas `[ ]`     | 300        |
+| Não iniciadas `[ ]`     | 16         |
 | **Total**               | **300**    |
 
-**Última etapa trabalhada:** — · **Data:** — · **Próxima etapa independente:** 267
+**Última etapa trabalhada:** 287 · **Data:** 2026-11-24 · **Próxima etapa independente:** 275 (onda 8). Na
+onda 1, a **057** (exclusão lógica em `FretesInternos`) depende das etapas **055** e **056**, que são DDL em
+produção e aguardam o dono; a **027** está na mesma situação.
 
 ### Registro - etapas 068-096 (2026-11-23)
 
