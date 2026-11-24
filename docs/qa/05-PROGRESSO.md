@@ -286,7 +286,7 @@
 - [x] **205** — `Analytics.tsx`: passar o intervalo de datas que a tela já tem para `useTrackingAnalytics` — onda 6 — Crítica
 - [x] **206** — `useTrackingAnalytics`: tornar a janela de datas obrigatória na assinatura — onda 6 — Alta
 - [x] **207** — `useLogisticsCalendar`: pôr teto na leitura de `coletas` — onda 6 — Alta
-- [ ] **208** — `useLogisticsCalendar`: pôr teto na leitura de `entregas` — onda 6 — Alta
+- [x] **208** — `useLogisticsCalendar`: pôr teto na leitura de `entregas` — onda 6 — Alta
 - [ ] **209** — `useLogisticsCalendar`: filtrar no servidor pelo mês que está na tela — onda 6 — Alta
 - [ ] **210** — `useCotacoesMulticanal`: teto no servidor e colunas explícitas — onda 6 — Alta
 - [~] **211** — Guard automatizado: consulta de listagem sem teto reprova a CI — onda 6 — Alta · **aguarda o dono**
@@ -434,6 +434,29 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapa 208 (2026-11-25) - achado P-01 (teto na leitura de entregas)
+
+**Causa:** mesma da etapa 207, no bloco gemeo. `src/hooks/logistics/useLogisticsCalendar.tsx` montava
+`entregasQuery` com `.select(...)` + `.not('previsao_entrega', 'is', null)` e **nenhum teto**; os filtros de
+status e transportadora tambem sao condicionais, e `entregas` e uma das tabelas mais movimentadas do sistema.
+Calendario aberto em "entregas" ou "todos" sem filtro baixava a tabela inteira, com joins de `transportadoras`
+e `clientes`.
+
+**Entrega:** espelho exato da 207 -- `.order('previsao_entrega', { ascending: true })` + `.limit(500)`,
+incondicional e colado ao `.not('previsao_entrega', 'is', null)`, antes dos filtros opcionais. Ordem antes do
+corte pelo mesmo motivo: sem ordenacao, as 500 linhas que sobram sao arbitrarias e o calendario esconde meses
+inteiros. Filtros condicionais intactos; bloco de `coletas` (etapa 207) confirmado sem alteracao pela propria
+regressao do spec.
+
+**Verificacao:** spec de contrato novo `tests/contracts/calendar-teto-entregas.spec.ts` (6 casos), com o helper
+`bloco(nome)` reaproveitado para coletas e entregas -- o 6o caso guarda explicitamente contra regressao do teto
+de coletas. 7 mutacoes -- remover `.limit(500)` de entregas, remover `.order(...)`, trocar para `.limit(5000)`,
+inverter para `ascending: false`, mover o teto para depois dos filtros condicionais, remover o
+`.not('previsao_entrega')` e remover o teto de coletas -- falham **4/1/3/1/1/1/1**; a versao correta passa 6/6.
+
+**Nao verificado:** o numero real de linhas de `entregas` no banco e o efeito "antes/depois" na tela -- sem
+credencial de banco e sem deploy nesta sessao.
 
 ### Registro - etapa 207 (2026-11-25) - achado P-01 (teto na leitura de coletas)
 
