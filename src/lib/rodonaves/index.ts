@@ -1,6 +1,7 @@
 export * from "./eventCodes";
 export * from "./freightHealth";
 export * from "./capabilities";
+export * from "./fallbackNotice";
 export * from "./occurrencePhase";
 export * from "./gatewaySLO";
 export * from "./sloAlerts";
