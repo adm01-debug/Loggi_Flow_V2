@@ -252,7 +252,7 @@
 - [x] **174** — `nexus-webhook-receiver`: erro genérico na resposta ao webhook — onda 5 — Média
 - [x] **175** — `lalamove-webhook`: erro genérico na resposta ao webhook — onda 5 — Média
 - [x] **176** — `rodonaves-webhook`: erro genérico na resposta ao webhook — onda 5 — Média
-- [ ] **177** — `smart-carrier-selection`: erro genérico na resposta da cotação — onda 5 — Média
+- [x] **177** — `smart-carrier-selection`: erro genérico na resposta da cotação — onda 5 — Média
 - [ ] **178** — Varredura final de `error.message`: as onze funções restantes de B-06 — onda 5 — Média
 - [~] **179** — `secure-store`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — **Crítica** · **aguarda o dono**
 - [ ] **180** — `get-mapbox-token`: trocar o CORS `*` fixo por `getCorsHeaders(req)` — onda 5 — **Crítica**
@@ -434,6 +434,44 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapa 177 (2026-11-25) - achado B-06 (`smart-carrier-selection`)
+
+**Causa:** o `catch` montava a resposta a mao com `{ error: "Internal Server Error", message: error.message }` e
+status 500. A funcao le `freight_selection_rules` e `tabelas_frete` (com o join em `transportadoras`), e o
+`throw tabelasError` de `:84-95` mandava o erro cru do PostgREST para esse catch — nome de tabela, de coluna e
+texto de policy no corpo da resposta de quem pediu a cotacao.
+
+**Correcao (so o arquivo da etapa):**
+
+- `:7` — import de `internalErrorResponse` de `_shared/httpError.ts` (etapa 164).
+- `:242-247` — o ramo `ValidationError` -> `validationErrorResponse` (400 com o campo, etapa 146) continua
+  **antes**; o resto virou `return internalErrorResponse(error, corsHeaders, "smart-carrier-selection")`: 500
+  `{"error":"INTERNAL_ERROR"}`, sem mensagem interna e sem stack. O `log({ level: LogLevel.ERROR, message: ...,
+  meta: { error: error.message } })` foi mantido — o detalhe continua no log.
+- **Nao tocado:** a regra de escolha e os pesos default (`price_weight: 0.5`, `time_weight: 0.3`,
+  `performance_weight: 0.2`, `max_sla_days: 15`) e o caminho de sucesso `{ success: true, recommendations }`.
+
+**Por que nao devolver "nenhuma transportadora encontrada":** confundiria falha de sistema com resultado vazio
+e o operador veria a tela errada. O 500 continua 500.
+
+**Quem via o detalhe:** quem chamasse a funcao direto (curl/script). O unico consumidor no front e
+`src/hooks/logistics/useSmartCarrierSelection.tsx:57`, que em falha HTTP mostra o toast fixo "Erro ao analisar
+transportadoras" e usa `error.message` do `supabase.functions.invoke` (mensagem do proprio supabase-js), nao o
+corpo; em resposta 200 de negocio usa `data.message`. Ou seja: a tela nao muda, e o detalhe do banco sai do
+corpo publico.
+
+**Verificado de verdade:** `tests/contracts/smart-carrier-selection-erro-generico.spec.ts` (7 casos) — 7/7; o
+spec anterior `smart-carrier-selection-input.spec.ts` segue verde. Prova por mutacao: A volta a ecoar
+`error.message` na resposta -> 3 falhas; B 500 escrito na mao -> 2; C 200 no catch -> 3; D remove o ramo de
+`ValidationError` -> 1; E troca `parseSmartSelectionInput` por `JSON.parse` -> 1; F muda `price_weight` -> 1;
+G devolve `success: true` no catch -> 3; restaurado -> 7/7. `deno check` 2 contra baseline 3 (a resposta antiga
+tinha um `TS18046` proprio, removido junto); `deno lint` 11 = baseline 11; `deno fmt --check` 1 = baseline 1
+(diff herdado nos imports/indentacao). `tsc` 0; `lint:budget` ok; suite 561 testes. Verificacao pedida pelo
+plano (`grep -n 'error.message|internalErrorResponse'`): executada — `error.message` so na meta do log e o
+`internalErrorResponse` no `catch`. Falha de banco real: NAO EXECUTADO (exigiria derrubar tabela em producao)
+— RASTREADO pelo codigo.
+
 
 ### Registro - etapa 176 (2026-11-25) - achado B-06 (`rodonaves-webhook`)
 
