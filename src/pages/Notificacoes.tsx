@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -31,9 +31,9 @@ import {
   useNotificacoesPage,
   TIPOS_NOTIFICACAO,
 } from "@/hooks/data/useNotificacoesPage";
+import { useNotificacoesRealtime } from "@/hooks/data/useNotificacoesRealtime";
 import { useDebounce } from "@/hooks/common/useDebounce";
 import { useAuth } from "@/hooks/auth/useAuth";
-import { useRealtime } from "@/hooks/data/useRealtime";
 import { PushNotificationCard } from "@/components/notifications/PushNotificationCard";
 
 const typeConfig: Record<string, { icon: LucideIcon; color: string }> = {
@@ -67,17 +67,10 @@ export default function Notificacoes() {
   const rows = pagination.rows;
   const stats = pagination.stats;
 
-  // Referencia estavel: cada notificacao nova disparava refetch -> render -> canal
-  // novo -> refetch (contrato em src/hooks/data/useRealtime.tsx).
-  const onNotificationChange = useCallback(() => {
-    void qc.invalidateQueries({ queryKey: ["notifications"] });
-  }, [qc]);
-
-  useRealtime({
-    table: "notifications",
-    onInsert: onNotificationChange,
-    onUpdate: onNotificationChange,
-    onDelete: onNotificationChange,
+  // Etapa 216 (P-02): o agrupamento dos avisos de tempo real vive em src/hooks/data/useNotificacoesRealtime.ts.
+  // Manter aqui as ~60 linhas do agrupamento estouraria o orcamento de 400 linhas deste arquivo.
+  useNotificacoesRealtime({
+    filtroAtivo: typeFilter !== "all" || readFilter !== "all" || termo.trim() !== "",
   });
 
   const { selectedIds, toggle, selectAll, clearSelection, isSelected } =

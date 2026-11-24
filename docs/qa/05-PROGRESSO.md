@@ -294,7 +294,7 @@
 - [x] **213** — `Notificacoes.tsx`: adotar `useServerPagination` como primeiro consumidor do contrato — onda 6 — Alta
 - [x] **214** — `Notificacoes.tsx`: trocar a barra de paginação em memória pela do servidor — onda 6 — Média
 - [x] **215** — `Notificacoes.tsx`: levar os filtros e a busca para o servidor — onda 6 — Alta
-- [ ] **216** — `Notificacoes.tsx`: o tempo real deixa de rebaixar a lista inteira a cada aviso — onda 6 — Alta
+- [x] **216** — `Notificacoes.tsx`: o tempo real deixa de rebaixar a lista inteira a cada aviso — onda 6 — Alta
 - [x] **217** — `useAccuracyMetaCycle`: uma única consulta a `notifications` para todas as linhas — onda 6 — Média
 - [ ] **218** — `count_prediction_breach_days`: variante que responde todas as transportadoras numa chamada — onda 6 — Média
 - [ ] **219** — `useKPIBenchmark`: tirar os `await` de dentro do laço — onda 6 — Média
@@ -434,6 +434,49 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 | 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           |           |      |                |
 
 ## Registro de execução
+
+### Registro - etapa 216 (2026-11-25) - tempo real de notificacoes deixa de recarregar a cada aviso
+
+**Causa:** a tela registrava `useRealtime({ table: "notifications", onInsert/onUpdate/onDelete: () => refetch() })`.
+Achado P-02. Cada notificacao nova, cada marcacao de lida e cada exclusao recarregava a listagem; depois da etapa
+213 a recarga rebaixa uma pagina em vez da tabela inteira, mas em rajada continua linear: um disparo em lote de 30
+avisos gerava 30 requisicoes. Pior, `onUpdate: () => refetch()` fechava um laco com as proprias mutacoes da tela --
+marcar como lida grava (`update` de `read`), o tempo real avisa, a pagina rebaixa.
+
+**Entrega:** o tratamento saiu da tela para `src/hooks/data/useNotificacoesRealtime.ts` (novo; manter as ~60 linhas
+no arquivo da tela estouraria o orcamento de 400 linhas do `max-lines`). O contrato do `useRealtime` **nao** foi
+tocado -- 12 telas dependem dele e o defeito dele e de outro achado (R-02); a assinatura continua ativa (remover o
+tempo real e deixar so o polling resolveria o custo destruindo a funcionalidade).
+
+- `onInsert`/`onDelete` mudam o conjunto (a linha entra ou sai): acumulam numa janela de **400 ms**
+  (`clearTimeout` + `setTimeout`) e disparam **uma** invalidacao ao fim dela. Uma rajada vira uma requisicao.
+- `onUpdate` nao recarrega: o payload do tempo real traz a linha (`{ old, new }` -- `onUpdate?: (payload: { old: T;
+  new: T }) => void` em `useRealtime.tsx`), entao a alteracao e aplicada no cache da pagina onde a linha esta, por
+  `setQueriesData` na chave `["notifications"]` e troca por `id`. Duas armadilhas tratadas: (a) essa chave tambem
+  casa com a entrada de contagem (`["notifications","stats",userId]`), que **nao tem** `data` -- sem o guard
+  `Array.isArray(atual.data)` a contagem do cabecalho viraria uma pagina de linhas; (b) com filtro ou busca ativos
+  a linha pode **sair** do conjunto (filtro "nao lidas" + linha marcada como lida), e so a recarga responde certo
+  -- nesse caso o hook cai na recarga agrupada.
+- Cleanup no unmount (`clearTimeout`) para nao invalidar depois da tela sair. A tela nao passa `queryKey` ao tempo
+  real de proposito: aquela invalidacao, dentro do hook, e imediata e a rajada voltaria a ser uma requisicao por
+  aviso. As mutacoes da propria tela (`markReadMut`, `markAllReadMut`, `deleteMut`) continuam invalidando.
+
+**Verificacao:** spec novo `tests/contracts/notificacoes-realtime-agrupado.spec.ts`, 11 casos: tela sem `refetch` e
+sem import direto do `useRealtime`; contrato `{ old, new }` no hook do tempo real (evidencia da decisao do
+`setQueriesData`); janela entre 300 e 500 ms e usada como argumento do agendamento; `clearTimeout` antes de
+reagendar; **uma** invalidacao e dentro da janela; duas saidas de `clearTimeout` (reagendamento e unmount);
+`setQueriesData` na chave e troca por `id`; guard do `data`; saida por filtro ativo antes do caminho pontual;
+`filtroAtivo` vindo dos tres filtros da consulta; `insert`/`delete` no caminho agrupado e `update` no pontual.
+**Prova por mutacao: 11/11 capturadas** (recarga direta sem janela, sem `clearTimeout`, janela de 1500 ms, sem a
+saida por filtro, sem o guard, `insert` pelo caminho pontual, tela sem tempo real, tela passando `queryKey`,
+`filtroAtivo` fixo, troca por `id` removida, contrato do `useRealtime` sem a linha). `npx tsc --noEmit` 0 erros;
+`npx eslint .` 77 avisos / 0 erros (orcamento 86, sem aviso novo -- a tela ficou em 363 linhas).
+
+**Nao verificado:** o teste de duas abas do plano (criar notificacao numa aba e ver aparecer na outra em ate 1 s)
+exige navegador e sessao real; nao ha credencial nesta sessao. A prova aqui e estrutural (contrato por mutacao).
+
+**Fora do escopo (registrado):** o defeito R-02 do `useRealtime` (assinatura derrubada e reaberta a cada render, em
+12 telas) segue aberto -- a etapa 216 nao o toca.
 
 ### Registro - etapa 217 (2026-11-25) - uma consulta a `notifications` (achado P-03)
 
