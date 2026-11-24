@@ -6,8 +6,11 @@ export type ColetaStatus =
   Database["public"]["Enums"]["coleta_status"];
 
 /**
- * Mapa completo de transicoes validas de entrega.
- * Espelha o que a funcao fn_valida_transicao_entrega do banco aplica (etapas 028-029).
+ * Transicoes de entrega oferecidas pela UI (caminho linear).
+ * A funcao fn_valida_transicao_entrega do banco (etapas 028-029) aceita tambem
+ * atalhos usados por despacho e rastreio: despachado/em_transito -> entregue,
+ * despachado -> saiu_entrega|ocorrencia, saiu_entrega -> em_transito e
+ * ocorrencia -> em_transito|entregue. O banco e sempre mais permissivo que este mapa.
  */
 export const TRANSICOES_ENTREGA: Record<EntregaStatus, EntregaStatus[]> = {
   aguardando_producao: ["pronto_despacho"],

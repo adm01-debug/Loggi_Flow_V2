@@ -114,15 +114,17 @@ export function useBusinessRuleEngine() {
       const table = resolveEntityTable(rule.entity_type);
       const novoStatus = action.config.new_status;
       if (table === "coletas") {
-        await supabase
+        const { error } = await supabase
           .from("coletas")
           .update({ status: novoStatus as Database["public"]["Enums"]["coleta_status"] })
           .eq("id", entityId);
+        if (error) console.warn("regra change_status (coleta):", error.message);
       } else if (table === "entregas") {
-        await supabase
+        const { error } = await supabase
           .from("entregas")
           .update({ status: novoStatus as Database["public"]["Enums"]["entrega_status"] })
           .eq("id", entityId);
+        if (error) console.warn("regra change_status (entrega):", error.message);
       } else {
         // ocorrencias nao tem coluna status: o estado e o booleano resolvida.
         const resolvida = ["resolvida", "resolvido", "concluida", "concluido", "fechada", "fechado"].includes(
