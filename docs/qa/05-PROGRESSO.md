@@ -237,7 +237,7 @@
 - [x] **159** — `nexus-webhook-receiver`: tempo limite nas duas chamadas internas dentro do webhook — onda 5 — **Crítica**
 - [x] **160** — `send-password-reset`: tempo limite na chamada interna — onda 5 — Alta
 - [x] **161** — `predict-delays` e `predict-delays-scheduled`: tempo limite nas chamadas internas — onda 5 — Média
-- [ ] **162** — `accuracy-meta-monitor`: tempo limite nas duas chamadas internas — onda 5 — Média
+- [x] **162** — `accuracy-meta-monitor`: tempo limite nas duas chamadas internas — onda 5 — Média
 - [ ] **163** — `accuracy-weekly-digest`: tempo limite na chamada interna — onda 5 — Média
 - [ ] **164** — Criar `_shared/httpError.ts`: uma resposta de erro que não vaza o detalhe interno — onda 5 — Alta
 - [ ] **165** — `ingest-biosync`: parar de devolver o erro do Postgres — onda 5 — Alta
@@ -435,6 +435,36 @@ Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um se
 
 ## Registro de execução
 
+### Registro - etapa 162 (2026-11-25) - achado B-05 (`accuracy-meta-monitor`)
+
+**Causa:** `index.ts:196` (e-mail) e `:215` (WhatsApp) chamavam `supabase.functions.invoke(...)` dentro do laço de
+avaliação do monitor diário de meta de acurácia. `functions.invoke` não aceita tempo limite: um `resend-email` ou
+`whatsapp-notification` lento segurava o monitor inteiro — que roda uma vez por dia e, se estourar o tempo da função,
+não avalia ninguém. Cada envio já vinha embrulhado em `try/catch` que gravava `throw:<mensagem crua>`.
+
+**Correção:** as duas chamadas passaram a usar `invokeFunction` (etapa 156) com `timeoutMs: DISPATCH_TIMEOUT_MS` de
+10 s (`:13`), corpo idêntico (`to`/`subject`/`html` no e-mail; `action`/`template`/`phone`/`variables` no WhatsApp).
+Como o helper nunca lança, os dois `try/catch` saíram: o resultado vai para `dispatched.email` (`:209`) e
+`dispatched.whatsapp` (`:233`) com o mesmo formato de antes (`"ok"`, `"ok:escalated"` ou `error:<motivo>`), agora com o
+**motivo curto** do helper (`timeout`, `http_error`, ...) em vez da mensagem crua — melhor no `metadata.channels` da
+notificação e no log `external channels dispatched`.
+
+**Mudança de comportamento:** o monitor segue avaliando os demais usuários mesmo se um envio falhar (antes também
+seguia, mas sem limite de tempo); o marcador `throw:` deixa de existir em `metadata.channels` — falha passa a ser
+sempre `error:<motivo>`.
+
+**Evidência:** `grep -n 'functions.invoke' supabase/functions/accuracy-meta-monitor/index.ts` -> nenhum;
+`invokeFunction` importado em `:8`, usado em `:200` e `:217`, ambos com `{ timeoutMs: DISPATCH_TIMEOUT_MS }`. Spec
+`tests/contracts/accuracy-meta-monitor-timeout.spec.ts` (5 casos); mutações A-E (voltar o `functions.invoke`, tirar o
+`timeoutMs` do e-mail, tirar o do WhatsApp, trocar `envioWhatsapp.reason`, mudar a constante) quebram de 1 a 2 testes
+cada, restaurado 5/5. `deno check` 0 (igual ao baseline); `deno lint` 2 (igual ao baseline); `deno fmt --check` já
+reprovava no baseline (import longo, `.select` e o ternário de `carrierVariants`) e as linhas novas não aparecem no
+diff de formatação.
+
+**NAO VERIFICADO:** execução real do monitor com o provedor de e-mail/WhatsApp lento (exige os segredos reais).
+
+**Fora de escopo (registrado, não tocado):** o `catch` final (`:286-291`) devolve `error.message` cru ao chamador —
+família `_shared/httpError` (etapas 164+); CORS `*`.
 ### Registro - etapa 161 (2026-11-25) - achado B-05 (`predict-delays` e `predict-delays-scheduled`)
 
 **Causa:** duas chamadas internas sem tempo limite.
@@ -477,7 +507,6 @@ de verdade em produção).
 
 **Fora de escopo (registrado, não tocado):** `error.message` cru (`predict-delays:389`, etapa 178); a janela de
 idempotência de 2 min e a leitura de `prevKeys` da agendada; CORS `*`.
-
 ### Registro - etapa 160 (2026-11-25) - achado B-05 (`send-password-reset`)
 
 **Causa:** `index.ts:151` chamava `supabaseAdmin.functions.invoke("resend-email", ...)` **dentro do caminho da
