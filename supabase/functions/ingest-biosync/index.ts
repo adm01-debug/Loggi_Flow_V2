@@ -3,6 +3,11 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
 import { log } from "../_shared/logger.ts";
 import { invokeFunction } from "../_shared/invokeFunction.ts";
 import { internalErrorResponse } from "../_shared/httpError.ts";
+import {
+  bodyHash,
+  buildEventKey,
+  claimIdempotencyKey,
+} from "../_shared/idempotency.ts";
 import { parseBioSyncInput } from "./parse.ts";
 import { getCorsHeaders } from "../_shared/cors.ts";
 
@@ -18,8 +23,59 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
+    const body = (await req.json()) as Record<string, unknown>;
     const { driver_id, vehicle_id, heart_rate, fatigue_index } =
-      parseBioSyncInput((await req.json()) as Record<string, unknown>);
+      parseBioSyncInput(body);
+
+    // Dedupe (etapa 199, achado B-08): o reenvio do mesmo batimento duplicava a
+    // telemetria e repetia o alerta ao motorista. A chave usa identificadores
+    // estaveis e o horario DO EVENTO quando o dispositivo manda; sem ele, o hash
+    // canonico do corpo. O valor medido nao entra em texto claro (LGPD): so dentro
+    // do hash. Relogio do servidor aqui anularia a dedupe (B-02).
+    const eventTime =
+      typeof body.event_time === "string" && body.event_time.trim()
+        ? body.event_time.trim()
+        : typeof body.timestamp === "string" && body.timestamp.trim()
+        ? body.timestamp.trim()
+        : null;
+    // Sem horario de evento a identidade do batimento e o proprio conteudo: o
+    // hash entra como PARTE da chave. Deixa-lo no fallback do helper nao serviria
+    // - com veiculo e motorista sempre presentes, o fallback nunca seria usado e
+    // toda leitura daquele motorista viraria duplicata da primeira.
+    const identidade = eventTime ?? `sha256-${await bodyHash(body)}`;
+    const eventKey = await buildEventKey("biosync", [
+      vehicle_id,
+      driver_id,
+      identidade,
+    ]);
+
+    if (!eventKey) {
+      log.error(
+        "[ingest-biosync] Leitura sem identificador de dispositivo/veiculo",
+      );
+      return new Response(
+        JSON.stringify({ error: "Event without stable identifier" }),
+        {
+          status: 400,
+          headers: { ...headers, "Content-Type": "application/json" },
+        },
+      );
+    }
+
+    const idem = await claimIdempotencyKey(eventKey.provider, eventKey.id);
+    if (idem.duplicate) {
+      return new Response(
+        JSON.stringify({
+          success: true,
+          duplicate: true,
+          message: "already processed",
+        }),
+        {
+          status: 200,
+          headers: { ...headers, "Content-Type": "application/json" },
+        },
+      );
+    }
 
     // 1. Fetch Alert Rules
     const { data: rules } = await supabaseClient

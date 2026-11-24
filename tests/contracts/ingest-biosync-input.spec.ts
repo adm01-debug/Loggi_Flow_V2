@@ -96,8 +96,8 @@ describe("ingest-biosync: heart_rate validado (etapa 148 / B-04)", () => {
   it("a edge valida antes de comparar com os limiares e devolve 422", () => {
     const fonte = readFileSync(EDGE, "utf8");
 
-    expect(fonte).toContain("parseBioSyncInput((await req.json())");
-    expect(fonte.indexOf("parseBioSyncInput((await req.json())")).toBeLessThan(
+    expect(fonte).toContain("parseBioSyncInput(body)");
+    expect(fonte.indexOf("parseBioSyncInput(body)")).toBeLessThan(
       fonte.indexOf("criticalThreshold)"),
     );
     expect(fonte).not.toContain("heart_rate ?? null");
