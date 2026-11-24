@@ -95,9 +95,9 @@
 - [x] **052** — Teste do `BulkActions`: ação destrutiva não executa sem confirmação — onda 1 — Média
 - [x] **053** — `Transportadoras`: trocar exclusão real por exclusão lógica — onda 1 — Alta
 - [x] **054** — Filtrar `deleted_at IS NULL` em todas as leituras de `transportadoras` — onda 1 — Alta
-- [~] **055** — Migration: acrescentar `deleted_at` a `fretes_internos` — onda 1 — Alta · **aguarda o dono**
-- [~] **056** — Aplicar a migration de `deleted_at` e sincronizar os tipos — onda 1 — Alta · **aguarda o dono**
-- [ ] **057** — `FretesInternos`: exclusão lógica e filtro em todas as leituras da tabela — onda 1 — Alta
+- [x] **055** — Migration: acrescentar `deleted_at` a `fretes_internos` — onda 1 — Alta · **aplicada** em 2026-11-24
+- [x] **056** — Aplicar a migration de `deleted_at` e sincronizar os tipos — onda 1 — Alta · **tipos sincronizados** (#426)
+- [x] **057** — `FretesInternos`: exclusão lógica e filtro em todas as leituras da tabela — onda 1 — Alta · #427
 - [~] **058** — Transformar a política de exclusão lógica em gate automático — onda 1 — Média · **aguarda o dono**
 - [x] **059** — Pedir confirmação ao cancelar uma logística reversa — onda 1 — Média
 
@@ -306,18 +306,18 @@
 - [x] **225** — `useDrillDown`: colunas explícitas nas duas leituras — onda 6 — Baixa
 - [x] **226** — `useSLANotifications`: colunas explícitas nas duas verificações de SLA — onda 6 — Baixa
 - [x] **227** — `RelatorioPDF`, `LogisticsService` e `useCotacoesMulticanal`: os três `select("*")` restantes — onda 6 — Baixa · **parcial**: `LogisticsService.getDeliveries` sem chamador, ver A-05
-- [~] **228** — Censo dos índices reais de `entregas`, `coletas` e `telemetry_logs` no banco ao vivo — onda 6 — Alta · **aguarda o dono**
-- [~] **229** — Provar a hipótese: `EXPLAIN (ANALYZE, BUFFERS)` da consulta do Painel SLA — onda 6 — Alta · **aguarda o dono**
-- [ ] **230** — Índice para o Painel SLA: `entregas (status, previsao_entrega)` — onda 6 — Alta
-- [ ] **231** — Índice parcial para a desigualdade de status do Kanban — onda 6 — Média
-- [ ] **232** — Índice composto `telemetry_logs (severity, created_at DESC)` — onda 6 — Baixa
-- [ ] **233** — Decidir com o dono sobre `(transportadora_id, created_at)` em `entregas` e `coletas` — onda 6 — Baixa
-- [~] **234** — Censo dos cinco candidatos a índice duplicado, com uso, no banco ao vivo — onda 6 — Média · **aguarda o dono**
-- [ ] **235** — Remover o duplicado de `rastreamento_historico (lalamove_order_id)` — onda 6 — Média
-- [ ] **236** — Remover o duplicado de `rastreamento_historico (coleta_id)` — onda 6 — Média
-- [ ] **237** — Remover o duplicado de `entregas (transportadora_id)` — onda 6 — Baixa
-- [ ] **238** — Remover o duplicado de `coletas (transportadora_id)` — onda 6 — Baixa
-- [ ] **239** — Decidir e remover a sobreposição em `audit_logs (table_name, record_id)` — onda 6 — Baixa
+- [x] **228** — Censo dos índices reais de `entregas`, `coletas` e `telemetry_logs` no banco ao vivo — onda 6 — Alta · censo registrado
+- [x] **229** — Provar a hipótese: `EXPLAIN (ANALYZE, BUFFERS)` da consulta do Painel SLA — onda 6 — Alta · medido: 0,12 ms
+- [x] **230** — Índice para o Painel SLA: `entregas (status, previsao_entrega)` — onda 6 — Alta · **não criar**: já existe equivalente melhor
+- [x] **231** — Índice parcial para a desigualdade de status do Kanban — onda 6 — Média · **não criar**: `idx_entregas_active` já entrega a ordem
+- [x] **232** — Índice composto `telemetry_logs (severity, created_at DESC)` — onda 6 — Baixa · **medido, não compensa** (0,7 ms)
+- [x] **233** — Decidir com o dono sobre `(transportadora_id, created_at)` em `entregas` e `coletas` — onda 6 — Baixa · **medido, não compensa**
+- [x] **234** — Censo dos cinco candidatos a índice duplicado, com uso, no banco ao vivo — onda 6 — Média · censo registrado
+- [x] **235** — Remover o duplicado de `rastreamento_historico (lalamove_order_id)` — onda 6 — Média · **já removido** pela dedupe de agosto
+- [x] **236** — Remover o duplicado de `rastreamento_historico (coleta_id)` — onda 6 — Média · **já removido** pela dedupe de agosto
+- [~] **237** — Remover o duplicado de `entregas (transportadora_id)` — onda 6 — Baixa · #428 **aguarda o dono** (DDL)
+- [~] **238** — Remover o duplicado de `coletas (transportadora_id)` — onda 6 — Baixa · #428 **aguarda o dono** (DDL)
+- [~] **239** — Decidir e remover a sobreposição em `audit_logs (table_name, record_id)` — onda 6 — Baixa · #428 **aguarda o dono** (DDL)
 - [~] **240** — Fechar o ciclo: registrar que índice se confere no banco, e conferir que nada regrediu — onda 6 — Alta · **aguarda o dono**
 
 ### Onda 8
@@ -351,7 +351,7 @@
 - [x] **261** — `TEMPLATE_STRUCTURE.md`: parar de ensinar hook na raiz de `src/hooks/` — onda 8 — Baixa
 - [x] **262** — `PLANO_FRONTEND_CONTRATOS_190_ETAPAS.md`: corrigir "43 edge functions" para 44 — onda 8 — Baixa
 - [~] **263** — Pedir ao dono o secret `SUPABASE_DB_URL`, sem o qual a fonte de contexto do banco nunca é gerada — onda 8 — Alta · **aguarda o dono**
-- [ ] **264** — Rodar o produtor do contexto de banco e confirmar que `docs/contexto/supabase/` foi publicado — onda 8 — Alta
+- [x] **264** — Rodar o produtor do contexto de banco e confirmar que `docs/contexto/supabase/` foi publicado — onda 8 — Alta · **553 arquivos publicados**
 - [~] **265** — Dizer ao agente o que fazer quando a fonte do banco não existir — onda 8 — Alta · **aguarda o dono**
 - [~] **266** — Fazer a ausência do snapshot do banco parar de sair verde em silêncio — onda 8 — Média · **aguarda o dono**
 
@@ -3603,6 +3603,91 @@ Uma linha por etapa concluída. A coluna **Evidência** é o que diferencia etap
 | ----- | --- | --------- | ------------------ | ------------------------ |
 |       |     |           |                    |                          |
 
+
+### Registro - ondas 1 e 6: DDL aplicada, tipos sincronizados e censo de índices (2026-11-24)
+
+Banco consultado ao vivo pelo Management API do Supabase, ref **jvfhclubfpxrtrrazrgr**, em 2026-11-24.
+
+**055/056 - `fretes_internos.deleted_at`.** A migration `20261124130000_fretes_internos_deleted_at.sql`
+foi aplicada pelo `aplicar-migration.yml` (run `45405557509`, `success`) e conferida no banco:
+
+```
+information_schema.columns -> column_name=deleted_at, data_type=timestamp with time zone, is_nullable=YES
+supabase_migrations.schema_migrations -> 20261124130000_fretes_internos_deleted_at.sql
+```
+
+O `types-sync` rodou no mesmo push e abriu a **#426** com `deleted_at: string | null` no bloco
+`fretes_internos` de `src/integrations/supabase/types.ts`, mais `supabase/schema-catalog.json` e
+`schema-manifest.json`; mergeada em `fb0f0ef1`. O `types.ts` nunca foi editado a mao.
+
+**057 - exclusao logica em `FretesInternos`.** #427, mergeada em `b721b85d`. O `.delete()` de
+`:254-258` virou `.update({ deleted_at })`; o filtro `.is("deleted_at", null)` entrou na lista da tela,
+no editar, no mudar-status, no bulk e nas tres leituras externas (`useDrillDown.tsx`,
+`ExportacaoDados.tsx`, `Relatorios.tsx`). RLS conferido: o UPDATE de `fretes_internos` ja era
+`has_role(uid,'admin')`, o mesmo gate do DELETE substituido, entao nenhuma permissao nova foi aberta.
+
+**264 - contexto de banco publicado.** O job `banco` do `contexto-ia.yml` nao rodava porque o DSN era
+lido de `secrets.SUPABASE_DB_URL`, que nao existe; o DSN real esta em `secrets.DESTINO_URL` do
+environment `banco-leitura` (#425). Prova nesta sessao: `workflow_dispatch` (run `45405526573`,
+`success`) e
+
+```
+git ls-tree -r --name-only origin/contexto docs/contexto/supabase/ | wc -l  ->  553
+```
+
+Antes eram **0** arquivos: a branch `contexto` publicava codigo e regras, nunca o schema do banco.
+
+#### Etapa 228 - censo dos indices reais (saida de `pg_indexes`, resumida)
+
+| Tabela | Indices hoje | Observacao que muda o plano |
+| --- | --- | --- |
+| `entregas` | 20 | ja existem `idx_entregas_previsao_active (previsao_entrega) WHERE status NOT IN ('entregue','finalizado') AND deleted_at IS NULL` e `idx_entregas_active (created_at DESC) WHERE deleted_at IS NULL` |
+| `coletas` | 14 | `idx_coletas_status_data (status, data_prevista_coleta DESC)` ja cobre o Painel SLA de coletas |
+| `telemetry_logs` | 5 | `severity` e `created_at` separados, sem composto; 394 linhas, 712 kB |
+
+**Tamanho das tabelas** (`pg_stat_user_tables`): `entregas` **0 linhas** (heap 0 bytes), `coletas`
+**0 linhas**, `telemetry_logs` 394 linhas/520 kB, `query_telemetry` 0 linhas. Nao ha staging: e o banco de
+producao, e ele esta vazio de entregas e coletas hoje.
+
+#### Etapa 229 - `EXPLAIN (ANALYZE, BUFFERS)` das consultas reais
+
+| Consulta | Plano medido | Tempo |
+| --- | --- | --- |
+| Painel SLA (entregas) | `Seq Scan` + `Sort` | **0,123 ms** |
+| Painel SLA (coletas) | `Seq Scan` + `Sort` | **0,103 ms** |
+| Kanban de entregas | `Seq Scan` + `Sort` | **0,117 ms** |
+| `telemetry_logs WHERE severity='error'` | `Index Scan using idx_telemetry_logs_severity` + `Sort` | **0,701 ms** |
+
+O `Seq Scan` nao e o defeito que P-05 descreveu: e o planejador descartando indice em tabela de **0
+linhas**. Num banco assim, nenhum dos tres indices das etapas 230-232 tem ganho medivel - e o proprio plano
+diz que a medicao e o criterio.
+
+#### Veredito por etapa (o criterio do plano, aplicado)
+
+| Etapa | Veredito | Por que |
+| --- | --- | --- |
+| 230 | **nao criar** | `idx_entregas_previsao_active` ja entrega o `ORDER BY previsao_entrega` sem `Sort` para o mesmo filtro: e melhor que o `(status, previsao_entrega)` proposto, que ainda exigiria `Sort` |
+| 231 | **nao criar** | `idx_entregas_active (created_at DESC) WHERE deleted_at IS NULL` ja cobre a ordenacao do Kanban; o parcial proposto so acrescenta o predicado de status, e o ganho nao e medivel com 0 linhas |
+| 232 | **medido, nao compensa** | 0,701 ms com 394 linhas; `telemetry_logs` e tabela de escrita intensa e o teto das telas e 100/500 - o custo de escrita supera o ganho |
+| 233 | **medido, nao compensa** | `idx_entregas_transportadora_id` ja e o indice mais usado de `entregas` (343 `idx_scan`), e o drill-down tem teto 100 |
+
+Reavaliar 230/231/233 quando `entregas` e `coletas` passarem de ~50 mil linhas: a decisao de hoje e sobre o
+banco de hoje, e o numero que muda a resposta e a contagem de linhas.
+
+#### Etapa 234 - censo dos cinco candidatos a duplicado
+
+| # | Tabela (coluna) | Existe hoje | `idx_scan` | Constraint? | Fica |
+| --- | --- | --- | --- | --- | --- |
+| 1 | `rastreamento_historico (lalamove_order_id)` | **so um** (`idx_rastreamento_lalamove_order`) | - | - | nada a fazer: o duplicado ja foi removido em `20260831130000` |
+| 2 | `rastreamento_historico (coleta_id)` | **so um** (`idx_rastreamento_historico_coleta_id`) | - | FK aponta para `coletas_pkey` | nada a fazer: idem |
+| 3 | `entregas (transportadora_id)` | os dois: `idx_entregas_transportadora` (parcial) e `idx_entregas_transportadora_id` | **0** x **343** | nao | sai o parcial - #428 |
+| 4 | `coletas (transportadora_id)` | os dois: `idx_coletas_transportadora` (parcial) e `idx_coletas_transportadora_id` | 0 x 0 | nao | sai o parcial - #428 |
+| 5 | `audit_logs (table_name, record_id)` | `idx_audit_logs_table_record` **nao existe**; `idx_audit_logs_record_id_table` e prefixo de `idx_audit_logs_record_composite` | 2 x 0 | nao | sai o prefixo - #428 |
+
+`AuditTrail.tsx:30` ordena por `created_at` sem filtrar por `record_id` nem `table_name`; as buscas do par
+sao atendidas pelo composto `(record_id, table_name, created_at DESC)`, que e o que sustenta a decisao da 239.
+Os tres `DROP` estao na **#428**, aberta: sao DDL em producao e aguardam o dono.
+
 ---
 
 ## Resumo do andamento
@@ -3611,15 +3696,15 @@ Atualize ao fim de cada sessão de trabalho.
 
 |                         | Quantidade |
 | ----------------------- | ---------- |
-| Concluídas `[x]`        | 236         |
-| Aguardando o dono `[~]` | 50         |
+| Concluídas `[x]`        | 249         |
+| Aguardando o dono `[~]` | 48         |
 | Bloqueadas `[!]`        | 0          |
-| Não iniciadas `[ ]`     | 14         |
+| Não iniciadas `[ ]`     | 3          |
 | **Total**               | **300**    |
 
-**Última etapa trabalhada:** 277 · **Data:** 2026-11-24 · **Próxima etapa independente:** 264 (onda 8). Na
-onda 1, a **057** (exclusão lógica em `FretesInternos`) depende das etapas **055** e **056**, que são DDL em
-produção e aguardam o dono; a **027** está na mesma situação.
+**Última etapa trabalhada:** 239 · **Data:** 2026-11-24 · **Próxima etapa independente:** 058 (gate
+automático da política de exclusão lógica; a 057 já entrou). A **027** (`logistica_reversa.codigo_rastreio_reverso`
+sem `UNIQUE`) segue como DDL dependente do dono, e a **#428** espera o ok para os três `DROP INDEX`.
 
 ### Registro - etapas 068-096 (2026-11-23)
 
