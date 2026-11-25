@@ -381,7 +381,7 @@
 - [x] **287** — Verificar no banco ao vivo se `webhook_failures` e `cron_job_logs` existem — onda 8 — Média — **nenhuma das duas existe**
 - [x] **288** — Dar destino persistente à falha de webhook de entrada · onda 8 · Média — **aplicada em produção** (`20261125093000_webhook_inbound_failures.sql`, runs `45603914030`/`45604413739`; [#459](https://github.com/adm01-debug/Loggi_Flow_V2/pull/459) + [#462](https://github.com/adm01-debug/Loggi_Flow_V2/pull/462))
 - [x] **289** — Mostrar as falhas de webhook numa tela que já existe · onda 8 · Média — **implementada** (aba "Falhas de entrada" em `/webhooks`, `useClientWebhooks` com `limit(50)`, estados de carregando/erro/vazio)
-- [~] **290** — Tornar visível a falha de cron, e decidir o destino das tabelas mortas — onda 8 — Média · **aguarda o dono**
+- [x] **290** — Tornar visível a falha de cron, e decidir o destino das tabelas mortas — onda 8 — Média · **feito — tela do cron destaca falha/atraso (14 testes); tabelas mortas nao existem**
 
 ### Onda 7
 
@@ -3694,8 +3694,8 @@ Atualize ao fim de cada sessão de trabalho.
 
 |                         | Quantidade |
 | ----------------------- | ---------- |
-| Concluídas `[x]`        | 270         |
-| Aguardando o dono `[~]` | 30         |
+| Concluídas `[x]`        | 271         |
+| Aguardando o dono `[~]` | 29         |
 16d0ca713 (docs: registra que indice se confere no banco e fecha 058, 240 e 265)
 | Bloqueadas `[!]`        | 0          |
 | Não iniciadas `[ ]`     | 0          |
@@ -4682,3 +4682,32 @@ O caminho de volta continua em `supabase/rollbacks/20261124150000_rollback_index
   **não** aparecem em `/indexes/`; `idx_entregas_transportadora_id`, `idx_coletas_transportadora_id` e
   `idx_audit_logs_record_composite` aparecem.
 - `node scripts/ci/check-claude-md-integrity.mjs` → `exit=0` (check obrigatório “Agents Docs Integrity”).
+
+
+### Registro - etapa 290 (2026-11-25) - a tela do cron passa a dizer o que deu errado
+
+**290** - a RPC `get_cron_jobs_status()` ja devolvia `schedule`, `active`, `last_start`, `last_status` e
+`last_duration_ms` (migration `20260712160921_964f0d7a-8cab-4349-9b12-89053b0d2b7b.sql:46`) e o hook
+`useCronJobs.ts:9-13` so repassava a lista. Logo a etapa e de apresentacao: **nenhum DDL**.
+
+`src/features/db-observability/cron-status.ts` (novo) classifica cada job em `falha`, `atrasado`,
+`sem_historico`, `parado` ou `ok`, com interpretador de `schedule` de 5 campos em UTC (como o pg_cron).
+`atrasado` = perdeu uma janela inteira (o proximo disparo passou e a folga entre dois disparos tambem), o
+que evita o alarme falso dos jobs mensais. `CronJobsCard.tsx` mostra o resumo no topo ("N de 28 jobs
+precisam de atencao") e poe os problemas nas primeiras linhas.
+
+**Numero de negocio (28 jobs, coleta de 2026-11-23):** 0 com falha na ultima execucao; 2 sem execucao nos
+7 dias - `ensure-future-partitions-monthly` (`0 2 1 * *`) e `nexus_partition_retention` (`0 3 1 * *`),
+ambos do dia 1 do mes, que agora aparecem como `ok` esperando 01/12 em vez de "atrasado" (era o falso
+positivo que a leitura ingenua "sem execucao ha 7 dias" produziria).
+
+**Tabelas mortas:** a 287 ja provou no banco que `webhook_failures` e `cron_job_logs` **nao existem**
+(`to_regclass` = null). Nada a remover nesta etapa; o destino da falha de **entrada** e uma tabela nova
+(`webhook_inbound_failures`, migration versionada na #459), que e DDL e segue aguardando o dono. Nao se
+cria historico de cron: o `pg_cron` ja guarda `cron.job_run_details` e a RPC ja le de la.
+
+**Provas:** `npx vitest run src/features/db-observability/cron-status.test.ts` -> **14 testes, 0 falhas**
+(cobre as 24 agendas reais do `inventario/estado/banco.json`, mensal que nao e atraso, diario parado ha 2
+dias = atrasado, `*/15` com 40 min = atrasado e com 10 min = ok, `0 0 30 2 *` = `null`, inativo / sem
+historico / schedule ilegivel, e a ordenacao com o resumo); `npm run typecheck` -> **0**; `npx eslint` nos
+3 arquivos -> **0 problemas**; `npm run lint:budget` -> **80/80**, nenhum aviso novo.
