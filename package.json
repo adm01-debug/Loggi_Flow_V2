@@ -17,6 +17,7 @@
     "validate:no-console": "node scripts/validate-no-console.mjs",
     "validate:query-limits": "node scripts/ci/validate-query-limits.mjs",
     "validate:soft-delete": "node scripts/ci/check-soft-delete.mjs",
+    "validate:agents-facts": "node scripts/ci/check-agents-facts.mjs",
     "validate:doc-paths": "node scripts/ci/check-doc-paths.mjs",
     "validate:root-files": "node scripts/ci/check-root-files.mjs",
     "test:rls": "vitest run tests/security/rls-access.spec.ts tests/security/integrations-access.spec.ts",

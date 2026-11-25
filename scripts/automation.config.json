@@ -907,6 +907,22 @@
       "manual": ["node", "scripts/ci/check-root-files.unit.mjs"],
       "triggers": ["manual"],
       "reason": "Legado sem chamador literal no inventario; execucao manual controlada. O runner de scripts-tests.yml o coleta por padrao (*.unit.mjs). O dispatcher nao executa esta operacao."
+    },
+    {
+      "id": "legacy-e31dbbeffeb82bb7",
+      "kind": "legacy",
+      "files": ["scripts/ci/check-agents-facts.mjs"],
+      "manual": ["node", "scripts/ci/check-agents-facts.mjs"],
+      "triggers": ["manual"],
+      "reason": "Legado mantido no fluxo existente; referencias literais: package.json:scripts, .github/workflows/ci-nexus.yml. O dispatcher nao executa esta operacao."
+    },
+    {
+      "id": "legacy-59c11756161f7edd",
+      "kind": "legacy",
+      "files": ["scripts/ci/check-agents-facts.unit.mjs"],
+      "manual": ["node", "scripts/ci/check-agents-facts.unit.mjs"],
+      "triggers": ["manual"],
+      "reason": "Legado sem chamador literal no inventario; execucao manual controlada. O runner de scripts-tests.yml o coleta por padrao (*.unit.mjs). O dispatcher nao executa esta operacao."
     }
   ],
   "ci": [
