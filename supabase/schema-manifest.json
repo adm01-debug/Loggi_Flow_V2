@@ -1925,6 +1925,7 @@
         "audit_logs_y2027m05.audit_logs_y2027m05_created_at_idx": "502545793696d5a5d47d8791631a1eef",
         "audit_logs_y2027m06.audit_logs_y2027m06_created_at_idx": "47e0c3d9d417bb8b52153690d3873395",
         "audit_logs_y2027m07.audit_logs_y2027m07_created_at_idx": "e15a108ee5091e939fa5742f1e0e7433",
+        "logistica_reversa.ux_logistica_reversa_codigo_rastreio": "1749a711ae49f4af37f28545784482c3",
         "notification_templates.notification_templates_code_key": "9d33a3081b96a518e0bc5e337bd45860",
         "rastreamento_historico.idx_rastreamento_lalamove_order": "86914cfc93cb545e2a5c2087f42f71bb",
         "remediation_actions.idx_remediation_actions_applied_by": "6494807174c518c573297c3734e09953",
@@ -3567,7 +3568,7 @@
         "e:public.frete_interno_status|PUBLIC|USAGE|grantor=postgres": "68934a3e9455fa72420237eb05902327",
         "e:public.frete_interno_status|postgres|USAGE|grantor=postgres": "68934a3e9455fa72420237eb05902327"
     },
-    "generated_at": "2026-11-25T11:08:27Z",
+    "generated_at": "2026-11-25T14:21:09Z",
     "column_grants": {
     },
     "schema_grants": {
