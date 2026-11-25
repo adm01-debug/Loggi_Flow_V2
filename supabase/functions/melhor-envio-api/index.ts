@@ -3,7 +3,7 @@ import { getCorsHeaders, corsResponse } from "../_shared/cors.ts";
 import { getCircuitBreaker } from "../_shared/circuitBreaker.ts";
 import { getRedisClient } from "../_shared/redis.ts";
 import { log } from "../_shared/logger.ts";
-import { requireUser } from "../_shared/auth.ts";
+import { requireRole } from "../_shared/auth.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
 import { ValidationError, validationErrorResponse } from "../_shared/validate.ts";
 import { parseMelhorEnvioQuote } from "./parse.ts";
@@ -42,11 +42,12 @@ Deno.serve(async (req) => {
       );
     }
 
-    const auth = await requireUser(req);
+    // Etapa 009: cotar e enviar exige papel de colaborador (admin ou user); autenticado sem papel nao passa
+    const auth = await requireRole(req, ["admin", "user"]);
     if (!auth.ok) {
       return new Response(
-        JSON.stringify({ error: "Unauthorized" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({ error: auth.status === 403 ? "Forbidden" : "Unauthorized" }),
+        { status: auth.status, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 

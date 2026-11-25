@@ -28,10 +28,10 @@ serve(async (req) => {
       .limit(1)
       .maybeSingle();
       
+    // Etapa 014: health e publica; devolve estado, nunca a mensagem crua do banco
     checks.database = {
       status: dbError ? 'unhealthy' : 'healthy',
-      latency_ms: Date.now() - startTime,
-      error: dbError?.message
+      latency_ms: Date.now() - startTime
     };
 
     // 2. Auth Service Check
@@ -70,7 +70,6 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         status: 'critical_failure', 
-        error: (err as Error).message,
         timestamp: new Date().toISOString() 
       }),
       { headers: { ...headers, 'Content-Type': 'application/json' }, status: 500 }

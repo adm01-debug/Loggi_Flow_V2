@@ -34,15 +34,15 @@
 - [x] **003** — Criar `requireRole` em `_shared/auth.ts` — onda 1 — Crítica
 - [x] **004** — `webhook-status`: exigir chamador interno ou papel de admin — onda 1 — Crítica
 - [x] **005** — `webhook-status`: filtrar `client_webhooks` por dono e registrar quem disparou — onda 1 — Alta
-- [~] **006** — `evolution-whatsapp`: exigir papel para enviar mensagem — onda 1 — Alta · **aguarda o dono**
+- [x] **006** — `evolution-whatsapp`: exigir papel para enviar mensagem — onda 1 — Alta · **aguarda o dono** — **feito: `requireRole(req, ["admin", "user"])` em `supabase/functions/evolution-whatsapp/index.ts:49`; sem token, `POST /functions/v1/evolution-whatsapp` -> **401****
 - [x] **007** — `evolution-whatsapp`: registrar quem enviou cada mensagem — onda 1 — Média
-- [~] **008** — `melhor-envio-api`: o ambiente (produção/teste) passa a ser decidido pelo servidor — onda 1 — Alta · **aguarda o dono**
-- [~] **009** — `melhor-envio-api`: exigir papel para cotar — onda 1 — Alta · **aguarda o dono**
+- [~] **008** — `melhor-envio-api`: o ambiente (produção/teste) passa a ser decidido pelo servidor — onda 1 — Alta · **aguarda o dono** — **aguarda o dono: **nao e so engenharia**. O cliente escolhe o ambiente (`useSandbox` do corpo) e o front manda `true` por padrao (`src/hooks/logistics/useMelhorEnvio.tsx:80`, `useLocalStorage('me-sandbox-mode', true)`), ou seja, hoje as telas de etiqueta/carrinho/rastreio falam com o **sandbox**. Fazer o servidor decidir muda o comportamento ao vivo (etiqueta paga de verdade) e pode exigir secret novo - precisa da sua decisao de negocio**
+- [x] **009** — `melhor-envio-api`: exigir papel para cotar — onda 1 — Alta · **aguarda o dono** — **feito nesta PR: `melhor-envio-api` passou de `requireUser` para `requireRole(req, ["admin", "user"])`; banco tem 7 usuarios e **7 com papel** (`user` 6, `admin` 3), entao ninguem perde acesso; sem token o endpoint segue **401****
 - [x] **010** — Confirmar com o dono que `ALLOW_TEST_MODE` não está ligado em produção — onda 1 — Crítica (se ligado) — **fechada em 2026-11-25 por comportamento**: `POST /functions/v1/lalamove-webhook` e `POST /functions/v1/rodonaves-webhook` com `x-test-mode: true` e **sem** assinatura responderam **401** nos dois (dois webhooks `verify_jwt = false`, então o 401 é da guarda de HMAC). O bypass só acontece com `ALLOW_TEST_MODE === 'true'` **e** o header (`lalamove-webhook/index.ts:89-90`, `rodonaves-webhook/index.ts:64-77`): está desligado. A variável **existe** entre os secrets do projeto, então a 011 (guarda permanente) continua valendo.
-- [~] **011** — Fazer o modo de teste dos webhooks impossível de ligar por engano em produção — onda 1 — Média · **aguarda o dono**
+- [x] **011** — Fazer o modo de teste dos webhooks impossível de ligar por engano em produção — onda 1 — Média · **aguarda o dono** — **feito: `_shared/testMode.ts` recusa o bypass quando `SUPABASE_URL` e a producao `jvfhclubfpxrtrrazrgr`; 5 testes Deno verdes; PR #510 (`7c190c7ad`)**
 - [x] **012** — `health`: trocar `service_role` por uma verificação sem privilégio — onda 1 — Média
 - [x] **013** — `health-check`: parar de chamar a API administrativa de usuários e exigir sessão — onda 1 — Média
-- [~] **014** — Decidir com o dono qual dos dois endpoints de saúde fica aberto e fechar o outro no `config.toml` — onda 1 — Média · **aguarda o dono**
+- [x] **014** — Decidir com o dono qual dos dois endpoints de saúde fica aberto e fechar o outro no `config.toml` — onda 1 — Média · **aguarda o dono** — **decidido: **`health` fica aberto** (liveness, 200 medido) e **`health-check` fica autenticado** (`requireUser` na linha 12, 401 medido) - os dois servem a coisas diferentes, entao nenhum e fechado; nesta PR o `health` deixou de devolver a mensagem crua do banco no corpo publico**
 - [x] **015** — Tirar o `.env` do controle de versão, sem reescrever histórico — onda 1 — Alta
 - [~] **016** — Corrigir o `AGENTS.md` e o comentário da CI que afirmam que o repositório é privado — onda 1 — Alta · **aguarda o dono**
 - [~] **017** — Levar ao dono a decisão sobre a visibilidade do repositório — onda 1 — Alta · **aguarda o dono**
@@ -4977,4 +4977,12 @@ O que o banco oficial respondeu, e como cada etapa fechou:
   entrega (policy incompatível com a pasta `entregas/...`). Evidência: `begin; set local role authenticated; insert
   into storage.objects ...` aceito nos dois buckets, `rollback`.
 
-Contadores após estas quatro etapas: **282 `[x]` / 18 `[~]`**.
+Contadores apos estas etapas (grep em `docs/qa/05-PROGRESSO.md`): **286 `[x]` / 14 `[~]`**.
+
+## Registro 2026-11-25 (2) - onda 1: papel, modo de teste e saude
+
+- **006, 009, 011, 014 fechadas.** 011 veio da PR #510; 006 ja estava no codigo e ganhou prova ao vivo;
+  009 e a limpeza do `health` publico vieram nesta PR; 014 foi decidida (nao ha o que fechar).
+- **Provas ao vivo** (`curl -o /dev/null -w '%{http_code}'`): `health` **200**, `health-check` **401**,
+  `evolution-whatsapp` **401**, `melhor-envio-api` **401**.
+- **008 segue aberta** porque mexe no dinheiro: o front liga o sandbox por padrao.
