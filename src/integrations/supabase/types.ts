@@ -1613,6 +1613,7 @@ export type Database = {
           is_valid: boolean
           latency_ms: number | null
           payload: Json | null
+          payload_hash: string | null
         }
         Insert: {
           created_at?: string | null
@@ -1622,6 +1623,7 @@ export type Database = {
           is_valid: boolean
           latency_ms?: number | null
           payload?: Json | null
+          payload_hash?: string | null
         }
         Update: {
           created_at?: string | null
@@ -1631,6 +1633,7 @@ export type Database = {
           is_valid?: boolean
           latency_ms?: number | null
           payload?: Json | null
+          payload_hash?: string | null
         }
         Relationships: []
       }
