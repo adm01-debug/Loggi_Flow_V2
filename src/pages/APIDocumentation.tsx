@@ -55,14 +55,6 @@ const endpoints: Endpoint[] = [
     category: "ia",
   },
   {
-    id: "mapbox",
-    method: "POST",
-    path: "/functions/v1/get-mapbox-token",
-    auth: false,
-    description: "Obter token público do Mapbox",
-    category: "integracao",
-  },
-  {
     id: "geocode",
     method: "POST",
     path: "/functions/v1/geocode-address",

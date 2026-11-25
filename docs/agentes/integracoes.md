@@ -61,7 +61,7 @@ o webhook passa a responder 401 e ninguém olha. Teste com request real antes de
 |---|---|---|
 | Assistente logístico e previsão de atraso | `ai-logistics-assistant`, `predict-delays`, `predict-delays-scheduled`, `accuracy-meta-monitor`, `accuracy-weekly-digest` | `GOOGLE_API_KEY`, `APP_URL` |
 | OCR de comprovante | `ocr-receipt-processor` | — |
-| Mapas e endereço | `get-mapbox-token`, `geocode-address` | `MAPBOX_PUBLIC_TOKEN` (público por design). Os mapas do front usam estilos sem token (`src/lib/mapStyles.ts`); `get-mapbox-token` não tem chamador em `src/` |
+| Mapas e endereço | `geocode-address` | `MAPBOX_PUBLIC_TOKEN` (público por design). Os mapas do front usam estilos sem token (`src/lib/mapStyles.ts`), por isso `get-mapbox-token` foi removida (etapa 295 / S-08) |
 | Clima | `get-weather-data` | `OPENWEATHER_API_KEY` |
 | Banco externo | `external-db-bridge` | `EXTERNAL_SUPABASE_URL`, `EXTERNAL_SUPABASE_SERVICE_KEY` — **é outro projeto Supabase**: nunca aponte para o oficial nem rode migration por ele |
 | Rate limit / cache | `check-rate-limit` + `_shared/redis.ts` | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` (sem eles o rate limit degrada para memória local) |
