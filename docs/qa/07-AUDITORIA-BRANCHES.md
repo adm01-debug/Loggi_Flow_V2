@@ -81,20 +81,22 @@ dele já entrou pela #474.
 | #87 | manifest_summary sem pg_cron | incorporada: `to_regclass('cron.job')` guarda o bloco em `scripts/audit/manifest_summary.sql` |
 | #86 | content_hash quebrado | incorporada: `to_jsonb(t)` só aparece dentro do SQL dinâmico, onde `t` é o alias da tabela; o `CROSS JOIN LATERAL ... LIMIT 0` sumiu |
 
-## 4. Os 7 arquivos que existem em PRs antigas e não na `main`
+## 4. Os 8 arquivos que existem em PRs antigas e não na `main`
 
-A checagem de caminho acusou os mesmos 7 arquivos em 12 PRs diferentes. Todos foram **removidos de
-propósito** por etapas posteriores — nenhum é trabalho perdido:
+A checagem de caminho acusou os mesmos arquivos em 12 PRs diferentes. Todos têm destino conhecido —
+nenhum é trabalho perdido. **Duas linhas desta tabela foram corrigidas na camada 5 (seção 7):** os dois SQL
+de `scripts/` não foram removidos, foram **movidos** para `scripts/historico/`.
 
-| Arquivo | Quem removeu |
+| Arquivo | O que aconteceu de fato |
 | --- | --- |
-| `scripts/cleanup_triggers_source.sql` | #340 (etapa 060 — SQL histórico sai da raiz de scripts) |
-| `scripts/origem_remediacao_2026-08-31.sql` | #340 |
-| `src/hooks/ai/useNexusSimulator.ts` | #300 (etapas 068+069 — hooks mortos) |
-| `src/hooks/security/useSelfHealing.ts` | #300 |
-| `src/utils/performance.ts` | #304 (etapas 080+081) |
-| `supabase/functions/_shared/service-wrapper.ts` | #305 (etapa 082 — sem importador) |
-| `supabase/migrations/20240822_gamification_system.sql` | #224 (migration legada), substituída por `supabase/migrations/20260102100001_gamification_real.sql` |
+| `scripts/cleanup_triggers_source.sql` | **movido** para `scripts/historico/` por #340 (`171f858a1`, rename com 0 alterações) — está na `main` hoje, com README explicando o histórico |
+| `scripts/origem_remediacao_2026-08-31.sql` | **movido** para `scripts/historico/` pelo mesmo #340 |
+| `src/hooks/ai/useNexusSimulator.ts` | removido por #300 (etapas 068+069 — hooks mortos); `git grep` na `main` = 0 importadores |
+| `src/hooks/security/useSelfHealing.ts` | removido por #300; 0 importadores na `main` |
+| `src/utils/performance.ts` | removido por #304 (etapas 080+081); 0 importadores de `@/utils/performance` na `main` |
+| `supabase/functions/_shared/service-wrapper.ts` | removido por #305 (etapa 082); 0 importadores na `main` |
+| `supabase/migrations/20240822_gamification_system.sql` | removida por #224; substituída por `supabase/migrations/20260102100001_gamification_real.sql` (existe na `main`) |
+| `supabase/functions/migrate-helper/index.ts` | removida do repo de propósito por **segurança** (`6086f5817` e `7b5594728` expunham `service_role` e `ACCESS_KEY`); produção confirma: a function devolve **HTTP 404 `{"code":"NOT_FOUND"}`** (a `health`, no mesmo gateway, devolve 200 — a sonda é válida). O que ela fazia (backup diário da origem) está na `main`: `scripts/ops/backup_origem.sh` + `scripts/ops/backup_origem.unit.mjs` |
 
 ## 5. Dependabot (28 PRs fechadas sem merge, 12 abertas)
 
@@ -129,8 +131,64 @@ Duas correções em relação à primeira passada:
   o conteúdo está na `main`.
 - Por isso o total de fechadas sem merge é 47, não 48.
 
-## 7. O que fica aberto
+## 7. A camada mais funda: os 833 commits inacessíveis
+
+Squash-merge não guarda o commit original: ele fica solto no repositório. `git fsck --unreachable` neste
+clone encontrou **833 commits inacessíveis** — o resíduo de todo merge feito com squash, mais commits de
+stash, rebases locais do dependabot e pontas de branches já apagadas. É a última superfície onde trabalho de
+agente poderia estar escondido, então ela foi auditada inteira.
+
+**Método.** Para cada commit com 1 parent (642; os outros 191 são commits de merge, que não acrescentam
+conteúdo próprio), `git diff --unified=0 <parent> <commit>`, coletando as linhas adicionadas com 18
+caracteres ou mais e testando pertinência contra o conjunto de linhas do arquivo correspondente na `main`,
+com normalização para não confundir renome de variável com perda. Depois, para cada caminho tocado,
+`git ls-tree` no commit contra a `main`, para separar "arquivo que está na main" de "arquivo que nunca
+chegou".
+
+**Resultado: 1.098 linhas adicionadas sem correspondência direta**, em: 474 de código-fonte, 269 de
+documento/contador, 166 de dependabot/lock, 49 de artefato gerado (`coverage/`), 48 de teste-espelho,
+11 de `schema-manifest.json` e o resto em workflows e configs.
+
+Nenhuma delas é trabalho perdido: todas são **formulações anteriores** do que a `main` tem hoje, porque a
+`main` continuou evoluindo depois daquele commit. As provas mais fortes, arquivo a arquivo:
+
+| Resíduo no commit inacessível | O que está na `main` hoje |
+| --- | --- |
+| `CotacaoMultiCanal.tsx` gravando `transportadora_nome` | `src/pages/CotacaoMultiCanal.tsx:165,337,424,452,475` gravam `transportadora_id` — evoluiu de nome para id |
+| `webhook-status/index.ts` chamando `validationErrorResponse(error, corsHeaders)` | `supabase/functions/webhook-status/index.ts:201` chama `validationErrorResponse(error, headers)` — mesmo comportamento, parâmetro renomeado |
+| `useAccuracyMetaCycle.ts` com laço `for` e `await` em série | `src/hooks/logistics/useAccuracyMetaCycle.ts:93,112,125` usa lote com `await Promise.all` — a versão paralela é a que ficou |
+| `ingest-biosync` importando a validação de `_shared/validate.ts` | `supabase/functions/ingest-biosync/index.ts:11` importa `parseBioSyncInput` de `./parse.ts` — validação extraída para o próprio diretório |
+| `nexus-webhook-receiver` respondendo `{ success: true, data: normalizacao.data }` | `supabase/functions/nexus-webhook-receiver/index.ts:192` — linha equivalente na `main` |
+| `PasswordStrengthIndicator` chamando a checagem de senha | `src/components/auth/PasswordStrengthIndicator.tsx:111` continua chamando por `supabase.functions.invoke` |
+
+**Arquivos inteiros que nunca chegaram à ponta da `main`: 134** (só `src/`, `supabase/`, `scripts/`,
+`tests/`, `public/` e `docs/contexto/`). Desses, **33 não têm homônimo** e foram resolvidos um a um:
+
+- 27 arquivos de teste (`src/test/*.test.ts`, `KPICard.test.tsx`, `FreightAudit.test.tsx`,
+  `celebrationSounds.test.ts`, `smoke.spec.ts`, `tests/load/cotacao.js`) foram apagados pelo commit-lote
+  `24af1e2b4` — **2026-05-15, limpeza legada do próprio projeto, antes de qualquer agente existir**. Os
+  equivalentes modernos estão na `main`: `tests/e2e/critical-paths.spec.ts`, `tests/e2e/dashboard.spec.ts`
+  e `tests/load/backend-stress.spec.ts`.
+- `kpi-benchmark-paralelo.spec.ts` foi substituído por `tests/contracts/kpi-benchmark-consulta-unica.spec.ts`
+  (etapa 220), que é justamente o teste da consulta única.
+- Os 8 arquivos de código fora de `src/` estão na tabela da seção 4.
+- Todos os `src/hooks/*.ts` "achatados" têm equivalente em subpasta de domínio (`src/hooks/<área>/`):
+  **0 órfãos**.
+- 58 caminhos reportados como ausentes eram artefatos gerados (`coverage/**`), que não são versionados.
+
+**Veredito da camada 5:** nada a restaurar. Nenhuma linha exclusiva de commit inacessível representa
+capacidade que a `main` não tenha hoje — e em todas as comparações acima o que ficou na `main` é a versão
+mais nova, não a mais antiga.
+
+## 8. O que fica aberto
 
 - **#477** — 4 índices redundantes em `entregas`/`coletas`; branch `claude/chore-drop-4-indices-redundantes-261125-1222`
   preservada, migration e rollback testados em banco descartável, nada aplicado em produção.
 - As 22 etapas `[~]` do plano continuam sendo decisão do dono, não trabalho de agente interrompido.
+- **`ESTADO_ATUAL.md` desatualizado sobre o `migrate-helper`** — as linhas 29, 144, 146 e 277 afirmam que a
+  function "está implantada e executando" em produção; hoje ela devolve 404, e a `health` no mesmo gateway
+  devolve 200, o que valida a sonda. Documento de estado, não de código.
+- **Texto da etapa 073 desatualizado** — `docs/qa/05-PROGRESSO.md:124` e a tabela em `:4643` descrevem
+  `ingest-biosync` "inventando batimento com `Math.random()` em `index.ts:43`", mas a `main` não tem nenhum
+  `Math.random()` no arquivo (151 linhas, validação por `parseBioSyncInput`): as etapas 148/149/199 já
+  tiraram isso. A decisão de manter ou remover a function precisa ser tomada com o texto atualizado.
