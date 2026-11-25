@@ -192,3 +192,64 @@ mais nova, não a mais antiga.
   `ingest-biosync` "inventando batimento com `Math.random()` em `index.ts:43`", mas a `main` não tem nenhum
   `Math.random()` no arquivo (151 linhas, validação por `parseBioSyncInput`): as etapas 148/149/199 já
   tiraram isso. A decisão de manter ou remover a function precisa ser tomada com o texto atualizado.
+
+## 9. Objetos órfãos do object DB (blobs e trees soltos)
+
+**Método.** `git fsck --dangling` separa dois resíduos diferentes: objetos *unreachable* (resto de squash e
+stash, cobertos pela seção 7) e objetos **soltos** (`dangling`), que nada referencia — sobra de `git add`
+seguido de reset, isto é, **snapshots de índice** (o que estava staged quando o agente parou). São 4 blobs e
+98 trees soltas. Reconstruí cada tree como `{caminho: blob}` e comparei com `git ls-tree -r origin/main`:
+1.795 caminhos, **45 que não existem na main hoje**.
+
+| O que é | Quantos | Situação |
+| --- | --- | --- |
+| `coverage/**` | 33 | artefato gerado, não versionado |
+| os 8 arquivos da seção 4 | 8 | já explicados |
+| `.env` | 1 | item 9.1 |
+| `.github/workflows/e2e.yml` | 1 | item 9.2 |
+| versão antiga de arquivo que existe na main | 2 | obsoleto (a main tem a versão mais nova) |
+
+Os 4 blobs soltos restantes (fora das trees) são artefatos: `prettify.css`, `coverage-final.json` e
+`public/quality-gate-report.json`.
+
+### 9.1 `.env` no histórico de um repositório público
+
+O blob `32feee7723` (460 B) contém `VITE_SUPABASE_PROJECT_ID`, `VITE_SUPABASE_URL`,
+`VITE_SUPABASE_PUBLISHABLE_KEY` e `VITE_MAPBOX_TOKEN`. Entrou em `852d0bdec` (31/08/2026, migração do Lovable
+para o Supabase) e foi destrackeado em `2aaab20b1` (#297, 23/11/2026, Onda 1 de segurança). Hoje o `.env` não
+está na árvore e o `.gitignore` já o cita — mas **o conteúdo continua no histórico**, e o repositório é
+público. Nenhum valor foi impresso nesta auditoria.
+
+O que isso significa, verificado:
+
+- **A publishable/anon key não é segredo** — é pública por desenho e vai no navegador; o risco dela é o que o
+  RLS permite (achados S-01 a S-08), não a exposição em si.
+- **O `VITE_MAPBOX_TOKEN` é dívida morta**: S-08 (`docs/qa/03-ACHADOS.md:231`) já registra que
+  `grep VITE_MAPBOX_TOKEN src/` não devolve nada e os mapas usam `maplibre-gl`, sem token. Restringir ou
+  revogar o token é ação no painel do Mapbox (dono) — segue aberto e não muda por causa do histórico.
+- **Credencial de teste não abre produção**: o `admin@nexus.ai` que estava fixo em
+  `tests/e2e/critical-paths.spec.ts` não existe em `auth.users` (7 contas no total), e a senha padrão
+  publicada em `scripts/seed-database.ts:35` **não** confere com o hash bcrypt do `admin@loggiflow.com.br`
+  de produção (comparação local por `crypt.crypt`, sem imprimir hash): o seed rodou com `SEED_PASSWORD`
+  própria. O spec já não carrega credencial (PR #498).
+
+Reescrever o histórico para apagar o blob não se recomenda: o repositório é público, o objeto pode já ter sido
+clonado e a reescrita quebra todos os SHA referenciados nas 482 PRs. A mitigação correta é rotacionar o que é
+segredo de verdade (Mapbox) e manter o resto, porque é público por desenho.
+
+### 9.2 `.github/workflows/e2e.yml`
+
+Quatro versões aparecem nos snapshots (`f00a52dc34`, `957f8512ba`, `5aaee01b6b` e `6cb86bc2c1`); a última foi
+removida de propósito na #223 ("remove e2e.yml morto"). Conteúdo: workflow manual (`workflow_dispatch`),
+`npm ci`, `npx playwright install --with-deps chromium` e `npm run test:e2e -- --project=chromium`; uma das
+versões usa `node-version: "22"`.
+
+**Obsoleto por decisão, não trabalho perdido.** As duas suítes existem na main e continuam fora da CI porque
+não há usuário semeado nem ambiente de teste — é exatamente isso que a etapa 283 trata. A parte da etapa que
+não dependia de ninguém está feita: `tests/e2e/README.md` (PR #498) documenta o que cada suíte exige, as
+credenciais e por que elas não estão nos 10 required checks. Recriar o workflow é Regra 8 e só faz sentido
+depois do usuário dedicado; a versão com Node 22 fica como insumo.
+
+**Veredito da camada 6:** nenhuma funcionalidade ficou perdida. Sobram um item de segurança (token do Mapbox,
+já aberto como S-08) e uma decisão de workflow já registrada — os dois dependem do dono e nenhum é resgate de
+código.
