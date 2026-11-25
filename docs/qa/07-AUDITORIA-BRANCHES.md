@@ -253,3 +253,29 @@ depois do usuário dedicado; a versão com Node 22 fica como insumo.
 **Veredito da camada 6:** nenhuma funcionalidade ficou perdida. Sobram um item de segurança (token do Mapbox,
 já aberto como S-08) e uma decisão de workflow já registrada — os dois dependem do dono e nenhum é resgate de
 código.
+
+## 10. Branches de automação (bots)
+
+As duas branches remotas que não são de agente nem de dependabot foram comparadas com a `main` antes de
+qualquer decisão sobre apagá-las.
+
+### 10.1 `automation/types-sync`
+
+Um commit (`d5e62a54d`, 25/11/2026, `chore(db): sincronizar artefatos com o banco [auto]`) que só toca
+`supabase/schema-manifest.json`. Prova de incorporação: `git diff origin/main origin/automation/types-sync`
+devolve **vazio** — o conteúdo da branch já está na `main`. É a branch de trabalho do workflow de tipos, que
+se recria sozinha quando o banco muda; não é trabalho de agente e não há nada a resgatar.
+
+### 10.2 `contexto`
+
+Histórico órfão (sem base comum com a `main`), um único commit reescrito a cada execução:
+`e283c1307 chore(contexto): 3 fonte(s) regerada(s) @ main a81ebc8 [skip ci]`. Carrega **589 arquivos** em
+`docs/contexto/` que a `main` não tem (a `main` só versiona `docs/contexto/regras/manual/`, 2 arquivos).
+
+Isso é **por desenho**, não perda: o `.github/workflows/contexto-ia.yml` da `main` documenta no cabeçalho
+"Onde fica: branch `contexto` (gerada, 1 commit — só o HEAD é consumido; nunca abra PR dela)". As últimas
+execuções estão verdes (25/11/2026 17:12 UTC, `schedule`, `success`) e o corpus é regenerável a partir das
+três fontes de verdade.
+
+**Não apagar nenhuma das duas.** A primeira é do bot e é idempotente; a segunda é o único lugar onde o corpus
+de contexto vive — apagá-la deixaria agentes sem a fonte até a próxima execução do workflow.
