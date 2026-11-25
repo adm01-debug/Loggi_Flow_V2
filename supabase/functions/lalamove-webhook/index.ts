@@ -8,6 +8,7 @@ import { verifyWebhookHmac } from "../_shared/webhookSignature.ts";
 import { requireString } from "../_shared/validate.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
 import { bodyHash, buildEventKey } from "../_shared/idempotency.ts";
+import { isTestModeRequest } from "../_shared/testMode.ts";
 
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -51,8 +52,8 @@ serve(async (req) => {
 
     const payload = await req.text();
     const signature = req.headers.get('x-lalamove-signature') || '';
-    const testModeAllowed = Deno.env.get('ALLOW_TEST_MODE') === 'true';
-    const isTestMode = testModeAllowed && req.headers.get('x-test-mode') === 'true';
+    // Etapa 011: producao recusa o bypass mesmo com ALLOW_TEST_MODE=true.
+    const isTestMode = isTestModeRequest(req);
 
     log.info('Received Lalamove webhook');
 

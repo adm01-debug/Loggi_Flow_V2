@@ -7,6 +7,7 @@ import { internalErrorResponse } from "../_shared/httpError.ts";
 import { verifyWebhookHmac } from "../_shared/webhookSignature.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { isTestModeRequest } from "../_shared/testMode.ts";
 
 // Map Rodonaves status codes to system entrega_status enum
 function mapRodonavesStatus(code: string): string | null {
@@ -61,9 +62,8 @@ serve(async (req: Request) => {
     // HMAC signature verification (fail-closed).
     // Test-mode bypass ONLY when ALLOW_TEST_MODE=true is set server-side —
     // clients cannot bypass by sending a header alone.
-    const testModeAllowed = Deno.env.get("ALLOW_TEST_MODE") === "true";
-    const isTestMode =
-      testModeAllowed && req.headers.get("x-test-mode") === "true";
+    // Etapa 011: producao recusa o bypass mesmo com ALLOW_TEST_MODE=true.
+    const isTestMode = isTestModeRequest(req);
     if (!isTestMode) {
       const signature = req.headers.get("x-rodonaves-signature") || "";
       if (
