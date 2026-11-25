@@ -1,15 +1,22 @@
 /* eslint-disable sonarjs/slow-regex */
 import { test, expect } from '@playwright/test';
 
+// Credenciais do usuario semeado, ver tests/e2e/README.md.
+const EMAIL = process.env.E2E_EMAIL ?? '';
+const SENHA = process.env.E2E_PASSWORD ?? '';
+
 test.describe('Nexus Core E2E - Critical Path Validation', () => {
   test('Complete login to dashboard and shipment creation flow', async ({ page }) => {
+    if (!EMAIL || !SENHA) {
+      throw new Error('defina E2E_EMAIL e E2E_PASSWORD - ver tests/e2e/README.md');
+    }
     await page.goto('/');
     
     // Auth Check
     const authForm = page.locator('form');
     if (await authForm.isVisible()) {
-      await page.fill('input[type="email"]', 'admin@nexus.ai');
-      await page.fill('input[type="password"]', 'NexusAlpha10/10!');
+      await page.fill('input[type="email"]', EMAIL);
+      await page.fill('input[type="password"]', SENHA);
       await page.click('button[type="submit"]');
     }
 
