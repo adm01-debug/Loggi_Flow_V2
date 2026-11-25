@@ -381,7 +381,7 @@
 - [~] **285** — Confirmar com o dono se `VITE_SENTRY_DSN` está configurado no Vercel — onda 8 — Média · **aguarda o dono**
 - [~] **286** — Provar que um erro de front chega ao Sentry — onda 8 — Média · **aguarda o dono**
 - [x] **287** — Verificar no banco ao vivo se `webhook_failures` e `cron_job_logs` existem — onda 8 — Média — **nenhuma das duas existe**
-- [~] **288** — Dar destino persistente à falha de webhook de entrada — onda 8 — Média · **aguarda o dono**
+- [~] **288** — Dar destino persistente à falha de webhook de entrada — onda 8 — Média · **aguarda o dono** ([#459](https://github.com/adm01-debug/Loggi_Flow_V2/pull/459) — migration + catch prontos, Regra 8)
 - [ ] **289** — Mostrar as falhas de webhook numa tela que já existe — onda 8 — Média
 - [~] **290** — Tornar visível a falha de cron, e decidir o destino das tabelas mortas — onda 8 — Média · **aguarda o dono**
 
@@ -4274,6 +4274,27 @@ casos), `scripts/ci/README.md` (seção nova), `package.json` (`validate:dedupe-
 **Decisão:** o gate **não** foi ligado a nenhum workflow (a etapa 142 proíbe mexer na CI e a escolha de
 required check é do dono); entra como `npm run validate:dedupe-keys`, mergeável sem alterar comportamento
 de CI. PR #439.
+
+## Registro - etapa 288: falha de webhook de entrada com destino persistente (2026-11-25)
+
+**Status:** implementada; PR aberta aguardando o dono (Regra 8 — DDL em produção).
+
+**Achado (H-14):** o `catch` do `carrier-webhook-receiver` só escrevia `log.error(...)` e devolvia 500. Log de edge function expira em poucos dias, então um webhook de entrada que falhasse não deixava rastro consultável.
+
+**Por que a tabela é nova:** `public.webhook_deliveries` tem `webhook_id uuid NOT NULL REFERENCES public.client_webhooks(id) ON DELETE CASCADE` (`supabase/migrations/20260317215104_154b5d22-37a6-4cc8-8919-e48967ba6ebd.sql:27`) e policies do webhook de saída do cliente. A etapa 287 confirmou que `webhook_failures` e `cron_job_logs` não existem (`to_regclass` = null).
+
+| Artefato | Conteúdo |
+| --- | --- |
+| `supabase/migrations/20261125093000_webhook_inbound_failures.sql` | tabela `public.webhook_inbound_failures` (`receiver`, `provider`, `event_id`, `response_status`, `error_message`, `created_at`), índice `created_at DESC`, RLS ligada, SELECT só admin, INSERT só `service_role`, `purge_webhook_inbound_failures(_keep_days)` SECURITY DEFINER |
+| `supabase/functions/carrier-webhook-receiver/index.ts` | `payload` declarado fora do `try`; o `catch` grava em try/catch próprio e mantém o `status: 500` |
+| `tests/contracts/carrier-webhook-entrada-persistente.spec.ts` | 7 testes de contrato |
+
+**LGPD:** nenhum corpo de webhook é gravado; a mensagem de erro passa pelo `redact` de `_shared/logger.ts` e vai truncada em 2000 caracteres.
+
+**Verificado:** `npx vitest run tests/contracts/` = 57 arquivos / 544 testes verdes. **Não verificado:** a linha real em produção (a migration ainda não foi aplicada).
+
+**Pendente do dono:** aprovar a [#459](https://github.com/adm01-debug/Loggi_Flow_V2/pull/459); depois do deploy, provocar uma falha controlada e confirmar 1 linha nova na tabela. A etapa 289 (tela) depende disto.
+
 
 ## Registro - correcao de status das etapas 018, 218, 266, 270 e 284 (2026-11-25)
 
