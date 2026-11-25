@@ -70,7 +70,8 @@ Fatos que já custaram retrabalho:
   lista de required checks: apagar um workflow trava todo merge até alguém editar a branch protection.
 - **`Deno Edge Function Smoke Tests` termina em `|| true`** (`ci-nexus.yml`): o passo é informativo, não
   gate. Não o cite como prova de que edge function foi testada.
-- **gitleaks precisa de `fetch-depth: 0`** e de `pull-requests: read` (repo privado) — os dois workflows de
+- **gitleaks precisa de `fetch-depth: 0`** e de `pull-requests: read` (o repo é publico, mas a permissão
+  explícita vale nos dois casos) — os dois workflows de
   security já fazem isso; copiar um job de security sem essas duas linhas dá falso verde.
 - **Allowlist do gitleaks (`.gitleaks.toml`) cobre só credencial pública por design**: anon key do Supabase
   (JWT com `role=anon`) e token `pk.` do Mapbox, em `.env`, `.env.example` e `tests/security/*.spec.ts`.
