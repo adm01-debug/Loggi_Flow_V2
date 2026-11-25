@@ -1,0 +1,8 @@
+{
+  "coletado_em": "2026-11-25",
+  "gerado_em": "2026-11-25T12:43:35.938Z",
+  "edges": 44,
+  "migrations_no_repo": 259,
+  "rotas_no_app": 61,
+  "paridade_com_o_banco": "nao medida aqui: exigiria SUPABASE_ACCESS_TOKEN (functions publicadas) e SUPABASE_DB_URL (migrations aplicadas)"
+}

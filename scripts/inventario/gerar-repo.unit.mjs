@@ -60,7 +60,7 @@ test('edges.json: total, linhas, segredos (index.ts + imports locais, sem teste)
   const r = montar(t);
   const saida = r.rodar();
   assert.equal(saida.status, 0, saida.stderr);
-  assert.match(saida.stdout, /^edges: 6 \| sem chamador no repo \(src\/migrations\/edges\): 3\n$/);
+  assert.match(saida.stdout, /^edges: 6 \| sem chamador no repo \(src\/migrations\/edges\): 3\n/);
   const inv = r.lerJson('edges.json');
   assert.equal(inv.total, 6);
   assert.ok(!Number.isNaN(Date.parse(inv.gerado_em)));
@@ -173,6 +173,34 @@ test('produtor lento no stdin: a lista chega inteira (antes: EAGAIN e exit 1)', 
   filho.stdin.end('coletas\n');
   assert.equal(await fim, 0, stderr);
   assert.deepEqual(Object.keys(r.lerJson('tabelas-uso.json').tabelas), ['coletas']);
+});
+
+test('contagens.json: edges, migrations e rotas com a data da coleta (etapa 257)', { skip: !temRg }, async (t) => {
+  await t.test('sem rotas.json o numero de rotas e null, nao zero', () => {
+    const r = montar(t);
+    const saida = r.rodar();
+    assert.equal(saida.status, 0);
+    assert.match(saida.stdout, /contagens: edges 6 \| migrations 1 \| rotas n\/d\n$/);
+    const c = r.lerJson('contagens.json');
+    assert.match(c.coletado_em, /^\d{4}-\d{2}-\d{2}$/);
+    assert.ok(!Number.isNaN(Date.parse(c.gerado_em)));
+    assert.equal(c.edges, 6);
+    assert.equal(c.migrations_no_repo, 1);
+    assert.equal(c.rotas_no_app, null);
+    assert.match(c.paridade_com_o_banco, /SUPABASE_ACCESS_TOKEN/);
+  });
+  await t.test('com rotas.json (gerar-rotas.mjs antes na CI) le resumo.urls', () => {
+    const r = montar(t);
+    fs.mkdirSync(path.join(r.raiz, 'inventario/estado'), { recursive: true });
+    fs.writeFileSync(path.join(r.raiz, 'inventario/estado/rotas.json'), '{ "resumo": { "urls": 61 } }\n');
+    assert.equal(r.rodar().status, 0);
+    assert.equal(r.lerJson('contagens.json').rotas_no_app, 61);
+  });
+  await t.test('sem supabase/migrations o repo continua valido (0, nao erro)', () => {
+    const r = montar(t, { omitir: ['supabase/migrations/'] });
+    assert.equal(r.rodar().status, 0);
+    assert.equal(r.lerJson('contagens.json').migrations_no_repo, 0);
+  });
 });
 
 test('sem ripgrep falha fechado: exit != 0, mensagem clara e nenhum edges.json gravado', (t) => {

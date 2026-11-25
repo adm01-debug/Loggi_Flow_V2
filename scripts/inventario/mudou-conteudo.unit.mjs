@@ -92,8 +92,8 @@ test('mudou: arquivo novo, apagado, igual e ausente dos dois lados', () => {
   assert.equal(mudou([], ler(antes), ler(depois)), false);
 });
 
-test('PADRAO: os tres arquivos que o workflow commita', () => {
-  assert.deepEqual(PADRAO, ['inventario/estado/banco.json', 'inventario/estado/rotas.json', 'inventario/estado/edges.json']);
+test('PADRAO: os arquivos que o workflow commita', () => {
+  assert.deepEqual(PADRAO, ['inventario/estado/banco.json', 'inventario/estado/rotas.json', 'inventario/estado/edges.json', 'inventario/estado/contagens.json']);
 });
 
 // ---------- CLI ----------
@@ -122,9 +122,24 @@ function repo(t, { commit = true, init = true } = {}) {
   escrever('inventario/estado/banco.json', `${JSON.stringify(BANCO, null, 2)}\n`);
   escrever('inventario/estado/rotas.json', `${JSON.stringify({ format_version: 1, resumo: { urls: 1 } }, null, 2)}\n`);
   escrever('inventario/estado/edges.json', `${JSON.stringify({ gerado_em: '2026-11-01T00:00:00.000Z', total: 1, edge_functions: { health: { linhas: 9 } } })}\n`);
+  escrever('inventario/estado/contagens.json', `${JSON.stringify({ coletado_em: '2026-11-01', gerado_em: '2026-11-01T00:00:00.000Z', edges: 1, migrations_no_repo: 259, rotas_no_app: 61, paridade_com_o_banco: 'nao medida' }, null, 2)}\n`);
   if (init && commit) { git('add', '-A'); git('commit', '-qm', 'base'); }
   return { raiz, git, escrever, rodar };
 }
+
+test('contagens.json (etapa 257): so a data da coleta muda -> false; numero novo -> true', { skip: !temGit }, (t) => {
+  const r = repo(t);
+  const rel = 'inventario/estado/contagens.json';
+  const ler = () => JSON.parse(fs.readFileSync(path.join(r.raiz, rel), 'utf8'));
+  const c = ler();
+  c.coletado_em = '2099-01-01';
+  c.gerado_em = '2099-01-01T00:00:00.000Z';
+  r.escrever(rel, `${JSON.stringify(c, null, 2)}\n`);
+  assert.equal(r.rodar().stdout, 'false');
+  c.migrations_no_repo += 1;
+  r.escrever(rel, `${JSON.stringify(c, null, 2)}\n`);
+  assert.equal(r.rodar().stdout, 'true');
+});
 
 test('CLI: sem mudanca imprime false; so carimbo, ordem de chaves, CRLF e telemetria tambem', { skip: !temGit }, (t) => {
   const r = repo(t);

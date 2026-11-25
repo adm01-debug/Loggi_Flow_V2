@@ -2,6 +2,7 @@
 // Inventario gerado do lado do repositorio (sem acesso ao banco):
 //  - edge functions: linhas do index.ts, segredos lidos (Deno.env.get no index.ts e nos arquivos locais que ele
 //    importa, _shared/ incluso) e quem as invoca (src, migrations, outras edges, e2e, CI)
+//  - contagens: edges, migrations do repo e rotas do App.tsx, com a data da coleta (etapa 257)
 //  - tabelas: para cada nome recebido em stdin (uma por linha), quantos .from('tabela') ha em src/ e supabase/functions/
 // Uso: node scripts/inventario/gerar-repo.mjs            -> escreve inventario/estado/edges.json
 //      node scripts/inventario/gerar-repo.mjs < tabelas.txt -> tambem escreve inventario/estado/tabelas-uso.json
@@ -93,6 +94,28 @@ for (const f of edges) {
 const semChamador = Object.entries(inventario).filter(([, v]) => v.sem_chamador).map(([k]) => k);
 writeFileSync(join(OUT, 'edges.json'), JSON.stringify({ gerado_em: new Date().toISOString(), total: edges.length, sem_chamador_no_repo: semChamador, edge_functions: inventario }) + '\n');
 console.log(`edges: ${edges.length} | sem chamador no repo (src/migrations/edges): ${semChamador.length}`);
+
+// Etapa 257: os numeros que `docs/prod-readiness.md` e o `AGENTS.md` citam, numa fonte so e datada.
+// `edges` e `migrations` sao do repositorio; a paridade com o banco (functions publicadas e migrations
+// aplicadas) exigiria SUPABASE_ACCESS_TOKEN/SUPABASE_DB_URL e por isso nao e medida aqui.
+const contarSql = (dir) => (existsSync(dir) ? readdirSync(dir).filter((n) => n.endsWith('.sql')).length : 0);
+let rotasNoApp = null;
+try {
+  rotasNoApp = JSON.parse(readFileSync(join(OUT, 'rotas.json'), 'utf8'))?.resumo?.urls ?? null;
+} catch {
+  rotasNoApp = null; // sem gerar-rotas.mjs antes: null, nao zero (zero seria uma medida falsa)
+}
+const coletadoEm = new Date();
+const migrationsNoRepo = contarSql(join(RAIZ, 'supabase/migrations'));
+writeFileSync(join(OUT, 'contagens.json'), `${JSON.stringify({
+  coletado_em: coletadoEm.toISOString().slice(0, 10),
+  gerado_em: coletadoEm.toISOString(),
+  edges: edges.length,
+  migrations_no_repo: migrationsNoRepo,
+  rotas_no_app: rotasNoApp,
+  paridade_com_o_banco: 'nao medida aqui: exigiria SUPABASE_ACCESS_TOKEN (functions publicadas) e SUPABASE_DB_URL (migrations aplicadas)',
+}, null, 2)}\n`);
+console.log(`contagens: edges ${edges.length} | migrations ${migrationsNoRepo} | rotas ${rotasNoApp ?? 'n/d'}`);
 
 // isatty(0), nao process.stdin.isTTY: tocar em process.stdin poe o pipe em modo nao-bloqueante e o
 // readFileSync(0) estoura EAGAIN quando o produtor ainda nao escreveu.

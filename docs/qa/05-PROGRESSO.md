@@ -342,7 +342,7 @@
 - [x] **254** — Propagar as correções de H-03 para `docs/agentes/github-ci.md` e `docs/agentes/deploy.md` — onda 8 — Média (Regra 8: merge aguarda o dono — PR #329)
 - [x] **255** — Fazer a CI conferir os fatos verificáveis que o `AGENTS.md` afirma — onda 8 — Média — **feito — `validate:agents-facts`: 10 required checks e 259 migrations conferidos contra o baseline e o disco, e todo workflow citado existe**
 - [x] **256** — `docs/prod-readiness.md`: corrigir as duas contagens de paridade que caducaram — onda 8 — Alta
-- [~] **257** — Fazer o inventário semanal recontar a paridade e datar o `prod-readiness` — onda 8 — Média · **aguarda o dono**
+- [x] **257** — Fazer o inventário semanal recontar a paridade e datar o `prod-readiness` — onda 8 — Média · **feito — `inventario/estado/contagens.json` datado + 118 testes de inventario**
 - [x] **258** — Rebaixar o enquadramento de "perfeição 10/10" nos dois documentos que o declaram — onda 8 — Média
 - [x] **259** — `docs/MELHORIAS.md`: corrigir o hook que nunca existiu e a contagem de edge functions — onda 8 — Média
 - [x] **260** — `docs/PLANO_MELHORIAS_2026.md`: corrigir a árvore de hooks que cita `useAnalyticsReal` — onda 8 — Baixa
@@ -3694,8 +3694,8 @@ Atualize ao fim de cada sessão de trabalho.
 
 |                         | Quantidade |
 | ----------------------- | ---------- |
-| Concluídas `[x]`        | 274         |
-| Aguardando o dono `[~]` | 26         |
+| Concluídas `[x]`        | 275         |
+| Aguardando o dono `[~]` | 25         |
 | Bloqueadas `[!]`        | 0          |
 | Não iniciadas `[ ]`     | 0          |
 | **Total**               | **300**    |
@@ -4779,3 +4779,25 @@ com o AGENTS.md; todo workflow citado existe`; `node --test scripts/ci/check-age
 **5 testes, 0 falhas** (inclui a prova negativa de 9 checks, 3 vs 5 migrations, workflow fantasma e frase
 removida); `check-claude-md-integrity.mjs` -> `exit=0`; `actionlint` -> `exit=0`; `npm run automation:test`
 -> **103 testes, 0 falhas**.
+
+### Registro - etapa 257 (2026-11-25)
+
+**257** - o inventario semanal recontava edge functions e rotas, mas nao os tres numeros que os documentos
+citam juntos, e nada dizia a data da coleta. `scripts/inventario/gerar-repo.mjs` agora escreve
+`inventario/estado/contagens.json` com `coletado_em`/`gerado_em`, `edges` (edges do repo),
+`migrations_no_repo` (`.sql` em `supabase/migrations/`) e `rotas_no_app` (o `resumo.urls` que o
+`gerar-rotas.mjs` ja calculava a partir de `src/App.tsx`); `mudou-conteudo.mjs` commita o arquivo e trata
+`coletado_em` como carimbo (mudar so a data nao abre PR); o workflow inclui o arquivo no `add-paths` e o
+corpo do PR do inventario passa a dizer a data da coleta.
+
+**Sem paridade inventada:** comparar com o banco (functions publicadas e migrations aplicadas) exigiria
+`SUPABASE_ACCESS_TOKEN`/`SUPABASE_DB_URL`, que este fluxo de repositorio nao tem; o campo
+`paridade_com_o_banco` declara essa dependencia em vez de publicar um numero falso. Sem `rotas.json`,
+`rotas_no_app` e `null` - nao `0`, que seria uma medida falsa.
+
+**Provas:** `node --test scripts/inventario/*.unit.mjs` -> **118 testes, 0 falhas** (1 pulado: o que exige
+Postgres de verdade; 3 casos novos na 257: sem `rotas.json` -> `null`, com `rotas.json` -> 61, sem
+`supabase/migrations` -> `0` e exit 0); `node scripts/inventario/gerar-repo.mjs < /dev/null` no repo real ->
+`coletado_em 2026-11-25`, `edges 44`, `migrations_no_repo 259`, `rotas_no_app 61` (bate com o `AGENTS.md`);
+`actionlint` no workflow -> `exit=0`; `npm run automation:test` -> **103 testes, 0 falhas**; gate do
+`mudou-conteudo` (carimbo + numero novo) verde.
