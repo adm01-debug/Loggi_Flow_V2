@@ -59,6 +59,11 @@ serve(async (req) => {
     return new Response("ok", { headers });
   }
 
+  // Etapa 288 (H-14): declarado fora do try para que o catch consiga identificar a
+  // origem da falha (provedor e id do evento) sem registrar o corpo do webhook - LGPD.
+  // deno-lint-ignore no-explicit-any
+  let payload: any;
+
   try {
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
@@ -91,7 +96,7 @@ serve(async (req) => {
       });
     }
 
-    const payload = JSON.parse(raw);
+    payload = JSON.parse(raw);
     log.info("Carrier Webhook received:", redact(payload));
 
     // Contract Validation
@@ -230,6 +235,33 @@ serve(async (req) => {
     );
   } catch (error: any) {
     log.error("[carrier-webhook-receiver] Error:", error.message);
+
+    // Etapa 288 (H-14): a falha passa a ter destino persistente em vez de virar so log.
+    // try/catch proprio: se a gravacao falhar, a resposta 500 original e preservada para
+    // a transportadora reenviar. Nada do corpo do webhook entra na tabela (LGPD).
+    try {
+      const failureClient = createClient(
+        Deno.env.get("SUPABASE_URL") ?? "",
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+        { auth: { persistSession: false } },
+      );
+      const origem = payload?.event_id ?? payload?.id;
+      await failureClient.from("webhook_inbound_failures").insert({
+        receiver: "carrier-webhook-receiver",
+        provider: typeof payload?.carrier_id === "string"
+          ? payload.carrier_id
+          : null,
+        event_id: typeof origem === "string" ? origem : null,
+        response_status: 500,
+        error_message: String(redact(error?.message ?? "unknown")).slice(0, 2000),
+      });
+    } catch (persistError) {
+      log.error(
+        "[carrier-webhook-receiver] Falha ao registrar webhook_inbound_failures:",
+        (persistError as Error).message,
+      );
+    }
+
     return new Response(JSON.stringify({ error: "Internal Server Error" }), {
       headers: { ...headers, "Content-Type": "application/json" },
       status: 500,
