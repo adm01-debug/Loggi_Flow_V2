@@ -108,7 +108,28 @@ perder trabalho". Duas observações que valem decisão:
   As de patch/minor (recharts 3.10→3.11, autoprefixer 10.6→10.7, react-resizable-panels, @tanstack/react-virtual)
   são seguras, mas continuam sendo tarefa de dependência, não deste resgate.
 
-## 6. O que fica aberto
+## 6. Inventário total de PRs (a prova final)
+
+Contagem fechada do repositório, `gh pr list --state all --limit 600`, em 2026-11-25:
+
+| Estado | Total | Composição |
+| --- | --- | --- |
+| Mergeadas | 422 | 346 de agente + 15 de bot de workflow + 1 de ferramenta |
+| Fechadas sem merge | 47 | **19 de agente** (todas na tabela da seção 3) + 28 do dependabot |
+| Abertas | 13 | **1 de agente (#477)** + 12 do dependabot |
+
+Fechando a conta: 482 PRs, e **não existe nenhuma PR de agente fora de uma destas três situações** —
+mergeada, auditada na seção 3, ou aberta. As 19 fechadas sem merge não são uma amostra, são o conjunto
+inteiro, conferido um a um.
+
+Duas correções em relação à primeira passada:
+
+- A #181 (realtime com topic único) está **mergeada**, não fechada. Ela entrou na lista de heads
+  baixados porque a branch `claude/fix-realtime-topics-duplicados-261118-0935` já tinha sido apagada;
+  o conteúdo está na `main`.
+- Por isso o total de fechadas sem merge é 47, não 48.
+
+## 7. O que fica aberto
 
 - **#477** — 4 índices redundantes em `entregas`/`coletas`; branch `claude/chore-drop-4-indices-redundantes-261125-1222`
   preservada, migration e rollback testados em banco descartável, nada aplicado em produção.
