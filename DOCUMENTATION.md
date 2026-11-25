@@ -259,7 +259,7 @@ const map = new mapboxgl.Map({
 | **Push Notifications**      | Web Push API           | `src/hooks/notifications/usePushNotifications.tsx`, `src/components/notifications/❌ PushNotificationSettings.tsx nao existe (verificado em 2026-11-23)` | Notificações do navegador      |
 | **Notificações de SLA**     | Supabase + React Query | `src/hooks/logistics/useSLANotifications.tsx`, `src/components/notifications/SLANotificationSettings.tsx`                                                | Alertas de prazos              |
 | **Notificações de Atraso**  | Supabase + React Query | `src/hooks/useDelayNotifications.tsx (nao localizado em 2026-11-23)`                                                                                     | Alertas preditivos             |
-| **Toast Notifications**     | Sonner                 | `src/components/ui/sonner.tsx`, `src/lib/toast.ts`, `src/lib/premiumToast.tsx`                                                                           | Feedback visual instantâneo    |
+| **Toast Notifications**     | Sonner                 | `src/components/ui/sonner.tsx`, `src/hooks/ui/use-toast.ts`                                                                           | Feedback visual instantâneo    |
 | **Alertas Inteligentes**    | Supabase + React Query | `src/hooks/logistics/useSmartAlerts.tsx`, `src/components/dashboard/AlertsPanel.tsx`                                                                     | Alertas baseados em regras     |
 
 ### Tipos de Notificação
@@ -338,7 +338,7 @@ serve(async (req) => {
 | **Design System**          | Tailwind CSS + Shadcn/UI    | `src/index.css`, `tailwind.config.ts`, `src/components/ui/`                                                        | Tokens CSS customizados      |
 | **Animações**              | Framer Motion               | `src/components/ui/micro-interactions.tsx`                                                                         | Transições suaves            |
 | **Dark Mode**              | next-themes                 | `src/components/layout/Header.tsx`                                                                                 | Toggle claro/escuro          |
-| **Tabelas de Dados**       | Shadcn/UI Table             | `src/components/common/DataTable.tsx`                                                                              | Tabela com sorting/filtering |
+| **Tabelas de Dados**       | Shadcn/UI Table             | `src/components/common/ResponsiveTable.tsx`                                                                              | Tabela com sorting/filtering |
 | **Paginação**              | React + Supabase            | `src/hooks/common/usePagination.ts`, `src/components/common/Pagination.tsx`                                        | Navegação de páginas         |
 | **Filtros Dinâmicos**      | React + Supabase            | `src/hooks/common/useFilters.ts`, `src/components/common/FilterBar.tsx`                                            | Filtros multi-campo          |
 | **Ordenação Multi-coluna** | React + Supabase            | `src/hooks/common/useSorting.ts`                                                                                   | Sort por múltiplas colunas   |
@@ -346,12 +346,12 @@ serve(async (req) => {
 | **Date Range Picker**      | react-day-picker + date-fns | `src/components/common/DateRangePicker.tsx`                                                                        | Seletor de período           |
 | **Upload de Imagens**      | Supabase Storage            | `src/hooks/data/useImageUpload.tsx`, `src/components/common/ImageUploader.tsx`                                     | Upload com preview           |
 | **Comentários**            | Supabase Realtime           | `src/hooks/common/useComments.tsx`, `src/components/common/CommentSection.tsx`                                     | Sistema de comentários       |
-| **Menções @usuário**       | Supabase + React            | `src/hooks/useMentions.tsx (nao localizado em 2026-11-23)`, `src/components/common/CommentSectionWithMentions.tsx` | Autocomplete de usuários     |
+| **Menções @usuário**       | Supabase + React            | `src/hooks/useMentions.tsx (nao localizado em 2026-11-23)`, `src/components/common/CommentSection.tsx` | Autocomplete de usuários     |
 | **Timeline/Histórico**     | Supabase + React Query      | `src/hooks/security/useEntityHistory.tsx`, `src/components/common/Timeline.tsx`                                    | Histórico de alterações      |
 | **Skeleton Loading**       | Shadcn/UI                   | `src/components/ui/skeleton.tsx`, `src/components/ui/skeletons.tsx`                                                | Placeholders animados        |
 | **Command Palette (⌘K)**   | cmdk                        | `src/components/common/SearchCommand.tsx`                                                                          | Busca global rápida          |
 | **Atalhos de Teclado**     | React Hooks                 | `src/hooks/common/useKeyboardShortcuts.ts`, `src/components/common/KeyboardShortcutsHelp.tsx`                      | Hotkeys customizáveis        |
-| **Tooltips**               | Radix UI                    | `src/components/common/TooltipWrapper.tsx`, `src/components/ui/tooltip.tsx`                                        | Dicas contextuais            |
+| **Tooltips**               | Radix UI                    | `src/components/onboarding/OnboardingTooltip.tsx`, `src/components/ui/tooltip.tsx`                                        | Dicas contextuais            |
 | **Dialogs/Modals**         | Radix UI                    | `src/components/ui/dialog.tsx`, `src/components/common/ConfirmDialog.tsx`                                          | Modais acessíveis            |
 | **Sheets (Side Panel)**    | Radix UI + Vaul             | `src/components/ui/sheet.tsx`, `src/components/common/DetailSheet.tsx`                                             | Painéis laterais             |
 | **Sidebar Responsiva**     | Radix UI                    | `src/components/ui/sidebar.tsx`, `src/components/layout/AppSidebar.tsx`                                            | Menu colapsável              |
@@ -443,8 +443,8 @@ export function useFilters<T extends Record<string, any>>(initialFilters: T) {
 | ------------------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------ | ------------------------ |
 | **Regras de Negócio (Se X, então Y)** | Supabase + React Query  | `src/hooks/logistics/useBusinessRules.tsx`, `src/components/automation/BusinessRulesManager.tsx`       | Automação configurável   |
 | **Integração Bitrix24**               | Supabase Edge Functions | `supabase/functions/bitrix24-integration/`, `src/hooks/useBitrix24.tsx (nao localizado em 2026-11-23)` | CRM sync                 |
-| **Integração n8n**                    | Supabase Edge Functions | `supabase/functions/n8n-integration/`, `src/hooks/useN8n.tsx (nao localizado em 2026-11-23)`           | Workflows externos       |
-| **API Pública**                       | Supabase Edge Functions | `supabase/functions/public-api/`                                                                       | Endpoints para terceiros |
+| **Integração n8n**                    | Supabase Edge Functions | `docs/pendencias/01-06-n8n-integration.md` (function nao existe), `src/hooks/useN8n.tsx (nao localizado em 2026-11-23)`           | Workflows externos       |
+| **API Pública**                       | Supabase Edge Functions | `docs/pendencias/01-07-public-api.md` (function nao existe)                                                                       | Endpoints para terceiros |
 | **Webhooks Lalamove**                 | Supabase Edge Functions | `supabase/functions/lalamove-webhook/`                                                                 | Receber eventos externos |
 
 ### Estrutura de Regras de Negócio

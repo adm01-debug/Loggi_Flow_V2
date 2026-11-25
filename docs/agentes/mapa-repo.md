@@ -24,7 +24,7 @@ Ler quando precisar saber onde fica algo antes de buscar por texto.
 | `src/features/` | fatias novas no padrão do ADR 0008: `analytics/`, `db-observability/`, `incidents/`, `logistics/`, `preferences/` |
 | `src/services/` | `api/` (authService, logisticsService, storageService), `base/BaseService.ts`, `resilience/CircuitBreaker.ts` |
 | `src/lib/` | utilitários e contratos: `schemas/` (Zod), `queryKeys.ts`/`queryConfig.ts` (TanStack Query), `formatters.ts`, importadores CSV/Excel, `predictions/`, `rodonaves/` |
-| `src/integrations/` | `supabase/client.ts` + `supabase/types.ts` (**gerado — não editar à mão**), `lovable/`, `shared/` |
+| `src/integrations/` | `src/integrations/supabase/client.ts` + `src/integrations/supabase/types.ts` (**gerado — não editar à mão**), `lovable/`, `shared/` |
 | `supabase/functions/` | **43 edge functions deployáveis** + `_shared/` (CORS em `cors.ts`, auth em `auth.ts`, `webhookSignature.ts`, `rateLimiter.ts`, `circuitBreaker.ts`, `idempotency.ts`, `logger.ts`, `crypto.ts`, `safeFetch.ts`, `schemas/`) |
 | `supabase/migrations/` | 244 arquivos `.sql` — **histórico**, não estado; o estado é o banco ao vivo |
 | `supabase/config.toml` | `project_id` oficial e quais functions rodam com `verify_jwt = false` (auth no código) |
@@ -63,7 +63,7 @@ arquivo que não existe. Não use como referência; se mexer em config de teste,
 Automação nova vive em `scripts/<nome>/`, um subdiretório por automação, cada um com `README.md` dizendo o
 que faz, como rodar e que secrets usa. Os gates antigos (`validate-*.mjs`, `audit-gate.mjs`,
 `check-warning-budget.mjs`) estão soltos na raiz de `scripts/` por histórico — não adicione mais nenhum lá.
-Não use `supabase/scripts` (o CLI do Supabase é dono de `supabase/`) nem `src/scripts` (entra no bundle).
+`supabase/scripts` e `src/scripts` nao existe hoje e nao devem ser criados: o CLI do Supabase e dono de `supabase/`, e `src/scripts` entraria no bundle.
 **Leia o README da automação antes de alterar.**
 
 ## Comandos
