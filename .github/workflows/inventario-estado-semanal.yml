@@ -77,6 +77,8 @@ jobs:
         run: |
           valor="$(node scripts/inventario/mudou-conteudo.mjs)"
           echo "valor=$valor" >> "$GITHUB_OUTPUT"
+          # Etapa 257: o corpo do PR diz a data da coleta.
+          echo "coleta=$(jq -r .coletado_em inventario/estado/contagens.json 2>/dev/null || date -u +%F)" >> "$GITHUB_OUTPUT"
           if [ "$valor" != "true" ]; then
             echo "Inventário sem mudança de conteúdo — nenhum PR a abrir."
           fi
@@ -100,11 +102,13 @@ jobs:
 
             - main de origem: `${{ github.sha }}`
             - run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            - coleta: ${{ steps.mudou.outputs.coleta }}
           labels: inventario
           add-paths: |
             inventario/estado/banco.json
             inventario/estado/rotas.json
             inventario/estado/edges.json
+            inventario/estado/contagens.json
 
       - name: Destravar os checks do PR do inventário
         if: steps.pull-request.outputs.pull-request-number != ''

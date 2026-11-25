@@ -16,8 +16,9 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 
-export const PADRAO = ['inventario/estado/banco.json', 'inventario/estado/rotas.json', 'inventario/estado/edges.json'];
-const CARIMBOS = new Set(['medido_em', 'gerado_em']);
+export const PADRAO = ['inventario/estado/banco.json', 'inventario/estado/rotas.json', 'inventario/estado/edges.json', 'inventario/estado/contagens.json'];
+// `coletado_em` (etapa 257) e a data da coleta: muda todo dia, sozinha, e nao e conteudo novo.
+const CARIMBOS = new Set(['medido_em', 'gerado_em', 'coletado_em']);
 // Telemetria viva do cron/WhatsApp: muda quase toda semana so pela janela rolante de 7 dias, sem
 // mudanca estrutural nenhuma. Fora desses nomes, nada muda: a lista de alertas, tabelas_orfas e o
 // resto de `banco.json`/`rotas.json` continuam comparados normalmente.
