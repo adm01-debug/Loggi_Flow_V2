@@ -7,10 +7,9 @@ const SENHA = process.env.E2E_PASSWORD ?? '';
 
 test.describe('Nexus Core E2E - Critical Path Validation', () => {
   test('Complete login to dashboard and shipment creation flow', async ({ page }) => {
-    // O cenario so autentica com usuario semeado (tests/e2e/README.md); sem as variaveis ele
-    // fica ignorado de proposito em vez de falhar no login.
-    // eslint-disable-next-line sonarjs/no-skipped-tests -- depende de semeadura em producao, nao de codigo
-    test.skip(!EMAIL || !SENHA, 'defina E2E_EMAIL e E2E_PASSWORD - ver tests/e2e/README.md');
+    if (!EMAIL || !SENHA) {
+      throw new Error('defina E2E_EMAIL e E2E_PASSWORD - ver tests/e2e/README.md');
+    }
     await page.goto('/');
     
     // Auth Check

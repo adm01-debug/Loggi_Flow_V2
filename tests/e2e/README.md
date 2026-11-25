@@ -23,7 +23,8 @@ também em `firefox`, `webkit` e `mobile-chrome`, e gera relatório HTML.
 ## Credenciais
 
 O cenário de login usa um **usuário semeado**. As credenciais vêm de variável de ambiente;
-sem elas o cenário é **pulado** com mensagem explícita:
+sem elas o cenário falha de imediato com mensagem explícita — ele não tenta mais autenticar
+com uma conta inventada:
 
 ```bash
 E2E_EMAIL=... E2E_PASSWORD=... npm run test:e2e -- --project=chromium
