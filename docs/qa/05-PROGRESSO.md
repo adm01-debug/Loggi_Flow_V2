@@ -46,7 +46,7 @@
 - [x] **015** — Tirar o `.env` do controle de versão, sem reescrever histórico — onda 1 — Alta
 - [~] **016** — Corrigir o `AGENTS.md` e o comentário da CI que afirmam que o repositório é privado — onda 1 — Alta · **aguarda o dono**
 - [~] **017** — Levar ao dono a decisão sobre a visibilidade do repositório — onda 1 — Alta · **aguarda o dono**
-- [~] **018** — Transformar "não commite `.env`" em teste automático — onda 1 — Média · **PR #438 aberta; aguarda o dono (acrescenta gate à CI)**
+- [x] **018** — Transformar "não commite `.env`" em teste automático — onda 1 — Média · **feito — gate `scripts/ci/check-env-not-tracked.mjs` ligado em `ci.yml`; PR #438 mergeada em `7097e7ac`**
 - [~] **019** — Mapbox: confirmar a restrição do token e remover a variável que ninguém mais usa — onda 1 — Média · **aguarda o dono**
 
 ### Onda 0
@@ -296,7 +296,7 @@
 - [x] **215** — `Notificacoes.tsx`: levar os filtros e a busca para o servidor — onda 6 — Alta
 - [x] **216** — `Notificacoes.tsx`: o tempo real deixa de rebaixar a lista inteira a cada aviso — onda 6 — Alta
 - [x] **217** — `useAccuracyMetaCycle`: uma única consulta a `notifications` para todas as linhas — onda 6 — Média
-- [~] **218** — `count_prediction_breach_days`: variante que responde todas as transportadoras numa chamada — onda 6 — Média · **PR #433 aberta; cria função em produção, aguarda o dono**
+- [x] **218** — `count_prediction_breach_days`: variante que responde todas as transportadoras numa chamada — onda 6 — Média · **feito — `count_prediction_breach_days_bulk` presente no `schema-manifest.json` do banco; PR #433 mergeada em `0f327c40`**
 - [x] **219** — `useKPIBenchmark`: tirar os `await` de dentro do laço — onda 6 — Média
 - [x] **220** — `useKPIBenchmark`: uma consulta por tabela cobrindo todos os períodos — onda 6 — Média
 - [x] **221** — `useExecutiveMetrics`: mesma consolidação de 18 consultas para 3 — onda 6 — Baixa
@@ -353,7 +353,7 @@
 - [~] **263** — Pedir ao dono o secret `SUPABASE_DB_URL`, sem o qual a fonte de contexto do banco nunca é gerada — onda 8 — Alta · **aguarda o dono**
 - [x] **264** — Rodar o produtor do contexto de banco e confirmar que `docs/contexto/supabase/` foi publicado — onda 8 — Alta · **553 arquivos publicados**
 - [~] **265** — Dizer ao agente o que fazer quando a fonte do banco não existir — onda 8 — Alta · **plano B escrito nos 3 arquivos; altera protocolo, aguarda o dono**
-- [~] **266** — Fazer a ausência do snapshot do banco parar de sair verde em silêncio — onda 8 — Média · **PR #441 aberta; aguarda o dono (mexe em workflow)**
+- [x] **266** — Fazer a ausência do snapshot do banco parar de sair verde em silêncio — onda 8 — Média · **feito — `contexto-ia.yml` publica a causa da ausência do snapshot; PR #441 mergeada em `26f0a4a1`**
 
 ### Onda 0
 
@@ -363,7 +363,7 @@
 
 ### Onda 8
 
-- [~] **270** — Remover as três entradas obsoletas da allowlist de vulnerabilidades — onda 8 — Baixa · **PR #436 aberta; aguarda o dono** (altera gate de segurança da CI)
+- [x] **270** — Remover as três entradas obsoletas da allowlist de vulnerabilidades — onda 8 — Baixa · **feito — `ALLOWLIST` vazia em `scripts/audit-gate.mjs`; PR #436 mergeada em `c4d2390c`** (altera gate de segurança da CI)
 - [x] **271** — Remover o arquivo `x` vazio versionado na raiz — onda 8 — Baixa
 - [~] **272** — Decidir com o dono o destino de `bun.lock` e `bun.lockb` — onda 8 — Baixa · **aguarda o dono**
 - [~] **273** — Barrar arquivo acidental na raiz antes do merge — onda 8 — Baixa · **aguarda o dono**
@@ -377,7 +377,7 @@
 - [x] **281** — Teste do caminho de criar coleta — onda 8 — Alta
 - [x] **282** — Teste do caminho de mover entrega de status — onda 8 — Alta
 - [~] **283** — Resolver o usuário semeado do `tests/e2e/` e dizer por que ele não roda na CI — onda 8 — Média · **aguarda o dono**
-- [~] **284** — Subir os pisos de cobertura para travar o que as etapas 275-282 conquistaram — onda 8 — Média · **PR #442 aberta; aguarda o dono** (altera limiar de gate da CI)
+- [x] **284** — Subir os pisos de cobertura para travar o que as etapas 275-282 conquistaram — onda 8 — Média · **feito — pisos 77/73/68/74 em `vitest.config.ts`; PR #442 mergeada em `fe4f9861`** (altera limiar de gate da CI)
 - [~] **285** — Confirmar com o dono se `VITE_SENTRY_DSN` está configurado no Vercel — onda 8 — Média · **aguarda o dono**
 - [~] **286** — Provar que um erro de front chega ao Sentry — onda 8 — Média · **aguarda o dono**
 - [x] **287** — Verificar no banco ao vivo se `webhook_failures` e `cron_job_logs` existem — onda 8 — Média — **nenhuma das duas existe**
@@ -3696,15 +3696,15 @@ Atualize ao fim de cada sessão de trabalho.
 
 |                         | Quantidade |
 | ----------------------- | ---------- |
-| Concluídas `[x]`        | 255         |
-| Aguardando o dono `[~]` | 44         |
+| Concluídas `[x]`        | 260         |
+| Aguardando o dono `[~]` | 39         |
 | Bloqueadas `[!]`        | 0          |
 | Não iniciadas `[ ]`     | 1          |
 | **Total**               | **300**    |
 
-**Última etapa trabalhada:** 142 · **Data:** 2026-11-25 · **Próxima etapa independente:** 018 (teste automático de `.env` na CI, PR #438 aberta) e 266 (snapshot do banco sem saída verde em silêncio)
-automático da política de exclusão lógica; a 057 já entrou). A **027** (`logistica_reversa.codigo_rastreio_reverso`
-sem `UNIQUE`) segue como DDL dependente do dono, e a **#428** espera o ok para os três `DROP INDEX`.
+**Última etapa trabalhada:** 142 · **Data:** 2026-11-25 · **Próxima etapa independente:** nenhuma — as cinco etapas de gate/doc da onda 8 (018, 218, 266, 270, 284) entraram na `main`; a única nao iniciada de verdade e a **289**, bloqueada pela **288**.
+A **027** (`logistica_reversa.codigo_rastreio_reverso`
+sem `UNIQUE`) segue como DDL dependente do dono. A **#428** entrou: os três `DROP INDEX` ja estao aplicados no banco (conferido no `schema-manifest.json`).
 
 ### Registro - etapas 068-096 (2026-11-23)
 
@@ -3849,6 +3849,11 @@ Travessia de 001 a 300 contra este arquivo: **219 concluidas**, **61 parciais**,
 (219 + 61 + 20 = 300; nenhuma etapa sem marca). Achado por achado, o estado final esta em `03-ACHADOS.md`
 (35 resolvidos / 15 parciais / 15 abertos).
 
+> **Atualizacao 2026-11-25:** as etapas 018, 218, 266, 270 e 284 sairam deste quadro - as PRs #438, #433,
+> #441, #436 e #442 ja estao na `main` (provas na secao "Registro - correcao de status das etapas 018, 218,
+> 266, 270 e 284 (2026-11-25)"). O retrato abaixo e de 2026-11-24, `main` em `c7fc18ae`; o resumo corrente
+> e o da secao "Resumo do andamento". A tabela de PRs abertas deste bloco tambem foi atualizada para 0.
+
 ### Esperando o dono (61 etapas `[~]`)
 
 | Assunto                                                      | Etapas                                                                                                                              | O que trava                                                                   |
@@ -3863,22 +3868,21 @@ Travessia de 001 a 300 contra este arquivo: **219 concluidas**, **61 parciais**,
 023, 026, 230, 231, 232, 233, 235, 236, 237, 238, 239, 264, 287 - todas exigem consulta ao banco ao vivo para
 decidir (RLS real, unicidade, uso de indice, existencia de tabela). Nenhuma e codigo pronto esperando merge.
 
-### Nao executada (7)
+### Nao executada (6)
 
 - **057, 061** - dependem da decisao de 056 e 060 (exclusao logica de `fretes_internos` e o registro unico de
   SQL avulso).
-- **218** - a variante da RPC so faz sentido depois de decidir o destino da `reconcile_pending_freights` (070).
 - **264, 265** - bloqueadas pelo secret `SUPABASE_DB_URL` (263).
 - **275** - base de teste de hook e de tela: a unica etapa de codigo que ainda nao comecou.
 - **277** - teste do `count` fora da tela: a versao de tela esta coberta desde a 282, falta a de hook.
 - **289, 296** - mostrar as falhas de webhook numa tela e regerar a branch `contexto`; as duas dependem das
   tabelas do banco que ninguem conseguiu confirmar (287) e do snapshot (263).
 
-### PRs abertas (2, nenhuma mergeavel sem voce)
+### PRs abertas (0) - nenhuma PR pendente em 2026-11-25
 
-| PR                                                    | Assunto                                                              | Por que espera                                    |
-| ----------------------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------- |
-| [#398](https://github.com/adm01-debug/Loggi_Flow_V2/pull/398) | guard de CI para consulta de listagem sem teto (etapa 211)           | mexe em workflow (regra 8)                        |
+A #398 (etapa 211) foi mergeada em `3a89bfd0` e a #340 (etapa 060) em `171f858a`; a tabela que ficava aqui
+ficou vazia (as duas PRs deste bloco eram as unicas que restavam). O quadro corrente de PRs do plano so
+existe no GitHub - este arquivo registra o resultado, nao a fila.
 
 ---
 
@@ -4232,6 +4236,30 @@ casos), `scripts/ci/README.md` (seção nova), `package.json` (`validate:dedupe-
 **Decisão:** o gate **não** foi ligado a nenhum workflow (a etapa 142 proíbe mexer na CI e a escolha de
 required check é do dono); entra como `npm run validate:dedupe-keys`, mergeável sem alterar comportamento
 de CI. PR #439.
+
+## Registro - correcao de status das etapas 018, 218, 266, 270 e 284 (2026-11-25)
+
+Cinco etapas ficaram com a linha de status `[~] aguarda o dono` depois de mergeadas - a mesma causa da 060:
+o merge entrou e a marca do indice ficou para tras. Nenhuma tinha trabalho pendente; o que "aguardava o dono"
+era a aprovacao da PR, que ja tinha sido dada em 2026-11-24.
+
+| Etapa | PR                                                    | Merge (squash) | Prova de que esta integrada                                                       |
+| ----- | ----------------------------------------------------- | -------------- | --------------------------------------------------------------------------------- |
+| 018   | [#438](https://github.com/adm01-debug/Loggi_Flow_V2/pull/438) | `7097e7ac`     | `.github/workflows/ci.yml:30` chama `node scripts/ci/check-env-not-tracked.mjs`   |
+| 218   | [#433](https://github.com/adm01-debug/Loggi_Flow_V2/pull/433) | `0f327c40`     | `count_prediction_breach_days_bulk(_pairs jsonb)` esta no `schema-manifest.json`  |
+| 266   | [#441](https://github.com/adm01-debug/Loggi_Flow_V2/pull/441) | `26f0a4a1`     | `.github/workflows/contexto-ia.yml` grava o `README.md` com causa e data do vazio |
+| 270   | [#436](https://github.com/adm01-debug/Loggi_Flow_V2/pull/436) | `c4d2390c`     | `scripts/audit-gate.mjs:23` tem `const ALLOWLIST = new Set([])`                   |
+| 284   | [#442](https://github.com/adm01-debug/Loggi_Flow_V2/pull/442) | `fe4f9861`     | `vitest.config.ts` com os pisos 77/73/68/74 e o comentario de revisao             |
+
+A variante antiga `count_prediction_breach_days(_target, _carrier)` fica no banco de proposito:
+`src/hooks/logistics/useAccuracyMetaCycle.ts:115` e `src/hooks/logistics/usePredictionAccuracySettings.ts:117`
+seguem chamando a versao de uma transportadora por vez. A em lote e o caminho novo, nao a unica porta -
+remover a antiga quebraria as duas telas.
+
+Corrigido tambem neste commit: tabela de PRs abertas de "O que sobrou" (2 -> 0, #398 e #340 ja mergeadas),
+bullet da 218 na lista de nao executadas e a linha de "proxima etapa independente" do resumo. Contagem do
+resumo recalculada pelo padrao `- [x|~|!| ] **NNN**` sobre as 300 etapas: **260 `[x]` / 39 `[~]` / 0 `[!]` /
+1 `[ ]`** (a unica nao iniciada de verdade e a 289, bloqueada pela 288).
 
 ## Registro - correcao de contagem e status da 060 (2026-11-25)
 
