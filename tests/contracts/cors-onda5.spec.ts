@@ -20,7 +20,7 @@ const FUNCOES: Record<string, number> = {
   "check-password-breach": 5,
   "bitrix24-integration": 18,
   "execute-protocol": 5,
-  "ingest-biosync": 4,
+  "ingest-biosync": 5, // guard de papel (etapa 073) acrescentou 1 resposta
   "ocr-receipt-processor": 4,
   "webhook-status": 5,
   "normalize-freight-response": 4,
