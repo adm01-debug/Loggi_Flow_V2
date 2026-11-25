@@ -381,8 +381,8 @@
 - [~] **285** — Confirmar com o dono se `VITE_SENTRY_DSN` está configurado no Vercel — onda 8 — Média · **aguarda o dono**
 - [~] **286** — Provar que um erro de front chega ao Sentry — onda 8 — Média · **aguarda o dono**
 - [x] **287** — Verificar no banco ao vivo se `webhook_failures` e `cron_job_logs` existem — onda 8 — Média — **nenhuma das duas existe**
-- [~] **288** — Dar destino persistente à falha de webhook de entrada — onda 8 — Média · **aguarda o dono** ([#459](https://github.com/adm01-debug/Loggi_Flow_V2/pull/459) — migration + catch prontos, Regra 8)
-- [ ] **289** — Mostrar as falhas de webhook numa tela que já existe — onda 8 — Média
+- [x] **288** — Dar destino persistente à falha de webhook de entrada · onda 8 · Média — **aplicada em produção** (`20261125093000_webhook_inbound_failures.sql`, runs `45603914030`/`45604413739`; [#459](https://github.com/adm01-debug/Loggi_Flow_V2/pull/459) + [#462](https://github.com/adm01-debug/Loggi_Flow_V2/pull/462))
+- [x] **289** — Mostrar as falhas de webhook numa tela que já existe · onda 8 · Média — **implementada** (aba "Falhas de entrada" em `/webhooks`, `useClientWebhooks` com `limit(50)`, estados de carregando/erro/vazio)
 - [~] **290** — Tornar visível a falha de cron, e decidir o destino das tabelas mortas — onda 8 — Média · **aguarda o dono**
 
 ### Onda 7
@@ -3696,13 +3696,13 @@ Atualize ao fim de cada sessão de trabalho.
 
 |                         | Quantidade |
 | ----------------------- | ---------- |
-| Concluídas `[x]`        | 260         |
-| Aguardando o dono `[~]` | 39         |
+| Concluídas `[x]`        | 262         |
+| Aguardando o dono `[~]` | 38         |
 | Bloqueadas `[!]`        | 0          |
-| Não iniciadas `[ ]`     | 1          |
+| Não iniciadas `[ ]`     | 0          |
 | **Total**               | **300**    |
 
-**Última etapa trabalhada:** 142 · **Data:** 2026-11-25 · **Próxima etapa independente:** nenhuma — as cinco etapas de gate/doc da onda 8 (018, 218, 266, 270, 284) entraram na `main`; a única nao iniciada de verdade e a **289**, bloqueada pela **288**.
+**Última etapa trabalhada:** 289 · **Data:** 2026-11-25 · **Próxima etapa independente:** nenhuma — as 300 etapas estão marcadas `[x]` ou `[~]`; a 290 continua aguardando o dono (Regra 8) e a 300 é o relatório final.
 A **027** (`logistica_reversa.codigo_rastreio_reverso`
 sem `UNIQUE`) segue como DDL dependente do dono. A **#428** entrou: os três `DROP INDEX` ja estao aplicados no banco (conferido no `schema-manifest.json`).
 
@@ -3875,8 +3875,7 @@ decidir (RLS real, unicidade, uso de indice, existencia de tabela). Nenhuma e co
 - **264, 265** - bloqueadas pelo secret `SUPABASE_DB_URL` (263).
 - **275** - base de teste de hook e de tela: a unica etapa de codigo que ainda nao comecou.
 - **277** - teste do `count` fora da tela: a versao de tela esta coberta desde a 282, falta a de hook.
-- **289, 296** - mostrar as falhas de webhook numa tela e regerar a branch `contexto`; as duas dependem das
-  tabelas do banco que ninguem conseguiu confirmar (287) e do snapshot (263).
+- **296** - regerar a branch `contexto`; depende do snapshot (263).
 
 ### PRs abertas (0) - nenhuma PR pendente em 2026-11-25
 
@@ -4293,8 +4292,27 @@ de CI. PR #439.
 
 **Verificado:** `npx vitest run tests/contracts/` = 57 arquivos / 544 testes verdes. **Não verificado:** a linha real em produção (a migration ainda não foi aplicada).
 
-**Pendente do dono:** aprovar a [#459](https://github.com/adm01-debug/Loggi_Flow_V2/pull/459); depois do deploy, provocar uma falha controlada e confirmar 1 linha nova na tabela. A etapa 289 (tela) depende disto.
+**Atualização (2026-11-25):** [#459](https://github.com/adm01-debug/Loggi_Flow_V2/pull/459) entrou em `3f17b4b7a`, mas a tabela já existia no banco sem estar em `supabase_migrations.schema_migrations`, e o `CREATE POLICY` não era idempotente (`already exists` no run `45600810091`). Corrigido na [#462](https://github.com/adm01-debug/Loggi_Flow_V2/pull/462) com `DROP POLICY IF EXISTS`, mergeada em `ccdb375e9`; o run `45603914030` terminou `success` e o `45604413739` recusou por “ja consta no schema_migrations” — prova de que o registro existe. O `types-sync` abriu e mergeou a [#461](https://github.com/adm01-debug/Loggi_Flow_V2/pull/461) em `c3d86c0b4` com as 7 colunas, as 2 policies e a função. **Não verificado:** a primeira linha real na tabela — só aparece após um webhook falhar em produção.
 
+
+## Registro - etapa 289: falhas de webhook de entrada na tela de /webhooks (2026-11-25)
+
+**Status:** implementada e integrada (front); sem DDL, sem rota nova.
+
+A spec (`docs/qa/04-PLANO.md:11713`) pedia a menor coisa util numa tela que ja existe: lista das ultimas falhas com teto
+explicito, provedor/horario/status/mensagem, estados de erro/carregando/vazio visiveis, sem realtime e sem tocar na
+parte que administra `client_webhooks`.
+
+| Artefato | Conteudo |
+| --- | --- |
+| `src/hooks/integrations/useClientWebhooks.tsx` | interface `WebhookInboundFailure` e `useQuery(['webhook-inbound-failures'])` em `webhook_inbound_failures` ordenado por `created_at` desc com `.limit(50)`, expondo `inboundFailures`, `isLoadingInboundFailures`, `isErrorInboundFailures` |
+| `src/components/integrations/WebhookManager.tsx` | terceira aba "Falhas de entrada" (`TabsContent value="inbound"`), tabela Receptor/Provedor/Status/Mensagem/Data, `Loader2` no carregando, `Alert variant="destructive"` no erro e mensagem no vazio |
+| `tests/contracts/webhook-entrada-tela-falhas.spec.ts` | 2 testes de contrato (hook tem .limit(50) e a coluna de erro; a tela tem aba, estados e as 5 colunas) |
+
+**Verificado:** `npx tsc --noEmit` sem erro; `npx eslint` nos dois arquivos alterados sem aviso; `npx vitest run tests/contracts/`
+= 58 arquivos / 546 testes verdes; `npm run lint:budget` 80/86 avisos, 0 erros, TypeScript 0/0 (o refactor de ternario
+aninhado em `renderInboundFailures` manteve o teto). **Nao verificado:** a tela com dado real, porque depende de uma linha
+em `webhook_inbound_failures` que so nasce de um webhook que falhe em producao.
 
 ## Registro - correcao de status das etapas 018, 218, 266, 270 e 284 (2026-11-25)
 
@@ -4437,7 +4455,7 @@ de 94 para 96) e `.github/workflows/ci.yml` (1 passo).
 - `node scripts/ci/check-env-not-tracked.mjs` com a árvore limpa -> `OK: nenhum arquivo de ambiente
   rastreado (1712 caminhos conferidos; permitido apenas .env.example).` / `exit=0`
 - com um `.env` de teste no índice (`git add -f .env`) -> `::error::.env esta rastreado pelo git. ... Tire do
-  indice com \`git rm --cached ".env"\` ...` / `exit=1`; desfeito com `git rm --cached .env` e `rm .env`,
+  indice com `git rm --cached ".env"` ...` / `exit=1`; desfeito com `git rm --cached .env` e `rm .env`,
   índice conferido depois com `git status --porcelain`
 - `node --test scripts/ci/check-env-not-tracked.unit.mjs` -> `pass 9`, `fail 0`
 - `npm run automation:test` -> `pass 103`, `fail 0`

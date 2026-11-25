@@ -10,7 +10,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, Plus, Trash2, Webhook, Activity, CheckCircle, XCircle, Copy } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Loader2, Plus, Trash2, Webhook, Activity, CheckCircle, XCircle, Copy, AlertTriangle } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
@@ -24,6 +25,7 @@ const AVAILABLE_EVENTS = [
 export function WebhookManager() {
   const {
     webhooks, deliveries, isLoading,
+    inboundFailures, isLoadingInboundFailures, isErrorInboundFailures,
     createWebhook, toggleWebhook, deleteWebhook,
   } = useClientWebhooks();
 
@@ -51,6 +53,52 @@ export function WebhookManager() {
     );
   };
 
+  const renderInboundFailures = () => {
+    if (isLoadingInboundFailures) {
+      return <div className="flex items-center justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>;
+    }
+    if (isErrorInboundFailures) {
+      return (
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Não foi possível carregar as falhas</AlertTitle>
+          <AlertDescription>
+            Recarregue a página. Se persistir, confira a policy de leitura de webhook_inbound_failures (somente admin).
+          </AlertDescription>
+        </Alert>
+      );
+    }
+    if (inboundFailures.length === 0) {
+      return <p className="text-center text-muted-foreground py-4">Nenhuma falha registrada</p>;
+    }
+    return (
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Receptor</TableHead>
+            <TableHead>Provedor</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Mensagem</TableHead>
+            <TableHead>Data</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {inboundFailures.map(f => (
+            <TableRow key={f.id}>
+              <TableCell><Badge variant="outline" className="text-xs">{f.receiver}</Badge></TableCell>
+              <TableCell className="text-xs">{f.provider ?? '-'}</TableCell>
+              <TableCell><Badge variant="outline">{f.response_status}</Badge></TableCell>
+              <TableCell className="text-xs text-destructive max-w-[280px] truncate">{f.error_message}</TableCell>
+              <TableCell className="text-xs text-muted-foreground">
+                {format(new Date(f.created_at), "dd/MM HH:mm:ss", { locale: ptBR })}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    );
+  };
+
   if (isLoading) {
     return <div className="flex items-center justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>;
   }
@@ -61,6 +109,7 @@ export function WebhookManager() {
         <TabsList>
           <TabsTrigger value="webhooks"><Webhook className="w-4 h-4 mr-1" />Webhooks</TabsTrigger>
           <TabsTrigger value="deliveries"><Activity className="w-4 h-4 mr-1" />Entregas de Log</TabsTrigger>
+          <TabsTrigger value="inbound"><AlertTriangle className="w-4 h-4 mr-1" />Falhas de Entrada</TabsTrigger>
         </TabsList>
 
         <TabsContent value="webhooks" className="space-y-4 mt-4">
@@ -154,6 +203,19 @@ export function WebhookManager() {
                   </TableBody>
                 </Table>
               )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="inbound" className="mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-sm">Falhas de Webhook de Entrada</CardTitle>
+              <CardDescription>
+                Webhooks recebidos das transportadoras que falharam. As 50 falhas mais recentes.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {renderInboundFailures()}
             </CardContent>
           </Card>
         </TabsContent>

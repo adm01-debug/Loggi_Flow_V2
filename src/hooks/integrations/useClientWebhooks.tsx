@@ -26,6 +26,16 @@ export interface WebhookDelivery {
   created_at: string;
 }
 
+export interface WebhookInboundFailure {
+  id: string;
+  receiver: string;
+  provider: string | null;
+  event_id: string | null;
+  response_status: number;
+  error_message: string;
+  created_at: string;
+}
+
 export function useClientWebhooks() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -53,6 +63,24 @@ export function useClientWebhooks() {
         .limit(100);
       if (error) throw error;
       return data as WebhookDelivery[];
+    },
+    enabled: !!user?.id,
+  });
+
+  const {
+    data: inboundFailures = [],
+    isLoading: isLoadingInboundFailures,
+    isError: isErrorInboundFailures,
+  } = useQuery({
+    queryKey: ['webhook-inbound-failures'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('webhook_inbound_failures')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      return data as WebhookInboundFailure[];
     },
     enabled: !!user?.id,
   });
@@ -115,8 +143,11 @@ export function useClientWebhooks() {
   return {
     webhooks,
     deliveries,
+    inboundFailures,
     isLoading,
     isLoadingDeliveries,
+    isLoadingInboundFailures,
+    isErrorInboundFailures,
     createWebhook,
     toggleWebhook,
     deleteWebhook,
