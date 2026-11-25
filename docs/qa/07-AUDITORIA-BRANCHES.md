@@ -187,11 +187,15 @@ mais nova, não a mais antiga.
 - As 22 etapas `[~]` do plano continuam sendo decisão do dono, não trabalho de agente interrompido.
 - **`ESTADO_ATUAL.md` desatualizado sobre o `migrate-helper`** — as linhas 29, 144, 146 e 277 afirmam que a
   function "está implantada e executando" em produção; hoje ela devolve 404, e a `health` no mesmo gateway
-  devolve 200, o que valida a sonda. Documento de estado, não de código.
+  devolve 200, o que valida a sonda. Documento de estado, não de código. **Fechado em 2026-11-25:** o texto
+  passou a dizer que a função *esteve* viva até 25/11 e que o drift inverso hoje é 0; o mesmo foi feito em
+  `ESTADO_ATUAL_EVIDENCIAS.md` (tabela §2.2 e a frase de conclusão).
 - **Texto da etapa 073 desatualizado** — `docs/qa/05-PROGRESSO.md:124` e a tabela em `:4643` descrevem
   `ingest-biosync` "inventando batimento com `Math.random()` em `index.ts:43`", mas a `main` não tem nenhum
   `Math.random()` no arquivo (151 linhas, validação por `parseBioSyncInput`): as etapas 148/149/199 já
-  tiraram isso. A decisão de manter ou remover a function precisa ser tomada com o texto atualizado.
+  tiraram isso. A decisão de manter ou remover a function precisa ser tomada com o texto atualizado. **Já corrigido:**
+  `05-PROGRESSO.md:124` e a tabela em `:4643` registram a 3ª conferência — o `Math.random()` saiu em
+  `24067b2c5` e o batimento usa hash do conteúdo; resta só a decisão do dono.
 
 ## 9. Objetos órfãos do object DB (blobs e trees soltos)
 

@@ -26,7 +26,7 @@ o usuário final em produção.
 | Camada              | Situação medida                                                                                                                                                                          |
 | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Frontend / rotas    | 61 rotas registradas, 0 páginas órfãs — íntegro                                                                                                                                          |
-| Edge Functions      | **43 de 43 do repo implantadas**; porém `migrate-helper` roda em produção **sem existir no repo**                                                                                        |
+| Edge Functions      | **43 de 43 do repo implantadas**; a sondagem inversa de 2026-11-25 não achou função viva sem fonte (**0**) - o `migrate-helper` devolve 404 (ver R3)                                                                                        |
 | Banco (estrutura)   | 100 tabelas base + 30 partições, 4 views e 79 RPCs — **sem drift**                                                                                                                       |
 | **Pipeline de CI**  | **🔴 0 execuções verdes em 120 amostradas (20/05 → 16/08/2026)**                                                                                                                         |
 | **Typecheck**       | **🔴 21 erros — o orçamento exige 0** — ⚠️ superado em 2026-11-23: `npx tsc --noEmit` sai com 0 erros, exit 0 (docs/qa/02-CENARIOS.md secao 0, E1), reconfirmado em 2026-11-23           |
@@ -141,7 +141,7 @@ nenhuma delas invoca Edge Functions nem `persist_db_health_snapshot` (parse exau
 **Consequência:** reconstruir o projeto a partir do repositório produz um ambiente sem essa rotina.
 
 **Segunda prova, mais forte — código vivo sem fonte no repositório.** A Edge Function
-`migrate-helper` está **implantada e executando** em produção: responde `{"error":"unauthorized"}`,
+`migrate-helper` **esteve implantada e executando** em produção até 25/11/2026, quando respondia `{"error":"unauthorized"}`,
 que é a checagem de autenticação da própria função (uma função ausente responderia
 `{"code":"NOT_FOUND"}`). **Não existe `supabase/functions/migrate-helper/` no repositório.**
 
@@ -152,9 +152,10 @@ que é a checagem de autenticação da própria função (uma função ausente r
 > de existir; o que ela fazia está versionado em `scripts/ops/backup_origem.sh` (com teste em
 > `scripts/ops/backup_origem.unit.mjs`). `supabase/functions/migrate-helper/` não existe no repositório.
 
-Ou seja, roda em produção um código que ninguém pode revisar, versionar ou reconstruir — e o nome
-sugere que ele executa migrations, operação privilegiada. O drift de implantação é **assimétrico**:
-repo → ambiente está 43/43 em dia; ambiente → repo tem pelo menos 1 função órfã.
+Ou seja, até 25/11/2026 rodava em produção um código que ninguém podia revisar, versionar ou reconstruir — e o nome
+sugeria que ele executava migrations, operação privilegiada. O drift de implantação era **assimétrico**:
+repo → ambiente estava 43/43 em dia; ambiente → repo tinha pelo menos 1 função órfã. A sondagem de
+25/11/2026 (bloco acima) zerou o lado do ambiente: **0 funções vivas sem fonte no repositório**.
 
 ### R3-b — 🟡 MÉDIO · Duas gerações de cron convivendo, agendando o mesmo trabalho
 
@@ -281,7 +282,7 @@ achado que faltava. Ficam registrados pelo mesmo motivo dos anteriores:
 | --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **"8 chamadas `cron.schedule`"**                          | São **15**, em 8 migrations. O `grep` só casava a forma de linha única. Cinco jobs ficaram fora do relatório. Corrigido em §3/R3 e no anexo §7.1.                                                                    |
 | **"duplicatas byte a byte"** (testes de fuzzing)          | Falso. Os MD5 diferem (`5cad21b2…` / `2cf93ae1…`): são **funcionalmente** idênticos, mas separados por 2 linhas em branco e 1 comentário. Precisão que eu não havia medido.                                          |
-| **"zero drift de deploy"**                                | Verdadeiro só no sentido repo → ambiente. A sondagem, por construção, não podia achar código vivo sem fonte. O teste inverso revelou **`migrate-helper` em produção sem existir no repositório**. Virou parte de R3. |
+| **"zero drift de deploy"**                                | Verdadeiro só no sentido repo → ambiente. A sondagem, por construção, não podia achar código vivo sem fonte. O teste inverso revelou **`migrate-helper` em produção sem existir no repositório**. Virou parte de R3 — fechado em 25/11/2026: a função devolve 404. |
 | **Critério de pronto: "100% dos arquivos inventariados"** | Overclaim. Recontar 1.005 arquivos e mapeá-los por diretório **não é** inventariá-los: o conteúdo de ~35 foi lido. Rebaixado para ⚠️ PARCIAL em §8.                                                                  |
 | **Denominadores inconsistentes nos testes**               | "7 de 30" e "12 de 32" conviviam. São **32** arquivos no total: 30 executados pelo vitest e 2 (`tests/e2e`) pelo Playwright, que o vitest exclui via `vitest.config.ts:12`. Padronizado em 32.                       |
 | **Achado que faltava**                                    | Três pares de jobs de cron duplicados — nova seção §3/R3-b.                                                                                                                                                          |
