@@ -117,7 +117,7 @@ O retrato versionado do banco oficial é `docs/contexto/supabase/` na branch `co
 `.github/workflows/contexto-ia.yml` (`scripts/supabase_snapshot/`). Ele é gerado: **não edite essa branch nem
 abra PR dela**.
 
-- **Plano B:** se a pasta não existir ou o `manifest.json` acusar erro (`supabase/errors.md` traz o erro do
+- **Plano B:** se a pasta não existir ou o `manifest.json` acusar erro (`supabase/errors.md`, gerado pelo snapshot e nao existe no repo, traz o erro do
   produtor para uma seção), consulte o banco pelo MCP `SUPABASE - LOGGI FLOW V2 - MCP`, só leitura.
 - **`docs/contexto/codigo/banco.json` não é fonte de banco.** Ele descreve o código que fala de banco; não
   modela índice, trigger criado fora do repo nem DDL dinâmico — foi dele o falso positivo "36 tabelas sem

@@ -40,3 +40,10 @@ graphify-out/
 # Estado local privado dos novos adaptadores de automação
 /.tools/repo-automation/
 /.tools/graphify/local-state/
+
+# Artefatos de patch, backup e depuracao (etapa 273: a raiz so carrega configuracao legitima)
+*.bak
+*.orig
+*.rej
+*.tmp
+*.log

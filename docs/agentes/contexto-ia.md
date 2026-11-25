@@ -37,7 +37,7 @@ do repo são histórico, não estado). Onde fica e quem chama? → `codigo/`. Po
 - Só há commit quando algo mudou de verdade. Quando só métricas voláteis mudam, o commit é limitado a
   1 por hora.
 - Produtor que falha não derruba os outros: o job `publicar` republica as fontes que saíram e mantém as
-  demais como estavam. Seções com erro aparecem em `supabase/errors.md` e em `codigo/` → `erros_do_gerador`.
+  demais como estavam. Seções com erro aparecem em `supabase/errors.md` (gerado; nao existe no repo) e em `codigo/` → `erros_do_gerador`.
 - Publica na branch gerada **`contexto`**, nunca na `main`. Não edite essa branch nem abra PR dela — o
   próximo run sobrescreve. Push com `GITHUB_TOKEN` não dispara outros workflows, e os CIs deste repo só
   escutam `main`/`master`/`develop`.

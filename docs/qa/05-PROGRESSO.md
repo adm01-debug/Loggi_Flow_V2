@@ -327,7 +327,7 @@
 - [x] **245** — Corrigir os 29 caminhos de hook citados em `DOCUMENTATION.md` — onda 8 — Alta
 - [x] **246** — Marcar em `DOCUMENTATION.md` os 10 componentes que não existem — onda 8 — Alta
 - [x] **247** — Corrigir a seção de internacionalização de `DOCUMENTATION.md` — onda 8 — Média
-- [~] **248** — Criar verificação automática dos caminhos citados na documentação — onda 8 — Média · **aguarda o dono**
+- [x] **248** — Criar verificação automática dos caminhos citados na documentação — onda 8 — Média — **feito — `validate:doc-paths` (11 caminhos mortos corrigidos; o gate reprova caminho citado sem arquivo)**
 
 ### Onda 0
 
@@ -364,7 +364,7 @@
 - [x] **270** — Remover as três entradas obsoletas da allowlist de vulnerabilidades — onda 8 — Baixa · **feito — `ALLOWLIST` vazia em `scripts/audit-gate.mjs`; PR #436 mergeada em `c4d2390c`** (altera gate de segurança da CI)
 - [x] **271** — Remover o arquivo `x` vazio versionado na raiz — onda 8 — Baixa
 - [~] **272** — Decidir com o dono o destino de `bun.lock` e `bun.lockb` — onda 8 — Baixa · — **levantado em 2026-11-25, aguarda o dono**: `bun.lock` (423 KB) e `bun.lockb` (199 KB) versionados; nenhum workflow usa bun (CI = `npm ci`) e `types-sync.yml:366` registra que estão defasados. Recomendação = remover os dois
-- [~] **273** — Barrar arquivo acidental na raiz antes do merge — onda 8 — Baixa · **aguarda o dono**
+- [x] **273** ? Barrar arquivo acidental na raiz antes do merge ? onda 8 ? Baixa ? **feito ? `validate:root-files` com os 39 arquivos da raiz declarados um a um**
 - [~] **274** — Tirar do `AGENTS.md` e do `types-sync.yml` a menção aos locks de bun — onda 8 — Baixa · — **levantado em 2026-11-25, aguarda a 272**: só faz sentido depois de os locks saírem; toca `AGENTS.md:86-88` e o comentário de `.github/workflows/types-sync.yml:366` (Regra 8)
 - [x] **275** — Criar a base de teste de hook e de tela que hoje não existe — onda 8 — Alta · **já estava na `main` (`src/test/`), smoke e testes de referência verdes**
 - [x] **276** — Teste da validação de transição de status (trava a correção de C-01) — onda 8 — Crítica
@@ -3694,14 +3694,13 @@ Atualize ao fim de cada sessão de trabalho.
 
 |                         | Quantidade |
 | ----------------------- | ---------- |
-| Concluídas `[x]`        | 271         |
-| Aguardando o dono `[~]` | 29         |
-16d0ca713 (docs: registra que indice se confere no banco e fecha 058, 240 e 265)
+| Concluídas `[x]`        | 273         |
+| Aguardando o dono `[~]` | 27         |
 | Bloqueadas `[!]`        | 0          |
 | Não iniciadas `[ ]`     | 0          |
 | **Total**               | **300**    |
 
-**Última etapa trabalhada:** levantamento das 13 etapas “que parecem sem uso” · **Data:** 2026-11-25 · **Próxima etapa independente:** nenhuma — as 300 etapas estão marcadas `[x]` ou `[~]`; a 290 continua aguardando o dono (Regra 8) e a 300 é o relatório final.
+**Última etapa trabalhada:** os gates de CI do grupo 5 (248, 273) · **Data:** 2026-11-25 · **Próxima etapa independente:** nenhuma — as 300 etapas estão marcadas `[x]` ou `[~]`; as `[~]` restantes dependem de decisão do dono (DDL, secret ou produto) ou de credencial de terceiro.
 A **027** (`logistica_reversa.codigo_rastreio_reverso`
 sem `UNIQUE`) segue como DDL dependente do dono. A **#428** entrou: os três `DROP INDEX` ja estao aplicados no banco (conferido no `schema-manifest.json`).
 
@@ -4730,3 +4729,28 @@ functions, 61 telas com rota, 28 cron jobs (0 com falha na última execução) e
 `03-ACHADOS.md` — o cabeçalho daquele arquivo ainda traz o número de `8406f688` (36/15/14), do dia 24.
 
 **Prova:** `node scripts/ci/check-claude-md-integrity.mjs` -> `exit=0`.
+
+### Registro - etapas 248 e 273 (2026-11-25) - os dois gates novos: doc sem caminho morto e raiz limpa
+
+**248 - `scripts/ci/check-doc-paths.mjs`.** O gate le `AGENTS.md`, `DOCUMENTATION.md` e `docs/agentes/*.md`,
+extrai o que esta entre crases e comeca por `src/`, `supabase/` ou `scripts/`, e reprova o que nao existe em
+disco. Sufixo `:153` / `:153-160` e validado contra o arquivo; glob e placeholder (`*.mjs`, `<feature>`) ficam
+fora; a linha inteira fica isenta quando declara que o alvo `nao existe` (a isencao e explicita no texto, nao
+no codigo). Na primeira execucao ele achou 13 caminhos mortos nos 10 documentos, todos corrigidos para o
+arquivo real: `src/lib/toast.ts` e `src/lib/premiumToast.tsx` -> `src/hooks/ui/use-toast.ts`;
+`DataTable.tsx` -> `ResponsiveTable.tsx`; `CommentSectionWithMentions.tsx` -> `CommentSection.tsx`;
+`TooltipWrapper.tsx` -> `onboarding/OnboardingTooltip.tsx`; `supabase/functions/n8n-integration/` e
+`supabase/functions/public-api/` -> a pendencia em `docs/pendencias/` (as functions nao existem); `supabase/errors.md`
+marcado como gerado pelo snapshot nos dois arquivos onde aparecia; e em `mapa-repo.md` o
+`supabase/client.ts`/`types.ts` virou o caminho completo em `src/integrations/`, com a frase sobre
+`supabase/scripts` e `src/scripts` reescrita para dizer que nao existem.
+
+**273 - `scripts/ci/check-root-files.mjs`.** Lista de permissao com os 39 arquivos de raiz declarados um a um
+(`git ls-files`, para nao precisar repetir padrao de `.gitignore`) e reprova qualquer outro. O `.gitignore`
+ganhou `*.bak`, `*.orig`, `*.rej`, `*.tmp` e `*.log`, que e o que mais aparece solto na raiz.
+
+**Provas:** `npm run validate:doc-paths` -> `exit=0` (10 documentos); `npm run validate:root-files` ->
+`[root-files] OK: 39 arquivos na raiz, todos declarados`; `node --test scripts/ci/check-doc-paths.unit.mjs` ->
+**6 testes, 0 falhas**; `node --test scripts/ci/check-root-files.unit.mjs` -> **4 testes, 0 falhas**;
+`actionlint .github/workflows/ci-nexus.yml` -> `exit=0`; `check-claude-md-integrity.mjs` -> `exit=0`.
+Os dois jobs entraram no `quality-gate` do `ci-nexus.yml`.
