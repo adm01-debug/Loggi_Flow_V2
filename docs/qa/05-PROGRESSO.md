@@ -397,7 +397,7 @@
 - [x] **297** — Atualizar `03-ACHADOS.md` e `05-PROGRESSO.md` com o estado final de cada achado — onda 8 — Alta
 - [x] **298** — Reler o plano inteiro e registrar o que ficou sem etapa executada — onda 8 — Alta
 - [x] **299** — Rodar a bateria completa de gates e comparar com os números do começo · onda 8 · Alta — **fechada em 2026-11-25**: bateria inteira rodada sobre `e8ad814ab`, nada piorou em nenhuma linha; lint 105 → 80 (E2) e o `lint:budget:ratchet` entrou na [#464](https://github.com/adm01-debug/Loggi_Flow_V2/pull/464) com o teto em **80/80** (era 86)
-- [x] **300** — Relatório final de uma página para o dono — onda 8 — Alta
+- [x] **300** — Relatório final de uma página para o dono — onda 8 — Alta — **atualizado em 2026-11-25 (`c0df8438b`): 271/29, os 5 riscos de 24/11 fechados e as 29 decisões agrupadas por tipo de trava**
 
 ---
 
@@ -4711,3 +4711,22 @@ cria historico de cron: o `pg_cron` ja guarda `cron.job_run_details` e a RPC ja 
 dias = atrasado, `*/15` com 40 min = atrasado e com 10 min = ok, `0 0 30 2 *` = `null`, inativo / sem
 historico / schedule ilegivel, e a ordenacao com o resumo); `npm run typecheck` -> **0**; `npx eslint` nos
 3 arquivos -> **0 problemas**; `npm run lint:budget` -> **80/80**, nenhum aviso novo.
+
+
+## Registro da etapa 300 — o relatório final reconferido contra a `main` de hoje (2026-11-25)
+
+O `docs/qa/06-RELATORIO-FINAL.md` foi escrito em 2026-11-24 (#416) sobre `c7fc18ae` e dizia 219 concluídas,
+61 esperando você e 20 não iniciadas. Reescrito sobre `c0df8438b` com o número de hoje (271 / 29 / 0) e com o
+que mudou desde então: os cinco riscos que abriam o relatínio estão fechados (triggers de transição e da NF
+nas 028-033, `user_panel_preferences` na 222, RLS de `scheduled_reports`/geo-blocking nas 023-025, e os
+índices do Painel SLA medidos em 0,12 ms nas 228-232), e as **29 etapas que aguardam você** aparecem agrupadas
+por tipo de trava — DDL em produção (027, 070, 073, 075, 076), secret/painel (002, 010, 263, 285, 286, 295),
+CI/workflow (248, 255, 257, 273), produto/integração (006, 008, 009, 011, 014, 016, 017, 043, 120, 272, 274),
+credencial de terceiro (039, 041) e E2E (283) — cada grupo com uma recomendação de uma linha.
+
+Os números da seção 4 vêm da etapa 299 (bateria completa em `e8ad814ab`) e do inventário datado: 44 edge
+functions, 61 telas com rota, 28 cron jobs (0 com falha na última execução) e 0 `SECURITY DEFINER` sem
+`search_path`. A contagem de achados (38 resolvidos / 16 parciais / 12 abertos) sai dos marcadores do corpo do
+`03-ACHADOS.md` — o cabeçalho daquele arquivo ainda traz o número de `8406f688` (36/15/14), do dia 24.
+
+**Prova:** `node scripts/ci/check-claude-md-integrity.mjs` -> `exit=0`.
