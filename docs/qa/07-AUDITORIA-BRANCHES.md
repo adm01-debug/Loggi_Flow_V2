@@ -184,7 +184,9 @@ mais nova, não a mais antiga.
 
 - **#477** — 4 índices redundantes em `entregas`/`coletas`; branch `claude/chore-drop-4-indices-redundantes-261125-1222`
   preservada, migration e rollback testados em banco descartável, nada aplicado em produção.
-- As 22 etapas `[~]` do plano continuam sendo decisão do dono, não trabalho de agente interrompido.
+- As 22 etapas `[~]` do plano são, na maioria, decisão do dono — mas **duas** escondiam metade executável que
+  nenhum agente tinha feito (a **283**, na #498, e a **016**, na #501) e uma terceira tinha o texto do
+  `ESTADO_ATUAL.md` contradizendo a medição (na #502). A varredura das 22 está na seção 11.
 - **`ESTADO_ATUAL.md` desatualizado sobre o `migrate-helper`** — as linhas 29, 144, 146 e 277 afirmam que a
   function "está implantada e executando" em produção; hoje ela devolve 404, e a `health` no mesmo gateway
   devolve 200, o que valida a sonda. Documento de estado, não de código. **Fechado em 2026-11-25:** o texto
@@ -283,3 +285,33 @@ três fontes de verdade.
 
 **Não apagar nenhuma das duas.** A primeira é do bot e é idempotente; a segunda é o único lugar onde o corpus
 de contexto vive — apagá-la deixaria agentes sem a fonte até a próxima execução do workflow.
+
+
+## 11. As 22 etapas `[~]` revisadas uma a uma (2026-11-25)
+
+`[~]` significa "aberta aguardando o dono", mas também é onde trabalho interrompido se esconde: foi exatamente
+o que aconteceu na 283, cuja parte (1) não dependia de ninguém. Então cada uma das 22 foi relida contra o código,
+o banco e a sondagem de hoje. Resultado: **19 dependem mesmo do dono** e **3 tinham parte executável esquecida**.
+
+| Etapa | O que faltava | Onde entrou |
+| --- | --- | --- |
+| **016** | `AGENTS.md:52` já estava corrigido, mas três comentários de workflow repetiam "repo privado" (`ci.yml:11`, `security.yml:13`, `contexto-ia.yml:99-101`) | #501 |
+| **283** (parte 1) | `tests/e2e/README.md` e credenciais por `E2E_EMAIL`/`E2E_PASSWORD` no lugar do usuário fixo `admin@nexus.ai` | #498 |
+| **298/`ESTADO_ATUAL`** | o documento ainda dizia que o `migrate-helper` estava vivo; o anexo de evidências mantinha a linha "viva? sim" | #502 |
+
+**Por que as outras 19 ficam com o dono** (verificado linha a linha, não presumido):
+
+- **DDL em produção (Regra 8):** 070, 073, 075, 076 — funções e buckets cujo destino (ligar ou remover) é
+  decisão de negócio; o levantamento de uso está no `05-PROGRESSO.md` e nenhum `DROP` foi executado.
+- **Segredo ou painel que o repositório não lê:** 002 (`NEXUS_WEBHOOK_SECRET`), 010 (`ALLOW_TEST_MODE`),
+  285/286 (`VITE_SENTRY_DSN`), 295 (S-05 e S-08). A 011 é a única cujo mecanismo (guard automático no lugar da
+  conferência manual) eu poderia escrever agora, mas ele depende da resposta da 010 para não virar código morto
+  — o bypass já exige `ALLOW_TEST_MODE=true` no servidor (corrigido na onda 1) e tem teste em
+  `_shared/webhookSignature.test.ts:119`.
+- **Decisão de produto:** 014 (qual dos dois endpoints de saúde fica aberto), 017 (visibilidade do repositório),
+  043 (as duas telas de cotação), 120 (histórico da importação em massa), 272/274 (os locks do bun).
+- **Credencial de terceiro ou operação em risco:** 039/041 (a verificação em runtime depende de credencial de
+  transportadora; o código já está entregue) e 006/008/009 (exigir papel em `evolution-whatsapp` e
+  `melhor-envio-api`: restringir a `admin` pode parar a cotação de quem hoje usa como `user`).
+
+Nenhuma das 22 ficou sem leitura: cada linha do `05-PROGRESSO.md` foi conferida contra o arquivo que ela cita.
