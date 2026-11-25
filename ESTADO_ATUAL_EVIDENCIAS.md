@@ -101,10 +101,12 @@ construção não detecta código vivo sem fonte versionada. Testando a direçã
 
 | Função           | No repo? | Viva?   | Resposta                                                            |
 | ---------------- | -------- | ------- | ------------------------------------------------------------------- |
-| `migrate-helper` | **não**  | **sim** | `{"error":"unauthorized"}` — checagem de auth da própria função     |
+| `migrate-helper` | **não**  | **não** (404 em 25/11) | estava viva até 25/11/2026 (`{"error":"unauthorized"}`); hoje, `{"code":"NOT_FOUND"}` |
 | `mcp-query`      | não      | não     | `{"code":"NOT_FOUND","message":"Requested function was not found"}` |
 
-`migrate-helper` executa em produção sem fonte no repositório. Ver `ESTADO_ATUAL.md` §3/R3.
+`migrate-helper` executava em produção sem fonte no repositório; em 25/11/2026 a sonda devolveu 404, então o
+drift inverso hoje é **0** e o que a função fazia está versionado em `scripts/ops/backup_origem.sh`. Ver
+`ESTADO_ATUAL.md` §3/R3.
 
 ### 2.3 A ferramenta MCP estava desatualizada
 
