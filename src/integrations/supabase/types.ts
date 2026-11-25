@@ -6483,7 +6483,6 @@ export type Database = {
         Args: { _keep_days?: number }
         Returns: number
       }
-      reconcile_pending_freights: { Args: never; Returns: Json }
       record_heartbeat: { Args: never; Returns: undefined }
       refresh_dashboard_views: { Args: never; Returns: Json }
       reject_index_proposal: {
