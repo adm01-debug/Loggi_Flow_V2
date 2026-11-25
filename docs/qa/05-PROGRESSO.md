@@ -30,7 +30,7 @@
 ### Onda 1
 
 - [x] **001** — Remover a condicional que desliga a verificação de assinatura do webhook do Nexus — onda 1 — Crítica
-- [~] **002** — Confirmar com o dono se `NEXUS_WEBHOOK_SECRET` está configurado em produção — onda 1 — Crítica · **aguarda o dono**
+- [x] **002** — Confirmar com o dono se `NEXUS_WEBHOOK_SECRET` está configurado em produção — onda 1 — Crítica — **fechada em 2026-11-25 por comportamento, sem ler valor de segredo**: `supabase secrets list --project-ref jvfhclubfpxrtrrazrgr` mostra `NEXUS_WEBHOOK_SECRET` entre os secrets do projeto, e `POST /functions/v1/nexus-webhook-receiver` sem assinatura responde **401**; como `verify_jwt = false` no `config.toml`, o 401 vem do HMAC (`nexus-webhook-receiver/index.ts:38`), não do JWT. Registro no fim do arquivo.
 - [x] **003** — Criar `requireRole` em `_shared/auth.ts` — onda 1 — Crítica
 - [x] **004** — `webhook-status`: exigir chamador interno ou papel de admin — onda 1 — Crítica
 - [x] **005** — `webhook-status`: filtrar `client_webhooks` por dono e registrar quem disparou — onda 1 — Alta
@@ -38,7 +38,7 @@
 - [x] **007** — `evolution-whatsapp`: registrar quem enviou cada mensagem — onda 1 — Média
 - [~] **008** — `melhor-envio-api`: o ambiente (produção/teste) passa a ser decidido pelo servidor — onda 1 — Alta · **aguarda o dono**
 - [~] **009** — `melhor-envio-api`: exigir papel para cotar — onda 1 — Alta · **aguarda o dono**
-- [~] **010** — Confirmar com o dono que `ALLOW_TEST_MODE` não está ligado em produção — onda 1 — Crítica (se ligado) · **aguarda o dono**
+- [x] **010** — Confirmar com o dono que `ALLOW_TEST_MODE` não está ligado em produção — onda 1 — Crítica (se ligado) — **fechada em 2026-11-25 por comportamento**: `POST /functions/v1/lalamove-webhook` e `POST /functions/v1/rodonaves-webhook` com `x-test-mode: true` e **sem** assinatura responderam **401** nos dois (dois webhooks `verify_jwt = false`, então o 401 é da guarda de HMAC). O bypass só acontece com `ALLOW_TEST_MODE === 'true'` **e** o header (`lalamove-webhook/index.ts:89-90`, `rodonaves-webhook/index.ts:64-77`): está desligado. A variável **existe** entre os secrets do projeto, então a 011 (guarda permanente) continua valendo.
 - [~] **011** — Fazer o modo de teste dos webhooks impossível de ligar por engano em produção — onda 1 — Média · **aguarda o dono**
 - [x] **012** — `health`: trocar `service_role` por uma verificação sem privilégio — onda 1 — Média
 - [x] **013** — `health-check`: parar de chamar a API administrativa de usuários e exigir sessão — onda 1 — Média
@@ -123,8 +123,8 @@
 - [x] **072** — Executar a decisão sobre `push-send` — onda 4 — Média · — **fechada em 2026-11-25**: decisão sobre `push-send` = **manter**; a tabela `push_subscriptions` existe no banco (schema-manifest) e o chamador está ligado à tela de Notificações — nada a remover
 - [~] **073** — `ingest-biosync`: decidir o destino de uma função que recebe dado de biometria e ninguém usa — onda 4 — Média · — **levantado em 2026-11-25, aguarda o dono**: `ingest-biosync` grava em `bio_sync_telemetry` (tabela existe) e **não tem chamador**; `index.ts:43` inventa batimento com `Math.random()`. Recomendação = remover a função; falta saber se há linhas gravadas (consulta ao banco) - **2026-11-25 (2a conferencia):** o inventario medido no banco em 2026-11-23 mostra **44 funcoes publicadas e `ingest-biosync` nao e uma delas** (`inventario/estado/banco.json`, `edge_functions.publicadas`), e `inventario/estado/edges.json` a lista em `sem_chamador_no_repo` junto de `health` e `push-send`: em producao ela nunca subiu, entao nao ha o que remover la - o codigo do repo fica como esta (apagar e decisao sua, Regra 8) - **2026-11-25 (3a conferencia, byte a byte):** a premissa do `Math.random()` caiu. Nao existe mais nenhum `Math.random()` em `supabase/functions/ingest-biosync/index.ts` (151 linhas): o commit `24067b2c5` ("mocks removidos") trocou o batimento inventado pelo hash do conteudo - `const identidade = eventTime ?? `sha256-${await bodyHash(body)}``. O motivo que resta para apagar a funcao e apenas "sem chamador no repo e nunca publicada"; a decisao segue sua.
 - [x] **074** — Levantar o uso real dos três buckets antes de qualquer decisão — onda 4 — Média · — **fechada em 2026-11-25** (levantamento concluído): `ocorrencias-fotos` **em uso** (`Ocorrencias.tsx:196,776,890`); `comprovantes` **zero uso** no código (o comprovante real vai para `documents`, `Envios.tsx:1183`); `entregas-fotos` **zero uso** no código. Os três são criados por `supabase/migrations/20251220173229_storage_buckets.sql`
-- [~] **075** — `comprovantes`: um caminho só para o comprovante de entrega — onda 4 — Média · — **levantado em 2026-11-25, aguarda o dono**: bucket `comprovantes` sem uso; `documents` já é privado e guarda o comprovante (`DeliveryReceiptUpload.tsx:55-57`). Recomendação = remover o bucket por migration (Regra 8) - **2026-11-25 (2a conferencia):** o caminho `entregas/<id>/comprovantes` de `src/pages/Envios.tsx:1183` e **pasta dentro do bucket `documents`** (o `DocumentUploadField` usa `useDocumentUpload`, cujo padrao e `bucket = "documents"`, `src/hooks/data/useDocumentUpload.ts:18`), nao o bucket `comprovantes` - era o falso positivo que a 074 ensinou a checar; `storage.from("comprovantes")` = 0 ocorrencias no repo. Falta so a contagem de objetos no bucket, que exige conexao ao banco de producao
-- [~] **076** — `entregas-fotos`: ligar a foto de entrega ou remover o bucket — onda 4 — Média · — **levantado em 2026-11-25, aguarda o dono**: bucket `entregas-fotos` sem uso no código; pergunta de negócio = *foto de entrega é prova a guardar?* Sim → ligar com o molde de `Ocorrencias.tsx:776` + `useImageUpload`; não → remover o bucket - **2026-11-25 (2a conferencia):** `useImageUpload` tem padrao `ocorrencias-fotos` (`src/hooks/data/useImageUpload.tsx:62`) e nenhum chamador passa `entregas-fotos`: o bucket esta vazio de uso no codigo. Decisao de negocio = ligar a foto de entrega (prova de entrega) ou remover; nos dois casos a contagem de objetos no bucket depende de conexao ao banco de producao
+- [x] **075** — `comprovantes`: um caminho só para o comprovante de entrega — onda 4 — Média — **fechada em 2026-11-25 ao vivo**: o bucket `comprovantes` **nunca existiu** em produção (`storage.buckets` tinha apenas `avatars` e `documents`, ambos com 0 objetos), então não havia o que remover. O comprovante de `src/pages/Envios.tsx:1183` fica em `documents/entregas/<id>/comprovantes`; o upload era **barrado pela policy** do bucket (que exigia `auth.uid()` como primeira pasta) e passou a funcionar com as policies `Documents: entregas *` da migration `20261125183109` (PR #507), provado por INSERT simulado como role `authenticated`.
+- [x] **076** — `entregas-fotos`: ligar a foto de entrega ou remover o bucket — onda 4 — Média — **fechada em 2026-11-25 ao vivo**: `entregas-fotos` não existe em produção e **não tem nenhum uso no código** (nenhum `storage.from` ou `bucket=` daquele nome); decisão = não criar (se a foto de entrega virar requisito, o molde pronto é o bucket `ocorrencias-fotos`). O achado que sobrava era o inverso: o bucket **usado** pelo app, `ocorrencias-fotos` (`src/pages/Ocorrencias.tsx:196,776,890` e `ImageUploader.tsx:21`), **faltava** em produção apesar de a migration `20251220173229_storage_buckets` constar como aplicada — foi criado privado, com 4 policies, na mesma migration #507.
 - [x] **077** — Remover `uploadDocument` de `storageService.ts` — onda 4 — Média
 - [x] **078** — Recusar arquivo cuja assinatura não é conhecida — onda 4 — Média
 - [x] **079** — Teste unitário da validação de assinatura de arquivo — onda 4 — Média
@@ -3694,8 +3694,8 @@ Atualize ao fim de cada sessão de trabalho.
 
 |                         | Quantidade |
 | ----------------------- | ---------- |
-| Concluidas `[x]`        | 278         |
-| Aguardando o dono `[~]` | 22          |
+| Concluidas `[x]`        | 282         |
+| Aguardando o dono `[~]` | 18          |
 | Bloqueadas `[!]`        | 0          |
 | Não iniciadas `[ ]`     | 0          |
 | **Total**               | **300**    |
@@ -4953,3 +4953,28 @@ receberam um registro - "orfa" aqui significa "sem dado", nao "sem uso". O unico
 `src/integrations/supabase/types.ts`, que e gerado do banco. `organizations` e a mais perigosa de tocar: e o esqueleto
 de multi-empresa (2 policies, 1 trigger, sem grant para `anon`) - dropar seria refazer arquitetura. A decisao de
 ligar ou remover essas funcionalidades e de negocio, nao de banco; nenhum `DROP` foi proposto.
+
+### Registro - etapas 002, 010, 075 e 076 e o dia em que o banco deixou de ser caixa-preta (2026-11-25)
+
+O que o banco oficial respondeu, e como cada etapa fechou:
+
+- **002 fechada.** Secret `NEXUS_WEBHOOK_SECRET` existe (`supabase secrets list`), e o endpoint recusa chamada sem
+  assinatura: `POST https://jvfhclubfpxrtrrazrgr.supabase.co/functions/v1/nexus-webhook-receiver` com corpo `{}`
+  devolveu **401**. Nenhum valor de segredo foi lido nem registrado.
+- **010 fechada.** `ALLOW_TEST_MODE` existe como secret, mas **não** está em `'true'`: os dois webhooks com bypass
+  responderam **401** mesmo com `-H 'x-test-mode: true'`. A varredura inclui o mesmo pedido sem o header, também 401.
+- **S-05 da 295 fechada pelo mesmo teste.** A pergunta era "o bypass de test-mode está ativo em produção?"; a resposta
+  medida é não. A **S-08** (restrição de URL do token Mapbox) segue aberta: é configuração do painel do Mapbox.
+- **Esteira de storage auditada ao vivo.** `storage.buckets` = `avatars`, `documents` e, desde a #507, `ocorrencias-fotos`;
+  os três com **0 objetos**. Nenhuma tabela de `public` sem RLS, nenhuma view sem `security_invoker` e nenhuma função
+  `SECURITY DEFINER` sem `search_path`.
+- **Grants da role `anon`.** Eram 917 grants com `INSERT/UPDATE/DELETE/TRUNCATE/TRIGGER/REFERENCES` em todas as tabelas
+  de `public` (default do Supabase; o RLS segurava, mas qualquer policy permissiva futura abriria escrita pública).
+  A migration `20261125183109` revogou a escrita e manteve `SELECT` (131 tabelas) mais `INSERT` em
+  `password_reset_requests`, que é o fluxo público existente. Provado depois: `set role anon; insert into ocorrencias`
+  -> **permission denied**; `insert` em `password_reset_requests` -> **ok**.
+- **Duas funcionalidades quebradas consertadas na #507.** Foto de ocorrência (bucket ausente) e comprovante/NF de
+  entrega (policy incompatível com a pasta `entregas/...`). Evidência: `begin; set local role authenticated; insert
+  into storage.objects ...` aceito nos dois buckets, `rollback`.
+
+Contadores após estas quatro etapas: **282 `[x]` / 18 `[~]`**.
