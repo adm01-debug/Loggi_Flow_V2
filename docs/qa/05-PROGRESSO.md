@@ -60,7 +60,7 @@
 - [x] **024** — Habilitar RLS em `scheduled_reports` — onda 1 — Crítica · **não se aplica: já habilitado (etapa 023)**
 - [x] **025** — Habilitar RLS nas duas tabelas de geo-blocking, depois de conferir o caminho de escrita da tela — onda 1 — Crítica · **não se aplica: já habilitado (etapa 023)**
 - [x] **026** — Confirmar no banco ao vivo a unicidade de `numero_coleta`, `numero_entrega` e do código de rastreio — onda 1 — Alta (se ausente) — **UNIQUE presente nos números; ausente no código de rastreio**
-- [~] **027** — Criar a unicidade que faltar nos números e no código de rastreio — onda 1 — Alta · **aguarda o dono**: a 026 provou no banco ao vivo que `numero_coleta` e `numero_entrega` ja tem UNIQUE e que **so `logistica_reversa.codigo_rastreio_reverso` ficou sem** - migration `20261125154000` escrita com indice unico **parcial** e guarda de duplicata, testada em Postgres 16 local, **PR #473 aberta** (Regra 8: aguarda o dono aplicar)
+- [x] **027** — Criar a unicidade que faltar nos números e no código de rastreio — onda 1 — Alta · **fechada em 2026-11-25 - PR #473 mergeada e migration APLICADA no banco oficial**: consulta ao vivo confirmou que `numero_coleta`/`numero_entrega` ja tinham UNIQUE e so `logistica_reversa.codigo_rastreio_reverso` estava sem; o indice `ux_logistica_reversa_codigo_rastreio` existe no banco: a 026 provou no banco ao vivo que `numero_coleta` e `numero_entrega` ja tem UNIQUE e que **so `logistica_reversa.codigo_rastreio_reverso` ficou sem** - migration `20261125154000` escrita com indice unico **parcial** e guarda de duplicata, testada em Postgres 16 local, **PR #473 aberta** (Regra 8: aguarda o dono aplicar)
 
 ### Onda 3
 
@@ -118,7 +118,7 @@
 
 - [x] **068** — Remover o hook `useSelfHealing` — onda 4 — Média
 - [x] **069** — Remover o hook `useNexusSimulator` — onda 4 — Média
-- [~] **070** — Decidir o destino da RPC `reconcile_pending_freights` e da tabela que ela não tem — onda 4 — Média · — **levantado em 2026-11-25, aguarda o dono**: `reconcile_pending_freights()` existe no banco (`schema-manifest` → `/functions/f:reconcile_pending_freights()`), mas **a tabela `freights` não existe** (só a coluna `performance_metrics.total_freights`) — a função é inoperante; recomendação = `DROP FUNCTION` por migration (Regra 8) - migration `20261125154100` escrita com rollback que recria a funcao e testada em Postgres 16 local, **PR #473 aberta** (Regra 8: aguarda o dono aplicar)
+- [x] **070** — Decidir o destino da RPC `reconcile_pending_freights` e da tabela que ela não tem — onda 4 — Média · — **fechada em 2026-11-25 - PR #473 mergeada e migration APLICADA**: `reconcile_pending_freights()` existe no banco (`schema-manifest` → `/functions/f:reconcile_pending_freights()`), mas **a tabela `freights` não existe** (só a coluna `performance_metrics.total_freights`) — a função é inoperante; recomendação = `DROP FUNCTION` por migration (Regra 8) - migration `20261125154100` escrita com rollback que recria a funcao e testada em Postgres 16 local, **PR #473 aberta** (Regra 8: aguarda o dono aplicar) - CONFIRMADO no banco oficial: `to_regclass(public.freights)` = NULL e `pg_proc` nao tem mais `reconcile_pending_freights` (0 linhas)
 - [x] **071** — Levar ao dono a decisão sobre `push-send` — onda 4 — Média · — **fechada em 2026-11-25** (levantamento): `push-send` **não é órfã** — `src/pages/Notificacoes.tsx:183` monta `PushNotificationCard`, que usa `usePushNotifications` (`src/hooks/notifications/usePushNotifications.tsx:211` → `functions.invoke('push-send')`); decisão: manter
 - [x] **072** — Executar a decisão sobre `push-send` — onda 4 — Média · — **fechada em 2026-11-25**: decisão sobre `push-send` = **manter**; a tabela `push_subscriptions` existe no banco (schema-manifest) e o chamador está ligado à tela de Notificações — nada a remover
 - [~] **073** — `ingest-biosync`: decidir o destino de uma função que recebe dado de biometria e ninguém usa — onda 4 — Média · — **levantado em 2026-11-25, aguarda o dono**: `ingest-biosync` grava em `bio_sync_telemetry` (tabela existe) e **não tem chamador**; `index.ts:43` inventa batimento com `Math.random()`. Recomendação = remover a função; falta saber se há linhas gravadas (consulta ao banco) - **2026-11-25 (2a conferencia):** o inventario medido no banco em 2026-11-23 mostra **44 funcoes publicadas e `ingest-biosync` nao e uma delas** (`inventario/estado/banco.json`, `edge_functions.publicadas`), e `inventario/estado/edges.json` a lista em `sem_chamador_no_repo` junto de `health` e `push-send`: em producao ela nunca subiu, entao nao ha o que remover la - o codigo do repo fica como esta (apagar e decisao sua, Regra 8)
@@ -348,7 +348,7 @@
 - [x] **260** — `docs/PLANO_MELHORIAS_2026.md`: corrigir a árvore de hooks que cita `useAnalyticsReal` — onda 8 — Baixa
 - [x] **261** — `TEMPLATE_STRUCTURE.md`: parar de ensinar hook na raiz de `src/hooks/` — onda 8 — Baixa
 - [x] **262** — `PLANO_FRONTEND_CONTRATOS_190_ETAPAS.md`: corrigir "43 edge functions" para 44 — onda 8 — Baixa
-- [~] **263** — Pedir ao dono o secret `SUPABASE_DB_URL`, sem o qual a fonte de contexto do banco nunca é gerada — onda 8 — Alta · **aguarda o dono**
+- [x] **263** — Pedir ao dono o secret `SUPABASE_DB_URL`, sem o qual a fonte de contexto do banco nunca é gerada — onda 8 — Alta · **fechada em 2026-11-25**: o secret `SUPABASE_DB_URL` foi criado (`gh secret list` -> `SUPABASE_DB_URL 2026-11-25T15:06:13Z`); o job `banco` do `contexto-ia.yml` passou a gerar de verdade - `origin/contexto:docs/contexto/supabase/` tem 563 arquivos com `manifest.json` `gerado_em 2026-11-25T15:07:22Z`, `erros: []`, `carried: []`
 - [x] **264** — Rodar o produtor do contexto de banco e confirmar que `docs/contexto/supabase/` foi publicado — onda 8 — Alta · **553 arquivos publicados**
 - [x] **265** — Dizer ao agente o que fazer quando a fonte do banco não existir — onda 8 — Alta · — **fechada em 2026-11-25**: o plano B está nos 3 arquivos — `AGENTS.md` (Plano B da fonte do banco), `docs/agentes/banco.md` (Plano B) e `docs/agentes/contexto-ia.md` (MCP como caminho enquanto `supabase/` estiver vazia)
 - [x] **266** — Fazer a ausência do snapshot do banco parar de sair verde em silêncio — onda 8 — Média · **feito — `contexto-ia.yml` publica a causa da ausência do snapshot; PR #441 mergeada em `26f0a4a1`**
@@ -3694,8 +3694,8 @@ Atualize ao fim de cada sessão de trabalho.
 
 |                         | Quantidade |
 | ----------------------- | ---------- |
-| Concluídas `[x]`        | 275         |
-| Aguardando o dono `[~]` | 25         |
+| Concluidas `[x]`        | 278         |
+| Aguardando o dono `[~]` | 22          |
 | Bloqueadas `[!]`        | 0          |
 | Não iniciadas `[ ]`     | 0          |
 | **Total**               | **300**    |
@@ -4862,3 +4862,38 @@ de `bio_sync_telemetry` precisam de conexao ao banco **oficial** (`jvfhclubfpxrt
 o repo so expoe `SUPABASE_ACCESS_TOKEN` e `DESTINO_URL` como segredo do environment `banco-leitura` (write-only, nao
 legivel) e nao ha `.env` com string de Postgres. Sem essa medida eu **nao escrevo** migration de remocao de bucket -
 remover bucket com objeto dentro e perda de dado, e a regra e nao perder trabalho nem dado.
+
+### Registro - etapa 295 (2026-11-25) - os seis achados HIPOTESE medidos no banco OFICIAL ao vivo
+
+A fonte que faltava passou a existir nesta sessao (etapa 263: secret `SUPABASE_DB_URL` + snapshot publicado), e o banco
+oficial `jvfhclubfpxrtrrazrgr` ficou alcancavel por leitura. Cada linha abaixo foi medida agora, nao inferida.
+
+- **F-02 -> REFUTADO - 2026-11-25.** `geo_blocking_rules` (2 policies), `geo_blocking_settings` (2) e `scheduled_reports`
+  (4) tem `relrowsecurity = true` (e `relforcerowsecurity = false`) no banco ao vivo: nao existe policy em tabela sem RLS.
+  A hipotese vinha de o repositorio nao ter migration de `ENABLE ROW LEVEL SECURITY`; o RLS foi ligado por fora das
+  migrations. Nada a corrigir.
+- **F-03 -> CONFIRMADO (e a parte que faltava foi corrigida na etapa 027) - 2026-11-25.**
+  `coletas_numero_coleta_key` e `entregas_numero_entrega_key` existem (indices UNIQUE), e
+  `logistica_reversa.codigo_rastreio_reverso` estava **sem** qualquer restricao. A migration `20261125154000`
+  (PR #473, aplicada) criou `ux_logistica_reversa_codigo_rastreio` - conferido por consulta:
+  `CREATE UNIQUE INDEX ux_logistica_reversa_codigo_rastreio ON public.logistica_reversa USING btree
+  (codigo_rastreio_reverso) WHERE (codigo_rastreio_reverso IS NOT NULL)`, 0 duplicatas na tabela.
+- **P-05 -> CONFIRMADO - 2026-11-25.** Inventario real de indices contado no banco: `coletas` tem **13**,
+  `entregas` tem **12** (incluindo `idx_entregas_status_composite`, `idx_entregas_transp_status`) e `telemetry_logs`
+  tem **5**. As migrations descrevem o que existe.
+- **P-06 -> CONFIRMADO com prazo util de medicao - 2026-11-25.** A janela das estatisticas e honesta: `pg_stat_database.stats_reset`
+  e **NULL** (nunca zerado) e o postmaster subiu em **2026-08-21**, ou seja o `idx_scan` cobre ~3 meses. Dentro dessa janela,
+  **13 indices em `coletas`/`entregas` tem `idx_scan = 0`** (ex.: `idx_entregas_rastreamento`, `idx_entregas_previsao_pendente`,
+  `idx_entregas_status_composite`, `idx_coletas_flags`, `idx_coletas_status_active`) e os mais usados sao
+  `idx_coletas_status_created_at` (768), `idx_entregas_transp_status` (556) e `idx_entregas_status_created_at` (388).
+  Ressalva registrada: `rastreamento_historico` (18 particoes) e `audit_logs` (13 particoes) sao **particionadas**, e as
+  estatisticas de indice vivem nas particoes - `pg_stat_user_indexes` nao mostra o pai. **Nada foi removido**: a decisao
+  de drop e das etapas 234-240.
+- **S-05 -> SEGUE ABERTO - 2026-11-25.** Nao ha fonte legivel: o snapshot publica `edge-functions.md` sem nomes de secret e
+  `auth.md` diz `_Configuracao indisponivel (Management API desabilitada)._`. Saber se `ALLOW_TEST_MODE` existe nas edge
+  functions em producao exige o painel do Supabase (etapa 010). Nao anotei valor nenhum.
+- **S-08 -> SEGUE ABERTO - 2026-11-25.** Se o token `VITE_MAPBOX_TOKEN` tem restricao de URL e propriedade do painel do
+  Mapbox; nenhuma consulta ao Postgres responde (etapa 019). Sem valor de segredo registrado.
+
+**Armadilha da etapa respeitada:** esta etapa e so medicao. Nenhum `CREATE`/`ALTER`/`DROP` foi executado aqui; a unica
+escrita no banco oficial na sessao foram as duas migrations da etapa 027/070, autorizadas pelo dono em PR propria.
