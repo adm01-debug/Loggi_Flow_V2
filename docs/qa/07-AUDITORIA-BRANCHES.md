@@ -116,11 +116,11 @@ Contagem fechada do repositório, `gh pr list --state all --limit 600`, em 2026-
 
 | Estado | Total | Composição |
 | --- | --- | --- |
-| Mergeadas | 422 | 346 de agente + 15 de bot de workflow + 1 de ferramenta |
+| Mergeadas | 431 | 355 de agente + 13 de bot de workflow + 1 de ferramenta + 62 do dependabot |
 | Fechadas sem merge | 47 | **19 de agente** (todas na tabela da seção 3) + 28 do dependabot |
-| Abertas | 13 | **1 de agente (#477)** + 12 do dependabot |
+| Abertas | 16 | **2 de agente (#477, DDL, e #501, comentários de CI)** + 14 do dependabot |
 
-Fechando a conta: 482 PRs, e **não existe nenhuma PR de agente fora de uma destas três situações** —
+Fechando a conta: 494 PRs (recontados em 2026-11-25, depois dos merges #502, #503 e #504), e **não existe nenhuma PR de agente fora de uma destas três situações** —
 mergeada, auditada na seção 3, ou aberta. As 19 fechadas sem merge não são uma amostra, são o conjunto
 inteiro, conferido um a um.
 
