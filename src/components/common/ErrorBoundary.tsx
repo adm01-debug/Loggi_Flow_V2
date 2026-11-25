@@ -2,6 +2,7 @@ import { Component, ErrorInfo, ReactNode, useCallback, useState } from "react";
 import { RefreshCw, Home, ChevronLeft, ShieldAlert, LifeBuoy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import * as Sentry from "@sentry/react";
 
 interface Props {
   children: ReactNode;
@@ -27,6 +28,11 @@ export class ErrorBoundary extends Component<Props, State> {
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     this.setState({ error, errorInfo });
     console.error("ErrorBoundary caught an error:", error, errorInfo);
+    // Sem isto o crash de render só aparecia no console do navegador do usuário.
+    // Sem DSN configurado o Sentry não inicializa e a chamada é no-op.
+    Sentry.captureException(error, {
+      contexts: { react: { componentStack: errorInfo.componentStack } },
+    });
   }
 
   handleReset = () => {
