@@ -60,7 +60,7 @@
 - [x] **024** — Habilitar RLS em `scheduled_reports` — onda 1 — Crítica · **não se aplica: já habilitado (etapa 023)**
 - [x] **025** — Habilitar RLS nas duas tabelas de geo-blocking, depois de conferir o caminho de escrita da tela — onda 1 — Crítica · **não se aplica: já habilitado (etapa 023)**
 - [x] **026** — Confirmar no banco ao vivo a unicidade de `numero_coleta`, `numero_entrega` e do código de rastreio — onda 1 — Alta (se ausente) — **UNIQUE presente nos números; ausente no código de rastreio**
-- [~] **027** — Criar a unicidade que faltar nos números e no código de rastreio — onda 1 — Alta · **aguarda o dono**
+- [~] **027** — Criar a unicidade que faltar nos números e no código de rastreio — onda 1 — Alta · **aguarda o dono**: a 026 provou no banco ao vivo que `numero_coleta` e `numero_entrega` ja tem UNIQUE e que **so `logistica_reversa.codigo_rastreio_reverso` ficou sem** - migration `20261125154000` escrita com indice unico **parcial** e guarda de duplicata, testada em Postgres 16 local, **PR #473 aberta** (Regra 8: aguarda o dono aplicar)
 
 ### Onda 3
 
@@ -118,13 +118,13 @@
 
 - [x] **068** — Remover o hook `useSelfHealing` — onda 4 — Média
 - [x] **069** — Remover o hook `useNexusSimulator` — onda 4 — Média
-- [~] **070** — Decidir o destino da RPC `reconcile_pending_freights` e da tabela que ela não tem — onda 4 — Média · — **levantado em 2026-11-25, aguarda o dono**: `reconcile_pending_freights()` existe no banco (`schema-manifest` → `/functions/f:reconcile_pending_freights()`), mas **a tabela `freights` não existe** (só a coluna `performance_metrics.total_freights`) — a função é inoperante; recomendação = `DROP FUNCTION` por migration (Regra 8)
+- [~] **070** — Decidir o destino da RPC `reconcile_pending_freights` e da tabela que ela não tem — onda 4 — Média · — **levantado em 2026-11-25, aguarda o dono**: `reconcile_pending_freights()` existe no banco (`schema-manifest` → `/functions/f:reconcile_pending_freights()`), mas **a tabela `freights` não existe** (só a coluna `performance_metrics.total_freights`) — a função é inoperante; recomendação = `DROP FUNCTION` por migration (Regra 8) - migration `20261125154100` escrita com rollback que recria a funcao e testada em Postgres 16 local, **PR #473 aberta** (Regra 8: aguarda o dono aplicar)
 - [x] **071** — Levar ao dono a decisão sobre `push-send` — onda 4 — Média · — **fechada em 2026-11-25** (levantamento): `push-send` **não é órfã** — `src/pages/Notificacoes.tsx:183` monta `PushNotificationCard`, que usa `usePushNotifications` (`src/hooks/notifications/usePushNotifications.tsx:211` → `functions.invoke('push-send')`); decisão: manter
 - [x] **072** — Executar a decisão sobre `push-send` — onda 4 — Média · — **fechada em 2026-11-25**: decisão sobre `push-send` = **manter**; a tabela `push_subscriptions` existe no banco (schema-manifest) e o chamador está ligado à tela de Notificações — nada a remover
-- [~] **073** — `ingest-biosync`: decidir o destino de uma função que recebe dado de biometria e ninguém usa — onda 4 — Média · — **levantado em 2026-11-25, aguarda o dono**: `ingest-biosync` grava em `bio_sync_telemetry` (tabela existe) e **não tem chamador**; `index.ts:43` inventa batimento com `Math.random()`. Recomendação = remover a função; falta saber se há linhas gravadas (consulta ao banco)
+- [~] **073** — `ingest-biosync`: decidir o destino de uma função que recebe dado de biometria e ninguém usa — onda 4 — Média · — **levantado em 2026-11-25, aguarda o dono**: `ingest-biosync` grava em `bio_sync_telemetry` (tabela existe) e **não tem chamador**; `index.ts:43` inventa batimento com `Math.random()`. Recomendação = remover a função; falta saber se há linhas gravadas (consulta ao banco) - **2026-11-25 (2a conferencia):** o inventario medido no banco em 2026-11-23 mostra **44 funcoes publicadas e `ingest-biosync` nao e uma delas** (`inventario/estado/banco.json`, `edge_functions.publicadas`), e `inventario/estado/edges.json` a lista em `sem_chamador_no_repo` junto de `health` e `push-send`: em producao ela nunca subiu, entao nao ha o que remover la - o codigo do repo fica como esta (apagar e decisao sua, Regra 8)
 - [x] **074** — Levantar o uso real dos três buckets antes de qualquer decisão — onda 4 — Média · — **fechada em 2026-11-25** (levantamento concluído): `ocorrencias-fotos` **em uso** (`Ocorrencias.tsx:196,776,890`); `comprovantes` **zero uso** no código (o comprovante real vai para `documents`, `Envios.tsx:1183`); `entregas-fotos` **zero uso** no código. Os três são criados por `supabase/migrations/20251220173229_storage_buckets.sql`
-- [~] **075** — `comprovantes`: um caminho só para o comprovante de entrega — onda 4 — Média · — **levantado em 2026-11-25, aguarda o dono**: bucket `comprovantes` sem uso; `documents` já é privado e guarda o comprovante (`DeliveryReceiptUpload.tsx:55-57`). Recomendação = remover o bucket por migration (Regra 8)
-- [~] **076** — `entregas-fotos`: ligar a foto de entrega ou remover o bucket — onda 4 — Média · — **levantado em 2026-11-25, aguarda o dono**: bucket `entregas-fotos` sem uso no código; pergunta de negócio = *foto de entrega é prova a guardar?* Sim → ligar com o molde de `Ocorrencias.tsx:776` + `useImageUpload`; não → remover o bucket
+- [~] **075** — `comprovantes`: um caminho só para o comprovante de entrega — onda 4 — Média · — **levantado em 2026-11-25, aguarda o dono**: bucket `comprovantes` sem uso; `documents` já é privado e guarda o comprovante (`DeliveryReceiptUpload.tsx:55-57`). Recomendação = remover o bucket por migration (Regra 8) - **2026-11-25 (2a conferencia):** o caminho `entregas/<id>/comprovantes` de `src/pages/Envios.tsx:1183` e **pasta dentro do bucket `documents`** (o `DocumentUploadField` usa `useDocumentUpload`, cujo padrao e `bucket = "documents"`, `src/hooks/data/useDocumentUpload.ts:18`), nao o bucket `comprovantes` - era o falso positivo que a 074 ensinou a checar; `storage.from("comprovantes")` = 0 ocorrencias no repo. Falta so a contagem de objetos no bucket, que exige conexao ao banco de producao
+- [~] **076** — `entregas-fotos`: ligar a foto de entrega ou remover o bucket — onda 4 — Média · — **levantado em 2026-11-25, aguarda o dono**: bucket `entregas-fotos` sem uso no código; pergunta de negócio = *foto de entrega é prova a guardar?* Sim → ligar com o molde de `Ocorrencias.tsx:776` + `useImageUpload`; não → remover o bucket - **2026-11-25 (2a conferencia):** `useImageUpload` tem padrao `ocorrencias-fotos` (`src/hooks/data/useImageUpload.tsx:62`) e nenhum chamador passa `entregas-fotos`: o bucket esta vazio de uso no codigo. Decisao de negocio = ligar a foto de entrega (prova de entrega) ou remover; nos dois casos a contagem de objetos no bucket depende de conexao ao banco de producao
 - [x] **077** — Remover `uploadDocument` de `storageService.ts` — onda 4 — Média
 - [x] **078** — Recusar arquivo cuja assinatura não é conhecida — onda 4 — Média
 - [x] **079** — Teste unitário da validação de assinatura de arquivo — onda 4 — Média
@@ -4801,3 +4801,64 @@ Postgres de verdade; 3 casos novos na 257: sem `rotas.json` -> `null`, com `rota
 `coletado_em 2026-11-25`, `edges 44`, `migrations_no_repo 259`, `rotas_no_app 61` (bate com o `AGENTS.md`);
 `actionlint` no workflow -> `exit=0`; `npm run automation:test` -> **103 testes, 0 falhas**; gate do
 `mudou-conteudo` (carimbo + numero novo) verde.
+
+### Registro - etapas 027 e 070 (2026-11-25) - as duas migrations de banco escritas e testadas, aguardando aplicar
+
+**027 - unicidade do codigo de rastreio reverso.** A 026 ja tinha conferido no banco ao vivo que
+`logistica_reversa.numero_coleta` e `numero_entrega` tem UNIQUE; a unica coluna que ficou sem protecao e
+`codigo_rastreio_reverso` (`20260512191343_9d4eff37-...sql:10`, `TEXT`, aceita nulo) - e ela e digitada a
+mao, entao dois registros com o mesmo codigo fazem o rastreamento apontar para a devolucao errada.
+
+Migration `20261125154000_codigo_rastreio_reverso_unico.sql`: um bloco `DO` conta as duplicatas e
+`RAISE EXCEPTION` com mensagem legivel antes de qualquer coisa, e so entao
+`CREATE UNIQUE INDEX IF NOT EXISTS ux_logistica_reversa_codigo_rastreio ... WHERE codigo_rastreio_reverso IS NOT NULL`.
+Indice **parcial** de proposito (a coluna aceita nulo, sem exclusao logica nela) e **sem `CONCURRENTLY`**,
+porque o `aplicar-migration.yml` roda a migration dentro de uma transacao.
+
+**070 - a RPC orfa.** `reconcile_pending_freights()` faz `UPDATE public.freights`, tabela que nenhuma das
+259 migrations cria, e o proprio corpo admite "Simula uma logica de reconciliacao real". O `EXECUTE` ja foi
+revogado de `authenticated` em tres migrations e nao ha chamador no `src/`. Migration
+`20261125154100_drop_reconcile_pending_freights.sql` = `DROP FUNCTION IF EXISTS public.reconcile_pending_freights();`,
+sem tocar nas migrations de REVOKE.
+
+**Provas (Postgres 16 local, banco descartavel `mig_test`, `ON_ERROR_STOP=1`):** com duplicata presente a 027
+aborta com `ERROR: Etapa 027 abortada: 1 codigo(s) de rastreio reverso repetido(s)` e nada muda; sem duplicata
+o indice nasce como `CREATE UNIQUE INDEX ux_logistica_reversa_codigo_rastreio ... WHERE (codigo_rastreio_reverso IS NOT NULL)`;
+`INSERT` repetido e recusado (`duplicate key value violates unique constraint`); varios `NULL` continuam aceitos;
+reaplicar a 027 e idempotente (`relation ... already exists, skipping`); a 070 aplica e reaplica sem erro
+(`does not exist, skipping`); o rollback da 070 recria a funcao (`pg_proc` volta a 1) e o rollback da 027
+remove o indice (`pg_indexes` volta a 0).
+
+**Estado:** PR **#473** aberta e **nao mergeada** - DDL em producao e Regra 8. Aplicacao pelo `Aplicar Migration`
+com `arquivo=supabase/migrations/20261125154000_...sql` (depois `..._154100_...sql`) e `confirmacao=APLICAR`;
+se o banco tiver duplicata, o run falha com a mensagem da etapa 027 e nada e alterado.
+
+### Registro - etapas 073, 075 e 076 (2026-11-25) - segunda conferencia dos tres levantamentos, com o inventario do banco na mao
+
+O levantamento destas tres etapas ja existia no progresso (2026-11-25) e a pendencia declarada era sempre a mesma:
+uma medida que so o banco de producao responde. Fui conferir o que o proprio repositorio ja guarda do banco real.
+
+**073 - `ingest-biosync`.** `inventario/estado/banco.json` (medido em **2026-11-23**) lista **44 funcoes
+publicadas** e `ingest-biosync` **nao esta entre elas**; `inventario/estado/edges.json` a coloca em
+`sem_chamador_no_repo` junto de `health` e `push-send`. Traduzindo: em producao ela **nunca subiu**, entao nao ha
+funcao viva para remover - o que existe e codigo parado no repo (`index.ts`, `parse.ts`, `index_test.ts`), que
+grava em `bio_sync_telemetry` e le `bio_sync_alert_rules`. Apagar codigo do repo e decisao sua (Regra 8, deploy
+de edge): mantenho o arquivo e nao removo nada.
+
+**075 - bucket `comprovantes`.** O falso positivo classico desta familia esta descartado por prova de codigo: o
+`folder` que aparece em `src/pages/Envios.tsx:1183` (`entregas/<id>/comprovantes`) e **pasta dentro do bucket
+`documents`**, porque o `DocumentUploadField` usa o `useDocumentUpload`, cujo padrao e `bucket = "documents"`
+(`src/hooks/data/useDocumentUpload.ts:18`). `storage.from("comprovantes")` nao aparece nenhuma vez no repo. O
+comprovante de entrega ja e guardado no `documents`, que e privado.
+
+**076 - bucket `entregas-fotos`.** `useImageUpload` tem padrao `ocorrencias-fotos`
+(`src/hooks/data/useImageUpload.tsx:62`) e nenhum chamador passa `entregas-fotos`. A pergunta continua sendo de
+negocio, nao tecnica: **foto de entrega e prova a guardar?** Se sim, liga-se com o molde de `Ocorrencias.tsx` +
+`useImageUpload`; se nao, remove-se o bucket. Nao escolho por voce e nao escrevo DDL nos dois casos.
+
+**O que continua faltando (e por que).** A contagem de objetos de cada bucket
+(`SELECT count(*) FROM storage.objects WHERE bucket_id IN ('comprovantes','entregas-fotos')`) e a contagem de linhas
+de `bio_sync_telemetry` precisam de conexao ao banco **oficial** (`jvfhclubfpxrtrrazrgr`), que esta sessao nao tem:
+o repo so expoe `SUPABASE_ACCESS_TOKEN` e `DESTINO_URL` como segredo do environment `banco-leitura` (write-only, nao
+legivel) e nao ha `.env` com string de Postgres. Sem essa medida eu **nao escrevo** migration de remocao de bucket -
+remover bucket com objeto dentro e perda de dado, e a regra e nao perder trabalho nem dado.
