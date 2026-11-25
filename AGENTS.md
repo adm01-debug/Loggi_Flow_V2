@@ -88,7 +88,7 @@ divergiu da realidade → corrija no mesmo PR do fix. Responda sempre em PT-BR.
 - **Não escrever** em `hgicfqjayrjurivtygqf` (Lovable Cloud, origem do cutover — só referência de paridade).
   `uwbpzfcysppwikfpnzok` é ref morto ainda citado em `index.html` e em
   `supabase/functions/send-password-reset/index.ts` — dívida, não destino.
-- As migrations do repo (hoje **261** em 2026-11-25; confira com `ls supabase/migrations/*.sql | wc -l`) são
+- As migrations do repo (hoje **262** em 2026-11-25; confira com `ls supabase/migrations/*.sql | wc -l`) são
   histórico; o estado real é o banco ao vivo (e, quando ela existir, a fonte `supabase/` da branch
   `contexto`). RLS segue o padrão `SECURITY DEFINER` (`docs/adr/0014-security-definer-rls-pattern.md`);
   exclusão é lógica, por `deleted_at` (`docs/SOFT_DELETE_POLICY.md`).
