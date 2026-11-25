@@ -1,5 +1,5 @@
 /* eslint-disable max-lines */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Stepper } from "@/components/ui/stepper";
 import { Progress } from "@/components/ui/progress";
@@ -177,6 +177,56 @@ export default function ImportacaoMassa() {
   );
   const { exportToCSV } = useExport();
 
+  // Etapa 120: o historico da importacao vive em audit_logs, nao so no estado da tela
+  const registrarHistorico = async (stat: ImportStats) => {
+    const { data: sessao } = await supabase.auth.getUser();
+    const { error } = await supabase.from("audit_logs").insert({
+      table_name: "importacao_massa",
+      record_id: crypto.randomUUID(),
+      action: "INSERT",
+      user_id: sessao.user?.id ?? null,
+      new_data: {
+        entity: stat.entity,
+        total: stat.total,
+        success: stat.success,
+        errors: stat.errors,
+        falhas: stat.falhas.length,
+      },
+    });
+    if (error) {
+      console.warn("Falha ao registrar o historico da importacao:", error.message);
+    }
+  };
+
+  useEffect(() => {
+    let ativo = true;
+    supabase
+      .from("audit_logs")
+      .select("record_id, new_data, created_at")
+      .eq("table_name", "importacao_massa")
+      .order("created_at", { ascending: false })
+      .limit(10)
+      .then(({ data }) => {
+        if (!ativo || !data) return;
+        setHistory(
+          data.map((row) => {
+            const d = (row.new_data ?? {}) as Record<string, unknown>;
+            return {
+              entity: String(d.entity ?? "desconhecido"),
+              total: Number(d.total ?? 0),
+              success: Number(d.success ?? 0),
+              errors: Number(d.errors ?? 0),
+              timestamp: new Date(row.created_at),
+              falhas: [],
+            } satisfies ImportStats;
+          }),
+        );
+      });
+    return () => {
+      ativo = false;
+    };
+  }, []);
+
   const importSteps = [
     { title: "Seleção", description: "Escolha o tipo de dados" },
     { title: "Upload", description: "Envie seu arquivo" },
@@ -224,6 +274,7 @@ export default function ImportacaoMassa() {
         falhas,
       };
       setHistory((h) => [stat, ...h]);
+      void registrarHistorico(stat);
       setUltimaImportacao(stat);
       setImportProgress(100);
       setCurrentStep(3); // Finalizado
