@@ -484,7 +484,7 @@ export default function CotacaoMultiCanal() {
   };
 
   const handleRegistrarResposta = () => {
-    if (!selectedCarrier || !manualValor) {
+    if (!manualValor) {
       toast.error("Informe o valor");
       return;
     }
@@ -630,6 +630,10 @@ export default function CotacaoMultiCanal() {
                 </div>
               </div>
             </h1>
+            <p className="max-w-md text-[11px] font-bold uppercase tracking-[0.2em] text-white/30">
+              Disparar e responder cotações — o histórico e a comparação ficam
+              no Dashboard de Cotações
+            </p>
           </div>
           <div className="flex items-center gap-3">
             <Button
@@ -647,7 +651,7 @@ export default function CotacaoMultiCanal() {
               className="h-14 px-8 rounded-2xl bg-primary text-black hover:bg-primary/90 font-black uppercase tracking-widest text-[11px] gap-3 transition-all shadow-lg shadow-primary/20"
             >
               <TrendingDown className="w-4 h-4" />
-              Insights de Custo
+              Acompanhar cotações
             </Button>
           </div>
         </div>
@@ -870,7 +874,9 @@ export default function CotacaoMultiCanal() {
                     </CardHeader>
                     <CardContent className="p-3 pt-0">
                       <p className="font-bold text-sm truncate">
-                        {melhorCotacao ? nomeTransportadora(melhorCotacao) : null}
+                        {melhorCotacao
+                          ? nomeTransportadora(melhorCotacao)
+                          : null}
                       </p>
                       <p className="text-xs text-muted-foreground">
                         R$ {melhorCotacao?.valor_cotado?.toFixed(2)}
@@ -946,7 +952,9 @@ export default function CotacaoMultiCanal() {
             {isLoading && cotacoes.length === 0 && (
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm">Carregando cotações…</CardTitle>
+                  <CardTitle className="text-sm">
+                    Carregando cotações…
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <SkeletonTable rows={4} cols={5} />
@@ -1026,19 +1034,17 @@ export default function CotacaoMultiCanal() {
                     onEscolher={handleEscolherCotacao}
                     onRegistrar={(cotacaoId) => {
                       const cot = cotacoes.find((x) => x.id === cotacaoId);
-                      const c = cot
-                        ? carriers.find(
-                            (x) =>
-                              x.transportadora_id === cot.transportadora_id,
-                          )
-                        : undefined;
-                      if (!cot || !c) {
+                      if (!cot) {
                         toast.error(
-                          "Transportadora desta cotação não está na busca atual — refaça a busca para registrar a resposta",
+                          "Cotação não encontrada — atualize a lista e tente de novo",
                         );
                         return;
                       }
-                      setSelectedCarrier(c);
+                      setSelectedCarrier(
+                        carriers.find(
+                          (x) => x.transportadora_id === cot.transportadora_id,
+                        ) ?? null,
+                      );
                       setManualCotacaoId(cot.id);
                       setManualDialog(true);
                     }}
@@ -1081,7 +1087,10 @@ export default function CotacaoMultiCanal() {
             <DialogHeader>
               <DialogTitle>
                 Registrar Cotação -{" "}
-                {selectedCarrier?.transportadora?.nome_fantasia}
+                {selectedCarrier?.transportadora?.nome_fantasia ??
+                  cotacoes.find((x) => x.id === manualCotacaoId)?.transportadora
+                    ?.nome_fantasia ??
+                  "cotação pendente"}
               </DialogTitle>
             </DialogHeader>
             <div className="space-y-4">

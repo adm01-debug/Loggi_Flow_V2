@@ -299,6 +299,13 @@ export default function DashboardCotacoes() {
           </div>
           <div className="flex gap-2">
             <Button
+              onClick={() => (window.location.href = "/cotacao-multicanal")}
+              size="sm"
+              className="gap-2"
+            >
+              <Zap className="w-4 h-4" /> Nova cotação
+            </Button>
+            <Button
               onClick={() => refetch()}
               variant="outline"
               size="sm"
