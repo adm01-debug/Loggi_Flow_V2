@@ -145,6 +145,13 @@ nenhuma delas invoca Edge Functions nem `persist_db_health_snapshot` (parse exau
 que é a checagem de autenticação da própria função (uma função ausente responderia
 `{"code":"NOT_FOUND"}`). **Não existe `supabase/functions/migrate-helper/` no repositório.**
 
+> **Atualização de 25/11/2026 (sondagem de produção):** esta segunda prova **caiu**. A Edge Function
+> `migrate-helper` **não responde mais** em produção: a sonda de hoje devolveu
+> **HTTP 404 `{"code":"NOT_FOUND"}`**, enquanto `health`, no mesmo gateway, devolveu 200 - ou seja, o
+> 404 é ausência da função, não falta de credencial. O item "função viva sem fonte no repositório" deixa
+> de existir; o que ela fazia está versionado em `scripts/ops/backup_origem.sh` (com teste em
+> `scripts/ops/backup_origem.unit.mjs`). `supabase/functions/migrate-helper/` não existe no repositório.
+
 Ou seja, roda em produção um código que ninguém pode revisar, versionar ou reconstruir — e o nome
 sugere que ele executa migrations, operação privilegiada. O drift de implantação é **assimétrico**:
 repo → ambiente está 43/43 em dia; ambiente → repo tem pelo menos 1 função órfã.

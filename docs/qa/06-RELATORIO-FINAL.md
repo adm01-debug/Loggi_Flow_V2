@@ -27,8 +27,9 @@
 3. **Erro de tela de usuário invisível (285/286).** Enquanto `VITE_SENTRY_DSN` não estiver confirmado no Vercel,
    falha em produção não deixa registro — foi assim que os bugs desta auditoria chegaram até você por print.
 4. **Funções e buckets órfãos no ar (073, 075, 076).** `reconcile_pending_freights()` foi removida em produção
-   (070, migration `20261125154100`): não há mais função sem tabela. Restam `ingest-biosync` (inventa
-   batimento com `Math.random()` em `index.ts:43`, sem chamador e **nunca publicada** em produção) e os dois
+   (070, migration `20261125154100`): não há mais função sem tabela. Restam `ingest-biosync` (sem chamador e
+   **nunca publicada** em produção; o `Math.random()` que a 1ª conferência citou foi trocado pelo hash do
+   conteúdo em `24067b2c5`) e os dois
    buckets de foto (`comprovantes`, `entregas-fotos`) sem uso pelo código.
 5. **Importação em massa sem rastro (120).** O histórico vive em `ImportacaoMassa.tsx:171` (`useState`): a tela
    fecha e some com quem importou o quê.
