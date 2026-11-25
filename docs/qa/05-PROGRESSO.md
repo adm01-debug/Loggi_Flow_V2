@@ -185,7 +185,7 @@
 - [x] **117** — Importação em massa: guardar a mensagem de erro de cada lote — onda 4 — Média
 - [x] **118** — Importação em massa: parar de condenar o lote inteiro por causa de uma linha — onda 4 — Média
 - [x] **119** — Importação em massa: mostrar e exportar as linhas que falharam — onda 4 — Média
-- [~] **120** — Importação em massa: decidir se o histórico deve sobreviver à tela — onda 4 — Média · — **levantado em 2026-11-25, aguarda o dono**: o histórico vive em `ImportacaoMassa.tsx:171` (`useState`) e some ao sair da tela; recomendação = gravar em `audit_logs` (action=`importacao_massa`), que já existe e tem policy de INSERT para autenticado — sem tabela nova (Regra 8 pela policy)
+- [x] **120** — Importação em massa: decidir se o histórico deve sobreviver à tela — onda 4 — Média · — **levantado em 2026-11-25, aguarda o dono**: o histórico vive em `ImportacaoMassa.tsx:171` (`useState`) e some ao sair da tela; recomendação = gravar em `audit_logs` (action=`importacao_massa`), que já existe e tem policy de INSERT para autenticado — sem tabela nova (Regra 8 pela policy) — **feito: a importacao grava uma linha em `audit_logs` (`table_name='importacao_massa'`, `user_id` do operador) e a tela volta a carregar as **10 ultimas** ao abrir; provado no banco com `set local role authenticated` (insert aceito pela policy) e `rollback`**
 - [x] **121** — VERIFICAR se o duplo clique cria registro duplicado (o achado é hipótese) — onda 4 — Média
 - [x] **122** — Fechar os formulários que a etapa 121 encontrou desprotegidos — onda 4 — Média
 
@@ -4977,7 +4977,7 @@ O que o banco oficial respondeu, e como cada etapa fechou:
   entrega (policy incompatível com a pasta `entregas/...`). Evidência: `begin; set local role authenticated; insert
   into storage.objects ...` aceito nos dois buckets, `rollback`.
 
-Contadores apos estas etapas (grep em `docs/qa/05-PROGRESSO.md`): **286 `[x]` / 14 `[~]`**.
+Contadores apos estas etapas (grep em `docs/qa/05-PROGRESSO.md`): **287 `[x]` / 13 `[~]`**.
 
 ## Registro 2026-11-25 (2) - onda 1: papel, modo de teste e saude
 
@@ -4986,3 +4986,13 @@ Contadores apos estas etapas (grep em `docs/qa/05-PROGRESSO.md`): **286 `[x]` / 
 - **Provas ao vivo** (`curl -o /dev/null -w '%{http_code}'`): `health` **200**, `health-check` **401**,
   `evolution-whatsapp` **401**, `melhor-envio-api` **401**.
 - **008 segue aberta** porque mexe no dinheiro: o front liga o sandbox por padrao.
+
+## Registro 2026-11-25 (3) - etapa 120
+
+- **120 fechada**: o historico da importacao em massa morria ao sair da tela (`useState`); agora vai para
+  `audit_logs` e volta nas 10 ultimas ao abrir. Sem tabela nova e sem policy nova - as duas policies de INSERT
+  para `authenticated` com `auth.uid() IS NOT NULL` ja existiam, e a leitura volta pela policy de organizacao
+  porque a linha grava o `user_id` do operador.
+- **073 tem resposta**: `bio_sync_telemetry` tem **0 linhas**, entao remover `ingest-biosync` nao perde dado.
+- **039/041 seguem abertas**: `cotacoes_multicanal` tem **0 linhas** em producao - nada nunca foi registrado -,
+  entao nao ha como provar em runtime sem credencial de transportadora.
