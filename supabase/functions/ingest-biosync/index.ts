@@ -10,6 +10,7 @@ import {
 } from "../_shared/idempotency.ts";
 import { parseBioSyncInput } from "./parse.ts";
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { requireRole } from "../_shared/auth.ts";
 
 serve(async (req) => {
   const headers = getCorsHeaders(req);
@@ -18,6 +19,17 @@ serve(async (req) => {
   }
 
   try {
+    // Etapa 073: funcao sem chamador no repo e nunca publicada, mas escrita com
+    // service role a partir do corpo do request. Sem guard, um deploy futuro a
+    // tornaria um escritor de telemetria de biometria aberto para qualquer um.
+    const auth = await requireRole(req, ["admin", "user"]);
+    if (!auth.ok) {
+      return new Response(
+        JSON.stringify({ error: auth.status === 403 ? "Forbidden" : "Unauthorized" }),
+        { status: auth.status, headers: { ...headers, "Content-Type": "application/json" } }
+      );
+    }
+
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
