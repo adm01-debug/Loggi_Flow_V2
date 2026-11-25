@@ -5698,6 +5698,36 @@ export type Database = {
         }
         Relationships: []
       }
+      webhook_inbound_failures: {
+        Row: {
+          created_at: string
+          error_message: string
+          event_id: string | null
+          id: string
+          provider: string | null
+          receiver: string
+          response_status: number
+        }
+        Insert: {
+          created_at?: string
+          error_message: string
+          event_id?: string | null
+          id?: string
+          provider?: string | null
+          receiver: string
+          response_status?: number
+        }
+        Update: {
+          created_at?: string
+          error_message?: string
+          event_id?: string | null
+          id?: string
+          provider?: string | null
+          receiver?: string
+          response_status?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       v_prediction_accuracy: {
@@ -6447,6 +6477,10 @@ export type Database = {
       }
       purge_rte_gateway_health: {
         Args: { retention_days?: number }
+        Returns: number
+      }
+      purge_webhook_inbound_failures: {
+        Args: { _keep_days?: number }
         Returns: number
       }
       reconcile_pending_freights: { Args: never; Returns: Json }

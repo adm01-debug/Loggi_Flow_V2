@@ -10,7 +10,7 @@
         "fn_valida_transicao_entrega(p_de entrega_status, p_para entrega_status)",
         "get_public_tracking(p_code text)"
     ],
-    "generated_at": "2026-11-24",
+    "generated_at": "2026-11-25",
     "anon_table_select": [
         "account_lockouts",
         "achievements",
@@ -141,9 +141,10 @@
         "webauthn_challenges",
         "webauthn_credentials",
         "webhook_deliveries",
-        "webhook_events_processed"
+        "webhook_events_processed",
+        "webhook_inbound_failures"
     ],
     "how_to_regenerate": "scripts/db-audit/grants-baseline.sql (E26)",
-    "service_role_execute_count": 118,
+    "service_role_execute_count": 119,
     "authenticated_execute_count": 64
 }

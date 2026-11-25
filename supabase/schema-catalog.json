@@ -147,7 +147,8 @@
         "webauthn_challenges",
         "webauthn_credentials",
         "webhook_deliveries",
-        "webhook_events_processed"
+        "webhook_events_processed",
+        "webhook_inbound_failures"
     ],
     "columns": [
         "account_lockouts.id:uuid:not-null",
@@ -1586,7 +1587,14 @@
         "webhook_events_processed.event_id:text:not-null",
         "webhook_events_processed.provider:text:not-null",
         "webhook_events_processed.processed_at:timestamp with time zone:nullable",
-        "webhook_events_processed.payload:jsonb:nullable"
+        "webhook_events_processed.payload:jsonb:nullable",
+        "webhook_inbound_failures.id:uuid:not-null",
+        "webhook_inbound_failures.receiver:text:not-null",
+        "webhook_inbound_failures.provider:text:nullable",
+        "webhook_inbound_failures.event_id:text:nullable",
+        "webhook_inbound_failures.response_status:integer:not-null",
+        "webhook_inbound_failures.error_message:text:not-null",
+        "webhook_inbound_failures.created_at:timestamp with time zone:not-null"
     ],
     "functions": [
         "add_user_xp",
@@ -1663,6 +1671,7 @@
         "persist_global_health_score",
         "purchase_reward",
         "purge_rte_gateway_health",
+        "purge_webhook_inbound_failures",
         "reconcile_pending_freights",
         "record_heartbeat",
         "refresh_dashboard_views",
@@ -1674,7 +1683,7 @@
         "validate_payload_schema",
         "xp_for_level"
     ],
-    "generated_at": "2026-11-24",
+    "generated_at": "2026-11-25",
     "format_version": 2,
     "check_constraints": [
         "achievements.achievements_rarity_check:CHECK ((rarity = ANY (ARRAY['common'::text, 'rare'::text, 'epic'::text, 'legendary'::text])))",
@@ -1844,6 +1853,7 @@
         "persist_global_health_score()->uuid|kind=f",
         "purchase_reward(p_user_id uuid, p_reward_item_id uuid)->jsonb|kind=f",
         "purge_rte_gateway_health(retention_days integer)->integer|kind=f",
+        "purge_webhook_inbound_failures(_keep_days integer)->integer|kind=f",
         "reconcile_pending_freights()->jsonb|kind=f",
         "record_heartbeat()->void|kind=f",
         "refresh_dashboard_views()->jsonb|kind=f",
