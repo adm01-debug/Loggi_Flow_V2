@@ -81,6 +81,10 @@ jobs:
       - name: Check Coverage
         run: npm run test:coverage -- --run
 
+      # Os numeros que o AGENTS.md afirma (required checks, migrations, workflows) tem de bater (etapa 255)
+      - name: Validate Agents Facts (AGENTS.md)
+        run: npm run validate:agents-facts
+
       # E2E nao e gate (nao roda no CI): specs de tests/e2e usam credenciais
       # ficticias e sem webServer; o workflow e2e.yml foi removido em 20/11/2026.
       # Reativar so com usuario de teste seedado em prod + webServer no workflow.

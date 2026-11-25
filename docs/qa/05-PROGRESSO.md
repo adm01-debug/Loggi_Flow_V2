@@ -340,7 +340,7 @@
 - [x] **252** — `AGENTS.md`: corrigir a contagem de migrations de 244 para a contagem real — onda 8 — Baixa
 - [x] **253** — `AGENTS.md`: corrigir o nome do workflow de contexto (`contexto.yml` → `contexto-ia.yml`) — onda 8 — Baixa
 - [x] **254** — Propagar as correções de H-03 para `docs/agentes/github-ci.md` e `docs/agentes/deploy.md` — onda 8 — Média (Regra 8: merge aguarda o dono — PR #329)
-- [~] **255** — Fazer a CI conferir os fatos verificáveis que o `AGENTS.md` afirma — onda 8 — Média · **aguarda o dono**
+- [x] **255** — Fazer a CI conferir os fatos verificáveis que o `AGENTS.md` afirma — onda 8 — Média — **feito — `validate:agents-facts`: 10 required checks e 259 migrations conferidos contra o baseline e o disco, e todo workflow citado existe**
 - [x] **256** — `docs/prod-readiness.md`: corrigir as duas contagens de paridade que caducaram — onda 8 — Alta
 - [~] **257** — Fazer o inventário semanal recontar a paridade e datar o `prod-readiness` — onda 8 — Média · **aguarda o dono**
 - [x] **258** — Rebaixar o enquadramento de "perfeição 10/10" nos dois documentos que o declaram — onda 8 — Média
@@ -3694,8 +3694,8 @@ Atualize ao fim de cada sessão de trabalho.
 
 |                         | Quantidade |
 | ----------------------- | ---------- |
-| Concluídas `[x]`        | 273         |
-| Aguardando o dono `[~]` | 27         |
+| Concluídas `[x]`        | 274         |
+| Aguardando o dono `[~]` | 26         |
 | Bloqueadas `[!]`        | 0          |
 | Não iniciadas `[ ]`     | 0          |
 | **Total**               | **300**    |
@@ -4754,3 +4754,28 @@ ganhou `*.bak`, `*.orig`, `*.rej`, `*.tmp` e `*.log`, que e o que mais aparece s
 **6 testes, 0 falhas**; `node --test scripts/ci/check-root-files.unit.mjs` -> **4 testes, 0 falhas**;
 `actionlint .github/workflows/ci-nexus.yml` -> `exit=0`; `check-claude-md-integrity.mjs` -> `exit=0`.
 Os dois jobs entraram no `quality-gate` do `ci-nexus.yml`.
+
+### Registro - etapa 255 (2026-11-25) - a CI passa a conferir o que o AGENTS.md afirma
+
+O `Agents Docs Integrity` provava que o arquivo existia e nao encolhia; nao provava que o conteudo era
+verdade. O H-03 existiu por meses exatamente por isso: o proprio `AGENTS.md` dizia **duas coisas diferentes**
+sobre o mesmo fato - "os 10 required checks" numa secao e "(9 checks obrigatorios)" na outra - e dizia "hoje
+**250** em 2026-11-23" para as migrations, que ja eram **259**.
+
+`scripts/ci/check-agents-facts.mjs` (`npm run validate:agents-facts`) faz tres conferencias locais, sem rede
+e sem token, e usa o baseline versionado (`scripts/ci/github-settings-baseline.json`) em vez da API - quem
+mantem o baseline fiel ao GitHub e o `settings-guard.yml`, que ja existe. Um gate que dependesse de rede
+ficaria intermitente e seria desligado:
+
+1. o numero em "os N required checks" e igual a `required_status_checks.length` do baseline (hoje **10**);
+2. a contagem em "hoje **N** em AAAA-MM-DD" e igual ao numero de `.sql` em `supabase/migrations/` (hoje **259**);
+3. todo `.github/workflows/<arquivo>.yml` citado no `AGENTS.md` existe.
+
+Se a frase sair do texto, o gate **reprova** em vez de passar em silencio: sumir com a afirmacao nao pode ser
+o caminho para ficar verde.
+
+**Provas:** `npm run validate:agents-facts` -> `[agents-facts] OK: 10 required checks e 259 migrations batem
+com o AGENTS.md; todo workflow citado existe`; `node --test scripts/ci/check-agents-facts.unit.mjs` ->
+**5 testes, 0 falhas** (inclui a prova negativa de 9 checks, 3 vs 5 migrations, workflow fantasma e frase
+removida); `check-claude-md-integrity.mjs` -> `exit=0`; `actionlint` -> `exit=0`; `npm run automation:test`
+-> **103 testes, 0 falhas**.
