@@ -84,6 +84,9 @@ describe("etapa 288: a falha do webhook de entrada tem destino persistente", () 
     expect(sql).toContain(
       "ALTER TABLE public.webhook_inbound_failures ENABLE ROW LEVEL SECURITY",
     );
+    // As duas policies precisam poder ser recriadas: o banco oficial ja tinha os
+    // objetos quando este arquivo entrou na main.
+    expect(sql.match(/DROP POLICY IF EXISTS/g)?.length).toBe(2);
     expect(sql).toContain("public.has_role(auth.uid(), 'admin'::app_role)");
     expect(sql).toContain("FOR INSERT\n  TO service_role");
     expect(sql).toContain(

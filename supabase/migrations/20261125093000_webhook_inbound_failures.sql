@@ -41,6 +41,10 @@ CREATE INDEX IF NOT EXISTS idx_webhook_inbound_failures_created
 ALTER TABLE public.webhook_inbound_failures ENABLE ROW LEVEL SECURITY;
 
 -- Leitura: so admin, no mesmo padrao de `security_events` e `idempotency_keys`.
+-- DROP IF EXISTS antes de cada CREATE POLICY: a migration precisa poder ser reaplicada
+-- (o banco oficial ja tinha estes objetos quando o arquivo entrou na main).
+DROP POLICY IF EXISTS "Admins can view webhook inbound failures"
+  ON public.webhook_inbound_failures;
 CREATE POLICY "Admins can view webhook inbound failures"
   ON public.webhook_inbound_failures
   FOR SELECT
@@ -50,6 +54,8 @@ CREATE POLICY "Admins can view webhook inbound failures"
 -- Escrita: so service_role. As edge functions usam SUPABASE_SERVICE_ROLE_KEY e ja
 -- passariam por cima da RLS; a policy existe para deixar explicito que nenhum outro
 -- papel grava nesta tabela.
+DROP POLICY IF EXISTS "System can insert webhook inbound failures"
+  ON public.webhook_inbound_failures;
 CREATE POLICY "System can insert webhook inbound failures"
   ON public.webhook_inbound_failures
   FOR INSERT
