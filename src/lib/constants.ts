@@ -126,7 +126,6 @@ export const API_ENDPOINTS = {
     lalamove_tracking: "lalamove-tracking",
     lalamove_webhook: "lalamove-webhook",
     geocode_address: "geocode-address",
-    get_mapbox_token: "get-mapbox-token",
   },
 } as const;
 

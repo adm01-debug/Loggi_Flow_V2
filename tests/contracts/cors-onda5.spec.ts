@@ -8,7 +8,6 @@ import { join } from "node:path";
 // Agora a origem e resolvida pelo helper compartilhado, que so devolve origem
 // quando ela esta na allowlist.
 const FUNCOES: Record<string, number> = {
-  "get-mapbox-token": 4,
   "resend-email": 3,
   "whatsapp-notification": 14,
   "push-send": 10,

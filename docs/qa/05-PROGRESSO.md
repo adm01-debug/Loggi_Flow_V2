@@ -392,7 +392,7 @@
 
 ### Onda 8
 
-- [~] **295** — Fechar no banco ao vivo os seis achados marcados HIPÓTESE — onda 8 — Alta — **F-02, F-03, P-05 e P-06 fechados com consulta ao banco ao vivo (2026-11-24); S-05 e S-08 dependem do painel, aguardam o dono**
+- [x] **295** — Fechar no banco ao vivo os seis achados marcados HIPÓTESE — onda 8 — Alta — **F-02, F-03, P-05 e P-06 fechados com consulta ao banco ao vivo (2026-11-24); S-05 e S-08 dependem do painel, aguardam o dono** — **2026-11-25 (fechada):** S-05 provado ao vivo - `x-test-mode: true` sem HMAC em `lalamove-webhook` e `rodonaves-webhook` de producao devolve **401 Invalid signature** (o guard `_shared/testMode.ts` recusa o bypass sempre que `SUPABASE_URL` e a producao, qualquer que seja `ALLOW_TEST_MODE`); S-08 resolvido removendo os tres residuos do token Mapbox revogado (`supabase/functions/get-mapbox-token/`, a constante em `src/lib/constants.ts` e a entrada em `src/pages/APIDocumentation.tsx`).
 - [x] **296** — Regerar a branch `contexto` para que as fontes reflitam o código corrigido — onda 8 — Média · **regerada em 2026-11-24** (run `45410194923`)
 - [x] **297** — Atualizar `03-ACHADOS.md` e `05-PROGRESSO.md` com o estado final de cada achado — onda 8 — Alta
 - [x] **298** — Reler o plano inteiro e registrar o que ficou sem etapa executada — onda 8 — Alta
