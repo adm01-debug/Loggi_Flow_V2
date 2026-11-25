@@ -349,7 +349,7 @@
 - [x] **261** — `TEMPLATE_STRUCTURE.md`: parar de ensinar hook na raiz de `src/hooks/` — onda 8 — Baixa
 - [x] **262** — `PLANO_FRONTEND_CONTRATOS_190_ETAPAS.md`: corrigir "43 edge functions" para 44 — onda 8 — Baixa
 - [x] **263** — Pedir ao dono o secret `SUPABASE_DB_URL`, sem o qual a fonte de contexto do banco nunca é gerada — onda 8 — Alta · **fechada em 2026-11-25**: o secret `SUPABASE_DB_URL` foi criado (`gh secret list` -> `SUPABASE_DB_URL 2026-11-25T15:06:13Z`); o job `banco` do `contexto-ia.yml` passou a gerar de verdade - `origin/contexto:docs/contexto/supabase/` tem 563 arquivos com `manifest.json` `gerado_em 2026-11-25T15:07:22Z`, `erros: []`, `carried: []`
-- [x] **264** — Rodar o produtor do contexto de banco e confirmar que `docs/contexto/supabase/` foi publicado — onda 8 — Alta · **553 arquivos publicados**
+- [x] **264** — Rodar o produtor do contexto de banco e confirmar que `docs/contexto/supabase/` foi publicado — onda 8 — Alta · **563 arquivos publicados** (reconferido em 2026-11-25 no banco oficial: `origin/contexto:docs/contexto/supabase/` tem 563 arquivos e o `manifest.json` sai com `erros: []`)
 - [x] **265** — Dizer ao agente o que fazer quando a fonte do banco não existir — onda 8 — Alta · — **fechada em 2026-11-25**: o plano B está nos 3 arquivos — `AGENTS.md` (Plano B da fonte do banco), `docs/agentes/banco.md` (Plano B) e `docs/agentes/contexto-ia.md` (MCP como caminho enquanto `supabase/` estiver vazia)
 - [x] **266** — Fazer a ausência do snapshot do banco parar de sair verde em silêncio — onda 8 — Média · **feito — `contexto-ia.yml` publica a causa da ausência do snapshot; PR #441 mergeada em `26f0a4a1`**
 
@@ -4897,3 +4897,59 @@ oficial `jvfhclubfpxrtrrazrgr` ficou alcancavel por leitura. Cada linha abaixo f
 
 **Armadilha da etapa respeitada:** esta etapa e so medicao. Nenhum `CREATE`/`ALTER`/`DROP` foi executado aqui; a unica
 escrita no banco oficial na sessao foram as duas migrations da etapa 027/070, autorizadas pelo dono em PR propria.
+
+### Registro - censo de indices e tabelas orfas reconferidos ao vivo (2026-11-25)
+
+Com o secret da etapa 263 no lugar, o censo da etapa 234 deixou de ser registro e passou a ser **reconferivel**.
+Rodei as tres consultas da etapa de novo contra `jvfhclubfpxrtrrazrgr`, as mesmas que o plano manda usar, e o
+resultado **bate** com o que ja estava registrado - mais duas coisas que so o banco podia mostrar.
+
+**Os cinco candidatos da etapa 234, estado ao vivo:**
+
+| # | Objeto | Existe hoje | idx_scan | Decisao |
+| --- | --- | --- | --- | --- |
+| 1 | `rastreamento_historico (lalamove_order_id)` | so `idx_rastreamento_lalamove_order` | 0 (72 filhos, nenhum uso) | ja resolvido (235 fechada) |
+| 2 | `rastreamento_historico (coleta_id)` | so `idx_rastreamento_historico_coleta_id` | **60 por particao** | ja resolvido (236 fechada) |
+| 3 | `entregas (transportadora_id)` | so `idx_entregas_transportadora_id` | **343** | ja resolvido (237 fechada) |
+| 4 | `coletas (transportadora_id)` | so `idx_coletas_transportadora_id` | **80** | ja resolvido (238 fechada) |
+| 5 | `audit_logs (table_name, record_id)` | nenhum dos dois; ficou `idx_audit_logs_record_composite (record_id, table_name, created_at DESC)` | 0 | ja resolvido (239 fechada) |
+
+O `idx_rastreamento_historico_coleta_id` e **valido** (`indisvalid = true`) e tem **18 filhos**, um por particao
+mensal, todos com `idx_scan = 60`: o indice do `coleta_id` e usado de verdade, nao heranca morta. Os quatro indices
+do pai particionado (`coleta_id`, `created`, `lalamove_order`, `pkey`) tem `indisvalid` e `indisready` verdadeiros e
+18 filhos cada - nenhum orfao.
+
+**O que o censo mostrou de novo (fora dos cinco):** sobram **4 indices sem uso cuja funcao ja e coberta por outro**
+- `idx_entregas_cliente_status (cliente_id, status)` 0 scans, prefixo coberto por `idx_entregas_cliente_id` (128);
+- `idx_entregas_status_composite (status, created_at DESC) WHERE deleted_at IS NULL` 0 scans, coberto por
+  `idx_entregas_status_created_at` (388);
+- `idx_entregas_status_active (status) WHERE deleted_at IS NULL` 0 scans, mesmo par acima;
+- `idx_coletas_status_active (status) WHERE deleted_at IS NULL` 0 scans, coberto por `idx_coletas_status_created_at` (768).
+Proposta de `DROP` em PR propria, para o dono decidir (ganho honesto: **32 kB** de indice e ~10% menos trabalho de
+escrita por `INSERT` em `entregas`, que hoje mantem 17 indices).
+
+**O resto dos indices com `idx_scan = 0` NAO e lixo.** `idx_entregas_previsao`/`_active`/`_pendente`,
+`idx_coletas_prevista_pendente`, `idx_coletas_flags`, `idx_entregas_coordinates` e os `_deleted_at` sao particoes
+de regra de negocio (pendente, reverso, urgente, mapa): zero no contador so diz que a consulta e rara, nao que o
+indice possa sair. Ficam.
+
+**As 9 tabelas orfas, medidas ao vivo** (`inventario/estado/banco.json`): as 9 existem em producao, **todas com 0
+linhas**, RLS ligado, **policies (1 a 5 cada) e triggers (0 a 2 cada)**:
+
+| Tabela | Linhas | Policies | Triggers | Usada em funcao/view | `anon` tem grant |
+| --- | --- | --- | --- | --- | --- |
+| `account_lockouts` | 0 | 2 | 2 | nao | sim |
+| `ai_chat_messages` | 0 | 3 | 1 | nao | sim |
+| `allowed_ips` | 0 | 5 | 2 | nao | sim |
+| `driver_badges` | 0 | 2 | 0 | nao | sim |
+| `email_verification_tokens` | 0 | 1 | 1 | nao | sim |
+| `freight_webhooks` | 0 | 1 | 1 | nao | sim |
+| `notification_templates` | 0 | 2 | 1 | nao | sim |
+| `organizations` | 0 | 2 | 1 | nao | **nao** |
+| `system_adr` | 0 | 1 | 2 | nao | sim |
+
+Conclusao: **nenhuma e lixo para dropar**. Sao funcionalidades montadas (RLS + policy + trigger) que nunca
+receberam um registro - "orfa" aqui significa "sem dado", nao "sem uso". O unico motivo de aparecerem no codigo e
+`src/integrations/supabase/types.ts`, que e gerado do banco. `organizations` e a mais perigosa de tocar: e o esqueleto
+de multi-empresa (2 policies, 1 trigger, sem grant para `anon`) - dropar seria refazer arquitetura. A decisao de
+ligar ou remover essas funcionalidades e de negocio, nao de banco; nenhum `DROP` foi proposto.
