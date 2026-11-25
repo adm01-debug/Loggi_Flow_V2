@@ -47,8 +47,7 @@
 - [~] **016** — Corrigir o `AGENTS.md` e o comentário da CI que afirmam que o repositório é privado — onda 1 — Alta · **aguarda o dono**
 - [~] **017** — Levar ao dono a decisão sobre a visibilidade do repositório — onda 1 — Alta · **aguarda o dono**
 - [x] **018** — Transformar "não commite `.env`" em teste automático — onda 1 — Média · **feito — gate `scripts/ci/check-env-not-tracked.mjs` ligado em `ci.yml`; PR #438 mergeada em `7097e7ac`**
-- [~] **019** — Mapbox: confirmar a restrição do token e remover a variável que ninguém mais usa — onda 1 — Média · **aguarda o dono**
-
+- [x] **019** — Mapbox: confirmar a restrição do token e remover a variável que ninguém mais usa — onda 1 — Média · — **fechada em 2026-11-25**: `VITE_MAPBOX_TOKEN` removida do `.env.example` e a menção corrigida em `docs/agentes/deploy.md` e `docs/agentes/integracoes.md`; nenhum arquivo do front lê a variável (mapas usam `src/lib/mapStyles.ts`, sem token)
 ### Onda 0
 
 - [x] **020** — Gerador de contexto: parar de afirmar "sem RLS" quando o arquivo tem DDL dinâmico — onda 0 — Alta
@@ -80,7 +79,7 @@
 - [x] **040** — Marcar no banco qual cotação foi a escolhida — onda 3 — Alta
 - [~] **041** — "Nexus Blast" e o envio por e-mail passam a criar a cotação no banco — onda 3 — Alta — **código já entregue na 038; verificação em runtime depende de credencial de transportadora (dono)**
 - [x] **042** — Mostrar carregando, erro e vazio na tela de cotação multicanal — onda 3 — Média
-- [~] **043** — Decidir com o dono o que fazer com as duas telas de cotação — onda 3 — Alta · **aguarda o dono**
+- [~] **043** — Decidir com o dono o que fazer com as duas telas de cotação — onda 3 — Alta · — **levantado em 2026-11-25, aguarda o dono**: `CotacaoMultiCanal` (é a de *disparar*) e `DashboardCotacoes` (é a de *acompanhar*) seguem no menu; recomendação = manter as duas com papel explícito e remover de cada uma o que é do outro papel
 - [x] **044** — `Despachos`: avisar quando o avanço de status não gravou — onda 3 — Alta
 - [x] **045** — `Despachos`: avisar quando a autorização de despacho final não gravou — onda 3 — Alta
 - [x] **046** — BOX: não registrar alocação no histórico quando a alocação não aconteceu — onda 3 — Alta
@@ -119,13 +118,13 @@
 
 - [x] **068** — Remover o hook `useSelfHealing` — onda 4 — Média
 - [x] **069** — Remover o hook `useNexusSimulator` — onda 4 — Média
-- [~] **070** — Decidir o destino da RPC `reconcile_pending_freights` e da tabela que ela não tem — onda 4 — Média · **aguarda o dono**
-- [~] **071** — Levar ao dono a decisão sobre `push-send` — onda 4 — Média · **aguarda o dono**
-- [~] **072** — Executar a decisão sobre `push-send` — onda 4 — Média · **aguarda o dono**
-- [~] **073** — `ingest-biosync`: decidir o destino de uma função que recebe dado de biometria e ninguém usa — onda 4 — Média · **aguarda o dono**
-- [~] **074** — Levantar o uso real dos três buckets antes de qualquer decisão — onda 4 — Média · **aguarda o dono**
-- [~] **075** — `comprovantes`: um caminho só para o comprovante de entrega — onda 4 — Média · **aguarda o dono**
-- [~] **076** — `entregas-fotos`: ligar a foto de entrega ou remover o bucket — onda 4 — Média · **aguarda o dono**
+- [~] **070** — Decidir o destino da RPC `reconcile_pending_freights` e da tabela que ela não tem — onda 4 — Média · — **levantado em 2026-11-25, aguarda o dono**: `reconcile_pending_freights()` existe no banco (`schema-manifest` → `/functions/f:reconcile_pending_freights()`), mas **a tabela `freights` não existe** (só a coluna `performance_metrics.total_freights`) — a função é inoperante; recomendação = `DROP FUNCTION` por migration (Regra 8)
+- [x] **071** — Levar ao dono a decisão sobre `push-send` — onda 4 — Média · — **fechada em 2026-11-25** (levantamento): `push-send` **não é órfã** — `src/pages/Notificacoes.tsx:183` monta `PushNotificationCard`, que usa `usePushNotifications` (`src/hooks/notifications/usePushNotifications.tsx:211` → `functions.invoke('push-send')`); decisão: manter
+- [x] **072** — Executar a decisão sobre `push-send` — onda 4 — Média · — **fechada em 2026-11-25**: decisão sobre `push-send` = **manter**; a tabela `push_subscriptions` existe no banco (schema-manifest) e o chamador está ligado à tela de Notificações — nada a remover
+- [~] **073** — `ingest-biosync`: decidir o destino de uma função que recebe dado de biometria e ninguém usa — onda 4 — Média · — **levantado em 2026-11-25, aguarda o dono**: `ingest-biosync` grava em `bio_sync_telemetry` (tabela existe) e **não tem chamador**; `index.ts:43` inventa batimento com `Math.random()`. Recomendação = remover a função; falta saber se há linhas gravadas (consulta ao banco)
+- [x] **074** — Levantar o uso real dos três buckets antes de qualquer decisão — onda 4 — Média · — **fechada em 2026-11-25** (levantamento concluído): `ocorrencias-fotos` **em uso** (`Ocorrencias.tsx:196,776,890`); `comprovantes` **zero uso** no código (o comprovante real vai para `documents`, `Envios.tsx:1183`); `entregas-fotos` **zero uso** no código. Os três são criados por `supabase/migrations/20251220173229_storage_buckets.sql`
+- [~] **075** — `comprovantes`: um caminho só para o comprovante de entrega — onda 4 — Média · — **levantado em 2026-11-25, aguarda o dono**: bucket `comprovantes` sem uso; `documents` já é privado e guarda o comprovante (`DeliveryReceiptUpload.tsx:55-57`). Recomendação = remover o bucket por migration (Regra 8)
+- [~] **076** — `entregas-fotos`: ligar a foto de entrega ou remover o bucket — onda 4 — Média · — **levantado em 2026-11-25, aguarda o dono**: bucket `entregas-fotos` sem uso no código; pergunta de negócio = *foto de entrega é prova a guardar?* Sim → ligar com o molde de `Ocorrencias.tsx:776` + `useImageUpload`; não → remover o bucket
 - [x] **077** — Remover `uploadDocument` de `storageService.ts` — onda 4 — Média
 - [x] **078** — Recusar arquivo cuja assinatura não é conhecida — onda 4 — Média
 - [x] **079** — Teste unitário da validação de assinatura de arquivo — onda 4 — Média
@@ -186,7 +185,7 @@
 - [x] **117** — Importação em massa: guardar a mensagem de erro de cada lote — onda 4 — Média
 - [x] **118** — Importação em massa: parar de condenar o lote inteiro por causa de uma linha — onda 4 — Média
 - [x] **119** — Importação em massa: mostrar e exportar as linhas que falharam — onda 4 — Média
-- [~] **120** — Importação em massa: decidir se o histórico deve sobreviver à tela — onda 4 — Média · **aguarda o dono**
+- [~] **120** — Importação em massa: decidir se o histórico deve sobreviver à tela — onda 4 — Média · — **levantado em 2026-11-25, aguarda o dono**: o histórico vive em `ImportacaoMassa.tsx:171` (`useState`) e some ao sair da tela; recomendação = gravar em `audit_logs` (action=`importacao_massa`), que já existe e tem policy de INSERT para autenticado — sem tabela nova (Regra 8 pela policy)
 - [x] **121** — VERIFICAR se o duplo clique cria registro duplicado (o achado é hipótese) — onda 4 — Média
 - [x] **122** — Fechar os formulários que a etapa 121 encontrou desprotegidos — onda 4 — Média
 
@@ -365,9 +364,9 @@
 
 - [x] **270** — Remover as três entradas obsoletas da allowlist de vulnerabilidades — onda 8 — Baixa · **feito — `ALLOWLIST` vazia em `scripts/audit-gate.mjs`; PR #436 mergeada em `c4d2390c`** (altera gate de segurança da CI)
 - [x] **271** — Remover o arquivo `x` vazio versionado na raiz — onda 8 — Baixa
-- [~] **272** — Decidir com o dono o destino de `bun.lock` e `bun.lockb` — onda 8 — Baixa · **aguarda o dono**
+- [~] **272** — Decidir com o dono o destino de `bun.lock` e `bun.lockb` — onda 8 — Baixa · — **levantado em 2026-11-25, aguarda o dono**: `bun.lock` (423 KB) e `bun.lockb` (199 KB) versionados; nenhum workflow usa bun (CI = `npm ci`) e `types-sync.yml:366` registra que estão defasados. Recomendação = remover os dois
 - [~] **273** — Barrar arquivo acidental na raiz antes do merge — onda 8 — Baixa · **aguarda o dono**
-- [~] **274** — Tirar do `AGENTS.md` e do `types-sync.yml` a menção aos locks de bun — onda 8 — Baixa · **aguarda o dono**
+- [~] **274** — Tirar do `AGENTS.md` e do `types-sync.yml` a menção aos locks de bun — onda 8 — Baixa · — **levantado em 2026-11-25, aguarda a 272**: só faz sentido depois de os locks saírem; toca `AGENTS.md:86-88` e o comentário de `.github/workflows/types-sync.yml:366` (Regra 8)
 - [x] **275** — Criar a base de teste de hook e de tela que hoje não existe — onda 8 — Alta · **já estava na `main` (`src/test/`), smoke e testes de referência verdes**
 - [x] **276** — Teste da validação de transição de status (trava a correção de C-01) — onda 8 — Crítica
 - [x] **277** — Teste da checagem de `count` no controle de concorrência (trava a correção de C-03) — onda 8 — Alta · **`useBoxManagement.test.ts` com 3 casos verdes; sem o guard o caso de conflito falha**
@@ -3696,13 +3695,13 @@ Atualize ao fim de cada sessão de trabalho.
 
 |                         | Quantidade |
 | ----------------------- | ---------- |
-| Concluídas `[x]`        | 263         |
-| Aguardando o dono `[~]` | 37         |
+| Concluídas `[x]`        | 267         |
+| Aguardando o dono `[~]` | 33         |
 | Bloqueadas `[!]`        | 0          |
 | Não iniciadas `[ ]`     | 0          |
 | **Total**               | **300**    |
 
-**Última etapa trabalhada:** 289 · **Data:** 2026-11-25 · **Próxima etapa independente:** nenhuma — as 300 etapas estão marcadas `[x]` ou `[~]`; a 290 continua aguardando o dono (Regra 8) e a 300 é o relatório final.
+**Última etapa trabalhada:** levantamento das 13 etapas “que parecem sem uso” · **Data:** 2026-11-25 · **Próxima etapa independente:** nenhuma — as 300 etapas estão marcadas `[x]` ou `[~]`; a 290 continua aguardando o dono (Regra 8) e a 300 é o relatório final.
 A **027** (`logistica_reversa.codigo_rastreio_reverso`
 sem `UNIQUE`) segue como DDL dependente do dono. A **#428** entrou: os três `DROP INDEX` ja estao aplicados no banco (conferido no `schema-manifest.json`).
 
@@ -4628,3 +4627,28 @@ coletado sozinho por `scripts-tests.yml` (`find scripts -name '*.unit.mjs'`).
 - `node --test scripts/ci/check-soft-delete.unit.mjs` -> **9 testes, 13 asserções, 0 falhas**
 - `npm run automation:test` -> **103 testes, 0 falhas**
 - `actionlint .github/workflows/ci-nexus.yml` -> `exit=0`
+
+---
+
+## Registro — levantamento de uso das 13 etapas “que parecem sem uso” (2026-11-25)
+
+Base: `main` `97712fa96`. Levantamento feito antes de decidir manter, ligar ou remover.
+
+| Etapa | Objeto | Evidência do levantamento | Decisão |
+| ----- | ------ | --------------------------- | --------- |
+| 019 | `VITE_MAPBOX_TOKEN` | `git grep VITE_MAPBOX` em `src/` → **0 leitores**; só `.env.example:23`; os mapas usam `src/lib/mapStyles.ts` (sem token) | **variável removida** (fechada); a edge `get-mapbox-token` segue publicada e sem chamador |
+| 014 | `health` × `health-check` | `supabase/config.toml:48-52`: as duas com `verify_jwt = false`; `docs/DISASTER_RECOVERY.md:14` documenta `/functions/v1/health` | aguarda o dono: manter `health` aberta (a documentada) e fechar `health-check` |
+| 043 | 2 telas de cotação | `src/App.tsx:153` (`/cotacao-multicanal`) e `:154` (`/dashboard-cotacoes`), ambas roteadas e no menu | aguarda o dono: manter as duas com papel explícito (disparar × acompanhar) |
+| 070 | `reconcile_pending_freights()` | existe no banco (`schema-manifest` → `/functions/f:reconcile_pending_freights()`), mas **a tabela `freights` não existe** (só a coluna `performance_metrics.total_freights`); `EXECUTE` só para `postgres`/`service_role`; 0 chamadores | aguarda o dono: `DROP FUNCTION` por migration (Regra 8) |
+| 071/072 | `push-send` | `Notificacoes.tsx:183` → `PushNotificationCard` → `usePushNotifications.tsx:211` → `functions.invoke('push-send')`; `push_subscriptions` existe no banco | **mantida** (fechadas): não é órfã |
+| 073 | `ingest-biosync` | 0 chamadores; grava em `bio_sync_telemetry`; `index.ts:43` inventa batimento com `Math.random()` | aguarda o dono: remover a função |
+| 074 | 3 buckets | `ocorrencias-fotos` em uso (`Ocorrencias.tsx:196,776,890`); `comprovantes` e `entregas-fotos` com 0 uso no código | **levantamento concluído** (fechada) |
+| 075 | bucket `comprovantes` | criado em `20251220173229_storage_buckets.sql:55`; o comprovante real vai para `documents` (`Envios.tsx:1183`, `DeliveryReceiptUpload.tsx:55-57`) | aguarda o dono: remover o bucket |
+| 076 | bucket `entregas-fotos` | criado na mesma migration; 0 referências no código | aguarda o dono: ligar (foto de entrega) ou remover |
+| 120 | histórico da importação em massa | `ImportacaoMassa.tsx:171` (`useState`) — sai da tela, some; `audit_logs` tem policy de INSERT para autenticado | aguarda o dono: gravar em `audit_logs` (sem tabela nova) |
+| 272 | `bun.lock` / `bun.lockb` | versionados; nenhum workflow usa bun (CI = `npm ci`); `types-sync.yml:366` diz que estão defasados | aguarda o dono: remover os dois |
+| 274 | menção aos locks de bun | `AGENTS.md:86-88` e `.github/workflows/types-sync.yml:366` | aguarda a 272 |
+
+**Achado fora do escopo (registrado, não corrigido):** `ocorrencias-fotos` é bucket **público**
+(`20251220173229_storage_buckets.sql:3-9`) com policy de leitura para qualquer um — quem tiver a URL lê a
+foto da ocorrência. Não foi tocado por estar fora do escopo do levantamento.
