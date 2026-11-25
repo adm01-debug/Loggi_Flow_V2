@@ -117,7 +117,7 @@ export function useDocumentUpload(options: UseDocumentUploadOptions = {}) {
     async (filePath: string): Promise<boolean> => {
       try {
         // Extract path from full URL
-        const pathMatch = filePath.match(/\/storage\/v1\/object\/public\/[^/]+\/(.+)/);
+        const pathMatch = filePath.match(/\/storage\/v1\/object\/(?:public|sign)\/[^/]+\/([^?]+)/);
         const storagePath = pathMatch ? pathMatch[1] : filePath;
 
         const { error } = await supabase.storage.from(bucket).remove([storagePath]);
