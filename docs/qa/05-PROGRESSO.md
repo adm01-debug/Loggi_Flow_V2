@@ -97,7 +97,7 @@
 - [x] **055** — Migration: acrescentar `deleted_at` a `fretes_internos` — onda 1 — Alta · **aplicada** em 2026-11-24
 - [x] **056** — Aplicar a migration de `deleted_at` e sincronizar os tipos — onda 1 — Alta · **tipos sincronizados** (#426)
 - [x] **057** — `FretesInternos`: exclusão lógica e filtro em todas as leituras da tabela — onda 1 — Alta · #427
-- [~] **058** — Transformar a política de exclusão lógica em gate automático — onda 1 — Média · **aguarda o dono**
+- [x] **058** — Transformar a política de exclusão lógica em gate automático — onda 1 — Média · — **fechada em 2026-11-25**: gate `scripts/ci/check-soft-delete.mjs` (+ `npm run validate:soft-delete`, 9 testes unitários) na CI e `docs/SOFT_DELETE_POLICY.md` corrigido — registro completo em “Registro da etapa 058”
 - [x] **059** — Pedir confirmação ao cancelar uma logística reversa — onda 1 — Média
 
 ### Onda 8
@@ -317,8 +317,7 @@
 - [x] **237** — Remover o duplicado de `entregas (transportadora_id)` — onda 6 — Baixa · #428 **aplicada no banco** (run 45444741315)
 - [x] **238** — Remover o duplicado de `coletas (transportadora_id)` — onda 6 — Baixa · #428 **aplicada no banco** (run 45444741315)
 - [x] **239** — Decidir e remover a sobreposição em `audit_logs (table_name, record_id)` — onda 6 — Baixa · #428 **aplicada no banco** (run 45444741315)
-- [~] **240** — Fechar o ciclo: registrar que índice se confere no banco, e conferir que nada regrediu — onda 6 — Alta · **aguarda o dono**
-
+- [x] **240** — Fechar o ciclo: registrar que índice se confere no banco, e conferir que nada regrediu — onda 6 — Alta · — **fechada em 2026-11-25**: subseção “Índices: confira no banco, não nas migrations” em `docs/agentes/banco.md` e censo reconferido no `schema-manifest.json`
 ### Onda 8
 
 - [x] **241** — Pôr aviso de obsolescência no alto de `ESTADO_ATUAL.md`, dizendo qual banco ele descreve — onda 8 — Crítica
@@ -351,7 +350,7 @@
 - [x] **262** — `PLANO_FRONTEND_CONTRATOS_190_ETAPAS.md`: corrigir "43 edge functions" para 44 — onda 8 — Baixa
 - [~] **263** — Pedir ao dono o secret `SUPABASE_DB_URL`, sem o qual a fonte de contexto do banco nunca é gerada — onda 8 — Alta · **aguarda o dono**
 - [x] **264** — Rodar o produtor do contexto de banco e confirmar que `docs/contexto/supabase/` foi publicado — onda 8 — Alta · **553 arquivos publicados**
-- [~] **265** — Dizer ao agente o que fazer quando a fonte do banco não existir — onda 8 — Alta · **plano B escrito nos 3 arquivos; altera protocolo, aguarda o dono**
+- [x] **265** — Dizer ao agente o que fazer quando a fonte do banco não existir — onda 8 — Alta · — **fechada em 2026-11-25**: o plano B está nos 3 arquivos — `AGENTS.md` (Plano B da fonte do banco), `docs/agentes/banco.md` (Plano B) e `docs/agentes/contexto-ia.md` (MCP como caminho enquanto `supabase/` estiver vazia)
 - [x] **266** — Fazer a ausência do snapshot do banco parar de sair verde em silêncio — onda 8 — Média · **feito — `contexto-ia.yml` publica a causa da ausência do snapshot; PR #441 mergeada em `26f0a4a1`**
 
 ### Onda 0
@@ -3695,8 +3694,9 @@ Atualize ao fim de cada sessão de trabalho.
 
 |                         | Quantidade |
 | ----------------------- | ---------- |
-| Concluídas `[x]`        | 267         |
-| Aguardando o dono `[~]` | 33         |
+| Concluídas `[x]`        | 270         |
+| Aguardando o dono `[~]` | 30         |
+16d0ca713 (docs: registra que indice se confere no banco e fecha 058, 240 e 265)
 | Bloqueadas `[!]`        | 0          |
 | Não iniciadas `[ ]`     | 0          |
 | **Total**               | **300**    |
@@ -4652,3 +4652,33 @@ Base: `main` `97712fa96`. Levantamento feito antes de decidir manter, ligar ou r
 **Achado fora do escopo (registrado, não corrigido):** `ocorrencias-fotos` é bucket **público**
 (`20251220173229_storage_buckets.sql:3-9`) com policy de leitura para qualquer um — quem tiver a URL lê a
 foto da ocorrência. Não foi tocado por estar fora do escopo do levantamento.
+
+## Registro da etapa 240 — índice se confere no banco, e o censo final (2026-11-25)
+
+**(1) Procedimento escrito.** Nova subseção **“Índices: confira no banco, não nas migrations”** em
+`docs/agentes/banco.md`, dentro de “Regras de migration” (as sete regras existentes foram mantidas —
+outros agentes as citam por número): as duas consultas prontas (`pg_indexes` e `pg_stat_user_indexes`), a
+regra de que `idx_scan = 0` não condena um índice sozinho, a checagem de índice de constraint
+(`pg_constraint.conindid`) e a nota de que `CONCURRENTLY` não roda no `aplicar-migration.yml` nem em tabela
+particionada. O caso P-06 ficou registrado em uma linha: em 2026-11, **7 dos 12 “duplicados”** lidos nas
+migrations já tinham sido removidos em produção por `20260831130000_index_dedupe_and_realtime.sql`.
+A frase “não existe workflow de apply” não existe mais em `docs/agentes/banco.md`: o arquivo cita
+`.github/workflows/aplicar-migration.yml` na seção “SQL avulso” e na regra 2.
+
+**(2) Censo reconferido depois dos `DROP` das etapas 235-239** (fonte: `supabase/schema-manifest.json`,
+gerado do banco oficial ao vivo — não das migrations):
+
+| Item | Alvo do `DROP` (etapas 237-239) | Estado hoje no banco |
+| ---- | ------------------------------- | -------------------- |
+| `entregas` | `idx_entregas_transportadora` | **ausente**; o par que cobre, `idx_entregas_transportadora_id`, **existe** |
+| `coletas` | `idx_coletas_transportadora` | **ausente**; o par que cobre, `idx_coletas_transportadora_id`, **existe** |
+| `audit_logs` | índice menor `(record_id, table_name)` | **ausente**; o composto `idx_audit_logs_record_composite`, **existe** |
+
+Nada além dos três alvos desapareceu: `entregas` segue com 18 índices e `coletas` com 11 no manifesto.
+O caminho de volta continua em `supabase/rollbacks/20261124150000_rollback_index_dedupe_transportadora_audit.sql`.
+
+**Evidência**
+- `python3` sobre `supabase/schema-manifest.json` → `idx_entregas_transportadora` e `idx_coletas_transportadora`
+  **não** aparecem em `/indexes/`; `idx_entregas_transportadora_id`, `idx_coletas_transportadora_id` e
+  `idx_audit_logs_record_composite` aparecem.
+- `node scripts/ci/check-claude-md-integrity.mjs` → `exit=0` (check obrigatório “Agents Docs Integrity”).

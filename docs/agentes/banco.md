@@ -82,6 +82,35 @@ apply é o dono; quem aplica é `.github/workflows/aplicar-migration.yml` (`work
    consumida pelo front, a regeneração de `src/integrations/supabase/types.ts` (**arquivo gerado — não
    editar à mão**).
 
+### Índices: confira no banco, não nas migrations
+
+`CREATE INDEX` em migration é histórico; o que existe hoje está em `pg_indexes` e o que é usado está em
+`pg_stat_user_indexes`. Antes de propor `DROP INDEX`, rode as duas consultas na produção (somente leitura):
+
+```sql
+-- 1. o que existe de fato
+SELECT tablename, indexname, indexdef
+FROM pg_indexes
+WHERE schemaname = 'public' AND tablename IN ('entregas', 'coletas', 'telemetry_logs')
+ORDER BY tablename, indexname;
+
+-- 2. o que é usado e quanto pesa
+SELECT relname AS tabela, indexrelname AS indice, idx_scan, idx_tup_read,
+       pg_size_pretty(pg_relation_size(indexrelid)) AS tamanho
+FROM pg_stat_user_indexes
+WHERE schemaname = 'public' AND relname IN ('entregas', 'coletas', 'telemetry_logs')
+ORDER BY idx_scan ASC, tabela;
+```
+
+- **`idx_scan = 0` não condena um índice sozinho:** estatística zerada por reinício, plano que não escolheu o índice
+  na janela medida e índice de constraint aparecem assim. Cheque antes `SELECT conname, conindid::regclass
+  FROM pg_constraint WHERE conindid <> 0` — índice que sustenta `PK`/`UNIQUE`/`FK` **nunca** sai por "duplicidade".
+- `CREATE`/`DROP INDEX CONCURRENTLY` não rodam no `aplicar-migration.yml` (ele aplica em `--single-transaction`)
+  nem em tabela particionada: esse caminho é pelo SQL Editor, com o dono.
+- **O caso que originou a regra:** em 2026-11, **7 dos 12 "índices duplicados"** lidos nas migrations já tinham sido
+  removidos em produção por `20260831130000_index_dedupe_and_realtime.sql`. Ler o repositório teria produzido a
+  proposta inteira para índices que não existiam mais.
+
 ## Fonte de contexto do banco (branch `contexto`)
 
 O retrato versionado do banco oficial é `docs/contexto/supabase/` na branch `contexto`, publicado por
