@@ -129,8 +129,8 @@ divergiu da realidade → corrija no mesmo PR do fix. Responda sempre em PT-BR.
 
 - Vite + React 18 + TS (`src/`), Tailwind/shadcn, Supabase (`supabase/functions/`, `supabase/migrations/`),
   TanStack Query, Sentry, PWA; Playwright em `tests/e2e/`.
-- **npm** é o gerenciador da CI (`npm ci`, `package-lock.json`, Node 20). `bun.lock` e `bun.lockb` existem no
-  repo e **não** são usados por nenhum workflow — não os trate como fonte.
+- **npm** — o gerenciador do projeto e da CI (`npm ci`, `package-lock.json`, Node 20). Os antigos `bun.lock` e
+  `bun.lockb` foram removidos (etapa 272): nenhum workflow usava bun e o lock estava defasado do `package.json`.
 - `npx vitest run <caminho>` (suíte inteira é longa); `npm run typecheck`; `npx eslint <arquivos>`;
   `npm run lint:budget`; `npm run test:rls`; `npm run test:security`; `npm run validate:csp`;
   `npm run validate:no-console`; `npm run security-scan`; `npm run test:e2e` (manual, precisa de usuário

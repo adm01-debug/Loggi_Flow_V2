@@ -39,8 +39,6 @@ export const PERMITIDOS = new Set([
   "README.md",
   "TEMPLATE_STRUCTURE.md",
   "ai-context.config.json",
-  "bun.lock",
-  "bun.lockb",
   "components.json",
   "eslint.config.js",
   "graphify.local.json",
