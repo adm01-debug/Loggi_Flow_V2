@@ -315,3 +315,36 @@ o banco e a sondagem de hoje. Resultado: **19 dependem mesmo do dono** e **3 tin
   `melhor-envio-api`: restringir a `admin` pode parar a cotação de quem hoje usa como `user`).
 
 Nenhuma das 22 ficou sem leitura: cada linha do `05-PROGRESSO.md` foi conferida contra o arquivo que ela cita.
+
+## 12. Caminhos que existem fora da `main` e não na `main` (2026-11-25)
+
+Varredura por conjunto de caminhos, não por commit: reuni todos os commits alcançáveis fora da `main`
+(90 — PRs dependabot abertas, as duas branches desta sessão, as branches geradas e as refs
+`autosave-conferido/*` e `mirror-backup`) e comparei a lista de caminhos com a árvore da `main`
+(`7d4776e35`). Descontando `coverage/` (artefato de teste), `.env` (não versionado de propósito) e
+`docs/contexto/` (gerado), sobram **14 caminhos**. Todos têm destino explicado — nenhum é trabalho perdido:
+
+| Caminho fora da `main` | Onde está hoje | Prova |
+| --- | --- | --- |
+| `scripts/cleanup_triggers_source.sql`, `scripts/origem_remediacao_2026-08-31.sql` | `scripts/historico/` (etapa 060, #340) | blob idêntico nos dois lados: `886f7ac…` e `b360ec1…` |
+| `src/hooks/ai/useNexusSimulator.ts`, `src/hooks/security/useSelfHealing.ts` | removidos (hook morto) | `c7eb350a0` (etapas 068+069, #300) |
+| `src/utils/performance.ts` | removido | `5fb923bd1` (etapas 080+081, #304) |
+| `supabase/functions/_shared/service-wrapper.ts` | removido (sem importador) | `806b9bacf` (etapa 082, #305) |
+| `.github/workflows/e2e.yml` | removido (workflow morto) | `e2fd132ea` (#223) |
+| `supabase/migrations/20240822_gamification_system.sql` | removida (migration legada) | `190f724e9` (#224) |
+| `scripts/automation-nightly.sh` | subsumido pela configuração | `scripts/automation.config.json` roda `node scripts/automation.mjs nightly --ref origin/main` — o mesmo comando do shim de 4 linhas |
+| `supabase/migrations/20261125162000_drop_4_indices_redundantes.sql` + rollback | PR #477, aberta (Regra 8) | aguarda autorização do dono; não está perdida |
+| `.verif_pushsend.txt`, `x`, `supabase/.temp/cli-latest` | rascunho/temporário | nenhum é referenciado no repo |
+
+As duas refs `mirror-backup` e as `autosave-conferido/*` estão dentro dessa mesma varredura: nada que
+elas guardam ficou fora do inventário acima.
+
+**Branches geradas** (não são trabalho de agente, e nenhuma das duas precisa ser apagada — as duas são
+recriadas pelos próprios workflows):
+
+- `automation/types-sync` — 1 commit à frente e 13 atrás; o único arquivo que ela muda
+  (`supabase/schema-manifest.json`) tem **o mesmo blob** na `main` (`5aad27bc6…` dos dois lados).
+  Incorporada, sem conteúdo próprio.
+- `contexto` — gerada pelo workflow `contexto-ia.yml` ("gerada, 1 commit — só o HEAD é consumido;
+  nunca abra PR dela"), sem base comum com a `main`; o conteúdo é recopiado das três fontes que vivem
+  na `main`.
