@@ -10,7 +10,7 @@ on:
 
 permissions:
   contents: read
-  pull-requests: read # gitleaks lê os commits do PR (repo privado exige permissão explícita)
+  pull-requests: read # gitleaks lê os commits do PR pela API (o repo é público; a permissão vale nos dois casos)
 
 jobs:
   security:

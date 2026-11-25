@@ -96,9 +96,9 @@ jobs:
         run: |
           head="$(git rev-parse HEAD)"
           last_codigo=""; last_regras=""
-          # Com persist-credentials: false o `origin` nao tem credencial e o fetch de um repo privado falha;
-          # o erro vai para /dev/null e parecia "branch inexistente" (o gate nunca pulava, a publicacao
-          # nascia orfa). Por isso o fetch usa a URL autenticada.
+          # Com persist-credentials: false o `origin` nao carrega credencial, entao o fetch da branch
+          # contexto usa a URL autenticada e nao depende da visibilidade do repo. O 2>/dev/null esconde
+          # a falha, que ja apareceu como "branch inexistente" (o gate nunca pulava, a publicacao orfa).
           REMOTE="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           if git fetch -q --depth=1 "$REMOTE" "$CONTEXTO_BRANCH" 2>/dev/null; then
             last_codigo="$(git show "FETCH_HEAD:$CONTEXTO_DIR/codigo/manifest.json" 2>/dev/null | python3 -c 'import json,sys; print(json.load(sys.stdin).get("commit",""))' 2>/dev/null || echo "")"

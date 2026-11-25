@@ -44,7 +44,7 @@
 - [x] **013** — `health-check`: parar de chamar a API administrativa de usuários e exigir sessão — onda 1 — Média
 - [~] **014** — Decidir com o dono qual dos dois endpoints de saúde fica aberto e fechar o outro no `config.toml` — onda 1 — Média · **aguarda o dono**
 - [x] **015** — Tirar o `.env` do controle de versão, sem reescrever histórico — onda 1 — Alta
-- [~] **016** — Corrigir o `AGENTS.md` e o comentário da CI que afirmam que o repositório é privado — onda 1 — Alta · **aguarda o dono**
+- [~] **016** — Corrigir o `AGENTS.md` e o comentário da CI que afirmam que o repositório é privado — onda 1 — Alta — **código pronto na PR desta etapa (`ci.yml:11`, `security.yml:13`, `contexto-ia.yml:99-101`); `AGENTS.md:52` já dizia “publico” (medido na API, 2026-11-23); a PR toca `.github/workflows/` — aguarda autorização (Regra 8)**
 - [~] **017** — Levar ao dono a decisão sobre a visibilidade do repositório — onda 1 — Alta · **aguarda o dono**
 - [x] **018** — Transformar "não commite `.env`" em teste automático — onda 1 — Média · **feito — gate `scripts/ci/check-env-not-tracked.mjs` ligado em `ci.yml`; PR #438 mergeada em `7097e7ac`**
 - [x] **019** — Mapbox: confirmar a restrição do token e remover a variável que ninguém mais usa — onda 1 — Média · — **fechada em 2026-11-25**: `VITE_MAPBOX_TOKEN` removida do `.env.example` e a menção corrigida em `docs/agentes/deploy.md` e `docs/agentes/integracoes.md`; nenhum arquivo do front lê a variável (mapas usam `src/lib/mapStyles.ts`, sem token)
@@ -4953,3 +4953,12 @@ receberam um registro - "orfa" aqui significa "sem dado", nao "sem uso". O unico
 `src/integrations/supabase/types.ts`, que e gerado do banco. `organizations` e a mais perigosa de tocar: e o esqueleto
 de multi-empresa (2 policies, 1 trigger, sem grant para `anon`) - dropar seria refazer arquitetura. A decisao de
 ligar ou remover essas funcionalidades e de negocio, nao de banco; nenhum `DROP` foi proposto.
+
+
+## Registro da etapa 016 — os comentários de CI param de afirmar que o repo é privado (2026-11-25)
+
+**O que faltava.** O `AGENTS.md:52` já tinha sido corrigido (`**publico**`, com a medição da API de 2026-11-23 anotada). O que restava do achado S-07 era a mesma suposição escrita em três comentários de workflow, que atribuíam a permissão `pull-requests: read` a um repositório privado que nunca existiu.
+
+**O que mudou.** `.github/workflows/ci.yml:11` e `.github/workflows/security.yml:13`: a permissão fica (o `gitleaks-action` lista os commits do PR pela API e falha com 403 sem ela), mas a justificativa passa a dizer que o repo é público e que a permissão vale nos dois casos. `.github/workflows/contexto-ia.yml:99-101`: o fetch autenticado deixou de ser justificado por “repo privado” e passou a ser justificado pelo que é verdade — com `persist-credentials: false` o `origin` não tem credencial, e o `2>/dev/null` esconde a falha, que já apareceu como “branch inexistente”.
+
+**Verificado.** `gh api repos/adm01-debug/Loggi_Flow_V2` devolve `{"visibility":"public","private":false}`. `git grep -n -i "privado" -- .github/workflows` não retorna mais nenhuma ocorrência. Nenhum comportamento mudou: são três linhas de comentário. A decisão de visibilidade continua sendo a etapa 017.

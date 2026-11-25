@@ -228,6 +228,14 @@ As chaves são `anon`; o ganho não paga o risco. O que resolve é: corrigir o `
 
 **Estado (2026-11-24):** PARCIAL (feito 015; falta 016, 017, 018 — aguarda o dono).
 
+**Estado em 2026-11-25 (etapa 016).** O `AGENTS.md:52` passou a dizer **“publico”**, com a medição da API de
+2026-11-23 anotada na própria linha. Os três comentários de workflow que repetiam a suposição
+(`ci.yml:11`, `security.yml:13`, `contexto-ia.yml:99-101`) foram reescritos e não citam mais repositório privado.
+O `.env` deixou de ser rastreado e o gate `scripts/ci/check-env-not-tracked.mjs` (etapa 018) reprova se voltar,
+então a hipótese de “o próximo `.env` entra no commit por hábito” tem barreira de CI. O que segue aberto é a
+decisão de negócio sobre a visibilidade em si (etapa 017) e a autorização da PR da etapa 016, que toca
+`.github/workflows/` (Regra 8).
+
 ## S-08 — O token do Mapbox no `.env` é dívida morta: nada no sistema o usa
 
 - **Camada:** infra/integração · **Severidade:** **Baixa** · **Confiança:** confirmado · **Método:** EXECUTADO
