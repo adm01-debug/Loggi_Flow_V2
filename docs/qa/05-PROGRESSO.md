@@ -48,6 +48,7 @@
 - [~] **017** — Levar ao dono a decisão sobre a visibilidade do repositório — onda 1 — Alta · **aguarda o dono**
 - [x] **018** — Transformar "não commite `.env`" em teste automático — onda 1 — Média · **feito — gate `scripts/ci/check-env-not-tracked.mjs` ligado em `ci.yml`; PR #438 mergeada em `7097e7ac`**
 - [x] **019** — Mapbox: confirmar a restrição do token e remover a variável que ninguém mais usa — onda 1 — Média · — **fechada em 2026-11-25**: `VITE_MAPBOX_TOKEN` removida do `.env.example` e a menção corrigida em `docs/agentes/deploy.md` e `docs/agentes/integracoes.md`; nenhum arquivo do front lê a variável (mapas usam `src/lib/mapStyles.ts`, sem token)
+
 ### Onda 0
 
 - [x] **020** — Gerador de contexto: parar de afirmar "sem RLS" quando o arquivo tem DDL dinâmico — onda 0 — Alta
@@ -79,7 +80,7 @@
 - [x] **040** — Marcar no banco qual cotação foi a escolhida — onda 3 — Alta
 - [~] **041** — "Nexus Blast" e o envio por e-mail passam a criar a cotação no banco — onda 3 — Alta — **código já entregue na 038; verificação em runtime depende de credencial de transportadora (dono)**
 - [x] **042** — Mostrar carregando, erro e vazio na tela de cotação multicanal — onda 3 — Média
-- [~] **043** — Decidir com o dono o que fazer com as duas telas de cotação — onda 3 — Alta · — **levantado em 2026-11-25, aguarda o dono**: `CotacaoMultiCanal` (é a de *disparar*) e `DashboardCotacoes` (é a de *acompanhar*) seguem no menu; recomendação = manter as duas com papel explícito e remover de cada uma o que é do outro papel
+- [x] **043** — Decidir com o dono o que fazer com as duas telas de cotação — onda 3 — Alta · **decidido e executado em 2026-11-25**: as duas telas ficam, com papel explícito — `CotacaoMultiCanal` **dispara e responde** (subtítulo na tela + botão renomeado para “Acompanhar cotações”) e `DashboardCotacoes` **acompanha e decide** (ganhou o botão “Nova cotação”, que não existia). O que era do outro papel saiu: registrar resposta deixou de exigir que a transportadora estivesse na busca atual (`onRegistrar` agora depende só da cotação), que era o beco sem saída de quem vinha do dashboard
 - [x] **044** — `Despachos`: avisar quando o avanço de status não gravou — onda 3 — Alta
 - [x] **045** — `Despachos`: avisar quando a autorização de despacho final não gravou — onda 3 — Alta
 - [x] **046** — BOX: não registrar alocação no histórico quando a alocação não aconteceu — onda 3 — Alta
@@ -130,15 +131,15 @@
 - [x] **079** — Teste unitário da validação de assinatura de arquivo — onda 4 — Média
 - [x] **080** — Provar, arquivo por arquivo, quais dos oito "hooks sem importador" estão realmente mortos — onda 4 — Baixa
   <!-- Veredictos (261123):
-                      1. components/accessibility/index.ts — VIVO por caminho direto (SkipLinks, LiveRegionProvider, ReducedMotionProvider importados em MainLayout.tsx:13, LazyProviders.tsx:8-9)
-                      2. components/common/index.ts — VIVO (barril; exports EmptyState, ConfirmDialog, Pagination… em uso por caminhos diretos)
-                      3. components/pwa/index.ts — VIVO por caminho direto (OfflineBanner, InstallPrompt, UpdatePrompt em MainLayout.tsx:14,47,52)
-                      4. hooks/gamification/useGamification.ts — VIVO (importado por GamificationPanel, LevelUpModal, AppSidebar, Header, FavoriteMetricsBar via caminho sem extensão)
-                         hooks/gamification/useGamification.tsx — INDEFINIDO: 349 linhas vs .ts 259, implementações divergem; comentário P18 em authService.ts:43 indica .tsx como schema em uso; aguarda decisão do dono
-                      5. hooks/rodonaves/index.ts — VIVO por caminho direto (useSLOTargets, useSLOSnapshots, useGatewayHealth importados em RTEGateway* panels)
-                      6. hooks/ai/useNexusSimulator.ts — REMOVIDO em etapa 069 (PR #300)
-                      7. hooks/security/useSelfHealing.ts — REMOVIDO em etapa 068 (PR #300)
-                      8. utils/performance.ts — MORTO: useRenderingMonitor e measureAction sem nenhum importador (grep -rn "useRenderingMonitor\|measureAction" src/ → vazio) -->
+                          1. components/accessibility/index.ts — VIVO por caminho direto (SkipLinks, LiveRegionProvider, ReducedMotionProvider importados em MainLayout.tsx:13, LazyProviders.tsx:8-9)
+                          2. components/common/index.ts — VIVO (barril; exports EmptyState, ConfirmDialog, Pagination… em uso por caminhos diretos)
+                          3. components/pwa/index.ts — VIVO por caminho direto (OfflineBanner, InstallPrompt, UpdatePrompt em MainLayout.tsx:14,47,52)
+                          4. hooks/gamification/useGamification.ts — VIVO (importado por GamificationPanel, LevelUpModal, AppSidebar, Header, FavoriteMetricsBar via caminho sem extensão)
+                             hooks/gamification/useGamification.tsx — INDEFINIDO: 349 linhas vs .ts 259, implementações divergem; comentário P18 em authService.ts:43 indica .tsx como schema em uso; aguarda decisão do dono
+                          5. hooks/rodonaves/index.ts — VIVO por caminho direto (useSLOTargets, useSLOSnapshots, useGatewayHealth importados em RTEGateway* panels)
+                          6. hooks/ai/useNexusSimulator.ts — REMOVIDO em etapa 069 (PR #300)
+                          7. hooks/security/useSelfHealing.ts — REMOVIDO em etapa 068 (PR #300)
+                          8. utils/performance.ts — MORTO: useRenderingMonitor e measureAction sem nenhum importador (grep -rn "useRenderingMonitor\|measureAction" src/ → vazio) -->
 - [x] **081** — Remover só o que a etapa 080 provou morto — onda 4 — Baixa
   <!-- Removido: src/utils/performance.ts (useRenderingMonitor + measureAction, zero importadores) -->
 - [x] **082** — Remover `_shared/service-wrapper.ts`, que nenhuma função usa — onda 4 — Baixa
@@ -318,6 +319,7 @@
 - [x] **238** — Remover o duplicado de `coletas (transportadora_id)` — onda 6 — Baixa · #428 **aplicada no banco** (run 45444741315)
 - [x] **239** — Decidir e remover a sobreposição em `audit_logs (table_name, record_id)` — onda 6 — Baixa · #428 **aplicada no banco** (run 45444741315)
 - [x] **240** — Fechar o ciclo: registrar que índice se confere no banco, e conferir que nada regrediu — onda 6 — Alta · — **fechada em 2026-11-25**: subseção “Índices: confira no banco, não nas migrations” em `docs/agentes/banco.md` e censo reconferido no `schema-manifest.json`
+
 ### Onda 8
 
 - [x] **241** — Pôr aviso de obsolescência no alto de `ESTADO_ATUAL.md`, dizendo qual banco ele descreve — onda 8 — Crítica
@@ -405,13 +407,13 @@
 
 Problema novo **não se corrige na hora** (regra 4). Anote aqui, com `arquivo:linha`, e siga a etapa em curso.
 
-| #    | Achado                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Onde (arquivo:linha)                                                                                                                     | Encontrado na etapa | Gravidade estimada |
-| ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------- | ------------------ |
-| A-01 | **Resolvido na etapa 220**: a consulta de `ocorrencias` do benchmark de KPI nao tinha teto, ao contrario das de `entregas`/`coletas` (`.limit(1000)`); mes com muitas ocorrencias baixava a tabela inteira                                                                                                                                                                                                                                                                       | `src/hooks/analytics/useKPIBenchmark.tsx:67-71`                                                                                          | 219 -> 220          | Baixa              |
-| A-02 | O teto de 6000 do benchmark de KPI e **unico para os seis meses**: se a soma dos seis passar de 6000 linhas, o PostgREST corta sem ordem definida e qualquer mes pode perder registros (antes o corte era de 1000 **por mes**)                                                                                                                                                                                                                                                   | `src/hooks/analytics/useKPIBenchmark.tsx:44,49-71`                                                                                       | 220                 | Media              |
-| A-03 | O teto unico para os seis meses tambem vale para as metricas executivas (6000/6000/3000): se a soma dos seis meses passar disso, o PostgREST corta sem ordem definida e qualquer mes pode perder registros (antes o corte era por mes -- 1000/1000/500)                                                                                                                                                                                                                          | `src/hooks/analytics/useExecutiveMetrics.tsx:55,62,68`                                                                                   | 221                 | Media              |
+| #    | Achado                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | Onde (arquivo:linha)                                                                                                                     | Encontrado na etapa | Gravidade estimada |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------- | ------------------ |
+| A-01 | **Resolvido na etapa 220**: a consulta de `ocorrencias` do benchmark de KPI nao tinha teto, ao contrario das de `entregas`/`coletas` (`.limit(1000)`); mes com muitas ocorrencias baixava a tabela inteira                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | `src/hooks/analytics/useKPIBenchmark.tsx:67-71`                                                                                          | 219 -> 220          | Baixa              |
+| A-02 | O teto de 6000 do benchmark de KPI e **unico para os seis meses**: se a soma dos seis passar de 6000 linhas, o PostgREST corta sem ordem definida e qualquer mes pode perder registros (antes o corte era de 1000 **por mes**)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | `src/hooks/analytics/useKPIBenchmark.tsx:44,49-71`                                                                                       | 220                 | Media              |
+| A-03 | O teto unico para os seis meses tambem vale para as metricas executivas (6000/6000/3000): se a soma dos seis meses passar disso, o PostgREST corta sem ordem definida e qualquer mes pode perder registros (antes o corte era por mes -- 1000/1000/500)                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | `src/hooks/analytics/useExecutiveMetrics.tsx:55,62,68`                                                                                   | 221                 | Media              |
 | A-04 | **RESOLVIDO na etapa 222**: a migration `20261121153649` da #248 foi aplicada em produção (run `45382402621`) e o `types.ts` deixou de ser editado à mão - passou a ser regenerado pelo `types-sync`, que voltou verde (PR #419). Achado original: **produção não tinha `public.user_panel_preferences`**: a migration `20261121153649` da #248 nunca foi aplicada (último dispatch do `aplicar-migration.yml` é de 20/11, anterior ao arquivo) e o `types.ts` foi editado à mão. Efeito: `useSLAMetas` lança erro ao ler e `PainelSLA.tsx:242-244` mostra `toast.success` incondicional sem persistir nada - o usuário vê "salvo" e as metas de SLA não são gravadas. É também a causa do `types-sync` vermelho desde 23/11 (Gate 1) | `src/hooks/sla/useSLAMetas.ts:31-36`, `src/pages/PainelSLA.tsx:242-244`, `supabase/migrations/20261121153649_user_panel_preferences.sql` | 222                 | **Alta**           |
-| A-05 | `LogisticsService.getDeliveries` (`src/features/logistics/services/LogisticsService.ts:8`) mantém `select('*')` porque **não tem chamador**: a classe não é importada em nenhum arquivo de `src/`. Cortar colunas de código morto não economiza banda; o que resolve é apagar ou usar o serviço                                                                                                                                                                                  | `src/features/logistics/services/LogisticsService.ts:5-14`                                                                               | 227                 | Baixa              |
+| A-05 | `LogisticsService.getDeliveries` (`src/features/logistics/services/LogisticsService.ts:8`) mantém `select('*')` porque **não tem chamador**: a classe não é importada em nenhum arquivo de `src/`. Cortar colunas de código morto não economiza banda; o que resolve é apagar ou usar o serviço                                                                                                                                                                                                                                                                                                                                                                                                                                       | `src/features/logistics/services/LogisticsService.ts:5-14`                                                                               | 227                 | Baixa              |
 
 | A-06 | As mutacoes de status vivem duplicadas por tela (`Despachos.tsx` e `KanbanEntregas.tsx`), sem hook comum: regra nova de transicao precisa ser aplicada duas vezes | `src/pages/Despachos.tsx:216-320`, `src/pages/KanbanEntregas.tsx:328` | 282 | Media |
 | A-07 | **Mitigado pelo banco na etapa 031** (a tela continua sem aviso previo): o trigger `a_valida_transicao_entregas` recusa `despachado` sem `nf_remessa`, entao o caminho do Kanban nao grava mais estado invalido - o operador recebe a mensagem do banco pelo `onError` de `KanbanEntregas.tsx:344`. `KanbanEntregas.tsx` move entrega para `despachado` sem exigir `nf_remessa` e sem confirmacao; `Despachos.tsx` exige as duas coisas | `src/pages/KanbanEntregas.tsx:328`, `src/pages/Despachos.tsx:256-274` | 282 | **Alta** |
@@ -440,15 +442,15 @@ Quando a evidência da etapa já não bate (regra 2), registre aqui em vez de ad
 Resultados das etapas que só confirmam estado. **Nunca escreva o valor de um segredo — só "configurado" ou
 "ausente".**
 
-| Etapa | O que foi verificado                                                           | Resultado | Data | Quem confirmou |
-| ----- | ------------------------------------------------------------------------------ | --------- | ---- | -------------- |
-| 002   | `NEXUS_WEBHOOK_SECRET` existe nas edge functions                               |           |      |                |
-| 010   | `ALLOW_TEST_MODE` presente em produção                                         |           |      |                |
-| 023   | RLS real de `geo_blocking_rules`, `geo_blocking_settings`, `scheduled_reports` | `relrowsecurity = true` nas três (2, 2 e 4 policies) — F-02 refutado | 2026-11-24 | agente (SQL read-only no `jvfhclubfpxrtrrazrgr`) |
+| Etapa | O que foi verificado                                                           | Resultado                                                                                | Data       | Quem confirmou                                   |
+| ----- | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------- | ---------- | ------------------------------------------------ |
+| 002   | `NEXUS_WEBHOOK_SECRET` existe nas edge functions                               |                                                                                          |            |                                                  |
+| 010   | `ALLOW_TEST_MODE` presente em produção                                         |                                                                                          |            |                                                  |
+| 023   | RLS real de `geo_blocking_rules`, `geo_blocking_settings`, `scheduled_reports` | `relrowsecurity = true` nas três (2, 2 e 4 policies) — F-02 refutado                     | 2026-11-24 | agente (SQL read-only no `jvfhclubfpxrtrrazrgr`) |
 | 026   | `UNIQUE` em `logistica_reversa.codigo_rastreio_reverso`                        | ausente (`coletas.numero_coleta` e `entregas.numero_entrega` com `UNIQUE`, 0 duplicatas) | 2026-11-24 | agente (SQL read-only no `jvfhclubfpxrtrrazrgr`) |
-| 285   | `VITE_SENTRY_DSN` configurado no Vercel                                        |           |      |                |
-| 287   | `webhook_failures` e `cron_job_logs` existem no banco                           | não existem (`to_regclass` = `null`; `webhook_deliveries` existe) | 2026-11-24 | agente (SQL read-only no `jvfhclubfpxrtrrazrgr`) |
-| 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           | F-02 refutado e F-03 resolvida nos números (etapas 023/026) | 2026-11-24 | agente (SQL read-only no `jvfhclubfpxrtrrazrgr`) |
+| 285   | `VITE_SENTRY_DSN` configurado no Vercel                                        |                                                                                          |            |                                                  |
+| 287   | `webhook_failures` e `cron_job_logs` existem no banco                          | não existem (`to_regclass` = `null`; `webhook_deliveries` existe)                        | 2026-11-24 | agente (SQL read-only no `jvfhclubfpxrtrrazrgr`) |
+| 295   | Reconferência de F-02, F-03, P-05, P-06, S-05, S-08 no banco ao vivo           | F-02 refutado e F-03 resolvida nos números (etapas 023/026)                              | 2026-11-24 | agente (SQL read-only no `jvfhclubfpxrtrrazrgr`) |
 
 ## Registro de execução
 
@@ -468,11 +470,11 @@ npx vitest run src/test/testInfra.smoke.test.ts src/hooks/logistics/useRuleTrigg
 mutacao de alocacao de BOX onde ela mora (`src/hooks/logistics/useBoxManagement.tsx:145-164`), com duplo
 proprio do Supabase para controlar `count`, `error` e o `insert` de `kanban_history`:
 
-| caso | duplo devolve | esperado |
-| --- | --- | --- |
-| versao casou | `{ count: 1, error: null }` | aloca com `{ count: "exact" }`, grava `kanban_history` com `notes = "Alocado ao BOX 03"` e anuncia sucesso |
-| registro alterado por outro usuario | `{ count: 0, error: null }` | rejeita com `Conflito de versao`, **nao** grava `kanban_history` e **nao** anuncia sucesso |
-| erro do banco | `{ error: { message: "permission denied..." } }` | rejeita com o motivo do banco e nao grava historico |
+| caso                                | duplo devolve                                    | esperado                                                                                                   |
+| ----------------------------------- | ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------- |
+| versao casou                        | `{ count: 1, error: null }`                      | aloca com `{ count: "exact" }`, grava `kanban_history` com `notes = "Alocado ao BOX 03"` e anuncia sucesso |
+| registro alterado por outro usuario | `{ count: 0, error: null }`                      | rejeita com `Conflito de versao`, **nao** grava `kanban_history` e **nao** anuncia sucesso                 |
+| erro do banco                       | `{ error: { message: "permission denied..." } }` | rejeita com o motivo do banco e nao grava historico                                                        |
 
 ```
 npx vitest run src/hooks/logistics/useBoxManagement.test.ts
@@ -524,11 +526,11 @@ WHERE n.nspname = 'public'
 **Etapa 026 — a unicidade existe onde importava.** `pg_constraint` (`contype IN ('u','p')`), `pg_indexes`
 com `indexdef ILIKE '%unique%'` e a contagem de duplicatas:
 
-| coluna                                      | `UNIQUE` no banco | duplicatas hoje |
-| ------------------------------------------- | ----------------- | --------------- |
-| `coletas.numero_coleta`                     | **presente** (`coletas_numero_coleta_key`) | 0 |
-| `entregas.numero_entrega`                   | **presente** (`entregas_numero_entrega_key`) | 0 |
-| `logistica_reversa.codigo_rastreio_reverso` | **ausente** | 0 |
+| coluna                                      | `UNIQUE` no banco                            | duplicatas hoje |
+| ------------------------------------------- | -------------------------------------------- | --------------- |
+| `coletas.numero_coleta`                     | **presente** (`coletas_numero_coleta_key`)   | 0               |
+| `entregas.numero_entrega`                   | **presente** (`entregas_numero_entrega_key`) | 0               |
+| `logistica_reversa.codigo_rastreio_reverso` | **ausente**                                  | 0               |
 
 A suspeita original de F-03 nos números está derrubada **no banco**, não só na leitura das migrations: as
 duas restrições existem e não há uma linha repetida. O que sobra é o que o achado já apontava — o código de
@@ -3601,7 +3603,6 @@ Uma linha por etapa concluída. A coluna **Evidência** é o que diferencia etap
 | ----- | --- | --------- | ------------------ | ------------------------ |
 |       |     |           |                    |                          |
 
-
 ### Registro - ondas 1 e 6: DDL aplicada, tipos sincronizados e censo de índices (2026-11-24)
 
 Banco consultado ao vivo pelo Management API do Supabase, ref **jvfhclubfpxrtrrazrgr**, em 2026-11-24.
@@ -3637,11 +3638,11 @@ Antes eram **0** arquivos: a branch `contexto` publicava codigo e regras, nunca 
 
 #### Etapa 228 - censo dos indices reais (saida de `pg_indexes`, resumida)
 
-| Tabela | Indices hoje | Observacao que muda o plano |
-| --- | --- | --- |
-| `entregas` | 20 | ja existem `idx_entregas_previsao_active (previsao_entrega) WHERE status NOT IN ('entregue','finalizado') AND deleted_at IS NULL` e `idx_entregas_active (created_at DESC) WHERE deleted_at IS NULL` |
-| `coletas` | 14 | `idx_coletas_status_data (status, data_prevista_coleta DESC)` ja cobre o Painel SLA de coletas |
-| `telemetry_logs` | 5 | `severity` e `created_at` separados, sem composto; 394 linhas, 712 kB |
+| Tabela           | Indices hoje | Observacao que muda o plano                                                                                                                                                                          |
+| ---------------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `entregas`       | 20           | ja existem `idx_entregas_previsao_active (previsao_entrega) WHERE status NOT IN ('entregue','finalizado') AND deleted_at IS NULL` e `idx_entregas_active (created_at DESC) WHERE deleted_at IS NULL` |
+| `coletas`        | 14           | `idx_coletas_status_data (status, data_prevista_coleta DESC)` ja cobre o Painel SLA de coletas                                                                                                       |
+| `telemetry_logs` | 5            | `severity` e `created_at` separados, sem composto; 394 linhas, 712 kB                                                                                                                                |
 
 **Tamanho das tabelas** (`pg_stat_user_tables`): `entregas` **0 linhas** (heap 0 bytes), `coletas`
 **0 linhas**, `telemetry_logs` 394 linhas/520 kB, `query_telemetry` 0 linhas. Nao ha staging: e o banco de
@@ -3649,11 +3650,11 @@ producao, e ele esta vazio de entregas e coletas hoje.
 
 #### Etapa 229 - `EXPLAIN (ANALYZE, BUFFERS)` das consultas reais
 
-| Consulta | Plano medido | Tempo |
-| --- | --- | --- |
-| Painel SLA (entregas) | `Seq Scan` + `Sort` | **0,123 ms** |
-| Painel SLA (coletas) | `Seq Scan` + `Sort` | **0,103 ms** |
-| Kanban de entregas | `Seq Scan` + `Sort` | **0,117 ms** |
+| Consulta                                | Plano medido                                            | Tempo        |
+| --------------------------------------- | ------------------------------------------------------- | ------------ |
+| Painel SLA (entregas)                   | `Seq Scan` + `Sort`                                     | **0,123 ms** |
+| Painel SLA (coletas)                    | `Seq Scan` + `Sort`                                     | **0,103 ms** |
+| Kanban de entregas                      | `Seq Scan` + `Sort`                                     | **0,117 ms** |
 | `telemetry_logs WHERE severity='error'` | `Index Scan using idx_telemetry_logs_severity` + `Sort` | **0,701 ms** |
 
 O `Seq Scan` nao e o defeito que P-05 descreveu: e o planejador descartando indice em tabela de **0
@@ -3662,25 +3663,25 @@ diz que a medicao e o criterio.
 
 #### Veredito por etapa (o criterio do plano, aplicado)
 
-| Etapa | Veredito | Por que |
-| --- | --- | --- |
-| 230 | **nao criar** | `idx_entregas_previsao_active` ja entrega o `ORDER BY previsao_entrega` sem `Sort` para o mesmo filtro: e melhor que o `(status, previsao_entrega)` proposto, que ainda exigiria `Sort` |
-| 231 | **nao criar** | `idx_entregas_active (created_at DESC) WHERE deleted_at IS NULL` ja cobre a ordenacao do Kanban; o parcial proposto so acrescenta o predicado de status, e o ganho nao e medivel com 0 linhas |
-| 232 | **medido, nao compensa** | 0,701 ms com 394 linhas; `telemetry_logs` e tabela de escrita intensa e o teto das telas e 100/500 - o custo de escrita supera o ganho |
-| 233 | **medido, nao compensa** | `idx_entregas_transportadora_id` ja e o indice mais usado de `entregas` (343 `idx_scan`), e o drill-down tem teto 100 |
+| Etapa | Veredito                 | Por que                                                                                                                                                                                       |
+| ----- | ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 230   | **nao criar**            | `idx_entregas_previsao_active` ja entrega o `ORDER BY previsao_entrega` sem `Sort` para o mesmo filtro: e melhor que o `(status, previsao_entrega)` proposto, que ainda exigiria `Sort`       |
+| 231   | **nao criar**            | `idx_entregas_active (created_at DESC) WHERE deleted_at IS NULL` ja cobre a ordenacao do Kanban; o parcial proposto so acrescenta o predicado de status, e o ganho nao e medivel com 0 linhas |
+| 232   | **medido, nao compensa** | 0,701 ms com 394 linhas; `telemetry_logs` e tabela de escrita intensa e o teto das telas e 100/500 - o custo de escrita supera o ganho                                                        |
+| 233   | **medido, nao compensa** | `idx_entregas_transportadora_id` ja e o indice mais usado de `entregas` (343 `idx_scan`), e o drill-down tem teto 100                                                                         |
 
 Reavaliar 230/231/233 quando `entregas` e `coletas` passarem de ~50 mil linhas: a decisao de hoje e sobre o
 banco de hoje, e o numero que muda a resposta e a contagem de linhas.
 
 #### Etapa 234 - censo dos cinco candidatos a duplicado
 
-| # | Tabela (coluna) | Existe hoje | `idx_scan` | Constraint? | Fica |
-| --- | --- | --- | --- | --- | --- |
-| 1 | `rastreamento_historico (lalamove_order_id)` | **so um** (`idx_rastreamento_lalamove_order`) | - | - | nada a fazer: o duplicado ja foi removido em `20260831130000` |
-| 2 | `rastreamento_historico (coleta_id)` | **so um** (`idx_rastreamento_historico_coleta_id`) | - | FK aponta para `coletas_pkey` | nada a fazer: idem |
-| 3 | `entregas (transportadora_id)` | os dois: `idx_entregas_transportadora` (parcial) e `idx_entregas_transportadora_id` | **0** x **343** | nao | sai o parcial - #428 |
-| 4 | `coletas (transportadora_id)` | os dois: `idx_coletas_transportadora` (parcial) e `idx_coletas_transportadora_id` | 0 x 0 | nao | sai o parcial - #428 |
-| 5 | `audit_logs (table_name, record_id)` | `idx_audit_logs_table_record` **nao existe**; `idx_audit_logs_record_id_table` e prefixo de `idx_audit_logs_record_composite` | 2 x 0 | nao | sai o prefixo - #428 |
+| #   | Tabela (coluna)                              | Existe hoje                                                                                                                   | `idx_scan`      | Constraint?                   | Fica                                                          |
+| --- | -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | --------------- | ----------------------------- | ------------------------------------------------------------- |
+| 1   | `rastreamento_historico (lalamove_order_id)` | **so um** (`idx_rastreamento_lalamove_order`)                                                                                 | -               | -                             | nada a fazer: o duplicado ja foi removido em `20260831130000` |
+| 2   | `rastreamento_historico (coleta_id)`         | **so um** (`idx_rastreamento_historico_coleta_id`)                                                                            | -               | FK aponta para `coletas_pkey` | nada a fazer: idem                                            |
+| 3   | `entregas (transportadora_id)`               | os dois: `idx_entregas_transportadora` (parcial) e `idx_entregas_transportadora_id`                                           | **0** x **343** | nao                           | sai o parcial - #428                                          |
+| 4   | `coletas (transportadora_id)`                | os dois: `idx_coletas_transportadora` (parcial) e `idx_coletas_transportadora_id`                                             | 0 x 0           | nao                           | sai o parcial - #428                                          |
+| 5   | `audit_logs (table_name, record_id)`         | `idx_audit_logs_table_record` **nao existe**; `idx_audit_logs_record_id_table` e prefixo de `idx_audit_logs_record_composite` | 2 x 0           | nao                           | sai o prefixo - #428                                          |
 
 `AuditTrail.tsx:30` ordena por `created_at` sem filtrar por `record_id` nem `table_name`; as buscas do par
 sao atendidas pelo composto `(record_id, table_name, created_at DESC)`, que e o que sustenta a decisao da 239.
@@ -3694,8 +3695,8 @@ Atualize ao fim de cada sessão de trabalho.
 
 |                         | Quantidade |
 | ----------------------- | ---------- |
-| Concluidas `[x]`        | 282         |
-| Aguardando o dono `[~]` | 18          |
+| Concluidas `[x]`        | 282        |
+| Aguardando o dono `[~]` | 18         |
 | Bloqueadas `[!]`        | 0          |
 | Não iniciadas `[ ]`     | 0          |
 | **Total**               | **300**    |
@@ -3754,21 +3755,21 @@ linha 234. A etapa 083 proibe tocar nele; fica registrado para etapa futura.
 
 ### Registro - etapas 281 e 282 (2026-11-24) - testes de criar coleta e de mover status
 
-**281 - criar coleta.** O plano (`04-PLANO.md:11341`) supunha um *hook* de coletas; ele nao existe: a
+**281 - criar coleta.** O plano (`04-PLANO.md:11341`) supunha um _hook_ de coletas; ele nao existe: a
 escrita mora no dialogo, `src/components/coletas/PickupDialog.tsx:162`
 (`supabase.from("coletas").insert(...)`). Caminho real conferido por leitura antes de escrever o teste.
 
 Criado `src/components/coletas/PickupDialog.test.tsx` (7 casos):
 
-| Caso                            | O que prova                                                                                                                                                       |
-| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Entrada valida                  | 1 insert com `numero_coleta`, `endereco_coleta`, `status: "aguardando_liberacao"`, `qtd_volumes: 0`, flags em `false`, toast "Protocolo Injetado" e `onSuccess`    |
-| Campo obrigatorio vazio         | 0 insert, 0 toast, 0 `onSuccess` - a validacao segura a escrita                                                                                                    |
-| Erro do banco (`permission denied`) | toast `variant: "destructive"` com o motivo do banco e o dialogo permanece aberto                                                                              |
-| Duplo envio (3 cliques)         | 1 insert (R-05)                                                                                                                                                    |
-| Reversa + Urgente               | `is_reverse` e `is_urgent` em `true` no payload, `observacoes` prefixado com `[LOGISTICA_REVERSA]`                                                                 |
-| Inbound depois de Reversa       | `is_reverse: false` no payload                                                                                                                                     |
-| CANCELAR_LOG                    | avisa o pai para fechar e nao escreve nada                                                                                                                         |
+| Caso                                | O que prova                                                                                                                                                     |
+| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Entrada valida                      | 1 insert com `numero_coleta`, `endereco_coleta`, `status: "aguardando_liberacao"`, `qtd_volumes: 0`, flags em `false`, toast "Protocolo Injetado" e `onSuccess` |
+| Campo obrigatorio vazio             | 0 insert, 0 toast, 0 `onSuccess` - a validacao segura a escrita                                                                                                 |
+| Erro do banco (`permission denied`) | toast `variant: "destructive"` com o motivo do banco e o dialogo permanece aberto                                                                               |
+| Duplo envio (3 cliques)             | 1 insert (R-05)                                                                                                                                                 |
+| Reversa + Urgente                   | `is_reverse` e `is_urgent` em `true` no payload, `observacoes` prefixado com `[LOGISTICA_REVERSA]`                                                              |
+| Inbound depois de Reversa           | `is_reverse: false` no payload                                                                                                                                  |
+| CANCELAR_LOG                        | avisa o pai para fechar e nao escreve nada                                                                                                                      |
 
 **282 - mover entrega de status.** `count: "exact"` ja estava nas duas telas: `Despachos.tsx:223` e `:284`,
 `KanbanEntregas.tsx:328` - etapas 044-048 cumpridas. As mutacoes seguem **separadas por tela** (nao ha hook
@@ -3778,12 +3779,12 @@ Criado `src/pages/Despachos.test.tsx` (12 casos), renderizando a pagina com o `s
 
 A mutacao:
 
-| Caso                               | O que prova                                                                                                                                                 |
-| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Transicao permitida com `count: 1` | 1 update com `{ status: "cotacao_frete" }` e `{ count: "exact" }`, `onStatusChange` avisado, toast "Movido para ..." e a fila recarregada (2 leituras)        |
-| Sem destino unico (`despachado`)   | nao existe botao PROSSEGUIR e nenhum update sai                                                                                                             |
-| `count: 0`                         | recusa com a mensagem de registro alterado por outro usuario, **sem** toast de sucesso, **sem** `onStatusChange` e **sem** gravar `kanban_history`            |
-| Erro do banco                      | a mutacao rejeita e o motivo do banco chega ao usuario                                                                                                      |
+| Caso                               | O que prova                                                                                                                                            |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Transicao permitida com `count: 1` | 1 update com `{ status: "cotacao_frete" }` e `{ count: "exact" }`, `onStatusChange` avisado, toast "Movido para ..." e a fila recarregada (2 leituras) |
+| Sem destino unico (`despachado`)   | nao existe botao PROSSEGUIR e nenhum update sai                                                                                                        |
+| `count: 0`                         | recusa com a mensagem de registro alterado por outro usuario, **sem** toast de sucesso, **sem** `onStatusChange` e **sem** gravar `kanban_history`     |
+| Erro do banco                      | a mutacao rejeita e o motivo do banco chega ao usuario                                                                                                 |
 
 A tela em volta (segundo bloco): Sincronizar recarrega a fila; evento de tempo real de insert toca o aviso e
 recarrega, o de update recarrega sem tocar som; clique no cartao abre os detalhes (som de navegacao) e o
@@ -3794,11 +3795,11 @@ O despacho final (terceiro bloco) e a unica saida que passa por confirmacao na t
 `despachado` como destino unico (`src/lib/statusTransitions.ts:16`), e `moveToNext` (`:268`) chama
 `setConfirmItem(item)` em vez de mover direto.
 
-| Caso                                  | O que prova                                                                                                                                              |
-| ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| NF de simples remessa ausente         | toast "NF de Simples Remessa obrigatoria", nenhum update e o dialogo de confirmacao nao abre                                                                |
-| Confirmacao autorizada                | o dialogo abre com o item, so o "autorizar" dispara a escrita: 1 update com `status: "despachado"` e `{ count: "exact" }`, `onStatusChange`, `kanban_history` (from `nf_emitida` -> `despachado`, notes "Despacho final autorizado"), toast de sucesso e fila recarregada |
-| Confirmacao com `count: 0`            | recusa com a mensagem de registro alterado por outro usuario e nenhum toast de sucesso                                                                      |
+| Caso                          | O que prova                                                                                                                                                                                                                                                               |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| NF de simples remessa ausente | toast "NF de Simples Remessa obrigatoria", nenhum update e o dialogo de confirmacao nao abre                                                                                                                                                                              |
+| Confirmacao autorizada        | o dialogo abre com o item, so o "autorizar" dispara a escrita: 1 update com `status: "despachado"` e `{ count: "exact" }`, `onStatusChange`, `kanban_history` (from `nf_emitida` -> `despachado`, notes "Despacho final autorizado"), toast de sucesso e fila recarregada |
+| Confirmacao com `count: 0`    | recusa com a mensagem de registro alterado por outro usuario e nenhum toast de sucesso                                                                                                                                                                                    |
 
 O caso `count: 0` cobre a mesma trava que a etapa 277 pede em nivel de hook, so que pela tela; **277 segue
 aberta** porque o Kanban nao foi exercitado.
@@ -3806,12 +3807,12 @@ aberta** porque o Kanban nao foi exercitado.
 **Por que existem os segundos blocos (cobertura).** Importar `Despachos.tsx` e `PickupDialog.tsx` coloca os
 dois no denominador da cobertura global (`vitest.config.ts`, piso de 73% em funcoes):
 
-| Momento                                           | Funcoes |
-| ------------------------------------------------- | ------- |
-| Sem os dois arquivos (base da `main`)             | 73.40%  |
-| So com os 8 testes de mutacao/criacao             | 71.75%  |
-| Com os caminhos de tela cobertos (16 testes)      | 73.84%  |
-| Com o despacho final coberto (19 testes)          | 74.43%  |
+| Momento                                      | Funcoes |
+| -------------------------------------------- | ------- |
+| Sem os dois arquivos (base da `main`)        | 73.40%  |
+| So com os 8 testes de mutacao/criacao        | 71.75%  |
+| Com os caminhos de tela cobertos (16 testes) | 73.84%  |
+| Com o despacho final coberto (19 testes)     | 74.43%  |
 
 A segunda linha foi o que reprovou `Unit & Integration Tests` e `quality-gate` na primeira rodada da PR. O
 piso nao foi mexido: o que subiu foi a cobertura real de `Despachos.tsx` (18/31 -> 31/31 funcoes) e de
@@ -3854,12 +3855,12 @@ Travessia de 001 a 300 contra este arquivo: **219 concluidas**, **61 parciais**,
 
 ### Esperando o dono (61 etapas `[~]`)
 
-| Assunto                                                      | Etapas                                                                                                                              | O que trava                                                                   |
-| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
-| Banco: DDL, RLS, unicidade e indices                         | 024, 025, 027-033, 037, 055, 056, 058, 222, 228, 229, 234, 240, 263, 265, 266, 290, 295                                              | nada disso roda sem sua autorizacao (regra 8)                                  |
-| Segredo e ambiente de producao                               | 002, 010, 011, 014, 019, 270, 285, 286                                                                                                | confirmar o estado do segredo, ou remover o que ficou obsoleto                 |
-| Decisao de negocio (o que existe e o que morre)               | 006, 008, 009, 016, 017, 018, 039, 041, 043, 060, 070-076, 120, 142, 211, 248, 255, 257, 272, 273, 274, 283, 288                       | escolher entre corrigir, remover ou aceitar                                    |
-| Fechamento do proprio plano                                  | 284, 299                                                                                                                              | pisos de cobertura e bateria final de gates: os dois mexem em gate de CI       |
+| Assunto                                         | Etapas                                                                                                           | O que trava                                                              |
+| ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| Banco: DDL, RLS, unicidade e indices            | 024, 025, 027-033, 037, 055, 056, 058, 222, 228, 229, 234, 240, 263, 265, 266, 290, 295                          | nada disso roda sem sua autorizacao (regra 8)                            |
+| Segredo e ambiente de producao                  | 002, 010, 011, 014, 019, 270, 285, 286                                                                           | confirmar o estado do segredo, ou remover o que ficou obsoleto           |
+| Decisao de negocio (o que existe e o que morre) | 006, 008, 009, 016, 017, 018, 039, 041, 043, 060, 070-076, 120, 142, 211, 248, 255, 257, 272, 273, 274, 283, 288 | escolher entre corrigir, remover ou aceitar                              |
+| Fechamento do proprio plano                     | 284, 299                                                                                                         | pisos de cobertura e bateria final de gates: os dois mexem em gate de CI |
 
 ### Aberta por falta de acesso ao banco (13)
 
@@ -3891,11 +3892,11 @@ arquivo ganhou o bloco de fechamento (data, commit da `main`, banco e a contagem
 da memoria: um script cruzou o campo `-> Etapas NNN` de cada achado com as marcas de `05-PROGRESSO.md` -
 `RESOLVIDO` somente quando **todas** as etapas do achado estao `[x]`.
 
-| Resultado | Achados | IDs |
-| --- | --- | --- |
-| RESOLVIDO | 35 | S-02, F-01, C-03, D-01, D-03, A-07, A-11, A-12, A-13, R-01 a R-06 (exceto R-07), R-08, R-09, B-01, B-03 a B-10, P-02, P-03, H-01, H-05, H-06, H-07, H-08, H-10, H-15 |
-| PARCIAL | 15 | S-01, S-03, S-06, S-07, C-02, D-02, A-08, R-07, B-02, P-01, P-04, H-02, H-03, H-04, H-12 |
-| ABERTO | 15 | S-04, S-05, S-08, F-02, F-03, C-01, D-04, A-09, A-10, P-05, P-06, H-09, H-11, H-13, H-14 |
+| Resultado | Achados | IDs                                                                                                                                                                  |
+| --------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| RESOLVIDO | 35      | S-02, F-01, C-03, D-01, D-03, A-07, A-11, A-12, A-13, R-01 a R-06 (exceto R-07), R-08, R-09, B-01, B-03 a B-10, P-02, P-03, H-01, H-05, H-06, H-07, H-08, H-10, H-15 |
+| PARCIAL   | 15      | S-01, S-03, S-06, S-07, C-02, D-02, A-08, R-07, B-02, P-01, P-04, H-02, H-03, H-04, H-12                                                                             |
+| ABERTO    | 15      | S-04, S-05, S-08, F-02, F-03, C-01, D-04, A-09, A-10, P-05, P-06, H-09, H-11, H-13, H-14                                                                             |
 
 Verificacao da etapa (esperado: os dois numeros iguais): `grep -c '^## [A-Z]-[0-9]'` = **65** e
 `grep -c '^\*\*Estado ('` = **65**. Nenhum achado ficou sem fechamento e nenhum recebeu dois.
@@ -3941,6 +3942,7 @@ dialogo de edicao.
 Nenhuma alteracao de codigo nas duas.
 
 **Verificacao**
+
 - `grep -n 'setSelectedPickup(c)' -A2 src/pages/Coletas.tsx` -> os tres pontos
   (`:754` detalhes, `:860` edicao, `:953` onEdit) chamam `setSelectedPickup` antes de
   abrir o dialogo correspondente
@@ -3966,6 +3968,7 @@ As linhas de `banco.md:32-41` sobre os projetos que nao sao o destino ficaram in
 a protecao contra escrever no banco errado.
 
 **Verificacao**
+
 - `node scripts/ci/check-claude-md-integrity.mjs` -> exit 0
 - `grep -n 'historico/\|nao reexecutar' -i docs/agentes/banco.md` -> os dois arquivos listados
   (`:50-51`) com data, projeto e marca de nao reexecutar
@@ -3990,6 +3993,7 @@ Conteudo SQL **nao** foi tocado - a revisao de 2026-11-09 ja os deixou replay-sa
 e qualquer edicao invalidaria os testes que verificam o conteudo.
 
 **Verificacao**
+
 - `node --test scripts/audit/sql.unit.mjs` -> **28 testes, 0 falhas, 0 pulados**; o
   Postgres descartavel subiu e os dois arquivos foram executados de verdade no novo caminho
 - `npm run automation:test` -> **103 testes, 0 falhas**
@@ -4036,6 +4040,7 @@ Rollback pronto: `supabase/rollbacks/20261124091000_rollback_maquina_estados.sql
 funcoes). Para usar, copiar para `supabase/migrations/` e despachar o mesmo workflow.
 
 **Verificacao**
+
 - `aplicar-migration.yml` 4x -> os 4 runs `success` (ids acima)
 - catalogo gerado do banco (`supabase/schema-catalog.json`, PR #419) tem as 6 rotinas novas:
   `fn_valida_transicao_entrega`, `fn_tr_valida_transicao_entrega`, `a_valida_transicao_entregas`,
@@ -4056,24 +4061,23 @@ Uma linha por etapa concluída. A coluna **Evidência** é o que diferencia etap
 
 ---
 
-
-
 ## Registro da etapa 296 - branch contexto regerada (2026-11-24)
 
 Depois de ~300 etapas as três fontes da branch `contexto` descreviam uma árvore que já não existia — e são
 a primeira coisa que qualquer agente lê. A regeração foi disparada por `workflow_dispatch` sobre a `main`
 `e65af9d8`, com os **três** produtores verdes no run `45410194923`:
 
-| Job | Estado |
-| --- | --- |
-| Produtor `codigo/` (`gerar.mjs`) | success |
-| Produtor `regras/` (`generate.py`) | success |
+| Job                                  | Estado  |
+| ------------------------------------ | ------- |
+| Produtor `codigo/` (`gerar.mjs`)     | success |
+| Produtor `regras/` (`generate.py`)   | success |
 | Produtor `supabase/` (`snapshot.py`) | success |
-| Índice único + branch `contexto` | success |
+| Índice único + branch `contexto`     | success |
 
 Commit publicado: `2026-11-24T14:09:53+00:00` — `chore(contexto): 3 fonte(s) regerada(s) @ main e65af9d [skip ci]`.
 
 **Verificação**
+
 - `git show origin/contexto:docs/contexto/00-INDEX.md | sed -n '1,16p'` -> cabeçalho
   `Gerado automaticamente por indice.py · 2026-11-24 14:09 UTC · HEAD e65af9d8af`, e a linha do banco real
   agora `ok · 0 min atrás` (antes: "ainda não gerado"); código `ok · 1 min atrás`, regras `ok · 0 min atrás`
@@ -4081,7 +4085,7 @@ Commit publicado: `2026-11-24T14:09:53+00:00` — `chore(contexto): 3 fonte(s) r
 - `docs/contexto/codigo/testes.json` -> `total: 201` (`contrato 57`, `unit 137`, `e2e 2`, `pytest 5`), com
   `cobertura_por_arquivo` e `sem_teste` — reflete as etapas 275-282, não os "61 de 61 sem teste" da versão velha
 - `docs/contexto/supabase/tables/public/fretes_internos.md:32` -> coluna 16 `deleted_at |
-  timestamp with time zone | sim`: o snapshot enxerga a DDL da etapa 056
+timestamp with time zone | sim`: o snapshot enxerga a DDL da etapa 056
 - `git ls-tree -r --name-only origin/contexto docs/contexto/supabase/ | wc -l` -> **553** arquivos
 - o job do banco saiu **verde com dados**, não verde com aviso: o secret `SUPABASE_DB_URL` existe (etapa 263
   resolvida na prática)
@@ -4090,7 +4094,6 @@ Commit publicado: `2026-11-24T14:09:53+00:00` — `chore(contexto): 3 fonte(s) r
 6 migrations com extensão dobrada — `docs/contexto/supabase/migrations/20261124090000_fn_valida_transicao_entrega.sql.sql`
 e outras cinco. São exatamente as migrations aplicadas pelo `aplicar-migration.yml`, cujo registro no ledger
 guarda o nome com `.sql` e o produtor acrescenta `.sql` de novo. O conteúdo está correto; só o nome mente.
-
 
 ## Registro da etapa 295 — os seis achados HIPÓTESE, medidos no banco ao vivo
 
@@ -4105,7 +4108,7 @@ Consultas feitas em **2026-11-24** contra o projeto `jvfhclubfpxrtrrazrgr` pela 
   coluna `status` (a coluna é `severity`) e ela recusa papéis sem admin (`Access denied: admin role required`
   para o papel da Management API), então esse caminho nunca teria fechado o achado.
 - **F-03 — CONFIRMADO para os números, REFUTADO para o rastreio.** `coletas_numero_coleta_key UNIQUE
-  (numero_coleta)` e `entregas_numero_entrega_key UNIQUE (numero_entrega)` existem, e as duas colunas são
+(numero_coleta)` e `entregas_numero_entrega_key UNIQUE (numero_entrega)` existem, e as duas colunas são
   `NOT NULL` — logo a geração por trigger `BEFORE INSERT` não tem como duplicar. Já `codigo_rastreamento` é
   `NULL`-ável e tem apenas dois índices btree **parciais e não únicos**
   (`idx_entregas_rastreamento`, `idx_entregas_codigo_rastreamento`): nada no banco impede dois fretes com o
@@ -4129,33 +4132,32 @@ Consultas feitas em **2026-11-24** contra o projeto `jvfhclubfpxrtrrazrgr` pela 
 - **S-08 — SEGUE ABERTO (dono).** Restrição de URL do token `VITE_MAPBOX_TOKEN` só existe no painel do Mapbox;
   a etapa 019 já pede a mesma confirmação.
 
-
 ## Registro da etapa 299 — bateria completa de gates: início × fim
 
 Medido em **2026-11-24** sobre a `main` (`e42bbf85`), em worktree limpo com `node_modules` do checkout. A coluna
 "início" é a `02-CENARIOS.md` §0 (E1–E11).
 
-| # | Gate | Início (02-CENARIOS §0) | Fim (medido hoje) | Diferença |
-| --- | --- | --- | --- | --- |
-| E1 | `npx tsc --noEmit` | 0 erros | **0 erros**, exit 0 | igual |
-| E2 | `npx eslint .` | 105 avisos, 0 erros | **80 avisos, 0 erros** | **−25 avisos** |
-| E3 | `npm run lint:budget` | 105/105 (no teto exato) | **80 / 86**, 0/0 erros | −25 avisos + 6 de margem |
-| E4 | `npm run validate:csp` | OK | **OK** | igual |
-| E5 | `npm run validate:no-console` | OK, 107 arquivos | **OK, 120 arquivos** | +13 arquivos cobertos |
-| E6 | `npm run security-scan` | OK + aviso de allowlist (`xlsx`, `vite`, `picomatch`) | **OK + o mesmo aviso** | igual — etapa 270 pendente |
-| E7 | `npm audit --json` | 0 em todas as severidades | **0** (critical 0, high 0, moderate 0, low 0) | igual |
-| E8 | `git ls-files .env` / `check-ignore` | rastreado e fora do `.gitignore` | **não rastreado e ignorado** | **corrigido** |
-| E9 | chaves em arquivo versionado | todas `"role":"anon"` | `docs/ops/cron_jobs_origem.json` **não contém chave nenhuma** | não se aplica mais |
-| E10 | visibilidade do repositório | `public` | **`public`** | igual — etapas 016/017 aguardam o dono |
-| E11 | funções SQL | 119 nas migrations: 83 definer com `search_path`, 2 sem, 34 não-definer | **117 no catálogo: 102 definer, 102 com `search_path`, 0 sem**, 15 invoker | **0 definer sem `search_path`** |
+| #   | Gate                                 | Início (02-CENARIOS §0)                                                 | Fim (medido hoje)                                                          | Diferença                              |
+| --- | ------------------------------------ | ----------------------------------------------------------------------- | -------------------------------------------------------------------------- | -------------------------------------- |
+| E1  | `npx tsc --noEmit`                   | 0 erros                                                                 | **0 erros**, exit 0                                                        | igual                                  |
+| E2  | `npx eslint .`                       | 105 avisos, 0 erros                                                     | **80 avisos, 0 erros**                                                     | **−25 avisos**                         |
+| E3  | `npm run lint:budget`                | 105/105 (no teto exato)                                                 | **80 / 86**, 0/0 erros                                                     | −25 avisos + 6 de margem               |
+| E4  | `npm run validate:csp`               | OK                                                                      | **OK**                                                                     | igual                                  |
+| E5  | `npm run validate:no-console`        | OK, 107 arquivos                                                        | **OK, 120 arquivos**                                                       | +13 arquivos cobertos                  |
+| E6  | `npm run security-scan`              | OK + aviso de allowlist (`xlsx`, `vite`, `picomatch`)                   | **OK + o mesmo aviso**                                                     | igual — etapa 270 pendente             |
+| E7  | `npm audit --json`                   | 0 em todas as severidades                                               | **0** (critical 0, high 0, moderate 0, low 0)                              | igual                                  |
+| E8  | `git ls-files .env` / `check-ignore` | rastreado e fora do `.gitignore`                                        | **não rastreado e ignorado**                                               | **corrigido**                          |
+| E9  | chaves em arquivo versionado         | todas `"role":"anon"`                                                   | `docs/ops/cron_jobs_origem.json` **não contém chave nenhuma**              | não se aplica mais                     |
+| E10 | visibilidade do repositório          | `public`                                                                | **`public`**                                                               | igual — etapas 016/017 aguardam o dono |
+| E11 | funções SQL                          | 119 nas migrations: 83 definer com `search_path`, 2 sem, 34 não-definer | **117 no catálogo: 102 definer, 102 com `search_path`, 0 sem**, 15 invoker | **0 definer sem `search_path`**        |
 
 Gates que o plano acrescentou depois da linha de base:
 
-| Gate | Resultado |
-| --- | --- |
-| `npm run test:rls` | 19 testes, 2 arquivos, todos passando |
-| `npm run test:security` | 19 testes, 2 arquivos, todos passando |
-| `npx vitest run` | **101 arquivos, 852 testes, 0 falha** (28 s) |
+| Gate                        | Resultado                                                                                                    |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `npm run test:rls`          | 19 testes, 2 arquivos, todos passando                                                                        |
+| `npm run test:security`     | 19 testes, 2 arquivos, todos passando                                                                        |
+| `npx vitest run`            | **101 arquivos, 852 testes, 0 falha** (28 s)                                                                 |
 | `npx vitest run --coverage` | statements **75,9** · branches **69,93** · functions **73,55** · lines **78,05** contra os pisos 70/67/73/72 |
 
 **Nenhuma linha piorou.** Duas não chegaram ao esperado, e não por regressão: E6 continua com o aviso de
@@ -4176,26 +4178,26 @@ exige folga maior, senão qualquer arquivo novo sem teste derruba a suíte.
 
 A onda 8 fechou: as cinco etapas de gate/doc (018, 218, 266, 270, 284) entraram na `main` depois da medição acima. Bateria repetida no mesmo formato, em worktree limpo com `node_modules` do checkout.
 
-| # | Gate | Registro de 2026-11-24 (`e42bbf85`) | Hoje (`7679a1967`) | Diferença |
-| --- | --- | --- | --- | --- |
-| E1 | `npx tsc --noEmit` | 0 erros | **0 erros**, exit 0 | igual |
-| E2 | `npx eslint .` | 80 avisos, 0 erros | **80 avisos, 0 erros** | igual |
-| E3 | `npm run lint:budget` | 80 / 86 | **80 / 86**, 0/0 erros, 0/0 tsErrors | igual |
-| E4 | `npm run validate:csp` | OK | **OK** | igual |
-| E5 | `npm run validate:no-console` | OK, 120 arquivos | **OK, 121 arquivos** | +1 arquivo |
-| E6 | `npm run security-scan` | OK **com** o aviso de allowlist | **OK, sem o aviso** | **resolvido** — etapa 270 ([#436](https://github.com/adm01-debug/Loggi_Flow_V2/pull/436), `c4d2390c`) |
-| E7 | `npm audit --json` | 0 | **0** (critical 0, high 0, moderate 0, low 0) | igual |
-| E8 | `.env` rastreado? | não rastreado e ignorado | **não rastreado** (`git ls-files --error-unmatch .env` = exit 1) e no `.gitignore:2` | igual |
-| E9 | chaves em arquivo versionado | json sem chave | **7 chaves, todas `"role":"anon"`** | igual — nenhuma de servidor |
-| E10 | visibilidade do repositório | `public` | **`public`** | igual — decisão do dono (etapas 016/017) |
-| E11 | funções SQL | catálogo: 117 nomes, 102 definer, 0 sem `search_path` | **migrations: 124 nomes, 88 definer com `search_path`, 34 não-definer** | igual — **0 definer sem `search_path`** |
+| #   | Gate                          | Registro de 2026-11-24 (`e42bbf85`)                   | Hoje (`7679a1967`)                                                                   | Diferença                                                                                             |
+| --- | ----------------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------- |
+| E1  | `npx tsc --noEmit`            | 0 erros                                               | **0 erros**, exit 0                                                                  | igual                                                                                                 |
+| E2  | `npx eslint .`                | 80 avisos, 0 erros                                    | **80 avisos, 0 erros**                                                               | igual                                                                                                 |
+| E3  | `npm run lint:budget`         | 80 / 86                                               | **80 / 86**, 0/0 erros, 0/0 tsErrors                                                 | igual                                                                                                 |
+| E4  | `npm run validate:csp`        | OK                                                    | **OK**                                                                               | igual                                                                                                 |
+| E5  | `npm run validate:no-console` | OK, 120 arquivos                                      | **OK, 121 arquivos**                                                                 | +1 arquivo                                                                                            |
+| E6  | `npm run security-scan`       | OK **com** o aviso de allowlist                       | **OK, sem o aviso**                                                                  | **resolvido** — etapa 270 ([#436](https://github.com/adm01-debug/Loggi_Flow_V2/pull/436), `c4d2390c`) |
+| E7  | `npm audit --json`            | 0                                                     | **0** (critical 0, high 0, moderate 0, low 0)                                        | igual                                                                                                 |
+| E8  | `.env` rastreado?             | não rastreado e ignorado                              | **não rastreado** (`git ls-files --error-unmatch .env` = exit 1) e no `.gitignore:2` | igual                                                                                                 |
+| E9  | chaves em arquivo versionado  | json sem chave                                        | **7 chaves, todas `"role":"anon"`**                                                  | igual — nenhuma de servidor                                                                           |
+| E10 | visibilidade do repositório   | `public`                                              | **`public`**                                                                         | igual — decisão do dono (etapas 016/017)                                                              |
+| E11 | funções SQL                   | catálogo: 117 nomes, 102 definer, 0 sem `search_path` | **migrations: 124 nomes, 88 definer com `search_path`, 34 não-definer**              | igual — **0 definer sem `search_path`**                                                               |
 
-| Gate agregado | Registro de 2026-11-24 | Hoje (`7679a1967`) | Diferença |
-| --- | --- | --- | --- |
-| `npm run test:rls` | 19 testes / 2 arquivos, todos passando | **19 / 2, todos passando** | igual |
-| `npm run test:security` | 19 testes / 2 arquivos, todos passando | **19 / 2, todos passando** | igual |
-| `npx vitest run` | 101 arquivos, 852 testes, 0 falha | **107 arquivos, 982 testes, 0 falha** (21 s) | **+6 arquivos, +130 testes** |
-| `npx vitest run --coverage` | 75,9 / 69,93 / 73,55 / 78,05 | **77,04 / 71,48 / 74,69 / 79,18** | **+1,14 / +1,55 / +1,14 / +1,13** |
+| Gate agregado               | Registro de 2026-11-24                 | Hoje (`7679a1967`)                           | Diferença                         |
+| --------------------------- | -------------------------------------- | -------------------------------------------- | --------------------------------- |
+| `npm run test:rls`          | 19 testes / 2 arquivos, todos passando | **19 / 2, todos passando**                   | igual                             |
+| `npm run test:security`     | 19 testes / 2 arquivos, todos passando | **19 / 2, todos passando**                   | igual                             |
+| `npx vitest run`            | 101 arquivos, 852 testes, 0 falha      | **107 arquivos, 982 testes, 0 falha** (21 s) | **+6 arquivos, +130 testes**      |
+| `npx vitest run --coverage` | 75,9 / 69,93 / 73,55 / 78,05           | **77,04 / 71,48 / 74,69 / 79,18**            | **+1,14 / +1,55 / +1,14 / +1,13** |
 
 (statements / branches / functions / lines; pisos da etapa 284 = 70 / 67 / 73 / 72.)
 
@@ -4209,27 +4211,26 @@ A onda 8 fechou: as cinco etapas de gate/doc (018, 218, 266, 270, 284) entraram 
 
 **Nota de método (E9):** são 7 chaves em `docs/ops/cron_jobs_origem.json`, todas `anon`; o `.env` não existe no worktree porque não é rastreado desde a [#297](https://github.com/adm01-debug/Loggi_Flow_V2/pull/297).
 
-
 ### Fechamento em 2026-11-25 (main `e8ad814ab`)
 
 O `lint:budget:ratchet` foi o unico item que faltava, e ele estava barrado pela propria condicao da etapa ("so
 quando nenhuma etapa estiver pendente de merge"). Com a fila zerada, a [#464](https://github.com/adm01-debug/Loggi_Flow_V2/pull/464)
 baixou o teto de 86 para 80 em `e8ad814ab`. Bateria repetida inteira na `main` depois disso:
 
-| # | Gate | Piso / referencia | Medido em `e8ad814ab` | Diferenca |
-| --- | --- | --- | --- | --- |
-| E1 | `npx tsc --noEmit` | 0 erros | **0 erros** | igual |
-| E2 | `npx eslint .` | 105 no inicio | **80 avisos, 0 erros** | -25 |
-| E3 | `npm run lint:budget` | 80 / 86 | **80 / 80**, 0/0 erros, 0/0 tsErrors | **teto cravado** |
-| E4 | `npm run validate:csp` | OK | **OK** | igual |
-| E5 | `npm run validate:no-console` | OK, 121 arquivos | **OK, 121 arquivos** | igual |
-| E6 | `npm run security-scan` | OK sem allowlist | **"Sem critical/high fora da allowlist"** | igual |
-| E7 | `npm audit --json` | 0 | **0** (critical 0, high 0, moderate 0, low 0) | igual |
-| E8 | `.env` rastreado? | nao rastreado e ignorado | **`git ls-files .env` = 0** e `.gitignore:2` | igual |
-| - | `npm run test:rls` | 19 testes | **19/19** | igual |
-| - | `npm run test:security` | 19 testes | **19/19** | igual |
-| - | `npx vitest run` | 982 testes | **109 arquivos / 991 testes, 0 falha** | +2 arquivos, +9 testes |
-| - | `npx vitest run --coverage` | 77,04 / 71,48 / 74,69 / 79,18 | **77,04 / 71,48 / 74,69 / 79,18** | igual (os 2 arquivos novos sao de contrato) |
+| #   | Gate                          | Piso / referencia             | Medido em `e8ad814ab`                         | Diferenca                                   |
+| --- | ----------------------------- | ----------------------------- | --------------------------------------------- | ------------------------------------------- |
+| E1  | `npx tsc --noEmit`            | 0 erros                       | **0 erros**                                   | igual                                       |
+| E2  | `npx eslint .`                | 105 no inicio                 | **80 avisos, 0 erros**                        | -25                                         |
+| E3  | `npm run lint:budget`         | 80 / 86                       | **80 / 80**, 0/0 erros, 0/0 tsErrors          | **teto cravado**                            |
+| E4  | `npm run validate:csp`        | OK                            | **OK**                                        | igual                                       |
+| E5  | `npm run validate:no-console` | OK, 121 arquivos              | **OK, 121 arquivos**                          | igual                                       |
+| E6  | `npm run security-scan`       | OK sem allowlist              | **"Sem critical/high fora da allowlist"**     | igual                                       |
+| E7  | `npm audit --json`            | 0                             | **0** (critical 0, high 0, moderate 0, low 0) | igual                                       |
+| E8  | `.env` rastreado?             | nao rastreado e ignorado      | **`git ls-files .env` = 0** e `.gitignore:2`  | igual                                       |
+| -   | `npm run test:rls`            | 19 testes                     | **19/19**                                     | igual                                       |
+| -   | `npm run test:security`       | 19 testes                     | **19/19**                                     | igual                                       |
+| -   | `npx vitest run`              | 982 testes                    | **109 arquivos / 991 testes, 0 falha**        | +2 arquivos, +9 testes                      |
+| -   | `npx vitest run --coverage`   | 77,04 / 71,48 / 74,69 / 79,18 | **77,04 / 71,48 / 74,69 / 79,18**             | igual (os 2 arquivos novos sao de contrato) |
 
 **Nada piorou.** E10 (visibilidade do repositorio) segue `public` porque e decisao do dono (etapas 016/017), e
 a E11 continua com 0 `SECURITY DEFINER` sem `search_path`. Com esta medicao, a etapa 299 fecha e o plano passa
@@ -4259,8 +4260,9 @@ Um agente que acreditasse na versão antiga aplicaria DDL à mão pelo MCP, que 
 ordem de migration proíbe.
 
 **Evidência**
+
 - `node scripts/ci/check-claude-md-integrity.mjs` -> `AGENTS.md OK: 8 secoes presentes; conjunto com
-  docs/agentes/: 73305 bytes (base HEAD: 70840 bytes em 10 arquivos, cada um >= 50% do tamanho na base)` /
+docs/agentes/: 73305 bytes (base HEAD: 70840 bytes em 10 arquivos, cada um >= 50% do tamanho na base)` /
   `exit=0`
 - `grep -n "banco.json" AGENTS.md docs/agentes/banco.md docs/agentes/contexto-ia.md` -> 5 ocorrências, todas
   com a ressalva (AGENTS.md:97, banco.md:93, contexto-ia.md:66,69,71)
@@ -4279,11 +4281,12 @@ casos), `scripts/ci/README.md` (seção nova), `package.json` (`validate:dedupe-
 `scripts/automation.config.json` (2 registros `legacy`, de 92 para 94).
 
 **Evidência**
+
 - `node scripts/ci/check-dedupe-keys.mjs` -> `OK: 44 arquivos index.ts conferidos; nenhuma chave com
-  crypto.randomUUID() ou Date.now().` / `exit=0`
+crypto.randomUUID() ou Date.now().` / `exit=0`
 - prova no defeito real: `buildEventKey('lalamove', [...partesEvento, crypto.randomUUID()])` reintroduzido
   em `supabase/functions/lalamove-webhook/index.ts:111` -> `::error::Chave de dedupe construida com valor
-  aleatorio ou relogio: supabase/functions/lalamove-webhook/index.ts:111 ...` / `exit=1`; arquivo restaurado,
+aleatorio ou relogio: supabase/functions/lalamove-webhook/index.ts:111 ...` / `exit=1`; arquivo restaurado,
   `git status --porcelain supabase/` vazio e gate de volta a `exit=0`
 - `node --test scripts/ci/check-dedupe-keys.unit.mjs` -> `pass 12`, `fail 0`
 - `npm run automation:test` -> `pass 103`, `fail 0`
@@ -4305,18 +4308,17 @@ de CI. PR #439.
 
 **Por que a tabela é nova:** `public.webhook_deliveries` tem `webhook_id uuid NOT NULL REFERENCES public.client_webhooks(id) ON DELETE CASCADE` (`supabase/migrations/20260317215104_154b5d22-37a6-4cc8-8919-e48967ba6ebd.sql:27`) e policies do webhook de saída do cliente. A etapa 287 confirmou que `webhook_failures` e `cron_job_logs` não existem (`to_regclass` = null).
 
-| Artefato | Conteúdo |
-| --- | --- |
+| Artefato                                                          | Conteúdo                                                                                                                                                                                                                                                                        |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `supabase/migrations/20261125093000_webhook_inbound_failures.sql` | tabela `public.webhook_inbound_failures` (`receiver`, `provider`, `event_id`, `response_status`, `error_message`, `created_at`), índice `created_at DESC`, RLS ligada, SELECT só admin, INSERT só `service_role`, `purge_webhook_inbound_failures(_keep_days)` SECURITY DEFINER |
-| `supabase/functions/carrier-webhook-receiver/index.ts` | `payload` declarado fora do `try`; o `catch` grava em try/catch próprio e mantém o `status: 500` |
-| `tests/contracts/carrier-webhook-entrada-persistente.spec.ts` | 7 testes de contrato |
+| `supabase/functions/carrier-webhook-receiver/index.ts`            | `payload` declarado fora do `try`; o `catch` grava em try/catch próprio e mantém o `status: 500`                                                                                                                                                                                |
+| `tests/contracts/carrier-webhook-entrada-persistente.spec.ts`     | 7 testes de contrato                                                                                                                                                                                                                                                            |
 
 **LGPD:** nenhum corpo de webhook é gravado; a mensagem de erro passa pelo `redact` de `_shared/logger.ts` e vai truncada em 2000 caracteres.
 
 **Verificado:** `npx vitest run tests/contracts/` = 57 arquivos / 544 testes verdes. **Não verificado:** a linha real em produção (a migration ainda não foi aplicada).
 
 **Atualização (2026-11-25):** [#459](https://github.com/adm01-debug/Loggi_Flow_V2/pull/459) entrou em `3f17b4b7a`, mas a tabela já existia no banco sem estar em `supabase_migrations.schema_migrations`, e o `CREATE POLICY` não era idempotente (`already exists` no run `45600810091`). Corrigido na [#462](https://github.com/adm01-debug/Loggi_Flow_V2/pull/462) com `DROP POLICY IF EXISTS`, mergeada em `ccdb375e9`; o run `45603914030` terminou `success` e o `45604413739` recusou por “ja consta no schema_migrations” — prova de que o registro existe. O `types-sync` abriu e mergeou a [#461](https://github.com/adm01-debug/Loggi_Flow_V2/pull/461) em `c3d86c0b4` com as 7 colunas, as 2 policies e a função. **Não verificado:** a primeira linha real na tabela — só aparece após um webhook falhar em produção.
-
 
 ## Registro - etapa 289: falhas de webhook de entrada na tela de /webhooks (2026-11-25)
 
@@ -4326,11 +4328,11 @@ A spec (`docs/qa/04-PLANO.md:11713`) pedia a menor coisa util numa tela que ja e
 explicito, provedor/horario/status/mensagem, estados de erro/carregando/vazio visiveis, sem realtime e sem tocar na
 parte que administra `client_webhooks`.
 
-| Artefato | Conteudo |
-| --- | --- |
-| `src/hooks/integrations/useClientWebhooks.tsx` | interface `WebhookInboundFailure` e `useQuery(['webhook-inbound-failures'])` em `webhook_inbound_failures` ordenado por `created_at` desc com `.limit(50)`, expondo `inboundFailures`, `isLoadingInboundFailures`, `isErrorInboundFailures` |
-| `src/components/integrations/WebhookManager.tsx` | terceira aba "Falhas de entrada" (`TabsContent value="inbound"`), tabela Receptor/Provedor/Status/Mensagem/Data, `Loader2` no carregando, `Alert variant="destructive"` no erro e mensagem no vazio |
-| `tests/contracts/webhook-entrada-tela-falhas.spec.ts` | 2 testes de contrato (hook tem .limit(50) e a coluna de erro; a tela tem aba, estados e as 5 colunas) |
+| Artefato                                              | Conteudo                                                                                                                                                                                                                                    |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/hooks/integrations/useClientWebhooks.tsx`        | interface `WebhookInboundFailure` e `useQuery(['webhook-inbound-failures'])` em `webhook_inbound_failures` ordenado por `created_at` desc com `.limit(50)`, expondo `inboundFailures`, `isLoadingInboundFailures`, `isErrorInboundFailures` |
+| `src/components/integrations/WebhookManager.tsx`      | terceira aba "Falhas de entrada" (`TabsContent value="inbound"`), tabela Receptor/Provedor/Status/Mensagem/Data, `Loader2` no carregando, `Alert variant="destructive"` no erro e mensagem no vazio                                         |
+| `tests/contracts/webhook-entrada-tela-falhas.spec.ts` | 2 testes de contrato (hook tem .limit(50) e a coluna de erro; a tela tem aba, estados e as 5 colunas)                                                                                                                                       |
 
 **Verificado:** `npx tsc --noEmit` sem erro; `npx eslint` nos dois arquivos alterados sem aviso; `npx vitest run tests/contracts/`
 = 58 arquivos / 546 testes verdes; `npm run lint:budget` 80/86 avisos, 0 erros, TypeScript 0/0 (o refactor de ternario
@@ -4343,8 +4345,8 @@ Cinco etapas ficaram com a linha de status `[~] aguarda o dono` depois de mergea
 o merge entrou e a marca do indice ficou para tras. Nenhuma tinha trabalho pendente; o que "aguardava o dono"
 era a aprovacao da PR, que ja tinha sido dada em 2026-11-24.
 
-| Etapa | PR                                                    | Merge (squash) | Prova de que esta integrada                                                       |
-| ----- | ----------------------------------------------------- | -------------- | --------------------------------------------------------------------------------- |
+| Etapa | PR                                                            | Merge (squash) | Prova de que esta integrada                                                       |
+| ----- | ------------------------------------------------------------- | -------------- | --------------------------------------------------------------------------------- |
 | 018   | [#438](https://github.com/adm01-debug/Loggi_Flow_V2/pull/438) | `7097e7ac`     | `.github/workflows/ci.yml:30` chama `node scripts/ci/check-env-not-tracked.mjs`   |
 | 218   | [#433](https://github.com/adm01-debug/Loggi_Flow_V2/pull/433) | `0f327c40`     | `count_prediction_breach_days_bulk(_pairs jsonb)` esta no `schema-manifest.json`  |
 | 266   | [#441](https://github.com/adm01-debug/Loggi_Flow_V2/pull/441) | `26f0a4a1`     | `.github/workflows/contexto-ia.yml` grava o `README.md` com causa e data do vazio |
@@ -4384,12 +4386,12 @@ subir. A medição foi feita sobre `37295911`; conferido que `git diff --stat 37
 vitest.config.ts` é **vazio**, ou seja, nada que a cobertura mede mudou até a `6da5dec3` — os números
 seguem válidos e a CI da PR roda o mesmo `test:coverage` sobre a main atual.
 
-| Piso | Antes | Medido | Medido − 1 | Agora |
-| --- | --- | --- | --- | --- |
-| statements | 70 | 75.9 | 74.9 | **74** |
-| branches | 67 | 69.93 | 68.93 | **68** |
-| functions | 73 | 73.55 | 72.55 | **73** (não mexe) |
-| lines | 72 | 78.05 | 77.05 | **77** |
+| Piso       | Antes | Medido | Medido − 1 | Agora             |
+| ---------- | ----- | ------ | ---------- | ----------------- |
+| statements | 70    | 75.9   | 74.9       | **74**            |
+| branches   | 67    | 69.93  | 68.93      | **68**            |
+| functions  | 73    | 73.55  | 72.55      | **73** (não mexe) |
+| lines      | 72    | 78.05  | 77.05      | **77**            |
 
 `functions` é a exceção: a fórmula (medido − 1 = 72.55) cairia **abaixo** do piso atual e o comentário
 do próprio arquivo proíbe descer sem aprovação. Fica em 73, com o comentário do bloco dizendo isso — é
@@ -4402,8 +4404,9 @@ a única margem apertada (0,55 ponto) e a próxima etapa que mexer ali precisa m
 verdade, não são só um número no arquivo.
 
 **Evidência**
+
 - `npm run test:coverage` (duas execuções) -> 101 arquivos, 852 testes, 0 falha; `All files 75.9 /
-  69.93 / 73.55 / 78.05`; `grep -c "does not meet"` = 0 com os pisos novos
+69.93 / 73.55 / 78.05`; `grep -c "does not meet"` = 0 com os pisos novos
 - `npx tsc --noEmit` e `npm run lint:budget` -> sem mudança (nenhum arquivo de código tocado, só config)
 - CI da PR: job de testes roda o mesmo `test:coverage` com os pisos novos
 
@@ -4447,6 +4450,7 @@ coberto por ele. `scripts/automation.config.json` foi conferido e não precisou 
 segue `manual`).
 
 **Evidência**
+
 - `npm run security-scan` -> `✅ Sem critical/high fora da allowlist` e **sem** a linha de aviso (antes:
   aviso presente)
 - `node --test scripts/gates/audit-gate.unit.mjs` -> 32 testes, 0 falha
@@ -4467,7 +4471,7 @@ qualquer caminho cujo **nome** comece com `.env` e não seja `.env.example`; olh
 `.env` na máquina de quem desenvolve, ignorado pelo git, não reprova. Exit 2 quando não consegue ler o índice
 (fora de repositório git, `git` fora do PATH) — falha do próprio gate, não verde falso. Sem dependência
 externa. Entrou no job `Security Scan` do `ci.yml`, ao lado do `audit-gate.mjs` e do gitleaks: o gitleaks
-procura *padrão de segredo* no diff e um `.env` só com a chave `anon` passa limpo — foi exatamente assim que
+procura _padrão de segredo_ no diff e um `.env` só com a chave `anon` passa limpo — foi exatamente assim que
 o arquivo ficou meses no repositório (achado S-07).
 
 **Arquivos:** `scripts/ci/check-env-not-tracked.mjs` (novo), `scripts/ci/check-env-not-tracked.unit.mjs`
@@ -4475,10 +4479,11 @@ o arquivo ficou meses no repositório (achado S-07).
 de 94 para 96) e `.github/workflows/ci.yml` (1 passo).
 
 **Evidência**
+
 - `node scripts/ci/check-env-not-tracked.mjs` com a árvore limpa -> `OK: nenhum arquivo de ambiente
-  rastreado (1712 caminhos conferidos; permitido apenas .env.example).` / `exit=0`
+rastreado (1712 caminhos conferidos; permitido apenas .env.example).` / `exit=0`
 - com um `.env` de teste no índice (`git add -f .env`) -> `::error::.env esta rastreado pelo git. ... Tire do
-  indice com `git rm --cached ".env"` ...` / `exit=1`; desfeito com `git rm --cached .env` e `rm .env`,
+indice com `git rm --cached ".env"` ...` / `exit=1`; desfeito com `git rm --cached .env` e `rm .env`,
   índice conferido depois com `git status --porcelain`
 - `node --test scripts/ci/check-env-not-tracked.unit.mjs` -> `pass 9`, `fail 0`
 - `npm run automation:test` -> `pass 103`, `fail 0`
@@ -4511,6 +4516,7 @@ segredos (`Guard - nenhum segredo na saida`) e a condicao dela **nao** foram toc
 `regras/` continuam iguais.
 
 **Evidencia (execucao local do script extraido do proprio YAML, nao leitura do codigo)**
+
 - `yaml.safe_load` do arquivo e o `run` do passo `Gerar supabase/` escrito em `/tmp/step266.sh`; os tres
   caminhos executados com `bash` e ambiente controlado:
   - agendamento sem secret -> `exit=0`, `README.md` com 17 linhas na pasta do snapshot, com a data
@@ -4592,6 +4598,7 @@ versão em `supabase_migrations.schema_migrations` dentro da mesma transação (
 `--single-transaction`), então ou tudo entrou ou nada entrou.
 
 **Estado:** PR #428 mergeada com o DDL já aplicado. Reverter = rodar o arquivo de `supabase/rollbacks/`.
+
 ## Registro da etapa 058 - gate de exclusão lógica (2026-11-25)
 
 A etapa 057 corrigiu a tela, mas a política continuava valendo por convenção: nada no código impedia o
@@ -4606,7 +4613,7 @@ Só reprova a cadeia `supabase.from("<tabela>").delete()` da mesma instrução, 
 por `;` no nível zero (ignora string, template e comentário). `deleted_at` só no `Insert` não define
 política; view com a coluna também não, porque o parser lê apenas a seção `Tables:`.
 
-Amarração: `npm run validate:soft-delete` em `package.json`, passo *Validate Soft Delete (exclusão lógica)*
+Amarração: `npm run validate:soft-delete` em `package.json`, passo _Validate Soft Delete (exclusão lógica)_
 em `.github/workflows/ci-nexus.yml` (junto de `validate:csp`, `validate:no-console`,
 `validate:query-limits`) e dois registros `legacy` em `scripts/automation.config.json`
 (`legacy-d42815dba2b77deb` para o gate, `legacy-98cbfd78afa441f8` para o teste). O teste unitário é
@@ -4616,12 +4623,13 @@ coletado sozinho por `scripts-tests.yml` (`find scripts -name '*.unit.mjs'`).
 `coletas`, `fornecedores` e `fretes_internos`: a tabela foi corrigida e agora aponta para o gate.
 
 **Evidência**
+
 - `node scripts/ci/check-soft-delete.mjs` -> `[soft-delete] OK: nenhum .delete() em tabela com deleted_at
-  (6 tabelas verificadas).` / `exit=0`
+(6 tabelas verificadas).` / `exit=0`
 - `npm run validate:soft-delete` -> mesma saída, `npm_exit=0`
 - prova negativa: `.delete()` reintroduzido em `src/pages/Transportadoras.tsx:337` ->
   `[soft-delete] 1 exclusão(ões) física(s) em tabela com exclusão lógica: src/pages/Transportadoras.tsx:337
-  — .from("transportadoras").delete()` / `exit=1`; `git checkout --` e o gate volta a `exit=0`
+— .from("transportadoras").delete()` / `exit=1`; `git checkout --` e o gate volta a `exit=0`
 - prova negativa em cadeia multilinha (`FretesInternos.tsx`) -> `exit=1` apontando `:257`
 - `node --test scripts/ci/check-soft-delete.unit.mjs` -> **9 testes, 13 asserções, 0 falhas**
 - `npm run automation:test` -> **103 testes, 0 falhas**
@@ -4633,20 +4641,20 @@ coletado sozinho por `scripts-tests.yml` (`find scripts -name '*.unit.mjs'`).
 
 Base: `main` `97712fa96`. Levantamento feito antes de decidir manter, ligar ou remover.
 
-| Etapa | Objeto | Evidência do levantamento | Decisão |
-| ----- | ------ | --------------------------- | --------- |
-| 019 | `VITE_MAPBOX_TOKEN` | `git grep VITE_MAPBOX` em `src/` → **0 leitores**; só `.env.example:23`; os mapas usam `src/lib/mapStyles.ts` (sem token) | **variável removida** (fechada); a edge `get-mapbox-token` segue publicada e sem chamador |
-| 014 | `health` × `health-check` | `supabase/config.toml:48-52`: as duas com `verify_jwt = false`; `docs/DISASTER_RECOVERY.md:14` documenta `/functions/v1/health` | aguarda o dono: manter `health` aberta (a documentada) e fechar `health-check` |
-| 043 | 2 telas de cotação | `src/App.tsx:153` (`/cotacao-multicanal`) e `:154` (`/dashboard-cotacoes`), ambas roteadas e no menu | aguarda o dono: manter as duas com papel explícito (disparar × acompanhar) |
-| 070 | `reconcile_pending_freights()` | existe no banco (`schema-manifest` → `/functions/f:reconcile_pending_freights()`), mas **a tabela `freights` não existe** (só a coluna `performance_metrics.total_freights`); `EXECUTE` só para `postgres`/`service_role`; 0 chamadores | aguarda o dono: `DROP FUNCTION` por migration (Regra 8) |
-| 071/072 | `push-send` | `Notificacoes.tsx:183` → `PushNotificationCard` → `usePushNotifications.tsx:211` → `functions.invoke('push-send')`; `push_subscriptions` existe no banco | **mantida** (fechadas): não é órfã |
-| 073 | `ingest-biosync` | 0 chamadores; grava em `bio_sync_telemetry`; o `Math.random()` citado na 1a conferencia nao existe mais (removido em `24067b2c5`): o batimento usa hash do conteudo | aguarda o dono: remover a função |
-| 074 | 3 buckets | `ocorrencias-fotos` em uso (`Ocorrencias.tsx:196,776,890`); `comprovantes` e `entregas-fotos` com 0 uso no código | **levantamento concluído** (fechada) |
-| 075 | bucket `comprovantes` | criado em `20251220173229_storage_buckets.sql:55`; o comprovante real vai para `documents` (`Envios.tsx:1183`, `DeliveryReceiptUpload.tsx:55-57`) | aguarda o dono: remover o bucket |
-| 076 | bucket `entregas-fotos` | criado na mesma migration; 0 referências no código | aguarda o dono: ligar (foto de entrega) ou remover |
-| 120 | histórico da importação em massa | `ImportacaoMassa.tsx:171` (`useState`) — sai da tela, some; `audit_logs` tem policy de INSERT para autenticado | aguarda o dono: gravar em `audit_logs` (sem tabela nova) |
-| 272 | `bun.lock` / `bun.lockb` | versionados; nenhum workflow usa bun (CI = `npm ci`); `types-sync.yml:366` diz que estão defasados | aguarda o dono: remover os dois |
-| 274 | menção aos locks de bun | `AGENTS.md:86-88` e `.github/workflows/types-sync.yml:366` | aguarda a 272 |
+| Etapa   | Objeto                           | Evidência do levantamento                                                                                                                                                                                                               | Decisão                                                                                   |
+| ------- | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| 019     | `VITE_MAPBOX_TOKEN`              | `git grep VITE_MAPBOX` em `src/` → **0 leitores**; só `.env.example:23`; os mapas usam `src/lib/mapStyles.ts` (sem token)                                                                                                               | **variável removida** (fechada); a edge `get-mapbox-token` segue publicada e sem chamador |
+| 014     | `health` × `health-check`        | `supabase/config.toml:48-52`: as duas com `verify_jwt = false`; `docs/DISASTER_RECOVERY.md:14` documenta `/functions/v1/health`                                                                                                         | aguarda o dono: manter `health` aberta (a documentada) e fechar `health-check`            |
+| 043     | 2 telas de cotação               | `src/App.tsx:153` (`/cotacao-multicanal`) e `:154` (`/dashboard-cotacoes`), ambas roteadas e no menu                                                                                                                                    | aguarda o dono: manter as duas com papel explícito (disparar × acompanhar)                |
+| 070     | `reconcile_pending_freights()`   | existe no banco (`schema-manifest` → `/functions/f:reconcile_pending_freights()`), mas **a tabela `freights` não existe** (só a coluna `performance_metrics.total_freights`); `EXECUTE` só para `postgres`/`service_role`; 0 chamadores | aguarda o dono: `DROP FUNCTION` por migration (Regra 8)                                   |
+| 071/072 | `push-send`                      | `Notificacoes.tsx:183` → `PushNotificationCard` → `usePushNotifications.tsx:211` → `functions.invoke('push-send')`; `push_subscriptions` existe no banco                                                                                | **mantida** (fechadas): não é órfã                                                        |
+| 073     | `ingest-biosync`                 | 0 chamadores; grava em `bio_sync_telemetry`; o `Math.random()` citado na 1a conferencia nao existe mais (removido em `24067b2c5`): o batimento usa hash do conteudo                                                                     | aguarda o dono: remover a função                                                          |
+| 074     | 3 buckets                        | `ocorrencias-fotos` em uso (`Ocorrencias.tsx:196,776,890`); `comprovantes` e `entregas-fotos` com 0 uso no código                                                                                                                       | **levantamento concluído** (fechada)                                                      |
+| 075     | bucket `comprovantes`            | criado em `20251220173229_storage_buckets.sql:55`; o comprovante real vai para `documents` (`Envios.tsx:1183`, `DeliveryReceiptUpload.tsx:55-57`)                                                                                       | aguarda o dono: remover o bucket                                                          |
+| 076     | bucket `entregas-fotos`          | criado na mesma migration; 0 referências no código                                                                                                                                                                                      | aguarda o dono: ligar (foto de entrega) ou remover                                        |
+| 120     | histórico da importação em massa | `ImportacaoMassa.tsx:171` (`useState`) — sai da tela, some; `audit_logs` tem policy de INSERT para autenticado                                                                                                                          | aguarda o dono: gravar em `audit_logs` (sem tabela nova)                                  |
+| 272     | `bun.lock` / `bun.lockb`         | versionados; nenhum workflow usa bun (CI = `npm ci`); `types-sync.yml:366` diz que estão defasados                                                                                                                                      | aguarda o dono: remover os dois                                                           |
+| 274     | menção aos locks de bun          | `AGENTS.md:86-88` e `.github/workflows/types-sync.yml:366`                                                                                                                                                                              | aguarda a 272                                                                             |
 
 **Achado fora do escopo (registrado, não corrigido):** `ocorrencias-fotos` é bucket **público**
 (`20251220173229_storage_buckets.sql:3-9`) com policy de leitura para qualquer um — quem tiver a URL lê a
@@ -4667,21 +4675,21 @@ A frase “não existe workflow de apply” não existe mais em `docs/agentes/ba
 **(2) Censo reconferido depois dos `DROP` das etapas 235-239** (fonte: `supabase/schema-manifest.json`,
 gerado do banco oficial ao vivo — não das migrations):
 
-| Item | Alvo do `DROP` (etapas 237-239) | Estado hoje no banco |
-| ---- | ------------------------------- | -------------------- |
-| `entregas` | `idx_entregas_transportadora` | **ausente**; o par que cobre, `idx_entregas_transportadora_id`, **existe** |
-| `coletas` | `idx_coletas_transportadora` | **ausente**; o par que cobre, `idx_coletas_transportadora_id`, **existe** |
-| `audit_logs` | índice menor `(record_id, table_name)` | **ausente**; o composto `idx_audit_logs_record_composite`, **existe** |
+| Item         | Alvo do `DROP` (etapas 237-239)        | Estado hoje no banco                                                       |
+| ------------ | -------------------------------------- | -------------------------------------------------------------------------- |
+| `entregas`   | `idx_entregas_transportadora`          | **ausente**; o par que cobre, `idx_entregas_transportadora_id`, **existe** |
+| `coletas`    | `idx_coletas_transportadora`           | **ausente**; o par que cobre, `idx_coletas_transportadora_id`, **existe**  |
+| `audit_logs` | índice menor `(record_id, table_name)` | **ausente**; o composto `idx_audit_logs_record_composite`, **existe**      |
 
 Nada além dos três alvos desapareceu: `entregas` segue com 18 índices e `coletas` com 11 no manifesto.
 O caminho de volta continua em `supabase/rollbacks/20261124150000_rollback_index_dedupe_transportadora_audit.sql`.
 
 **Evidência**
+
 - `python3` sobre `supabase/schema-manifest.json` → `idx_entregas_transportadora` e `idx_coletas_transportadora`
   **não** aparecem em `/indexes/`; `idx_entregas_transportadora_id`, `idx_coletas_transportadora_id` e
   `idx_audit_logs_record_composite` aparecem.
 - `node scripts/ci/check-claude-md-integrity.mjs` → `exit=0` (check obrigatório “Agents Docs Integrity”).
-
 
 ### Registro - etapa 290 (2026-11-25) - a tela do cron passa a dizer o que deu errado
 
@@ -4710,7 +4718,6 @@ cria historico de cron: o `pg_cron` ja guarda `cron.job_run_details` e a RPC ja 
 dias = atrasado, `*/15` com 40 min = atrasado e com 10 min = ok, `0 0 30 2 *` = `null`, inativo / sem
 historico / schedule ilegivel, e a ordenacao com o resumo); `npm run typecheck` -> **0**; `npx eslint` nos
 3 arquivos -> **0 problemas**; `npm run lint:budget` -> **80/80**, nenhum aviso novo.
-
 
 ## Registro da etapa 300 — o relatório final reconferido contra a `main` de hoje (2026-11-25)
 
@@ -4877,7 +4884,7 @@ oficial `jvfhclubfpxrtrrazrgr` ficou alcancavel por leitura. Cada linha abaixo f
   `logistica_reversa.codigo_rastreio_reverso` estava **sem** qualquer restricao. A migration `20261125154000`
   (PR #473, aplicada) criou `ux_logistica_reversa_codigo_rastreio` - conferido por consulta:
   `CREATE UNIQUE INDEX ux_logistica_reversa_codigo_rastreio ON public.logistica_reversa USING btree
-  (codigo_rastreio_reverso) WHERE (codigo_rastreio_reverso IS NOT NULL)`, 0 duplicatas na tabela.
+(codigo_rastreio_reverso) WHERE (codigo_rastreio_reverso IS NOT NULL)`, 0 duplicatas na tabela.
 - **P-05 -> CONFIRMADO - 2026-11-25.** Inventario real de indices contado no banco: `coletas` tem **13**,
   `entregas` tem **12** (incluindo `idx_entregas_status_composite`, `idx_entregas_transp_status`) e `telemetry_logs`
   tem **5**. As migrations descrevem o que existe.
@@ -4906,13 +4913,13 @@ resultado **bate** com o que ja estava registrado - mais duas coisas que so o ba
 
 **Os cinco candidatos da etapa 234, estado ao vivo:**
 
-| # | Objeto | Existe hoje | idx_scan | Decisao |
-| --- | --- | --- | --- | --- |
-| 1 | `rastreamento_historico (lalamove_order_id)` | so `idx_rastreamento_lalamove_order` | 0 (72 filhos, nenhum uso) | ja resolvido (235 fechada) |
-| 2 | `rastreamento_historico (coleta_id)` | so `idx_rastreamento_historico_coleta_id` | **60 por particao** | ja resolvido (236 fechada) |
-| 3 | `entregas (transportadora_id)` | so `idx_entregas_transportadora_id` | **343** | ja resolvido (237 fechada) |
-| 4 | `coletas (transportadora_id)` | so `idx_coletas_transportadora_id` | **80** | ja resolvido (238 fechada) |
-| 5 | `audit_logs (table_name, record_id)` | nenhum dos dois; ficou `idx_audit_logs_record_composite (record_id, table_name, created_at DESC)` | 0 | ja resolvido (239 fechada) |
+| #   | Objeto                                       | Existe hoje                                                                                       | idx_scan                  | Decisao                    |
+| --- | -------------------------------------------- | ------------------------------------------------------------------------------------------------- | ------------------------- | -------------------------- |
+| 1   | `rastreamento_historico (lalamove_order_id)` | so `idx_rastreamento_lalamove_order`                                                              | 0 (72 filhos, nenhum uso) | ja resolvido (235 fechada) |
+| 2   | `rastreamento_historico (coleta_id)`         | so `idx_rastreamento_historico_coleta_id`                                                         | **60 por particao**       | ja resolvido (236 fechada) |
+| 3   | `entregas (transportadora_id)`               | so `idx_entregas_transportadora_id`                                                               | **343**                   | ja resolvido (237 fechada) |
+| 4   | `coletas (transportadora_id)`                | so `idx_coletas_transportadora_id`                                                                | **80**                    | ja resolvido (238 fechada) |
+| 5   | `audit_logs (table_name, record_id)`         | nenhum dos dois; ficou `idx_audit_logs_record_composite (record_id, table_name, created_at DESC)` | 0                         | ja resolvido (239 fechada) |
 
 O `idx_rastreamento_historico_coleta_id` e **valido** (`indisvalid = true`) e tem **18 filhos**, um por particao
 mensal, todos com `idx_scan = 60`: o indice do `coleta_id` e usado de verdade, nao heranca morta. Os quatro indices
@@ -4920,13 +4927,14 @@ do pai particionado (`coleta_id`, `created`, `lalamove_order`, `pkey`) tem `indi
 18 filhos cada - nenhum orfao.
 
 **O que o censo mostrou de novo (fora dos cinco):** sobram **4 indices sem uso cuja funcao ja e coberta por outro**
+
 - `idx_entregas_cliente_status (cliente_id, status)` 0 scans, prefixo coberto por `idx_entregas_cliente_id` (128);
 - `idx_entregas_status_composite (status, created_at DESC) WHERE deleted_at IS NULL` 0 scans, coberto por
   `idx_entregas_status_created_at` (388);
 - `idx_entregas_status_active (status) WHERE deleted_at IS NULL` 0 scans, mesmo par acima;
 - `idx_coletas_status_active (status) WHERE deleted_at IS NULL` 0 scans, coberto por `idx_coletas_status_created_at` (768).
-Proposta de `DROP` em PR propria, para o dono decidir (ganho honesto: **32 kB** de indice e ~10% menos trabalho de
-escrita por `INSERT` em `entregas`, que hoje mantem 17 indices).
+  Proposta de `DROP` em PR propria, para o dono decidir (ganho honesto: **32 kB** de indice e ~10% menos trabalho de
+  escrita por `INSERT` em `entregas`, que hoje mantem 17 indices).
 
 **O resto dos indices com `idx_scan = 0` NAO e lixo.** `idx_entregas_previsao`/`_active`/`_pendente`,
 `idx_coletas_prevista_pendente`, `idx_coletas_flags`, `idx_entregas_coordinates` e os `_deleted_at` sao particoes
@@ -4936,17 +4944,17 @@ indice possa sair. Ficam.
 **As 9 tabelas orfas, medidas ao vivo** (`inventario/estado/banco.json`): as 9 existem em producao, **todas com 0
 linhas**, RLS ligado, **policies (1 a 5 cada) e triggers (0 a 2 cada)**:
 
-| Tabela | Linhas | Policies | Triggers | Usada em funcao/view | `anon` tem grant |
-| --- | --- | --- | --- | --- | --- |
-| `account_lockouts` | 0 | 2 | 2 | nao | sim |
-| `ai_chat_messages` | 0 | 3 | 1 | nao | sim |
-| `allowed_ips` | 0 | 5 | 2 | nao | sim |
-| `driver_badges` | 0 | 2 | 0 | nao | sim |
-| `email_verification_tokens` | 0 | 1 | 1 | nao | sim |
-| `freight_webhooks` | 0 | 1 | 1 | nao | sim |
-| `notification_templates` | 0 | 2 | 1 | nao | sim |
-| `organizations` | 0 | 2 | 1 | nao | **nao** |
-| `system_adr` | 0 | 1 | 2 | nao | sim |
+| Tabela                      | Linhas | Policies | Triggers | Usada em funcao/view | `anon` tem grant |
+| --------------------------- | ------ | -------- | -------- | -------------------- | ---------------- |
+| `account_lockouts`          | 0      | 2        | 2        | nao                  | sim              |
+| `ai_chat_messages`          | 0      | 3        | 1        | nao                  | sim              |
+| `allowed_ips`               | 0      | 5        | 2        | nao                  | sim              |
+| `driver_badges`             | 0      | 2        | 0        | nao                  | sim              |
+| `email_verification_tokens` | 0      | 1        | 1        | nao                  | sim              |
+| `freight_webhooks`          | 0      | 1        | 1        | nao                  | sim              |
+| `notification_templates`    | 0      | 2        | 1        | nao                  | sim              |
+| `organizations`             | 0      | 2        | 1        | nao                  | **nao**          |
+| `system_adr`                | 0      | 1        | 2        | nao                  | sim              |
 
 Conclusao: **nenhuma e lixo para dropar**. Sao funcionalidades montadas (RLS + policy + trigger) que nunca
 receberam um registro - "orfa" aqui significa "sem dado", nao "sem uso". O unico motivo de aparecerem no codigo e
@@ -4975,7 +4983,7 @@ O que o banco oficial respondeu, e como cada etapa fechou:
   -> **permission denied**; `insert` em `password_reset_requests` -> **ok**.
 - **Duas funcionalidades quebradas consertadas na #507.** Foto de ocorrência (bucket ausente) e comprovante/NF de
   entrega (policy incompatível com a pasta `entregas/...`). Evidência: `begin; set local role authenticated; insert
-  into storage.objects ...` aceito nos dois buckets, `rollback`.
+into storage.objects ...` aceito nos dois buckets, `rollback`.
 
 Contadores apos estas etapas (grep em `docs/qa/05-PROGRESSO.md`): **287 `[x]` / 13 `[~]`**.
 
@@ -4996,3 +5004,21 @@ Contadores apos estas etapas (grep em `docs/qa/05-PROGRESSO.md`): **287 `[x]` / 
 - **073 tem resposta**: `bio_sync_telemetry` tem **0 linhas**, entao remover `ingest-biosync` nao perde dado.
 - **039/041 seguem abertas**: `cotacoes_multicanal` tem **0 linhas** em producao - nada nunca foi registrado -,
   entao nao ha como provar em runtime sem credencial de transportadora.
+
+## Registro 2026-11-25 (4) - etapa 043: as duas telas de cotacao
+
+- **043 fechada.** As duas telas ficam, com papel explicito: `CotacaoMultiCanal` (disparar e responder) e
+  `DashboardCotacoes` (acompanhar e decidir).
+- **O que era do outro papel saiu.** `onRegistrar` da `CotacaoMultiCanal` exigia que a transportadora da
+  cotacao estivesse na busca de rota atual (`toast.error("Transportadora desta cotacao nao esta na busca
+atual")`): quem estava no dashboard nao conseguia registrar a resposta de uma cotacao pendente antiga.
+  Agora a acao depende so da cotacao (`setSelectedCarrier(... ?? null)`) e o titulo do dialogo cai para o nome
+  da propria cotacao quando o carrier nao esta na busca.
+- **Beco sem saida fechado no dashboard.** `DashboardCotacoes` nao tinha nenhuma entrada para criar cotacao;
+  ganhou o botao **Nova cotacao** -> `/cotacao-multicanal`. O caminho de volta ja existia e foi renomeado de
+  "Insights de Custo" para **Acompanhar cotacoes**.
+- **Verificacao:** `npx tsc --noEmit` exit 0; `npx eslint` nos dois arquivos sem erro (1 aviso herdado de
+  `Date.now` em `TimeRemaining`, ja no orcamento); `npx vitest run
+src/pages/cotacao-multicanal/CotacaoResultsTable.test.tsx` -> 6/6.
+
+Contadores apos esta etapa (grep em `docs/qa/05-PROGRESSO.md`): **292 `[x]` / 8 `[~]`**.

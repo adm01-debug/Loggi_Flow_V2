@@ -503,7 +503,7 @@ então não há registro de por que aquele frete foi contratado — e a negocia�
 
 → Etapas **038** a **043**
 
-**Estado (2026-11-24):** PARCIAL (feito 038; falta 043 — aguarda o dono).
+**Estado (2026-11-25):** FECHADO — 038 levou a tabela para o banco e 043 separou os papeis: `CotacaoMultiCanal` dispara e registra, `DashboardCotacoes` acompanha, e o dashboard passou a ter entrada para cotar de novo.
 
 ## C-03 — Travas de concorrência que não avisam quando bloqueiam
 
