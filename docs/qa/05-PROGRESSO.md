@@ -374,7 +374,7 @@
 - [x] **280** — Teste da idempotência atômica dos webhooks (trava a correção de B-01) — onda 8 — Crítica
 - [x] **281** — Teste do caminho de criar coleta — onda 8 — Alta
 - [x] **282** — Teste do caminho de mover entrega de status — onda 8 — Alta
-- [~] **283** — Resolver o usuário semeado do `tests/e2e/` e dizer por que ele não roda na CI — onda 8 — Média · **aguarda o dono**
+- [~] **283** — Resolver o usuário semeado do `tests/e2e/` e dizer por que ele não roda na CI — onda 8 — Média · **parte (1) feita: `tests/e2e/README.md` + credenciais por variavel de ambiente; aguarda o dono o usuario dedicado e o job de CI**
 - [x] **284** — Subir os pisos de cobertura para travar o que as etapas 275-282 conquistaram — onda 8 — Média · **feito — pisos 77/73/68/74 em `vitest.config.ts`; PR #442 mergeada em `fe4f9861`** (altera limiar de gate da CI)
 - [~] **285** — Confirmar com o dono se `VITE_SENTRY_DSN` está configurado no Vercel — onda 8 — Média · **aguarda o dono**
 - [~] **286** — Provar que um erro de front chega ao Sentry — onda 8 — Média · **aguarda o dono**
