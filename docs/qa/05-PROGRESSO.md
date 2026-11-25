@@ -398,7 +398,7 @@
 - [x] **296** — Regerar a branch `contexto` para que as fontes reflitam o código corrigido — onda 8 — Média · **regerada em 2026-11-24** (run `45410194923`)
 - [x] **297** — Atualizar `03-ACHADOS.md` e `05-PROGRESSO.md` com o estado final de cada achado — onda 8 — Alta
 - [x] **298** — Reler o plano inteiro e registrar o que ficou sem etapa executada — onda 8 — Alta
-- [~] **299** — Rodar a bateria completa de gates e comparar com os números do começo — onda 8 — Alta · **bateria inteira rodada em 2026-11-24 sobre a `main` (`e42bbf85`); nada piorou, lint caiu de 105 para 80; falta o `lint:budget:ratchet`, que a própria etapa proíbe com PR pendente de merge**
+- [~] **299** — Rodar a bateria completa de gates e comparar com os números do começo — onda 8 — Alta · **bateria inteira rodada em 2026-11-24 sobre a `main` (`e42bbf85`); nada piorou, lint caiu de 105 para 80; falta o `lint:budget:ratchet`, que a própria etapa proíbe com PR pendente de merge; **re-medida em 2026-11-25 (`7679a1967`)**: nada piorou, o E6 saiu do vermelho de allowlist (etapa 270), a cobertura subiu nas quatro métricas e o ratchet segue pendente**
 - [x] **300** — Relatório final de uma página para o dono — onda 8 — Alta
 
 ---
@@ -4174,6 +4174,44 @@ teto de 86 para 80.
 
 **Ressalva para a etapa 284:** `functions` está em 73,55 contra piso 73 — 0,55 ponto de folga. Subir esse piso
 exige folga maior, senão qualquer arquivo novo sem teste derruba a suíte.
+
+### Re-medição em 2026-11-25 (main `7679a1967`)
+
+A onda 8 fechou: as cinco etapas de gate/doc (018, 218, 266, 270, 284) entraram na `main` depois da medição acima. Bateria repetida no mesmo formato, em worktree limpo com `node_modules` do checkout.
+
+| # | Gate | Registro de 2026-11-24 (`e42bbf85`) | Hoje (`7679a1967`) | Diferença |
+| --- | --- | --- | --- | --- |
+| E1 | `npx tsc --noEmit` | 0 erros | **0 erros**, exit 0 | igual |
+| E2 | `npx eslint .` | 80 avisos, 0 erros | **80 avisos, 0 erros** | igual |
+| E3 | `npm run lint:budget` | 80 / 86 | **80 / 86**, 0/0 erros, 0/0 tsErrors | igual |
+| E4 | `npm run validate:csp` | OK | **OK** | igual |
+| E5 | `npm run validate:no-console` | OK, 120 arquivos | **OK, 121 arquivos** | +1 arquivo |
+| E6 | `npm run security-scan` | OK **com** o aviso de allowlist | **OK, sem o aviso** | **resolvido** — etapa 270 ([#436](https://github.com/adm01-debug/Loggi_Flow_V2/pull/436), `c4d2390c`) |
+| E7 | `npm audit --json` | 0 | **0** (critical 0, high 0, moderate 0, low 0) | igual |
+| E8 | `.env` rastreado? | não rastreado e ignorado | **não rastreado** (`git ls-files --error-unmatch .env` = exit 1) e no `.gitignore:2` | igual |
+| E9 | chaves em arquivo versionado | json sem chave | **7 chaves, todas `"role":"anon"`** | igual — nenhuma de servidor |
+| E10 | visibilidade do repositório | `public` | **`public`** | igual — decisão do dono (etapas 016/017) |
+| E11 | funções SQL | catálogo: 117 nomes, 102 definer, 0 sem `search_path` | **migrations: 124 nomes, 88 definer com `search_path`, 34 não-definer** | igual — **0 definer sem `search_path`** |
+
+| Gate agregado | Registro de 2026-11-24 | Hoje (`7679a1967`) | Diferença |
+| --- | --- | --- | --- |
+| `npm run test:rls` | 19 testes / 2 arquivos, todos passando | **19 / 2, todos passando** | igual |
+| `npm run test:security` | 19 testes / 2 arquivos, todos passando | **19 / 2, todos passando** | igual |
+| `npx vitest run` | 101 arquivos, 852 testes, 0 falha | **107 arquivos, 982 testes, 0 falha** (21 s) | **+6 arquivos, +130 testes** |
+| `npx vitest run --coverage` | 75,9 / 69,93 / 73,55 / 78,05 | **77,04 / 71,48 / 74,69 / 79,18** | **+1,14 / +1,55 / +1,14 / +1,13** |
+
+(statements / branches / functions / lines; pisos da etapa 284 = 70 / 67 / 73 / 72.)
+
+**Nenhuma linha piorou.** A única pendência da medição anterior — E6 — foi fechada pela etapa 270: o gate de vulnerabilidades não emite mais o aviso de allowlist.
+
+**O piso de `functions` da etapa 284 pode subir.** Estava em 73,55 contra piso 73 (0,55 de folga, o que a ressalva anterior desaconselhava mexer); hoje está em **74,69**, com 1,69 de folga, então subir `functions` de 73 para 74 passa a ser seguro.
+
+**`lint:budget:ratchet` continua NÃO rodado, de propósito.** A condição da etapa ("só quando nenhuma etapa estiver pendente de merge") não foi cumprida: a [#459](https://github.com/adm01-debug/Loggi_Flow_V2/pull/459) (etapa 288) está aberta com código. Cravar o teto em 80 agora faria a próxima PR do plano reprovar por um aviso novo — é o H-10.
+
+**Nota de método (E11):** a coluna de hoje conta os nomes nas migrations. As duas funções que aparecem sem `SET search_path` dentro do `CREATE` (`cleanup_old_telemetry_logs`, `reconcile_pending_freights`) recebem `ALTER FUNCTION ... SET search_path = public` em `supabase/migrations/20260628122712_1fffd9e0-381e-4619-a2f9-953ba14fbb1e.sql:2,3,8` — por isso o catálogo vivo conta zero. O número que decide é o do catálogo: **0 `SECURITY DEFINER` sem `search_path`**.
+
+**Nota de método (E9):** são 7 chaves em `docs/ops/cron_jobs_origem.json`, todas `anon`; o `.env` não existe no worktree porque não é rastreado desde a [#297](https://github.com/adm01-debug/Loggi_Flow_V2/pull/297).
+
 
 ## Registro da etapa 265 - plano B da fonte do banco (2026-11-25)
 
