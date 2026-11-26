@@ -1,42 +1,41 @@
-/* eslint-disable sonarjs/slow-regex */
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test";
+import { FALHA_CRITICA, autenticar, exigirCredenciais } from "./helpers";
 
-// Credenciais do usuario semeado, ver tests/e2e/README.md.
-const EMAIL = process.env.E2E_EMAIL ?? '';
-const SENHA = process.env.E2E_PASSWORD ?? '';
+test.describe("LogiFlow E2E - caminhos criticos", () => {
+  test("rota protegida manda quem nao entrou para o login", async ({
+    page,
+  }) => {
+    await page.goto("/coletas");
 
-test.describe('Nexus Core E2E - Critical Path Validation', () => {
-  test('Complete login to dashboard and shipment creation flow', async ({ page }) => {
-    if (!EMAIL || !SENHA) {
-      throw new Error('defina E2E_EMAIL e E2E_PASSWORD - ver tests/e2e/README.md');
-    }
-    await page.goto('/');
-    
-    // Auth Check
-    const authForm = page.locator('form');
-    if (await authForm.isVisible()) {
-      await page.fill('input[type="email"]', EMAIL);
-      await page.fill('input[type="password"]', SENHA);
-      await page.click('button[type="submit"]');
-    }
-
-    // Dashboard State
-    await expect(page).toHaveURL(/.*dashboard/);
-    await expect(page.locator('text=Visão Geral')).toBeVisible();
-
-    // Module Navigation
-    const navLinks = ['Coletas', 'Fretes', 'Analytics', 'Configurações'];
-    for (const link of navLinks) {
-      await page.getByRole('link', { name: link }).click();
-      await page.waitForLoadState('networkidle');
-      // Verify no crash (Error Boundary)
-      await expect(page.locator('text=Error').or(page.locator('text=Erro'))).not.toBeVisible();
-    }
+    await expect(page).toHaveURL(/\/auth/, { timeout: 20_000 });
+    await expect(page.locator("#login-email")).toBeVisible();
   });
 
-  test('Responsiveness and Error State resilience', async ({ page }) => {
-    await page.setViewportSize({ width: 375, height: 667 }); // Mobile check
-    await page.goto('/dashboard');
-    await expect(page.locator('nav')).toBeVisible(); // Sidebar should adapt to mobile (hamburger or sheet)
+  test("login com o usuario semeado chega na home sem Error Boundary", async ({
+    page,
+  }) => {
+    exigirCredenciais();
+    await autenticar(page);
+
+    await expect(page.locator("#main-navigation")).toBeVisible();
+    await expect(page.locator("body")).not.toContainText(FALHA_CRITICA);
+  });
+
+  test("modulos principais abrem sem quebrar a tela", async ({ page }) => {
+    exigirCredenciais();
+    await autenticar(page);
+
+    for (const rota of [
+      "/coletas",
+      "/transportadoras",
+      "/despachos",
+      "/configuracoes",
+    ]) {
+      await page.goto(rota);
+      await expect(page).toHaveURL(new RegExp(`${rota}/?$`), {
+        timeout: 20_000,
+      });
+      await expect(page.locator("body")).not.toContainText(FALHA_CRITICA);
+    }
   });
 });

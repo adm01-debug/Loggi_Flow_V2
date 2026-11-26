@@ -2011,6 +2011,14 @@ Consequência direta para este plano: **a suíte existente não cobre nenhuma da
 `npx vitest run` dá confiança sobre utilitários, não sobre criar coleta, mover status ou cotar frete. E
 `tests/e2e/` precisa de usuário semeado e por isso não roda na CI.
 
+**Estado (2026-11-26).** O quadro de telas mudou pouco, mas a parte que era ficção foi corrigida: as duas
+suítes de `tests/e2e/` descreviam um app que não existe ("Nexus Core", `/dashboard`, "Visão Geral") e, com a
+porta 8080 ocupada por outro projeto da máquina, rodavam contra o app errado. Foram reescritas contra o
+produto real, passaram a rodar na porta 8099 com `--strictPort` e estão **6/6 verdes** (etapa 283). O usuário
+semeado existe (`e2e@promobrindes.com.br`, secrets `E2E_EMAIL`/`E2E_PASSWORD`). O que **continua aberto** é o
+miolo do achado: **nenhuma tela tem teste unitário** e não há cobertura das jornadas de negócio - o E2E cobre
+navegação e login, não criar coleta ou mover status.
+
 **Impacto no negócio.** Toda correção deste plano vai ser verificada manualmente ou não vai ser verificada. É
 a razão pela qual cada etapa adiante traz um comando concreto de verificação em vez de "rode os testes".
 
