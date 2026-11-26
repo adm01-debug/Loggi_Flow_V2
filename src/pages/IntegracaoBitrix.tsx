@@ -53,6 +53,25 @@ const SPA_KEYS = [
   },
 ] as const;
 
+// A edge function explica a causa no corpo (ex.: credencial ausente); o supabase-js so
+// expoe "Edge Function returned a non-2xx status code" em error.message. Sem ler o
+// corpo, o painel mostrava erro generico e a causa ficava invisivel para o operador.
+async function mensagemDaFuncao(
+  error: unknown,
+  alternativa: string,
+): Promise<string> {
+  const contexto = (
+    error as { context?: { json?: () => Promise<unknown> } } | null
+  )?.context;
+  try {
+    const corpo = (await contexto?.json?.()) as { error?: string } | undefined;
+    if (corpo?.error) return corpo.error;
+  } catch {
+    // Corpo sem JSON: fica a mensagem alternativa.
+  }
+  return alternativa;
+}
+
 export default function IntegracaoBitrix() {
   const qc = useQueryClient();
   const [webhookUrl, setWebhookUrl] = useState("");
@@ -95,7 +114,8 @@ export default function IntegracaoBitrix() {
           body: { action: "sync_deals" },
         },
       );
-      if (error) throw error;
+      if (error) throw new Error(await mensagemDaFuncao(error, error.message));
+      if (data?.error) throw new Error(data.error);
       return data;
     },
     onSuccess: (data) => {

@@ -3,6 +3,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { log } from "../_shared/logger.ts";
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { isSecretConfigured } from "../_shared/secretConfig.ts";
 
 interface BitrixRequest {
   action:
@@ -34,7 +35,7 @@ serve(async (req) => {
     // ENV tem precedência; sem ela, usa o webhook_url salvo pela tela de
     // configuração em bitrix_sync_config.
     let bitrixWebhookUrl = Deno.env.get("BITRIX24_WEBHOOK_URL");
-    if (!bitrixWebhookUrl) {
+    if (!isSecretConfigured(bitrixWebhookUrl)) {
       const { data: cfg } = await supabase
         .from("bitrix_sync_config")
         .select("webhook_url")
@@ -43,7 +44,7 @@ serve(async (req) => {
       if (cfg?.webhook_url) bitrixWebhookUrl = cfg.webhook_url;
     }
 
-    if (!bitrixWebhookUrl) {
+    if (!isSecretConfigured(bitrixWebhookUrl)) {
       return new Response(
         JSON.stringify({
           success: false,

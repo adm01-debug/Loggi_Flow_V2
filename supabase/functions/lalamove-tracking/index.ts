@@ -5,6 +5,7 @@ import { log } from "../_shared/logger.ts";
 import { corsHeaders } from "../_shared/cors.ts";
 import { ValidationError, validationErrorResponse } from "../_shared/validate.ts";
 import { parseDriverId, parseOrderId } from "./parse.ts";
+import { isSecretConfigured } from "../_shared/secretConfig.ts";
 
 const LALAMOVE_SANDBOX_URL = "https://rest.sandbox.lalamove.com";
 const LALAMOVE_PRODUCTION_URL = "https://rest.lalamove.com";
@@ -49,7 +50,7 @@ async function lalamoveRequest(
   const apiKey = Deno.env.get("LALAMOVE_API_KEY");
   const apiSecret = Deno.env.get("LALAMOVE_API_SECRET");
 
-  if (!apiKey || !apiSecret) {
+  if (!isSecretConfigured(apiKey) || !isSecretConfigured(apiSecret)) {
     throw new Error("Lalamove API credentials not configured");
   }
 

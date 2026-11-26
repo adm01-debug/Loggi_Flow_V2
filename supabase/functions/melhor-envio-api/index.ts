@@ -8,6 +8,7 @@ import { checkRateLimit } from "../_shared/rateLimiter.ts";
 import { ValidationError, validationErrorResponse } from "../_shared/validate.ts";
 import { parseMelhorEnvioQuote } from "./parse.ts";
 import { resolveMelhorEnvioAmbiente } from "./ambiente.ts";
+import { isSecretConfigured } from "../_shared/secretConfig.ts";
 
 const SANDBOX_URL = "https://sandbox.melhorenvio.com.br/api/v2";
 const PRODUCTION_URL = "https://melhorenvio.com.br/api/v2";
@@ -70,7 +71,7 @@ Deno.serve(async (req) => {
     }
 
     const token = Deno.env.get("MELHOR_ENVIO_TOKEN");
-    if (!token) {
+    if (!isSecretConfigured(token)) {
       return new Response(
         JSON.stringify({ error: "MELHOR_ENVIO_TOKEN not configured" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }

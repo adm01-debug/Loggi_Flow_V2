@@ -5,6 +5,7 @@ import { requireUser } from "../_shared/auth.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
 import { safeFetch } from "../_shared/safeFetch.ts";
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { isSecretConfigured } from "../_shared/secretConfig.ts";
 
 interface SecurityEventRequest {
   user_id?: string;
@@ -135,7 +136,7 @@ serve(async (req: Request) => {
           }),
         );
       }
-      if (slackWebhook) {
+      if (isSecretConfigured(slackWebhook)) {
         tasks.push(
           safeFetch(slackWebhook, {
             method: "POST",

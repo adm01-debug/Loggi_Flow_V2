@@ -7,6 +7,7 @@ import { parseLocaleNumber } from "../_shared/number.ts";
 import { safeFetch } from "../_shared/safeFetch.ts";
 import { invokeFunction } from "../_shared/invokeFunction.ts";
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { isSecretConfigured } from "../_shared/secretConfig.ts";
 
 serve(async (req) => {
   const headers = getCorsHeaders(req);
@@ -101,6 +102,7 @@ serve(async (req) => {
     // 3. Use AI if fallback is enabled and we are missing data
     if (
       (!price || !days) &&
+      isSecretConfigured(Deno.env.get("OPENAI_API_KEY")) &&
       (config.fallback_strategy === "ai_extraction" ||
         config.fallback_strategy === "hybrid")
     ) {
