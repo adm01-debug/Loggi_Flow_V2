@@ -5384,3 +5384,36 @@ fora da transacao igual ao inicial.
 **Rollback:** `supabase/rollbacks/20261126190000_rollback_remove_camada_fast_metrics.sql` (DDL das MVs verbatim
 da migration `20260712110919`, nomes de indice iguais aos do banco real, grants originais e o cron de 5 min).
 
+## Registro 2026-11-26 (16) - retencao de logs provada, cron conferido e censo do doc 08 fechado
+
+**Dor:** a lista "Decisoes que dependem do dono" do doc 08 ainda tinha itens abertos (limpeza de falhas de
+webhook, os 1.775 registros de fuzz e a camada fast-metrics), e a leitura anterior dos cron jobs 102/103
+parecia bug de producao (0 execucoes).
+
+**Causa raiz de cada item:**
+- os jobs 102/103 foram criados em 26/11 por volta de 12:00 UTC com horario 03:35/03:45 - 0 execucoes era
+  esperado, nao falha;
+- `webhook_inbound_failures` esta com 0 linhas, entao nao havia acumulo a limpar;
+- `contract_test_logs` tem 1.775 linhas, todas `is_valid = false`, 1.704 de `lalamove-webhook` com o mesmo
+  erro, `payload_hash` nulo e nada novo desde 22/11 (antes do commit `b31440015`, que trocou payload por hash);
+- a camada fast-metrics estava mergeada na #547 mas a migration ainda nao tinha sido aplicada.
+
+**O que foi feito:**
+- PR #547 mergeada em `ccea0b65a` com CI verde;
+- `Aplicar Migration` (run 45890225703, `success`) aplicou
+  `supabase/migrations/20261126190000_remove_camada_fast_metrics_sem_leitor.sql`.
+
+**Conferido no catalogo do banco oficial depois do apply:** `pg_proc` das 4 funcoes = 0, `pg_class` das 2 MVs
+internas = 0, `cron.job` de `refresh-dashboard-views-5m` = 0, versao registrada em
+`supabase_migrations.schema_migrations`, e `has_permission` + `get_current_organization_id` intactas
+(`prosecdef = true`) - as 3 policies que dependem da segunda continuam validas.
+
+**Doc 08 atualizado:** linha 34 (`contract_test_logs`), linha 59 (`purge_webhook_inbound_failures` de LIGAR
+para LIGADO), achado colateral 1 (resolvido), decisoes 1 e 2b (resolvidas) e Adendo (5).
+
+**Nada foi apagado a mao:** nenhum `DELETE` e nenhuma tabela removida nesta rodada; a limpeza dos logs e a
+retencao que ja esta agendada (job 103), executando 27/11 03:45 UTC.
+
+**Rollback:** o rollback da camada fast-metrics continua em
+`supabase/rollbacks/20261126190000_rollback_remove_camada_fast_metrics.sql` e foi testado em transacao
+revertida antes do merge.
