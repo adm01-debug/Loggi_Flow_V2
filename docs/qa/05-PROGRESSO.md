@@ -379,7 +379,7 @@
 - [x] **283** — Resolver o usuário semeado do `tests/e2e/` e dizer por que ele não roda na CI — onda 8 — Média · **2026-11-26 (fechada):** usuário dedicado `e2e@promobrindes.com.br` com a senha rotacionada por SQL (nunca versionada) e guardada nos secrets `E2E_EMAIL`/`E2E_PASSWORD`; login GoTrue comprovado (JWT de 803 caracteres, role `authenticated`). As duas suítes foram **reescritas**: as antigas testavam um app que não existe ("Nexus Core") e, por causa da porta 8080 ocupada por outro projeto da mesma máquina, rodavam contra o app errado. Agora rodam na 8099 (`--strictPort`) e estão **6/6 verdes** em 12,8s. O job de CI dedicado entrou na **#524** (squash `ab6c51022`): `.github/workflows/e2e.yml` roda as suites em todo pull request e por `workflow_dispatch`, com guarda de credencial e relatorio como artefato na falha. **Prova:** run `45864659358` (dispatch na `main`) = success, o run da PR = success e `actionlint 1.7.7` limpo no arquivo.
 - [x] **284** — Subir os pisos de cobertura para travar o que as etapas 275-282 conquistaram — onda 8 — Média · **feito — pisos 77/73/68/74 em `vitest.config.ts`; PR #442 mergeada em `fe4f9861`** (altera limiar de gate da CI)
 - [x] **285** — Confirmar com o dono se `VITE_SENTRY_DSN` está configurado no Vercel — onda 8 — Média · **aguarda o dono** — **2026-11-25 (fechada, resposta: NAO esta configurado):** provas - (1) o bundle publicado em `loggi-flow-v2.vercel.app` nao tem **nenhuma** ocorrencia de `sentry.io`/`ingest.sentry.io` em nenhum dos 10 chunks servidos; (2) build local da `main` sem variavel de ambiente reproduz o mesmo resultado - o unico residuo do SDK no bundle e `captureException` minificado a uma chamada sem cliente (no-op), porque `if (import.meta.env.VITE_SENTRY_DSN)` (`src/main.tsx:11`) vira codigo morto e o Rollup descarta o SDK. Ou seja: falta criar o projeto no Sentry e definir `VITE_SENTRY_DSN` no ambiente Production da Vercel.
-- [~] **286** — Provar que um erro de front chega ao Sentry — onda 8 — Média · **aguarda o dono** — **2026-11-25 (codigo pronto, prova pendente):** o caminho de envio que faltava entrou na #513 - `ErrorBoundary.componentDidCatch` agora chama `Sentry.captureException` com `componentStack` (`src/components/common/ErrorBoundary.tsx:33`), no-op enquanto nao houver DSN. Falta so a credencial da 285 para gerar um erro real e ver o evento no projeto.
+- [~] **286** — Provar que um erro de front chega ao Sentry — onda 8 — Média · **aguarda o dono** — **2026-11-25 (codigo pronto, prova pendente):** o caminho de envio que faltava entrou na #513 - `ErrorBoundary.componentDidCatch` agora chama `Sentry.captureException` com `componentStack` (`src/components/common/ErrorBoundary.tsx:33`), no-op enquanto nao houver DSN. Falta so a credencial da 285 para gerar um erro real e ver o evento no projeto. **2026-11-26 (o destino do erro deixou de depender do Sentry):** `ErrorBoundary` passou a gravar o crash em `telemetry_logs` (`category='ui_crash'`, com stack, `componentStack`, `url` e `device_info`) na PR #550 e a tela `/admin/telemetria` (`src/pages/AdminTelemetria.tsx:170` na rota, `TelemetryViewer.tsx:45` lendo a tabela) ja mostra o registro; a prova e o teste `src/components/common/ErrorBoundary.test.tsx` (3 casos). O evento no Sentry continua pendente da credencial da 285.
 - [x] **287** — Verificar no banco ao vivo se `webhook_failures` e `cron_job_logs` existem — onda 8 — Média — **nenhuma das duas existe**
 - [x] **288** — Dar destino persistente à falha de webhook de entrada · onda 8 · Média — **aplicada em produção** (`20261125093000_webhook_inbound_failures.sql`, runs `45603914030`/`45604413739`; [#459](https://github.com/adm01-debug/Loggi_Flow_V2/pull/459) + [#462](https://github.com/adm01-debug/Loggi_Flow_V2/pull/462))
 - [x] **289** — Mostrar as falhas de webhook numa tela que já existe · onda 8 · Média — **implementada** (aba "Falhas de entrada" em `/webhooks`, `useClientWebhooks` com `limit(50)`, estados de carregando/erro/vazio)
@@ -5461,3 +5461,21 @@ gravado com o contexto da tela; nada gravado quando nao ha erro; rejeicao do ban
 RLS e continua so no console — cobrir isso exige policy nova para `anon` (DDL) ou DSN ativo (etapa 285).
 
 **Etapa 285:** segue ABERTA apenas quanto a existir ou nao `VITE_SENTRY_DSN` no Vercel e ao custo do servico.
+
+## Registro 2026-11-26 (19)
+
+**O que foi decidido:** a decisao 5 do censo (`docs/qa/08-AUDITORIA-COBERTURA-UI.md`, ultima da lista DECIDIR)
+foi fechada como **MANTER** - `organizations`, `get_current_organization_id()` e `has_permission` ficam no
+banco, dormentes. Nao houve DDL: o registro e a decisao, com a medicao que a sustenta.
+
+**Evidencia medida no catalogo de producao:** `organizations` com 0 linhas; `profiles` com 7 usuarios e
+`organization_id` nulo nos 7, logo `get_current_organization_id()` devolve NULL hoje; `fretes_internos` tem
+2 policies permissivas de SELECT e 2 de INSERT, entao as duas policies de organizacao entram em `OR` com
+`auth.uid() IS NOT NULL` e nao bloqueiam nada; em `audit_logs` a leitura de admin sobrevive pela policy
+`Allow admins to view audit logs`; `has_permission` tem 0 policies, 0 chamadas em corpo de funcao e 0 triggers.
+Nenhuma dessas funcoes aparece em `src/`, `supabase/functions/` ou `scripts/`.
+
+**Por que nao remover:** derrubar a FK entrante e 3 policies em producao muda o risco sem mudar comportamento
+observavel. Fica registrado no Adendo 7 do doc 08.
+
+**Censo:** com isso a lista DECIDIR do doc 08 fica sem pendencia (decisoes 1, 2, 2b, 3, 4 e 5 fechadas).

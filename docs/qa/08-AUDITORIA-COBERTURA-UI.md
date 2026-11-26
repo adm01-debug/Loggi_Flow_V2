@@ -94,7 +94,7 @@ O último é o **veredicto da etapa 080**, que estava como "INDEFINIDO: aguarda 
 | 2b  | **RESOLVIDO em 26/11** — nada foi apagado a mao: a retencao de 30 dias (`cleanup-contract-test-logs-daily`, job 103, 03:45) apaga as 1.775 linhas em no maximo 30 dias (263 ja vencidas saem em 27/11); nenhum registro novo desde 22/11 e o payload ja nao e gravado (hash desde `b31440015`) | `contract_test_logs`, `supabase/functions/*/index_test.ts` |
 | 3   | **RESOLVIDO em 26/11** - migration `20261126170000` removeu `system_adr` e as outras 6 tabelas comprovadamente mortas, com rollback em `supabase/rollbacks/`                                                                                                                    | `system_adr`, `system_contract_schemas`, `driver_badges`, `account_lockouts`, `allowed_ips`, `email_verification_tokens`, `notification_templates`           |
 | 4   | **RESOLVIDO em 26/11** - tela e leitor ja existem: o painel `Integracao Bitrix24` grava as tres chaves de SPA e a edge function le a tabela (`index.ts:60-83`, #537). Nao remover a tabela                                                                                      | `business_rules_config`                                                                                                                                      |
-| 5   | **PARCIALMENTE RESOLVIDO em 26/11** - as 4 tabelas vazias sairam na migration `20261126170000`; `organizations` + `get_current_organization_id` + `has_permission` ficam porque tem FK entrante e 3 policies ativas. O que falta decidir e se o multi-tenant liga ou sai de vez | `organizations`, `has_permission`                                                                                                                            |
+| 5   | **RESOLVIDO em 26/11** - as 4 tabelas vazias sairam na migration `20261126170000` e o multi-tenant fica **dormente** (ver Adendo 7): nenhuma linha em `organizations`, `profiles.organization_id` nulo nos 7 usuarios e zero referencias no codigo; as 3 policies de organizacao sao inofensivas porque dividem a tabela com policies permissivas irmas. Remover custaria DDL em producao + queda de FK e policies, sem ganho nenhum | `organizations`, `has_permission`                                                                                                                            |
 
 ## Adendo 2026-11-26 (verificacoes feitas depois do merge deste documento)
 
@@ -189,3 +189,26 @@ O último é o **veredicto da etapa 080**, que estava como "INDEFINIDO: aguarda 
 3. **124 tabelas em `public`, nenhuma sem referencia no codigo; nenhuma view orfa** - as 4 views restantes ou
    sao lidas por outra view, ou citadas em `src`/`supabase/functions`.
 4. **`carrier_rankings` segue vazia por falta de entrega, nao por falta de gatilho** - ver Adendo (5), item 5.
+
+## Adendo 2026-11-26 (7) - decisao 5 fechada: o multi-tenant fica, dormente
+
+Medicao no catalogo de producao (`jvfhclubfpxrtrrazrgr`) antes de decidir:
+
+1. **Nada usa o multi-tenant.** `organizations` tem **0 linhas**; `profiles` tem 7 usuarios e
+   `organization_id` e **nulo nos 7**. `get_current_organization_id()` devolve
+   `(SELECT organization_id FROM public.profiles WHERE id = auth.uid())`, ou seja **NULL para todo mundo hoje**.
+   Zero ocorrencias de `get_current_organization_id`, `organization_id`, `organizations` e `has_permission` em
+   `src/`, `supabase/functions/` e `scripts/` (fora de `types.ts`).
+2. **As 3 policies de organizacao nao bloqueiam nem vazam nada.** Em `fretes_internos` convivem 2 policies
+   permissivas de SELECT e 2 de INSERT, e as duas de organizacao caem no mesmo `OR`:
+   `Authenticated users can view/insert fretes_internos` liberam `auth.uid() IS NOT NULL` para as mesmas
+   operacoes. Como policy permissiva soma (nunca subtrai), o resultado para o usuario logado e o mesmo com ou
+   sem as linhas de organizacao. Em `audit_logs`, a policy de organizacao nunca e verdadeira hoje, mas
+   `Allow admins to view audit logs` mantem a leitura de admin funcionando.
+3. **`has_permission` continua sem consumidor**: definida, 0 policies, 0 corpos de funcao, 0 triggers.
+
+**Decisao: MANTER** `organizations`, `get_current_organization_id` e `has_permission`. Remover exigiria DDL em
+producao, derrubar a FK entrante e 3 policies, e nao muda comportamento observavel - risco de regressao com
+ganho zero. Fica registrado como caminho dormente: no dia em que o multi-tenant ligar, a funcao e as policies
+ja estao no lugar; no dia em que a decisao for sair, o caminho e a migration com rollback, nao um `DROP` solto.
+
