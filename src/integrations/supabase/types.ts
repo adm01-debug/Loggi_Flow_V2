@@ -6251,6 +6251,15 @@ export type Database = {
         Returns: number
       }
       record_heartbeat: { Args: never; Returns: undefined }
+      registrar_crash_ui: {
+        Args: {
+          p_message: string
+          p_metadata?: Json
+          p_stack_trace?: string
+          p_url?: string
+        }
+        Returns: undefined
+      }
       reject_index_proposal: {
         Args: { p_id: string; p_reason?: string }
         Returns: undefined

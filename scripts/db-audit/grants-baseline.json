@@ -1,7 +1,8 @@
 {
     "note": "Regenerar apos qualquer GRANT/REVOKE e revisar o diff antes de commitar.",
     "anon_execute": [
-        "get_public_tracking(p_code text)"
+        "get_public_tracking(p_code text)",
+        "registrar_crash_ui(p_message text, p_stack_trace text, p_url text, p_metadata jsonb)"
     ],
     "generated_at": "2026-11-26",
     "anon_table_select": [
@@ -131,6 +132,6 @@
         "webhook_inbound_failures"
     ],
     "how_to_regenerate": "scripts/db-audit/grants-baseline.sql (E26)",
-    "service_role_execute_count": 107,
-    "authenticated_execute_count": 54
+    "service_role_execute_count": 108,
+    "authenticated_execute_count": 55
 }
