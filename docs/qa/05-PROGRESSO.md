@@ -5128,3 +5128,26 @@ tetos; `npx vitest run tests/security/` -> `19 passed`.
 
 **NAO VERIFICADO:** (1) o efeito do job de E2E depois de mergeado, que so se confirma em push futuro da
 `main`; (2) os valores de painel (S-05, S-08) e o DSN do Sentry, que nao sao legiveis do repositorio.
+## Registro 2026-11-26 (6) - auditoria de cobertura UI: todos os objetos de banco tem consumidor
+
+**Fonte:** `docs/qa/08-AUDITORIA-COBERTURA-UI.md`. Censo ao vivo de producao (137 relacoes, 116 funcoes, 28 cron jobs)
+cruzado com `src/`, `supabase/functions/`, `supabase/migrations/` e `tests/`.
+
+**Resultado:** 0 objetos totalmente orfaos. `db_health_score_history` tem tela (RPC `get_health_score_history_fast`);
+`xp_for_level` e usada por `calculate_level`; `mcp_exec_many` e interface do MCP restrita a `postgres`/`service_role`.
+Sobras reais: 9 tabelas vazias (seguranca/multi-tenant) a duplicata `system_adr` e a tabela `contract_test_logs`, cujas 1.775 linhas sao fuzz gravado pelos smoke tests
+do proprio repo direto no banco de producao,
+`business_rules_config` com 24 chaves sem nenhum leitor e 7 funcoes sem trigger nem chamador.
+
+**Acao tomada nesta data:** a PR #526 removeu os 6 modulos de `src/` sem importador (650 linhas), incluindo o
+veredicto da etapa 080 sobre `useGamification.tsx` (resolucao do tsc sempre para o `.ts`; helpers do `.tsx` sem
+chamador; `.ts` alinhado ao banco real).
+
+**Prova:** `npm run typecheck` 0 erros; `npx vitest run` 112 arquivos / 1010 testes; `npm run lint:budget` OK;
+`npm run build` conclui; `npm run test:security` 19 testes; catalogo do banco conferido por `psql`.
+
+**NAO VERIFICADO:** (1) clique autenticado nas telas de gamificacao e de saude do banco; (2) intencao de negocio
+das 9 tabelas vazias; (3) `inventario/estado/*` e `.tools/graphify/output/*` seguem de 24/11 e citam arquivos ja
+removidos.
+
+Contadores do plano: **299 `[x]` / 1 `[~]`** (nenhuma etapa alterada por esta auditoria).

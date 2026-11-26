@@ -40,7 +40,7 @@ export const authService = {
     // P18: o RPC update_user_streak estava retornando 403 (permissão negada
     // para o role anon). Como o debounce de 1x/dia já é feito no
     // useAuth via localStorage, basta atualizar o last_activity_date em
-    // user_levels (schema em uso pelo useGamification.tsx). Se a linha
+    // user_levels (schema em uso pelo useGamification.ts). Se a linha
     // não existir para este user, ignora silenciosamente.
     try {
       const today = new Date().toISOString().slice(0, 10);

@@ -13,7 +13,7 @@ type UserLevelRow = {
   [key: string]: unknown;
 };
 
-// P18: alinhado ao schema em uso por useGamification.tsx.
+// P18: alinhado ao schema em uso por useGamification.ts.
 // Tabelas usadas no projeto: achievements, rewards, user_levels,
 // user_achievements, user_ranks. RPC: add_user_xp. As antigas
 // rank_badges/task_gifts/update_user_streak não existem (404/403).
