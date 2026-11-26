@@ -348,3 +348,140 @@ recriadas pelos próprios workflows):
 - `contexto` — gerada pelo workflow `contexto-ia.yml` ("gerada, 1 commit — só o HEAD é consumido;
   nunca abra PR dela"), sem base comum com a `main`; o conteúdo é recopiado das três fontes que vivem
   na `main`.
+
+## 13. Reauditoria 2026-11-26 (21) — 49 PRs fechadas sem merge e 16 branches remotas, arquivo a arquivo
+
+**Por que refazer.** O dono pediu prova byte a byte antes de apagar qualquer branch ou PR, depois de todas as
+entregas da rodada (#547 a #554). Esta seção é o estado corrente: substitui as medições das seções 2 a 12,
+feitas antes dessas mergeadas.
+
+**Universo medido** (`main` em `169ad92b2`, 2026-11-26):
+
+| Medida | Valor |
+| --- | --- |
+| PRs no repositório | **544** — 481 mergeadas, 49 fechadas sem merge, 14 abertas |
+| Branches remotas | **16** — `main`, `contexto` (gerada por workflow) e 14 `dependabot/*` |
+| Branches locais | 0 no clone novo; as 18 antigas tinham upstream `gone` e nenhum conteúdo próprio |
+| Stashes / árvore de trabalho | 0 / limpa |
+
+**Método (o mesmo para todas as 49).** `git fetch origin pull/N/head:refs/tmp/prN` → `git merge-base` com
+`origin/main` → lista dos arquivos que a PR realmente muda (`git diff --name-only base prN`) → para cada arquivo,
+`git diff --quiet refs/tmp/prN origin/main -- <arquivo>`. Arquivo que diverge foi aberto lado a lado, e o último
+commit da `main` que toca o arquivo foi lido (`git log -1 --date=short`). Arquivo idêntico = trabalho incorporado
+sem discussão. Arquivo divergente só conta como perdido se a versão da PR tiver algo que a da `main` não tenha.
+
+### 13.1 As 21 PRs fechadas sem merge que não são do dependabot
+
+| PR | Arquivos próprios | Divergentes | Veredito | Prova |
+| --- | --- | --- | --- | --- |
+| #86 | 1 | 1 | incorporado, versão da `main` é a canônica | `scripts/audit/content_hash.sql` na `main` usa md5 por linha agregado (mesmo algoritmo de `manifest_data.sql`); o `to_jsonb(t)` e o `CROSS JOIN LATERAL ... LIMIT 0` não existem em lugar nenhum |
+| #87 | 1 | 1 | incorporado e ampliado | `manifest_summary.sql` da `main` documenta `total NULL` = pg_cron ausente e é idempotente (`DROP TABLE IF EXISTS pg_temp`) |
+| #88 | 1 | 1 | superado | `.gitattributes` da `main` tem `* text=auto eol=lf` mais `.py`, `*.md` e o resto — superconjunto da PR |
+| #92 | 1 | 1 | reescrito depois | `scripts/ratchet-warning-budget.mjs` (f2dc8925) |
+| #94 | 1 | 1 | superado | `scripts/ops/set_missing_secrets.sh` na `main`: 279 linhas, modo `--env-file` (09ae937a, #535) contra o guard simples da PR |
+| #98 | 1 | 1 | superado | `scripts/ops/pos_deploy_functions.sql` reescrito em 3cd55fa4 e runbook em `docs/` |
+| #102 | 2 | 2 | incorporado | `scripts/seed-database.ts` na `main` é a versão com teste (f2dc8925); `package-lock.json` posterior (eb09cdc2) |
+| #105 | 1 | 1 | incorporado | `package-lock.json` posterior (eb09cdc2) — `npm ci` verde na CI atual |
+| #106 | 11 | 8 | incorporado, telas evoluíram depois | os 8 divergentes têm commit posterior na `main` entre 2026-11-17 e 2026-11-24 (`c3c72a95`, `5b14adc0`, `71cbe45e`, `ed5c7f8b`, `7ab44e75`, `b721b85d`, `71cbe45e`); os outros 3 idênticos |
+| #107 | 13 | 10 | incorporado, mais rigoroso | `.warning-budget.json` da `main` crava **80** avisos (e8ad814a, etapas 269/299) — melhor que o número da PR; `eslint.config.js` com a regra de `innerHTML` (e694b521) |
+| #122 | 1 | 1 | obsoleto | a PR só acrescentava um comentário "teste gate" em `supabase/config.toml`; o arquivo foi corrigido de verdade em bbb9bbc9 (import_map) |
+| #135 | 20 | 3 | incorporado | 17 arquivos idênticos; os 3 divergentes (`DORAMetrics`, `TelemetryViewer`, `coletas/types`) têm versão posterior (d952137b, daa5f481, d15ef794) |
+| #332 | 2 | 2 | incorporado | `src/pages/Despachos.tsx` posterior (1ca11dd5, etapa 044); o outro arquivo é `docs/qa/05-PROGRESSO.md` |
+| #333 | 6 | 5 | incorporado | `Clientes`/`Fornecedores` (180db41a), `Envios` (8406f688), `FretesInternos` (b721b85d) — todas as quatro telas com o estado de erro que a PR introduzia |
+| #334 | 1 | 1 | só documentação | `docs/qa/05-PROGRESSO.md`; as etapas 062-067 estão marcadas na `main` |
+| #335 | 1 | 1 | só documentação | `docs/qa/05-PROGRESSO.md`; onda 1 de segurança marcada |
+| #336 | 5 | 4 | incorporado | `BulkActions.test.tsx` (e2c95757) e as duas telas (180db41a); a exclusão em massa com confirmação digitada está na `main` |
+| #337 | 1 | 1 | só documentação | `docs/qa/05-PROGRESSO.md` |
+| #437 | 114 | 113 | incorporado | 113 dos 114 arquivos são artefato `coverage/`; o único de código, `vitest.config.ts`, está **idêntico** — pisos 77/73/68/74 |
+| #501 | 5 | — | incorporado | `git grep -ci "privado\|private" origin/main -- .github/workflows` = **0 ocorrências**: os três workflows não afirmam mais que o repositório é privado |
+| #534 | 1 | 1 | superado | `grants-baseline.json` da `main` = **108/55** (`service_role`/`authenticated`), regenerado pelo types-sync da #553; a PR trazia 112/58 |
+
+Nenhuma das 21 esconde trabalho exclusivo: 12 têm conteúdo idêntico ou só documentação, 9 têm versão da `main`
+posterior ao commit da PR e mais completa.
+
+### 13.2 Dependabot — 28 fechadas e 14 abertas
+
+Todas as 28 PRs fechadas do bot foram conferidas por lista de arquivos: **nenhuma toca nada além de
+`package.json`, `package-lock.json` e `.github/workflows/*`**. Não há código, migration, SQL ou tela em PR de
+dependabot, logo não existe trabalho a recuperar — o bot reabre a atualização quando quiser.
+
+O que o bot pedia e o que a `main` tem hoje:
+
+| Pacote | PR fechada | `main` hoje | Situação |
+| --- | --- | --- | --- |
+| `react-router-dom` | 6.30.3 → 7.18.3 (#44) e 6.30.3 → 6.30.6 (#184) | **^7.18.6** | `main` já passou todas |
+| `@hookform/resolvers` | 3.10.0 → 5.4.0 (#8) | **^5.4.0** | mergeado por outro caminho |
+| `vite` | 5.4.21 → 8.x (#59, #183) | ^6.4.6 | bump major ainda não feito |
+| `eslint` | 9.32 → 10.8 (#26) | ^9.39.0 | major pendente |
+| `jsdom` | 20.0.3 → 31 (#132) | ^20.0.3 | major pendente |
+| `vitest` | 4.1.12 → 5.1.0 (#190) | ^4.1.11 | major pendente |
+
+As 14 PRs abertas são todas do bot e todas de versão; **13 estão com CI verde** e a #491 (`react-i18next` 17 → 18)
+está vermelha (Type Check, Lint, testes e dois gates falham). Nenhuma carrega trabalho de agente de IA.
+
+### 13.3 Branches
+
+| Branch | Conteúdo | Veredito |
+| --- | --- | --- |
+| `main` | — | referência |
+| `contexto` | 1 commit gerado por `contexto-ia.yml` ("nunca abra PR dela") | gerada, sem base comum com a `main`, conteúdo recopiado das fontes que vivem na `main` |
+| 14 `dependabot/*` | 1 commit de bump cada, casadas com as PRs abertas | geradas pelo bot; apagar não perde nada e o bot recria |
+
+Nenhuma branch remota tem commit com trabalho de agente: o histórico de branches de agente terminou todo em
+squash-merge ou nas 21 PRs acima.
+
+### 13.4 Conclusão
+
+O repositório não guarda trabalho de agente fora da `main`. As 49 PRs fechadas sem merge estão explicadas uma a
+uma, as 16 branches remotas são `main` + uma gerada + 14 do bot, e as 14 PRs abertas são bumps de dependência.
+**Nada precisa ser apagado para "não perder trabalho"** — o que existe fora da `main` é bot ou documentação viva.
+### 13.5 Análise hunk a hunk — o que "divergiu" e por quê
+
+A comparação por arquivo (13.1) responde "a `main` tem uma versão diferente?". Esta seção responde a pergunta
+seguinte: **cada linha que a PR adicionou existe hoje na `main`?** Para cada PR e cada arquivo tocado, extraí as
+linhas adicionadas (`git diff base..prN`, sem contar `+++`) e testei presença exata (após `strip()`) na versão da
+`main`. Nenhum arquivo existe só na PR — **0 caminhos ausentes** —; o que há são linhas ausentes dentro de
+arquivos reescritos:
+
+| PR | Arquivo | Linhas da PR ausentes na `main` | Por quê |
+| --- | --- | --- | --- |
+| #86 | `scripts/audit/content_hash.sql` | 20/31 | cabeçalho de comentário e a versão plpgsql foram substituídos pela implementação canônica (md5 por linha, agregado); o bug (`to_jsonb(t)`, `LATERAL ... LIMIT 0`) não existe em nenhuma versão |
+| #87 | `scripts/audit/manifest_summary.sql` | 10/21 | as mesmas consultas com alias (`AS section, AS total`) e o tratamento de pg_cron ausente; a `main` tem idempotência (`DROP TABLE IF EXISTS pg_temp`) que a PR não tinha |
+| #88 | `.gitattributes` | 7/10 | a `main` troca a lista `*.ts/*.tsx/*.json/*.yml` por `* text=auto eol=lf` + exceções — cobre mais, não menos |
+| #94 | `scripts/ops/set_missing_secrets.sh` | 71/102 | reescrita maior: `--env-file`, `eh_placeholder()` (`:87`), `--apply` (`:174`) |
+| #98 | `scripts/ops/pos_deploy_functions.sql` | 123/127 | runbook reescrito; o conteúdo da PR foi **recuperado de propósito**: `:17` diz "PASSO 0 — pré-requisitos, antes de qualquer deploy (recuperado da PR #98)" |
+| #102 | `scripts/seed-database.ts` | 182/213 | reescrito com `--dry-run`/`--confirmar-producao` (`:37`) e upsert por `onConflict` (`:310`) |
+| #106 | `TelemetryCharts.tsx` | 2/2 | só quebra de linha do prettier; o `formatter` está em `:246-253` |
+| #106 | `src/pages/Relatorios.tsx` | 2/8 | os dois casts existem em `:553-560` e `:629-630`, com o mesmo comentário sobre Recharts 3 |
+| #107 | `.warning-budget.json` | 2/2 | a `main` crava **80** avisos (a PR pedia 105) |
+| #107 | `TelemetryCharts.tsx`, `Relatorios.tsx` | 2/2 + 2/8 | os mesmos de #106 |
+| #122 | `supabase/config.toml` | 1/1 | era o comentário "teste gate"; descartável por definição |
+| #135 | `src/components/admin/DORAMetrics.tsx` | 8/34 | prettier; `DORAIndicator` existe na `main` (`:27` definição, `:243` uso) |
+| #332–#337 | `docs/qa/05-PROGRESSO.md` | 7 a 9 por PR | registros de progresso escritos de novo; o conteúdo da #337 vive em `05-PROGRESSO.md:3572` ("Registro - etapas 015 e 054") |
+| #336 | `src/components/common/BulkActions.test.tsx` | 6/60 | a `main` usa o helper `dialog` e mantém o mesmo caso: `confirmTyping: "EXCLUIR"` (`:131`) e `getByPlaceholderText(/digite "excluir"/i)` (`:162`) |
+| #437 | `docs/qa/05-PROGRESSO.md` | 19/24 | registro da etapa 284 reescrito; `vitest.config.ts` é **idêntico** e os pisos subiram para 77/73/68/74 |
+| #501 | `ci.yml`, `security.yml`, `contexto-ia.yml` | 1/1 + 1/1 + 3/3 | os mesmos comentários existem na `main` com a palavra "publico" (`ci.yml:11`, `security.yml:13`, `contexto-ia.yml:99-101`) |
+| #501 | `docs/qa/03-ACHADOS.md` | 7/7 | o estado está registrado em `03-ACHADOS.md:235`: "Estado (2026-11-26): FECHADO — 016 e 274 entraram na PR #519" |
+| #534 | `scripts/db-audit/grants-baseline.json` | 2/3 | a `main` está **abaixo** (108/55 contra 112/58): o EXECUTE fechado desde então é maior que o da PR |
+
+Provas executáveis que já existiam na `main` e cobrem o que as PRs de script pediam:
+
+- `scripts/audit/manifest-summary-content-hash.unit.mjs` roda de verdade os dois SQLs das #86/#87 em bancos de
+  fixture (com e sem `pg_cron`, linhas carregadas em ordem diferente) — é o teste que a #92 pediu como gate.
+- `scripts/historico/cleanup_triggers_source.sql` e `scripts/historico/origem_remediacao_2026-08-31.sql` existem
+  na `main` — eram os dois caminhos da seção 12 que viviam só em ref apagada.
+
+**Branch `contexto` (a única remota que não é `main` nem bot):** 584 arquivos, todos `docs/contexto/**` gerados pelo
+workflow + um `README.md` de 4 linhas que é o aviso do próprio workflow ("branch gerada, não edite"). Os dois únicos
+arquivos manuais dessa árvore — `docs/contexto/regras/manual/README.md` e `TEMPLATE-regras-de-negocio.md` — existem
+na `main`. Nada a recuperar.
+
+### 13.6 O único item que ficou de fato para trás: 9 bumps patch/minor do dependabot
+
+Conferindo as 28 PRs fechadas do bot contra o `package.json` da `main`, **9 atualizações patch/minor não estão em
+lugar nenhum** (nenhuma PR aberta as cobre): `zod` 4.5.4 → 4.6.4, `tsx` 4.23.12 → 4.23.15, `@types/node` 26.4.0 →
+26.5.1, `@testing-library/dom` 10.4.1 → 10.4.2, `@radix-ui/react-switch` 1.2.6 → 1.4.1, `@radix-ui/react-checkbox`
+1.3.2 → 1.3.11, `@radix-ui/react-toggle-group` 1.1.10 → 1.1.19, `@radix-ui/react-aspect-ratio` 1.1.8 → 1.1.15 e
+`eslint-plugin-react-refresh` 0.5.5 → 0.5.6. Não são trabalho de agente (só `package.json`/`package-lock.json`) e
+nenhuma corrige comportamento do sistema — ficam registradas como dívida de dependência, com a decisão de não mexer
+no lockfile nesta rodada.
