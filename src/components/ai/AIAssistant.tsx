@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAuth } from "@/hooks/auth/useAuth";
+import { useHistoricoChat } from "@/hooks/ai/useHistoricoChat";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
@@ -36,6 +37,9 @@ const CHAT_URL = `${sanitizarUrlSupabase(import.meta.env.VITE_SUPABASE_URL) ?? "
 
 export function AIAssistant() {
   const { session } = useAuth();
+  const userId = session?.user?.id ?? null;
+  const { carregarTurnos, gravarTurno, limparHistorico } =
+    useHistoricoChat(userId);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -45,6 +49,19 @@ export function AIAssistant() {
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  useEffect(() => {
+    let cancelado = false;
+
+    void carregarTurnos().then((turnos) => {
+      if (cancelado || turnos.length === 0) return;
+      setMessages((prev) => (prev.length > 0 ? prev : turnos));
+    });
+
+    return () => {
+      cancelado = true;
+    };
+  }, [carregarTurnos]);
 
   const handleStreamData = useCallback(
     (chunk: string, assistantContent: string) => {
@@ -130,7 +147,9 @@ export function AIAssistant() {
     setIsLoading(true);
 
     try {
-      await streamChat(userMessage, messages);
+      void gravarTurno("user", userMessage);
+      const resposta = await streamChat(userMessage, messages);
+      void gravarTurno("assistant", resposta);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erro na IA");
       setMessages((prev) => [
@@ -146,7 +165,10 @@ export function AIAssistant() {
     }
   };
 
-  const clearChat = () => setMessages([]);
+  const clearChat = async () => {
+    setMessages([]);
+    await limparHistorico();
+  };
 
   const quickActions = [
     {
