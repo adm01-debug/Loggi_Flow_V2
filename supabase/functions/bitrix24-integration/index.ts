@@ -89,18 +89,73 @@ serve(async (req) => {
     switch (body.action) {
       case "test-connection": {
         // Safe, side-effect-free reachability check used by the integrations panel.
-        const response = await safeFetch(`${bitrixWebhookUrl}/crm.item.list`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            entityTypeId: body.spa_id || spaIds.coletas,
-            filter: { ">=updatedTime": getLastSyncTime() },
-            select: ["id"],
-            start: -1, // Bitrix returns only count, no items, for limit -1
-          }),
-        });
+        // A mensagem de erro nunca ecoa a URL: o webhook carrega o token no caminho.
+        let response: Response;
+        try {
+          response = await safeFetch(`${bitrixWebhookUrl}/crm.item.list`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              entityTypeId: body.spa_id || spaIds.coletas,
+              filter: { ">=updatedTime": getLastSyncTime() },
+              select: ["id"],
+              start: -1, // Bitrix returns only count, no items, for limit -1
+            }),
+          });
+        } catch (e) {
+          log.error("bitrix24-integration: webhook inalcancavel", {
+            error: String(e),
+          });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error:
+                "webhook do Bitrix inalcancavel (URL invalida, host bloqueado ou sem resposta)",
+            }),
+            {
+              status: 502,
+              headers: { ...headers, "Content-Type": "application/json" },
+            },
+          );
+        }
 
-        const data = await response.json();
+        const texto = await response.text();
+        let data: {
+          error?: string;
+          error_description?: string;
+          total?: number;
+        };
+        try {
+          data = JSON.parse(texto);
+        } catch {
+          log.error("bitrix24-integration: webhook respondeu corpo nao-JSON", {
+            status: response.status,
+          });
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: `webhook do Bitrix respondeu HTML/texto (HTTP ${response.status}): confira se a URL salva termina com /rest/1/<token>/`,
+            }),
+            {
+              status: 502,
+              headers: { ...headers, "Content-Type": "application/json" },
+            },
+          );
+        }
+
+        if (!response.ok && !data.error) {
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: `webhook do Bitrix respondeu HTTP ${response.status} sem detalhe`,
+            }),
+            {
+              status: 502,
+              headers: { ...headers, "Content-Type": "application/json" },
+            },
+          );
+        }
+
         if (data.error) {
           return new Response(
             JSON.stringify({
