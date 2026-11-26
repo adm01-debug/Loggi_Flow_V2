@@ -5462,6 +5462,23 @@ RLS e continua so no console — cobrir isso exige policy nova para `anon` (DDL)
 
 **Etapa 285:** segue ABERTA apenas quanto a existir ou nao `VITE_SENTRY_DSN` no Vercel e ao custo do servico.
 
+## Registro 2026-11-26 (20)
+
+**O que foi feito:** a etapa 285 (H-14) tinha um buraco - o `ErrorBoundary` gravava o crash em `telemetry_logs`, mas
+a policy de INSERT exige sessao (`auth.uid() IS NOT NULL`), entao erro de render na tela de login (onde nao ha
+usuario) continuava morrendo no console. A migration `20261126220000_registrar_crash_ui_para_anonimo.sql` cria a RPC
+`public.registrar_crash_ui(p_message, p_stack_trace, p_url, p_metadata)`, `SECURITY DEFINER` com
+`search_path = public, pg_temp`, `EXECUTE` para `anon`, `authenticated` e `service_role`, e `REVOKE ALL ... FROM public`.
+
+**Por que RPC e nao policy:** liberar INSERT direto para `anon` deixaria a tabela inteira (severity, category,
+user_id) nas maos de quem tiver a chave publica. A funcao fixa `severity = 'error'` e `category = 'ui_crash'`, corta
+mensagem em 500, stack em 4000 e url em 500 caracteres, e descarta metadata acima de 2 KB - o pior caso de abuso fica
+limitado a linhas `ui_crash` bem formadas. Rollback em
+`supabase/rollbacks/20261126220000_rollback_registrar_crash_ui.sql` (nao apaga linha nenhuma, so a funcao).
+
+**Estado:** apply pendente pelo `Aplicar Migration`; o `ErrorBoundary` so passa a chamar a RPC depois que os tipos
+gerados (`src/integrations/supabase/types.ts`) trouxerem a assinatura, via `types-sync`.
+
 ## Registro 2026-11-26 (19)
 
 **O que foi decidido:** a decisao 5 do censo (`docs/qa/08-AUDITORIA-COBERTURA-UI.md`, ultima da lista DECIDIR)
