@@ -5213,3 +5213,23 @@ funcoes novas sem `anon`.
 **Proximo passo conhecido:** toda funcao nova criada no schema `public` por outro role que nao `postgres`
 (por exemplo `supabase_admin`, usado pela plataforma) ainda segue o default dele - o `check-grants-fresh.mjs`
 acusa na hora em que acontecer.
+
+## Registro 2026-11-26 (9) - IDs de SPA do Bitrix e a tabela de regras que ninguem lia
+
+**O que estava errado:** a edge function `bitrix24-integration` tinha os tres IDs de SPA do CRM fixos no codigo
+(1186 compras, 1234 entregas, 1050 ocorrencias). A tabela `business_rules_config` ja guardava
+`bitrix_spa_coletas_id` e `bitrix_spa_entregas_id` desde 2026-08-13 e ninguem lia - trocar de funil exigia deploy.
+
+**Aplicado (PR #537, squash `1549d6fc2`):** a funcao resolve os tres IDs pela tabela, com o literal como ultimo
+recurso e `log.warn` se a leitura falhar; a migration `20261126160000_bitrix_spa_ocorrencias_no_business_rules.sql`
+ligou a terceira chave (a unica sem registro) e foi aplicada pelo `Aplicar Migration` - conferido no banco: as tres
+chaves existem e os valores sao iguais aos literais, entao nada muda de comportamento hoje. O hook
+`useBitrixEntregaSync` mandava um `CATEGORY_ID: 1234` que `sync_deals` ignorava: removido.
+
+**Tela nova (PR #538):** em `Integracao Bitrix24 > Configuracoes`, o bloco "IDs das SPAs no CRM" le e grava as tres
+chaves (a RLS ja permitia: SELECT para authenticated, ALL para admin). Antes disso a tabela nao tinha tela nenhuma:
+zero arquivos em `src/` citavam `business_rules_config`.
+
+**Achado que fica aberto:** das 25 chaves de `business_rules_config`, 22 nao sao lidas em lugar nenhum - zero
+ocorrencias em `src/` e `supabase/functions/`, e nenhuma funcao/view do banco as referencia (unica citacao e a
+migration que criou a tabela). XP, SLA, OTIF e limites de alerta estao no banco e nao tem efeito.
