@@ -5151,3 +5151,17 @@ das 9 tabelas vazias; (3) `inventario/estado/*` e `.tools/graphify/output/*` seg
 removidos.
 
 Contadores do plano: **299 `[x]` / 1 `[~]`** (nenhuma etapa alterada por esta auditoria).
+
+## Registro 2026-11-26 (7)
+
+**Origem:** os dois achados operacionais da auditoria de cobertura UI (merged em 11:50) viraram duas
+migrations de DDL, que ficam **aguardando autorizacao** porque tocam o banco oficial (Regra 8 do fluxo Git).
+
+- **#528** `chore: agenda retencao dos logs de contrato e de falhas de webhook` — `purge_webhook_inbound_failures(90)` existe desde a migration `20261125093000` e nenhum dos 28 cron jobs a chamava; `contract_test_logs` nao tinha rotina de limpeza nenhuma (1.775 linhas em 26/11, 1.512 so em novembro, todas fuzz dos `supabase/functions/*/index_test.ts`). Cria `cleanup_old_contract_test_logs(30)` e agenda as duas diarias as 03:35 e 03:45.
+- **#529** `chore: remove 7 funcoes sem chamador, trigger, policy ou cron` — `audit_trigger_func`, `fn_audit_trigger`, `tr_increment_version`, `update_fretes_internos_updated_at`, `update_performance_metrics`, `jsonb_recursive_merge` e `validate_payload_schema`. Nenhuma tem `REVOKE` de `PUBLIC`, ou seja, todas sao alcancaveis por `/rest/v1/rpc/<nome>` com a chave publica.
+
+**Ensaio feito antes de abrir as PRs:** as duas migrations foram aplicadas em producao dentro de transacao
+(`BEGIN; <arquivo>; ROLLBACK;` com `ON_ERROR_STOP=1`) sem erro, e o estado foi conferido depois do rollback:
+0 funcao nova em #528, 7 funcoes intactas em #529, 0 job novo.
+
+**NAO VERIFICADO:** a execucao real das duas — depende da autorizacao acima.
