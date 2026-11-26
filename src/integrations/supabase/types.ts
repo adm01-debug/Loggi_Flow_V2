@@ -9,36 +9,6 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      account_lockouts: {
-        Row: {
-          created_at: string
-          email: string
-          failed_attempts: number
-          id: string
-          locked_until: string
-          reason: string | null
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          email: string
-          failed_attempts?: number
-          id?: string
-          locked_until: string
-          reason?: string | null
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          email?: string
-          failed_attempts?: number
-          id?: string
-          locked_until?: string
-          reason?: string | null
-          updated_at?: string
-        }
-        Relationships: []
-      }
       achievements: {
         Row: {
           category: string
@@ -193,39 +163,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      allowed_ips: {
-        Row: {
-          created_at: string
-          created_by: string | null
-          description: string | null
-          id: string
-          ip_address: string
-          is_active: boolean
-          updated_at: string
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string
-          created_by?: string | null
-          description?: string | null
-          id?: string
-          ip_address: string
-          is_active?: boolean
-          updated_at?: string
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string
-          created_by?: string | null
-          description?: string | null
-          id?: string
-          ip_address?: string
-          is_active?: boolean
-          updated_at?: string
-          user_id?: string | null
-        }
-        Relationships: []
       }
       architecture_decisions: {
         Row: {
@@ -1989,60 +1926,6 @@ export type Database = {
           },
         ]
       }
-      driver_badges: {
-        Row: {
-          badge_type: string
-          driver_id: string
-          id: string
-          level: number | null
-          metadata: Json | null
-          unlocked_at: string | null
-        }
-        Insert: {
-          badge_type: string
-          driver_id: string
-          id?: string
-          level?: number | null
-          metadata?: Json | null
-          unlocked_at?: string | null
-        }
-        Update: {
-          badge_type?: string
-          driver_id?: string
-          id?: string
-          level?: number | null
-          metadata?: Json | null
-          unlocked_at?: string | null
-        }
-        Relationships: []
-      }
-      email_verification_tokens: {
-        Row: {
-          created_at: string
-          expires_at: string
-          id: string
-          token: string
-          user_id: string
-          verified_at: string | null
-        }
-        Insert: {
-          created_at?: string
-          expires_at: string
-          id?: string
-          token: string
-          user_id: string
-          verified_at?: string | null
-        }
-        Update: {
-          created_at?: string
-          expires_at?: string
-          id?: string
-          token?: string
-          user_id?: string
-          verified_at?: string | null
-        }
-        Relationships: []
-      }
       entregas: {
         Row: {
           box_alocado: string | null
@@ -3059,45 +2942,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      notification_templates: {
-        Row: {
-          body_html: string | null
-          body_text: string
-          channels: string[] | null
-          code: string
-          created_at: string | null
-          id: string
-          is_active: boolean | null
-          name: string
-          subject: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          body_html?: string | null
-          body_text: string
-          channels?: string[] | null
-          code: string
-          created_at?: string | null
-          id?: string
-          is_active?: boolean | null
-          name: string
-          subject?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          body_html?: string | null
-          body_text?: string
-          channels?: string[] | null
-          code?: string
-          created_at?: string | null
-          id?: string
-          is_active?: boolean | null
-          name?: string
-          subject?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
       }
       notifications: {
         Row: {
@@ -4917,66 +4761,6 @@ export type Database = {
         }
         Relationships: []
       }
-      system_adr: {
-        Row: {
-          consequences: string | null
-          context: string | null
-          created_at: string | null
-          decision: string | null
-          id: string
-          status: string
-          title: string
-          updated_at: string | null
-        }
-        Insert: {
-          consequences?: string | null
-          context?: string | null
-          created_at?: string | null
-          decision?: string | null
-          id?: string
-          status: string
-          title: string
-          updated_at?: string | null
-        }
-        Update: {
-          consequences?: string | null
-          context?: string | null
-          created_at?: string | null
-          decision?: string | null
-          id?: string
-          status?: string
-          title?: string
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      system_contract_schemas: {
-        Row: {
-          created_at: string | null
-          entity_name: string
-          id: string
-          schema: Json
-          updated_at: string | null
-          version: number | null
-        }
-        Insert: {
-          created_at?: string | null
-          entity_name: string
-          id?: string
-          schema: Json
-          updated_at?: string | null
-          version?: number | null
-        }
-        Update: {
-          created_at?: string | null
-          entity_name?: string
-          id?: string
-          schema?: Json
-          updated_at?: string | null
-          version?: number | null
-        }
-        Relationships: []
-      }
       system_heartbeat: {
         Row: {
           last_check: string
@@ -5979,16 +5763,6 @@ export type Database = {
           threshold: number
         }[]
       }
-      get_carrier_performance_fast: {
-        Args: never
-        Returns: unknown[]
-        SetofOptions: {
-          from: "*"
-          to: "mv_carrier_performance"
-          isOneToOne: false
-          isSetofReturn: true
-        }
-      }
       get_carrier_performance_stats: {
         Args: never
         Returns: {
@@ -6014,16 +5788,6 @@ export type Database = {
       }
       get_current_organization_id: { Args: never; Returns: string }
       get_dashboard_metrics: { Args: never; Returns: Json }
-      get_dashboard_metrics_fast: {
-        Args: never
-        Returns: unknown
-        SetofOptions: {
-          from: "*"
-          to: "mv_dashboard_metrics"
-          isOneToOne: true
-          isSetofReturn: false
-        }
-      }
       get_duplicate_indexes: {
         Args: { p_limit?: number }
         Returns: {
@@ -6487,7 +6251,6 @@ export type Database = {
         Returns: number
       }
       record_heartbeat: { Args: never; Returns: undefined }
-      refresh_dashboard_views: { Args: never; Returns: Json }
       reject_index_proposal: {
         Args: { p_id: string; p_reason?: string }
         Returns: undefined
@@ -6502,9 +6265,7 @@ export type Database = {
         }[]
       }
       rte_rollup_slo_daily: { Args: { target_day?: string }; Returns: number }
-      system_health_check: { Args: never; Returns: Json }
       update_user_streak: { Args: { p_user_id: string }; Returns: undefined }
-      xp_for_level: { Args: { lvl: number }; Returns: number }
     }
     Enums: {
       app_role: "admin" | "user"

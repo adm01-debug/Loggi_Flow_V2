@@ -5,12 +5,10 @@
     ],
     "generated_at": "2026-11-26",
     "anon_table_select": [
-        "account_lockouts",
         "achievements",
         "ai_chat_messages",
         "ai_delay_predictions",
         "alertas_custo",
-        "allowed_ips",
         "architecture_decisions",
         "audit_logs",
         "audit_logs_y2026m07",
@@ -46,8 +44,6 @@
         "db_slo_daily",
         "delay_predictions_history",
         "delivery_receipt_audit",
-        "driver_badges",
-        "email_verification_tokens",
         "entregas",
         "error_events",
         "feature_flags",
@@ -69,7 +65,6 @@
         "logistica_reversa",
         "mitigation_actions",
         "notificacoes_custo",
-        "notification_templates",
         "notifications",
         "ocorrencias",
         "password_reset_requests",
@@ -112,8 +107,6 @@
         "scheduled_reports",
         "security_events",
         "sla_alerts",
-        "system_adr",
-        "system_contract_schemas",
         "system_heartbeat",
         "system_integrity_logs",
         "tabelas_frete",
@@ -138,6 +131,6 @@
         "webhook_inbound_failures"
     ],
     "how_to_regenerate": "scripts/db-audit/grants-baseline.sql (E26)",
-    "service_role_execute_count": 112,
-    "authenticated_execute_count": 58
+    "service_role_execute_count": 107,
+    "authenticated_execute_count": 54
 }
