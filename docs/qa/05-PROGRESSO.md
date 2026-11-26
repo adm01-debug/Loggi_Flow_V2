@@ -5165,3 +5165,51 @@ migrations de DDL, que ficam **aguardando autorizacao** porque tocam o banco ofi
 0 funcao nova em #528, 7 funcoes intactas em #529, 0 job novo.
 
 **NAO VERIFICADO:** a execucao real das duas — depende da autorizacao acima.
+
+## Registro 2026-11-26 (8) - retencao, funcoes orfas e o EXECUTE que vinha de fabrica
+
+**Origem:** as duas migrations que aguardavam autorizacao (#528 e #529) foram aplicadas no banco oficial e,
+ao conferir o resultado, apareceu o `EXECUTE` publico que toda funcao nova herda de `pg_default_acl`.
+
+- **#528 aplicada** - `Aplicar Migration` (run 45816857417) criou `cleanup_old_contract_test_logs(days_to_keep integer)`
+  e agendou `cleanup-contract-test-logs-daily` (03:45) e `purge-webhook-inbound-failures-daily` (03:35); os dois
+  jobs existem em `cron.job` (ids 103 e 102).
+- **#529 aplicada** - `Aplicar Migration` (run 45817573616) removeu as 7 funcoes sem chamador: `pg_proc` devolve
+  0 linhas para as 7 e os 61 triggers de auditoria continuam intactos.
+- **Auditoria de grants/RLS no banco oficial** - 131 tabelas com RLS habilitado (0 sem), 0 views sem
+  `security_invoker`, 0 funcoes `SECURITY DEFINER` sem `search_path` fixo, 0 policies para `anon` e **7 funcoes
+  `SECURITY DEFINER` com `EXECUTE` para `anon`**: `alert_slow_queries(numeric)`,
+  `count_prediction_breach_days(numeric,text)`, `count_prediction_breach_days_bulk(jsonb)`,
+  `fn_valida_transicao_coleta(coleta_status,coleta_status)`, `fn_valida_transicao_entrega(entrega_status,entrega_status)`,
+  `fn_tr_valida_transicao_coleta()` e `fn_tr_valida_transicao_entrega()`.
+- **#532 aplicada** - 7 `REVOKE` fecharam o `EXECUTE` de `PUBLIC` e `anon`; `get_public_tracking(text)` continua
+  publica (e o unico consumidor anonimo legitimo), `authenticated` foi preservado nas duas `count_prediction_*`
+  porque `useAccuracyMetaCycle` as chama, e o job 52 do `pg_cron` (`nexus_slow_queries`) roda
+  `alert_slow_queries(500)` como `postgres`, sem depender do grant removido.
+- **#533 aplicada** - a causa raiz: no `pg_default_acl` do role `postgres`, schema `public`, toda **funcao nova**
+  nasce com `{postgres=X,anon=X,authenticated=X,service_role=X}` - revogar de `PUBLIC` nao tira o `EXECUTE` de
+  `anon`. A migration revoga `anon`/`authenticated` da funcao de retencao e, principalmente, aplica
+  `ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public REVOKE EXECUTE ON FUNCTIONS FROM anon`. A linha
+  equivalente `FOR ROLE supabase_admin` foi retirada: o usuario da migration nao e membro desse role
+  (`permission denied to change default privileges`), e o motivo ficou registrado no arquivo. O default de
+  **tabelas** continua com `anon=rm` de proposito: e o que o PostgREST precisa, e o RLS filtra as linhas.
+- **#531 (automacao `types-sync`)** - regerou `src/integrations/supabase/types.ts`, `supabase/schema-manifest.json`,
+  `supabase/schema-catalog.json` e `scripts/db-audit/grants-baseline.json` contra o banco oficial depois das quatro
+  migrations: o baseline agora lista **uma unica** funcao executavel por `anon` (`get_public_tracking(text)`),
+  contra 8 antes.
+- **#534 fechada** - era o mesmo baseline, escrito a mao; o `git diff` entre as duas branches no arquivo era
+  vazio. O artefato passou a ser gerado so pela automacao.
+- **#535 mergeada** - o job `Scripts Tests (Node 22)` estava vermelho desde a #522/#516: o catalogo de
+  `set_missing_secrets.sh` nao tinha `MELHOR_ENVIO_SANDBOX` (lido em `melhor-envio-api/index.ts:61`) e ainda
+  listava `MAPBOX_PUBLIC_TOKEN`, que nenhuma function le desde a migracao da `geocode-address` para Nominatim e
+  a remocao da `get-mapbox-token` (etapa 295 / S-08). Com o catalogo alinhado,
+  `node --test scripts/ops/set-missing-secrets.unit.mjs` = 93 pass / 0 fail.
+
+**Verificacao no catalogo do banco (nao em print):** `has_function_privilege('anon', ...)` = false nas 5
+testadas, `get_public_tracking` = true, `authenticated` = true nas duas `count_prediction_*`, `postgres` = true
+no `alert_slow_queries`; retencao com `service_role` = true e `anon`/`authenticated` = false; `acldefault` de
+funcoes novas sem `anon`.
+
+**Proximo passo conhecido:** toda funcao nova criada no schema `public` por outro role que nao `postgres`
+(por exemplo `supabase_admin`, usado pela plataforma) ainda segue o default dele - o `check-grants-fresh.mjs`
+acusa na hora em que acontecer.
