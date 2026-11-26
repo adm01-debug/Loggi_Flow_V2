@@ -5807,6 +5807,10 @@ export type Database = {
         Returns: boolean
       }
       check_and_alert_health_regression: { Args: never; Returns: Json }
+      cleanup_old_contract_test_logs: {
+        Args: { days_to_keep?: number }
+        Returns: number
+      }
       cleanup_old_delay_predictions: { Args: never; Returns: undefined }
       cleanup_old_health_snapshots: {
         Args: { days_to_keep?: number }
@@ -6462,7 +6466,6 @@ export type Database = {
         }
         Returns: boolean
       }
-      jsonb_recursive_merge: { Args: { a: Json; b: Json }; Returns: Json }
       mcp_exec: { Args: { max_rows?: number; sql: string }; Returns: Json }
       mcp_exec_many: {
         Args: { max_rows?: number; statements: string[] }
@@ -6501,10 +6504,6 @@ export type Database = {
       rte_rollup_slo_daily: { Args: { target_day?: string }; Returns: number }
       system_health_check: { Args: never; Returns: Json }
       update_user_streak: { Args: { p_user_id: string }; Returns: undefined }
-      validate_payload_schema: {
-        Args: { p_entity_name: string; p_payload: Json }
-        Returns: boolean
-      }
       xp_for_level: { Args: { lvl: number }; Returns: number }
     }
     Enums: {

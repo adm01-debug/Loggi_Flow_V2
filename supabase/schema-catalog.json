@@ -1604,6 +1604,7 @@
         "calculate_level",
         "cancel_long_running_query",
         "check_and_alert_health_regression",
+        "cleanup_old_contract_test_logs",
         "cleanup_old_delay_predictions",
         "cleanup_old_health_snapshots",
         "cleanup_old_notifications",
@@ -1663,7 +1664,6 @@
         "get_wraparound_status",
         "has_permission",
         "has_role",
-        "jsonb_recursive_merge",
         "mcp_exec",
         "mcp_exec_many",
         "measure_index_proposal_impact",
@@ -1679,10 +1679,9 @@
         "rte_rollup_slo_daily",
         "system_health_check",
         "update_user_streak",
-        "validate_payload_schema",
         "xp_for_level"
     ],
-    "generated_at": "2026-11-25",
+    "generated_at": "2026-11-26",
     "format_version": 2,
     "check_constraints": [
         "achievements.achievements_rarity_check:CHECK ((rarity = ANY (ARRAY['common'::text, 'rare'::text, 'epic'::text, 'legendary'::text])))",
@@ -1743,9 +1742,7 @@
     "how_to_regenerate": "scripts/db-audit/catalog.sql",
     "trigger_functions": [
         "audit_log_trigger",
-        "audit_trigger_func",
         "capture_index_proposal_baseline",
-        "fn_audit_trigger",
         "fn_tr_valida_transicao_coleta",
         "fn_tr_valida_transicao_entrega",
         "generate_coleta_numero",
@@ -1764,13 +1761,10 @@
         "notify_entrega_concluida",
         "notify_frete_interno_concluido",
         "notify_ocorrencia_registrada",
-        "tr_increment_version",
         "trigger_bitrix_alert_notification",
         "update_carrier_ranking",
         "update_comments_updated_at",
         "update_device_last_seen",
-        "update_fretes_internos_updated_at",
-        "update_performance_metrics",
         "update_updated_at_column",
         "update_user_rank",
         "validate_frete_values"
@@ -1784,6 +1778,7 @@
         "calculate_level(xp integer)->integer|kind=f",
         "cancel_long_running_query(p_pid integer, p_terminate boolean)->boolean|kind=f",
         "check_and_alert_health_regression()->jsonb|kind=f",
+        "cleanup_old_contract_test_logs(days_to_keep integer)->integer|kind=f",
         "cleanup_old_delay_predictions()->void|kind=f",
         "cleanup_old_health_snapshots(days_to_keep integer)->integer|kind=f",
         "cleanup_old_notifications(days_to_keep integer)->integer|kind=f",
@@ -1844,7 +1839,6 @@
         "get_wraparound_status(p_limit integer)->TABLE(schema_name text, table_name text, xid_age bigint, freeze_max_age bigint, pct_towards_wraparound numeric, last_autovacuum timestamp with time zone, table_size_bytes bigint, severity text, recommendation text)|kind=f",
         "has_permission(_user_id uuid, _permission_code text)->boolean|kind=f",
         "has_role(_user_id uuid, _role app_role)->boolean|kind=f",
-        "jsonb_recursive_merge(a jsonb, b jsonb)->jsonb|kind=f",
         "mcp_exec(sql text, max_rows integer)->jsonb|kind=f",
         "mcp_exec_many(statements text[], max_rows integer)->jsonb|kind=f",
         "measure_index_proposal_impact(p_id uuid)->jsonb|kind=f",
@@ -1860,7 +1854,6 @@
         "rte_rollup_slo_daily(target_day date)->integer|kind=f",
         "system_health_check()->jsonb|kind=f",
         "update_user_streak(p_user_id uuid)->void|kind=f",
-        "validate_payload_schema(p_entity_name text, p_payload jsonb)->boolean|kind=f",
         "xp_for_level(lvl integer)->integer|kind=f"
     ]
 }
