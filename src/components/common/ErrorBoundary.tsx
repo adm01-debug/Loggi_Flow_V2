@@ -3,6 +3,7 @@ import { RefreshCw, Home, ChevronLeft, ShieldAlert, LifeBuoy } from "lucide-reac
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import * as Sentry from "@sentry/react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Props {
   children: ReactNode;
@@ -33,6 +34,43 @@ export class ErrorBoundary extends Component<Props, State> {
     Sentry.captureException(error, {
       contexts: { react: { componentStack: errorInfo.componentStack } },
     });
+    this.registrarCrashEmTelemetria(error, errorInfo);
+  }
+
+  /**
+   * Etapa 285 do censo: crash de render passa a existir no banco, não só no
+   * console de quem caiu. Best-effort: a policy de INSERT de `telemetry_logs`
+   * exige sessão (`auth.uid() IS NOT NULL`), então erro em tela pública é
+   * recusado pelo RLS e sobra o Sentry/console — nunca quebra a tela de erro.
+   */
+  private registrarCrashEmTelemetria(error: Error, errorInfo: ErrorInfo) {
+    void supabase
+      .from("telemetry_logs")
+      .insert({
+        severity: "error",
+        category: "ui_crash",
+        message: error.message || error.name,
+        stack_trace: error.stack ?? null,
+        metadata: { componentStack: errorInfo.componentStack },
+        url: window.location.href,
+        device_info: {
+          userAgent: navigator.userAgent,
+          language: navigator.language,
+        },
+      })
+      .then(
+        ({ error: insertError }) => {
+          if (insertError) {
+            console.warn("Falha ao registrar crash em telemetry_logs:", insertError.message);
+          }
+        },
+        (falha: unknown) => {
+          console.warn(
+            "Falha ao registrar crash em telemetry_logs:",
+            falha instanceof Error ? falha.message : String(falha),
+          );
+        },
+      );
   }
 
   handleReset = () => {
