@@ -5269,3 +5269,21 @@ tela de integracao mostra a mensagem que a funcao devolveu (antes o supabase-js 
 **Nao e codigo, e credencial:** ate o dono colar o valor real em `supabase secrets set`, essas integracoes continuam
 sem funcionar; o que muda e que agora o sistema diz qual delas falta. O `set_missing_secrets.sh` ja recusava esses
 literais, entao o guard fecha o ciclo.
+## Registro 2026-11-26 (11) - Bitrix: erro do webhook deixa de ser opaco
+
+**Dor:** com uma URL de webhook salva em `bitrix_sync_config`, o `test-connection` devolvia `500 INTERNAL_ERROR` sem
+dizer o que aconteceu - nao havia como saber se o problema era a URL, o token ou a rede.
+
+**Causa raiz:** o `fetch` ao webhook do Bitrix nao tratava `response.ok` nem o formato da resposta; qualquer excecao
+caia no `catch` generico. O `safeFetch` tambem lanca `SSRFBlockedError` com a URL completa (com o token) na mensagem -
+por isso nada disso pode ser ecoado ao cliente.
+
+**Aplicado (PR #540, squash `7ef98efa7`):** `supabase/functions/bitrix24-integration/index.ts` passou a devolver 502
+com causa especifica: webhook inalcancavel, resposta HTML/texto (com o HTTP e a dica do sufixo `/rest/1/<token>/`) ou
+HTTP sem detalhe. Nenhuma mensagem inclui a URL. `tests/contracts/bitrix-webhook-erro-visivel.spec.ts` cobre as tres.
+
+**Prova em runtime (producao, depois do deploy `45843416591`):**
+- linha temporaria em `bitrix_sync_config` com `https://example.com` -> `502 webhook do Bitrix respondeu HTML/texto (HTTP 405): confira se a URL salva termina com /rest/1/<token>/`
+- linha removida (tabela de volta a 0 linhas) -> `500 BITRIX24_WEBHOOK_URL not configured`
+
+**Placar do plano:** 299/300 `[x]`; a unica pendente e a 286 (Sentry), que depende da DSN em maos do dono.
