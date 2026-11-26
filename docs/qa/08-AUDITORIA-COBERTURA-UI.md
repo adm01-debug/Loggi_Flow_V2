@@ -58,11 +58,11 @@ Nenhuma tabela, view ou função do banco ficou sem _nenhum_ consumidor. O que e
 | `mcp_exec_many`                     | `statements text[], max_rows integer`  | **MANTER** — interface do servidor MCP; `EXECUTE` só para `postgres` e `service_role` (não exposta a `anon`/`authenticated`)                                        |
 | `purge_webhook_inbound_failures`    | `_keep_days integer DEFAULT 90`        | **LIGAR** — ver achado colateral nº 1                                                                                                                               |
 | `validate_payload_schema`           | `p_entity_name text, p_payload jsonb`  | **REMOVER** — stub explícito: `RETURN TRUE` incondicional, com o próprio comentário do autor dizendo que a validação seria tratada nas edge functions; sem chamador |
-| `system_health_check`               | —                                      | **DECIDIR** — a saúde exibida em `/admin/db-health` vem de `persist_global_health_score` + `get_health_score_history_fast`, não desta função                        |
-| `get_dashboard_metrics_fast`        | —                                      | **DECIDIR** — RPC `SECURITY DEFINER` com `EXECUTE` para `authenticated` e nenhuma chamada no app                                                                    |
-| `get_carrier_performance_fast`      | —                                      | **DECIDIR** — mesma situação                                                                                                                                        |
-| `has_permission`                    | `_user_id uuid, _permission_code text` | **DECIDIR** — RBAC nunca ligado (junto com `organizations`)                                                                                                         |
-| `get_current_organization_id`       | —                                      | **DECIDIR** — idem                                                                                                                                                  |
+| `system_health_check` | - | **REMOVIDO** - devolvia `healthy`/`production-grade` fixos, sem medir nada (PR #547) |
+| `get_dashboard_metrics_fast` | - | **REMOVIDO** - wrapper `SECURITY DEFINER` sem chamador; a MV que ele lia nao tem outro leitor (PR #547) |
+| `get_carrier_performance_fast` | - | **REMOVIDO** - mesma situacao (PR #547) |
+| `has_permission` | `_user_id uuid, _permission_code text` | **MANTER** - camada RBAC/multi-tenant, mantida junto com `organizations` (0 chamador hoje) |
+| `get_current_organization_id` | - | **MANTER** - sustenta 3 policies ativas (`fretes_internos` SELECT/INSERT, `audit_logs` SELECT) |
 
 ## 3. Módulos de `src/` sem importador (6) — resolvidos
 
@@ -126,3 +126,26 @@ O último é o **veredicto da etapa 080**, que estava como "INDEFINIDO: aguarda 
    escopada, a conversa seguindo quando a gravacao falha e nenhuma consulta quando nao ha sessao.
 4. **Sem regressao:** falha de leitura ou gravacao nao interrompe o streaming; o usuario recebe um `toast` unico por
    sessao.
+
+## Adendo 2026-11-26 (4) - a camada "fast metrics" saiu do banco
+
+1. **Os tres vereditos DECIDIR de funcao viraram REMOVIDO** na migration
+   `20261126190000_remove_camada_fast_metrics_sem_leitor.sql` (PR #547): `system_health_check()`,
+   `get_dashboard_metrics_fast()` e `get_carrier_performance_fast()`.
+2. **`system_health_check()` mentia.** Devolvia `status: 'healthy'`, `database: 'online'`,
+   `env: 'production-grade'` e `audit_compliance: true` fixos, sem consultar nada. A tela `/admin/db-health`
+   usa `persist_global_health_score` + `get_health_score_history_fast`.
+3. **Os dois wrappers eram o unico leitor das MVs internas.** `internal.mv_dashboard_metrics` (1 linha) e
+   `internal.mv_carrier_performance` (5 linhas) existiam para acelerar o dashboard, mas o dashboard calcula
+   ao vivo nas tabelas. Sem os wrappers, o cron `refresh-dashboard-views-5m` (job 54, `*/5 * * * *`, 288
+   execucoes/dia, 57-329 ms cada) atualizaria MV sem leitor - por isso `refresh_dashboard_views()`, as duas
+   MVs e o job saem juntos.
+4. **As MVs nao devem virar UI.** Elas agregam `coletas`, `entregas` e `transportadoras` de todas as
+   organizacoes, sem filtro de RLS: expor o resultado a `authenticated` mostraria numero de outro tenant.
+   Manter o dashboard lendo as tabelas e decisao de seguranca, nao de performance.
+5. **`has_permission()` e `get_current_organization_id()` ficam** (mesma decisao do Adendo (2) item 5): a
+   segunda sustenta 3 policies ativas e as duas sao a camada RBAC/multi-tenant.
+6. **Rollback testado:** `supabase/rollbacks/20261126190000_rollback_remove_camada_fast_metrics.sql` rodou
+   junto com a migration dentro de uma transacao revertida no banco oficial - recriou as 2 MVs, os 3 indices,
+   as 4 funcoes com os grants originais e o cron; o `ROLLBACK` devolveu o estado anterior (4 funcoes, 2 MVs,
+   1 cron).

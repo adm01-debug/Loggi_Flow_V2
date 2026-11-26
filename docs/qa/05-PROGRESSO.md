@@ -5349,3 +5349,38 @@ registrada em `supabase_migrations.schema_migrations`.
 **Rollback testado de verdade:** `supabase/rollbacks/20261126170000_rollback_remove_tabelas_mortas.sql` rodado com
 `commit;` trocado por `rollback;` - recriou as 7 tabelas (sonda `RECRIADAS=7`), indices, 14 policies, grants, RLS e as
 3 linhas de fixture; o `ROLLBACK` devolveu o banco ao estado pos-migration.
+
+## Registro 2026-11-26 (15) - a camada fast-metrics sem leitor sai do banco (fecha a lista DECIDIR de funcao do doc 08)
+
+**Dor:** o censo de cobertura deixou 5 funcoes em DECIDIR. Uma delas, `system_health_check()`, respondia
+`status: healthy` e `env: production-grade` **fixos** - um "esta tudo bem" falso para qualquer monitor que a
+chamasse. As outras duas (`get_dashboard_metrics_fast` e `get_carrier_performance_fast`) eram wrappers
+`SECURITY DEFINER` com `EXECUTE` para `authenticated` e nenhum chamador, e sustentavam sozinhos duas MVs
+internas atualizadas a cada 5 minutos pelo cron `refresh-dashboard-views-5m` (job 54, 288 execucoes/dia).
+
+**Causa raiz:** a sprint 21 criou as MVs em `public` "para dashboards", a sprint 23 mudou para o schema
+`internal` com wrappers RPC, e o dashboard seguiu calculando ao vivo nas tabelas - sobrou a infraestrutura de
+leitura rapida sem leitor. `system_health_check` era um stub nunca ligado.
+
+**Aplicado (migration `20261126190000_remove_camada_fast_metrics_sem_leitor.sql`):** `drop function` para
+`system_health_check`, `get_carrier_performance_fast`, `get_dashboard_metrics_fast` e
+`refresh_dashboard_views`; `cron.unschedule('refresh-dashboard-views-5m')` com `raise exception` se o job
+sobreviver (sem silencio); `drop materialized view` para `internal.mv_dashboard_metrics` e
+`internal.mv_carrier_performance`. Sem `CASCADE`.
+
+**Conferido no catalogo de producao antes do `DROP`:** 0 mencao em `src/`, `supabase/functions/`, `tests/` e
+`scripts/`; 0 `cron.job` citando as funcoes; 0 corpo de outra funcao; 0 policy; 0 trigger; sobre as MVs
+apenas os proprios indices; nenhuma view em `public` depende do schema `internal`.
+
+**Fica, por decisao registrada:** `has_permission()` e `get_current_organization_id()` - a segunda sustenta 3
+policies ativas (`fretes_internos` SELECT/INSERT, `audit_logs` SELECT) e as duas sao a camada RBAC/multi-tenant
+(apagar isso e mudanca de arquitetura, nao limpeza).
+
+**Verificado de verdade:** migration **e** rollback rodados no banco oficial dentro de uma transacao revertida
+(`begin; ... rollback;`) - depois da migration `funcoes=0`, `mvs=0`, `cron=0`; depois do rollback `funcoes=4`,
+`mvs=mv_dashboard_metrics,mv_carrier_performance`, `cron=1`, 3 indices recriados e MVs repovoadas; estado final
+fora da transacao igual ao inicial.
+
+**Rollback:** `supabase/rollbacks/20261126190000_rollback_remove_camada_fast_metrics.sql` (DDL das MVs verbatim
+da migration `20260712110919`, nomes de indice iguais aos do banco real, grants originais e o cron de 5 min).
+
