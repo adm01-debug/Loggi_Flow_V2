@@ -5498,3 +5498,29 @@ Nenhuma dessas funcoes aparece em `src/`, `supabase/functions/` ou `scripts/`.
 observavel. Fica registrado no Adendo 7 do doc 08.
 
 **Censo:** com isso a lista DECIDIR do doc 08 fica sem pendencia (decisoes 1, 2, 2b, 3, 4 e 5 fechadas).
+
+## Registro 2026-11-26 (21) - reauditoria de todas as PRs fechadas e branches, arquivo a arquivo
+
+**O que foi feito:** a reauditoria que o dono exigiu antes de apagar qualquer branch ou PR - nenhum trabalho de
+agente pode se perder, nem parcial. Resultado completo na secao 13 do `07-AUDITORIA-BRANCHES.md`; aqui fica o
+resumo e o numero que importa.
+
+**Universo medido** (`main` em `169ad92b2`): 544 PRs (481 mergeadas, 49 fechadas sem merge, 14 abertas), 16
+branches remotas (`main`, `contexto` gerada, 14 `dependabot/*`), 0 stashes, arvore limpa.
+
+**Metodo:** para cada PR, `fetch pull/N/head`, `merge-base` com `origin/main`, lista dos arquivos que a PR muda e
+`git diff --quiet refs/tmp/prN origin/main -- arquivo` arquivo por arquivo; divergente lido lado a lado e comparado
+com o ultimo commit da `main` que toca o arquivo.
+
+**Resultado:** das 49 fechadas sem merge, 28 sao do dependabot e nenhuma delas toca algo alem de `package.json`,
+`package-lock.json` e workflows - nao existe codigo, SQL, migration ou tela em PR de dependabot, logo nao ha
+trabalho a recuperar. As 21 restantes: 12 tem conteudo identico ou so documentacao, e 9 tem na `main` uma versao
+**posterior** ao commit da PR e mais completa (`content_hash.sql`, `manifest_summary.sql`, `.gitattributes`,
+`ratchet-warning-budget.mjs`, `set_missing_secrets.sh`, `pos_deploy_functions.sql`, `seed-database.ts`,
+`config.toml`, telas de erro de Clientes/Fornecedores/Envios/FretesInternos, `vitest.config.ts`,
+`grants-baseline.json`). Os tres workflows da #501 tambem ja nao afirmam que o repositorio e privado
+(`git grep -ci "privado\|private" .github/workflows` = 0).
+
+**Consequencia pratica:** nada fora da `main` precisa ser apagado para "nao perder trabalho" - o que sobra e bot
+(14 PRs abertas de bump, 13 verdes e a #491 de `react-i18next` 17 -> 18 vermelha) ou branch gerada por workflow.
+Nenhuma branch remota guarda commit de agente que nao tenha entrado por squash-merge.
