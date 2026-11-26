@@ -5102,3 +5102,29 @@ Contadores apos esta etapa (grep em `docs/qa/05-PROGRESSO.md`): **296 `[x]` / 4 
   `VITE_SENTRY_DSN`.
 
 Contadores apos estas etapas (grep em `docs/qa/05-PROGRESSO.md`): **299 `[x]` / 1 `[~]`**.
+
+## Registro 2026-11-26 (5) - etapa 300: o relatorio final reconferido contra a `main` de hoje
+
+O `docs/qa/06-RELATORIO-FINAL.md` foi reescrito sobre `9bf8bac6a` (era `7f22b1c57`, de 25/11, dizendo 278
+concluidas e 22 esperando voce). Agora ele conta o estado real: **299 `[x]` / 1 `[~]`**, e a unica que sobra e
+a 286 (Sentry), que nao depende de codigo.
+
+O que a versao nova registra como fechado desde 25/11: unicidade do codigo de rastreio (027, PR #473), remocao
+de `reconcile_pending_freights()` (070), schema real entregue aos agentes (263), contratos de automacao (272,
+274, 016, 017), Melhor Envio e gravacao da cotacao provada ponta a ponta (008, 039, 041) e as suites E2E
+reescritas (283, PR #523). A decisao que sobra em CI e a **PR #524** (workflow de E2E), que e Regra 8.
+
+Os numeros da secao 5 foram remedidos hoje em vez de reaproveitados: `tsc` 0 erro, lint **78 avisos / 0 erro**
+(teto 80/80), **112 arquivos / 1010 testes**, cobertura 77,78 / 72,24 / 75,16 / 79,88 e RLS/seguranca 19/19. Os
+itens de `inventario/estado/*` seguem de 2026-11-24 e o documento agora diz isso explicitamente, em vez de
+apresenta-los como medicao do commit atual.
+
+Contagem de achados refeita pelos marcadores do corpo de `03-ACHADOS.md` (ultimo `**Estado (...)**` de cada
+`H-`): **7 resolvidos / 4 parciais / 4 abertos**, de 15. O cabecalho daquele arquivo ainda traz o numero
+antigo - e a proxima correcao de doc, nao um achado novo.
+
+**Prova:** `npx vitest run --coverage` -> `112 passed / 1010 passed`; `npm run lint:budget` -> `OK` nos tres
+tetos; `npx vitest run tests/security/` -> `19 passed`.
+
+**NAO VERIFICADO:** (1) o efeito do job de E2E depois de mergeado, que so se confirma em push futuro da
+`main`; (2) os valores de painel (S-05, S-08) e o DSN do Sentry, que nao sao legiveis do repositorio.
