@@ -7,6 +7,7 @@ import { requireRole } from "../_shared/auth.ts";
 import { checkRateLimit } from "../_shared/rateLimiter.ts";
 import { ValidationError, validationErrorResponse } from "../_shared/validate.ts";
 import { parseMelhorEnvioQuote } from "./parse.ts";
+import { resolveMelhorEnvioAmbiente } from "./ambiente.ts";
 
 const SANDBOX_URL = "https://sandbox.melhorenvio.com.br/api/v2";
 const PRODUCTION_URL = "https://melhorenvio.com.br/api/v2";
@@ -51,6 +52,23 @@ Deno.serve(async (req) => {
       );
     }
 
+    const body = await req.json();
+    const { action, params, useSandbox } = body ?? {};
+
+    // Etapa 008: quem decide o ambiente e o servidor. A acao `ambiente` so devolve a configuracao - nao
+    // chama o parceiro nem depende do token -, para o aviso do painel nao mentir quando falta credencial.
+    const ambiente = resolveMelhorEnvioAmbiente({
+      sandbox: Deno.env.get("MELHOR_ENVIO_SANDBOX"),
+      supabaseUrl: Deno.env.get("SUPABASE_URL"),
+    });
+
+    if (action === "ambiente") {
+      return new Response(
+        JSON.stringify({ ambiente }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const token = Deno.env.get("MELHOR_ENVIO_TOKEN");
     if (!token) {
       return new Response(
@@ -59,9 +77,15 @@ Deno.serve(async (req) => {
       );
     }
 
-    const body = await req.json();
-    const { action, params, useSandbox = true } = body;
-    const baseUrl = useSandbox ? SANDBOX_URL : PRODUCTION_URL;
+    // Campo aceito por compatibilidade e ignorado de proposito: o log aponta quem ainda o envia.
+    if (typeof useSandbox === "boolean") {
+      log.info("melhor-envio: campo useSandbox do corpo ignorado (o ambiente vem do servidor)", {
+        useSandbox,
+        ambiente,
+      });
+    }
+
+    const baseUrl = ambiente === "sandbox" ? SANDBOX_URL : PRODUCTION_URL;
 
     const headers: Record<string, string> = {
       "Accept": "application/json",

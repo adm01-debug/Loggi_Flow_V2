@@ -36,7 +36,7 @@
 - [x] **005** — `webhook-status`: filtrar `client_webhooks` por dono e registrar quem disparou — onda 1 — Alta
 - [x] **006** — `evolution-whatsapp`: exigir papel para enviar mensagem — onda 1 — Alta · **aguarda o dono** — **feito: `requireRole(req, ["admin", "user"])` em `supabase/functions/evolution-whatsapp/index.ts:49`; sem token, `POST /functions/v1/evolution-whatsapp` -> **401****
 - [x] **007** — `evolution-whatsapp`: registrar quem enviou cada mensagem — onda 1 — Média
-- [~] **008** — `melhor-envio-api`: o ambiente (produção/teste) passa a ser decidido pelo servidor — onda 1 — Alta · **aguarda o dono** — **aguarda o dono: **nao e so engenharia**. O cliente escolhe o ambiente (`useSandbox` do corpo) e o front manda `true` por padrao (`src/hooks/logistics/useMelhorEnvio.tsx:80`, `useLocalStorage('me-sandbox-mode', true)`), ou seja, hoje as telas de etiqueta/carrinho/rastreio falam com o **sandbox**. Fazer o servidor decidir muda o comportamento ao vivo (etiqueta paga de verdade) e pode exigir secret novo - precisa da sua decisao de negocio**
+- [x] **008** — `melhor-envio-api`: o ambiente (produção/teste) passa a ser decidido pelo servidor — onda 1 — Alta · **feito em `claude/feat-melhor-envio-ambiente-261126-0835`** — servidor decide: `resolveMelhorEnvioAmbiente` lê `MELHOR_ENVIO_SANDBOX`, padrão **produção** e recusa sandbox no projeto de produção; `useSandbox` do corpo ignorado com log; o painel mostra o ambiente que a ação `ambiente` responde. Contrato `tests/contracts/melhor-envio-ambiente.spec.ts`
 - [x] **009** — `melhor-envio-api`: exigir papel para cotar — onda 1 — Alta · **aguarda o dono** — **feito nesta PR: `melhor-envio-api` passou de `requireUser` para `requireRole(req, ["admin", "user"])`; banco tem 7 usuarios e **7 com papel** (`user` 6, `admin` 3), entao ninguem perde acesso; sem token o endpoint segue **401****
 - [x] **010** — Confirmar com o dono que `ALLOW_TEST_MODE` não está ligado em produção — onda 1 — Crítica (se ligado) — **fechada em 2026-11-25 por comportamento**: `POST /functions/v1/lalamove-webhook` e `POST /functions/v1/rodonaves-webhook` com `x-test-mode: true` e **sem** assinatura responderam **401** nos dois (dois webhooks `verify_jwt = false`, então o 401 é da guarda de HMAC). O bypass só acontece com `ALLOW_TEST_MODE === 'true'` **e** o header (`lalamove-webhook/index.ts:89-90`, `rodonaves-webhook/index.ts:64-77`): está desligado. A variável **existe** entre os secrets do projeto, então a 011 (guarda permanente) continua valendo.
 - [x] **011** — Fazer o modo de teste dos webhooks impossível de ligar por engano em produção — onda 1 — Média · **aguarda o dono** — **feito: `_shared/testMode.ts` recusa o bypass quando `SUPABASE_URL` e a producao `jvfhclubfpxrtrrazrgr`; 5 testes Deno verdes; PR #510 (`7c190c7ad`)**
@@ -5036,3 +5036,23 @@ Contadores apos esta etapa (grep em `docs/qa/05-PROGRESSO.md`): **292 `[x]` / 8 
   pergunta nem "corrigir" a documentacao de volta para privado.
 
 Contadores apos estas etapas (grep em `docs/qa/05-PROGRESSO.md`): **295 `[x]` / 5 `[~]`**.
+
+## Registro 2026-11-26 (3) - etapa 008: o ambiente do Melhor Envio passa a ser do servidor
+
+- **O que mudou:** `supabase/functions/melhor-envio-api/ambiente.ts` (novo) resolve o ambiente. O
+  `index.ts` deixou de ler `useSandbox` do corpo - o campo continua aceito e vira log quando vem - e ganhou
+  a acao `ambiente`, que responde `{ ambiente }` antes da checagem de token, para o aviso do painel nao
+  mentir quando falta credencial. Regra: **producao**, exceto `MELHOR_ENVIO_SANDBOX=true` **e** fora do
+  projeto de producao (`PRODUCTION_PROJECT_REF`), a mesma trava de `_shared/testMode.ts`.
+- **Front:** `useMelhorEnvio.tsx` e `useIntegrationValidation.tsx` param de enviar o campo;
+  `GestaoMelhorEnvio.tsx` troca o `Switch` "Sandbox" - que mentia, porque o servidor ignorava o campo - por
+  um selo com o ambiente que o servidor responde.
+- **Por que agora:** o dono liberou a producao do Melhor Envio em 2026-11-26 (decisao de negocio). Ate aqui
+  as telas de etiqueta, carrinho e rastreamento falavam com o sandbox sem ninguem ter escolhido isso.
+- **Prova:** contrato `tests/contracts/melhor-envio-ambiente.spec.ts` (resolver + leitura da fonte do
+  handler + front sem o campo), suite completa 111 arquivos / 1005 testes, `npx tsc --noEmit` e `npx eslint`
+  dos arquivos tocados (0 erros, 0 avisos novos).
+- **NAO VERIFICADO:** etiqueta real (exige saldo na conta Melhor Envio) e a resposta ao vivo da acao
+  `ambiente` com JWT de `admin`/`user` - sem login com papel nao ha como assinar a chamada.
+
+Contadores apos esta etapa (grep em `docs/qa/05-PROGRESSO.md`): **296 `[x]` / 4 `[~]`**.

@@ -87,7 +87,7 @@ export function useIntegrationValidation() {
   const validateMelhorEnvio = useCallback(async (): Promise<IntegrationStatus> => {
     try {
       const { error } = await supabase.functions.invoke('melhor-envio-api', {
-        body: { action: 'infoUsuario', useSandbox: true },
+        body: { action: 'infoUsuario' },
       });
       if (error) return { name: 'Melhor Envio', status: 'error', message: error.message };
       return { name: 'Melhor Envio', status: 'connected', lastCheck: new Date() };

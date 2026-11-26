@@ -42,7 +42,7 @@ o webhook passa a responder 401 e ninguém olha. Teste com request real antes de
 |---|---|---|---|
 | **Lalamove** | `lalamove-api`, `lalamove-tracking`, `lalamove-webhook` | `LALAMOVE_API_KEY`, `LALAMOVE_API_SECRET`, `LALAMOVE_BASE_URL` | produção em `https://rest.lalamove.com`; webhook com HMAC |
 | **Rodonaves (RTE)** | `rodonaves-api`, `rodonaves-webhook` | `RODONAVES_USERNAME`, `RODONAVES_PASSWORD`, `RODONAVES_CNPJ_REMETENTE`, `RODONAVES_WEBHOOK_SECRET` | contrato em `docs/rodonaves_tracking_openapi_v1.27.3.json` e `docs/ANALISE_API_RODONAVES.md`; front em `src/components/rodonaves/` + `src/lib/rodonaves/`; jobs `rte-gateway-health-check`/`rte-slo-daily-rollup` monitoram o gateway |
-| **Melhor Envio** | `melhor-envio-api` | `MELHOR_ENVIO_TOKEN` | front em `src/components/melhorenvio/` |
+| **Melhor Envio** | `melhor-envio-api` | `MELHOR_ENVIO_TOKEN`, `MELHOR_ENVIO_SANDBOX` | ambiente decidido no servidor: produção por padrão, sandbox só com `MELHOR_ENVIO_SANDBOX=true` fora do projeto de produção (etapa 008) · front em `src/components/melhorenvio/` |
 | **Cotação multicanal** | `smart-carrier-selection`, `normalize-freight-response` | `OPENAI_API_KEY` (normalização) | páginas `src/pages/cotacao-multicanal/` e `dashboard-cotacoes/` |
 
 ## CRM, mensageria e e-mail

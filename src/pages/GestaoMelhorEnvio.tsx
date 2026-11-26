@@ -6,15 +6,40 @@ import { MECotacaoPanel, MECarrinhoPanel, MEEtiquetasPanel, MERastreamentoPanel,
 import { MEWebhookPanel } from '@/components/melhorenvio/MEWebhookPanel';
 import { Calculator, ShoppingCart, Tag, MapPin, Truck, User, Store, Package2, Webhook } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { useLocalStorage } from "@/hooks/common/useLocalStorage";
 import { useKeyboardShortcut } from "@/hooks/common/useKeyboardShortcuts";
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+
+const AMBIENTE_BADGE = {
+  producao: '🚀 Produção',
+  sandbox: '🧪 Ambiente de Testes',
+  desconhecido: '⚠️ Ambiente não confirmado',
+} as const;
 
 export default function GestaoMelhorEnvio() {
-  const [useSandbox, setUseSandbox] = useLocalStorage('me-sandbox-mode', true);
   const [activeTab, setActiveTab] = useState<string>('cotacao');
+  // Etapa 008: o ambiente e do servidor. Este selo so mostra o que a acao `ambiente` responde - o
+  // interruptor que existia aqui era mentira, porque o campo do corpo era ignorado.
+  const [ambiente, setAmbiente] = useState<'producao' | 'sandbox' | 'desconhecido'>('desconhecido');
+
+  useEffect(() => {
+    let ativo = true;
+    supabase.functions
+      .invoke('melhor-envio-api', { body: { action: 'ambiente' } })
+      .then(({ data, error }) => {
+        if (!ativo) return;
+        const valor = (data as { ambiente?: string } | null)?.ambiente;
+        setAmbiente(
+          !error && (valor === 'producao' || valor === 'sandbox') ? valor : 'desconhecido',
+        );
+      })
+      .catch(() => {
+        if (ativo) setAmbiente('desconhecido');
+      });
+    return () => {
+      ativo = false;
+    };
+  }, []);
 
   // Keyboard shortcuts for tab switching
   useKeyboardShortcut('1', useCallback(() => setActiveTab('cotacao'), []), { alt: true });
@@ -43,14 +68,14 @@ export default function GestaoMelhorEnvio() {
         />
 
         <div className="flex items-center gap-3 mb-2">
-          <div className="flex items-center gap-2">
-            <Switch checked={useSandbox} onCheckedChange={setUseSandbox} />
-            <Label className="text-sm cursor-pointer">Sandbox</Label>
-          </div>
-          <Badge variant={useSandbox ? 'outline' : 'default'} className="text-xs">
-            {useSandbox ? '🧪 Ambiente de Testes' : '🚀 Produção'}
+          <Badge
+            variant={ambiente === 'producao' ? 'default' : 'outline'}
+            className="text-xs"
+            title="Definido no servidor (MELHOR_ENVIO_SANDBOX)"
+          >
+            {AMBIENTE_BADGE[ambiente]}
           </Badge>
-          {!useSandbox && (
+          {ambiente === 'producao' && (
             <span className="text-xs text-destructive font-medium">Ações terão efeito real!</span>
           )}
         </div>

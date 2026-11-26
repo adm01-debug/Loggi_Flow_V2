@@ -149,7 +149,11 @@ ir para o ambiente errado, gerando cotação ou etiqueta inválida.
 
 → Etapas **008**, **009**
 
-**Estado (2026-11-24):** ABERTO (008, 009 — aguarda o dono).
+**Estado (2026-11-26):** FECHADO (008 e 009). O `melhor-envio-api` exige papel
+(`requireRole(["admin", "user"])`, etapa 009) e o ambiente vem do servidor: `resolveMelhorEnvioAmbiente`
+(`supabase/functions/melhor-envio-api/ambiente.ts`) lê `MELHOR_ENVIO_SANDBOX`, responde **produção** por
+padrão e recusa o sandbox dentro do projeto de produção; o campo `useSandbox` do corpo continua aceito e é
+**ignorado com log** (etapa 008). Contrato: `tests/contracts/melhor-envio-ambiente.spec.ts`.
 
 ## S-05 — Modo de teste dos webhooks pula o HMAC e grava de verdade
 

@@ -3,7 +3,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from "@/hooks/auth/useAuth";
 import { toast } from 'sonner';
-import { useLocalStorage } from "@/hooks/common/useLocalStorage";
 
 // --- Singleton: todas as instâncias do hook compartilham um único health check ---
 // Evita N chamadas simultâneas quando N componentes usam useMelhorEnvio().
@@ -22,13 +21,10 @@ let _meAvailable = _healthCache.ok;
 
 // Helper to chamar a edge function. Quando recebe "MELHOR_ENVIO_TOKEN not
 // configured", marca indisponibilidade e persiste no sessionStorage.
-async function meApi(
-  action: string,
-  params: Record<string, unknown>,
-  useSandbox: boolean,
-) {
+async function meApi(action: string, params: Record<string, unknown>) {
   const { data, error } = await supabase.functions.invoke('melhor-envio-api', {
-    body: { action, params, useSandbox },
+    // O ambiente (producao/teste) e decisao do servidor (etapa 008), nao do corpo da request.
+    body: { action, params },
   });
   if (error) throw new Error(error.message);
   if (data?.error) {
@@ -77,7 +73,6 @@ export function useMelhorEnvio() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const enabled = !!user?.id;
-  const [useSandbox] = useLocalStorage('me-sandbox-mode', true);
 
   // Todas as instâncias observam o mesmo snapshot — não importa quantos
   // componentes usem o hook na mesma página.
@@ -94,7 +89,7 @@ export function useMelhorEnvio() {
     queryFn: async () => {
       try {
         const { data, error } = await supabase.functions.invoke('melhor-envio-api', {
-          body: { action: 'infoUsuario', params: {}, useSandbox },
+          body: { action: 'infoUsuario', params: {} },
         });
         if (error) throw new Error(error.message);
         if (data?.error) throw new Error(String(data.error));
@@ -117,7 +112,7 @@ export function useMelhorEnvio() {
   });
 
   const api = (action: string, params: Record<string, unknown> = {}) =>
-    meApi(action, params, useSandbox);
+    meApi(action, params);
 
   // === COTAÇÃO ===
   const calcularFrete = useMutation({
