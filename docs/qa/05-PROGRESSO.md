@@ -5233,3 +5233,39 @@ zero arquivos em `src/` citavam `business_rules_config`.
 **Achado que fica aberto:** das 25 chaves de `business_rules_config`, 22 nao sao lidas em lugar nenhum - zero
 ocorrencias em `src/` e `supabase/functions/`, e nenhuma funcao/view do banco as referencia (unica citacao e a
 migration que criou a tabela). XP, SLA, OTIF e limites de alerta estao no banco e nao tem efeito.
+
+## Registro 2026-11-26 (10) - os 13 segredos que estavam com o literal `PLACEHOLDER_NEEDS_SETUP`
+
+**Como apareceu:** a sonda de runtime do Bitrix (`POST /functions/v1/bitrix24-integration` com
+`{"action":"test-connection"}`) respondia `500 {"success":false,"error":"INTERNAL_ERROR"}` e a tela de integracao so
+mostrava erro interno - o operador nao tinha como saber qual credencial faltava.
+
+**Prova (sem ler nenhum valor):** `supabase secrets list --project-ref jvfhclubfpxrtrrazrgr` mostra o digest de cada
+segredo, e `sha256("PLACEHOLDER_NEEDS_SETUP") = 5c6bf8d4020333ea13342e62560fc92f2ab73899901c49cecd60ad72dd979a39`.
+Treze segredos de producao tem exatamente esse digest:
+
+| Segredo | Integracao que para |
+| --- | --- |
+| `BITRIX24_WEBHOOK_URL` | CRM Bitrix24 (sync de negocios, SPAs, ocorrencias) |
+| `MELHOR_ENVIO_TOKEN` | cotacao e etiqueta (etapa 008) |
+| `LALAMOVE_API_KEY`, `LALAMOVE_API_SECRET` | cotacao/rastreio Lalamove |
+| `RODONAVES_USERNAME`, `RODONAVES_PASSWORD`, `RODONAVES_CNPJ_REMETENTE` | cotacao Rodonaves |
+| `OPENAI_API_KEY` | analise de frete (`normalize-freight-response`) e Nexus |
+| `OPENWEATHER_API_KEY` | clima (`get-weather-data`) |
+| `ATICKET_API_KEY` | atendimento |
+| `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | cache/idempotencia (`_shared/redis`) |
+| `SECURITY_SLACK_WEBHOOK_URL` | alerta de seguranca (`log-security-event`) |
+
+**Causa raiz:** o guard dos nove pontos era `if (!valor)`. O placeholder e uma string nao vazia, entao passava, o
+parceiro respondia erro e o `catch` generico devolvia `INTERNAL_ERROR`. No Bitrix havia um segundo efeito: como a env
+existe, o fallback para a tabela `bitrix_sync_config` nunca rodava - a tela de configuracao ficava sem efeito em
+producao.
+
+**Aplicado (PR #539):** `supabase/functions/_shared/secretConfig.ts` centraliza `isSecretConfigured` com a mesma
+semantica de `eh_placeholder` (`scripts/ops/set_missing_secrets.sh`): vazio, `<entre_sinais>` ou contendo
+"placeholder" = nao configurado. Os nove pontos passaram a usar o guard, o Bitrix consulta `bitrix_sync_config` e a
+tela de integracao mostra a mensagem que a funcao devolveu (antes o supabase-js so expunha "non-2xx").
+
+**Nao e codigo, e credencial:** ate o dono colar o valor real em `supabase secrets set`, essas integracoes continuam
+sem funcionar; o que muda e que agora o sistema diz qual delas falta. O `set_missing_secrets.sh` ja recusava esses
+literais, entao o guard fecha o ciclo.

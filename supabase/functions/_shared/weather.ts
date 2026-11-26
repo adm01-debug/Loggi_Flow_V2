@@ -7,6 +7,7 @@
 
 import { safeFetch } from "./safeFetch.ts";
 import { log } from "./logger.ts";
+import { isSecretConfigured } from "./secretConfig.ts";
 
 const OPENWEATHER_HOST = "api.openweathermap.org";
 
@@ -66,7 +67,7 @@ export async function getWeather(
   lon: number,
 ): Promise<WeatherSnapshot> {
   const key = Deno.env.get("OPENWEATHER_API_KEY");
-  if (!key) {
+  if (!isSecretConfigured(key)) {
     return {
       available: false,
       summary: "Clima não avaliado (OPENWEATHER_API_KEY ausente)",

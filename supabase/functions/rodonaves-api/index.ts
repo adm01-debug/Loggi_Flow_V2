@@ -12,6 +12,7 @@ import { getCircuitBreaker } from "../_shared/circuitBreaker.ts";
 import { getRedisClient } from "../_shared/redis.ts";
 import { log } from "../_shared/logger.ts";
 import { internalErrorResponse } from "../_shared/httpError.ts";
+import { isSecretConfigured } from "../_shared/secretConfig.ts";
 import {
   mapWithLimit,
   withFallback,
@@ -129,7 +130,7 @@ async function getToken(gateway: string): Promise<string> {
 
   const username = Deno.env.get("RODONAVES_USERNAME");
   const password = Deno.env.get("RODONAVES_PASSWORD");
-  if (!username || !password)
+  if (!isSecretConfigured(username) || !isSecretConfigured(password))
     throw new Error("RODONAVES credentials not configured");
 
   const response = await fetchWithTimeout(gateway, `${gateway}/token`, {

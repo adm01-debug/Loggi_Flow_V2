@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
 import { safeFetch } from "../_shared/safeFetch.ts";
 import { log } from "../_shared/logger.ts";
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { isSecretConfigured } from "../_shared/secretConfig.ts";
 
 serve(async (req) => {
   const headers = getCorsHeaders(req);
@@ -17,7 +18,7 @@ serve(async (req) => {
     );
 
     const WEATHER_API_KEY = Deno.env.get("OPENWEATHER_API_KEY");
-    if (!WEATHER_API_KEY) {
+    if (!isSecretConfigured(WEATHER_API_KEY)) {
       throw new Error("Missing OPENWEATHER_API_KEY");
     }
 
