@@ -8,7 +8,7 @@ on:
 
 permissions:
   contents: read
-  pull-requests: read # gitleaks lê os commits do PR (repo privado exige permissão explícita)
+  pull-requests: read # gitleaks lê os commits do PR pela API (o repo é publico; a permissão vale nos dois casos)
 
 # Um push novo no mesmo ref cancela o run anterior em vez de empilhar.
 # Sem isto, cada push cria 7 jobs novos e a fila cresce linearmente.

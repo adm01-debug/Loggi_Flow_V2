@@ -363,8 +363,8 @@ jobs:
           if [ "${{ needs.ler-banco.outputs.manifest_changed }}" = true ]; then cp /tmp/manifest.new.json supabase/schema-manifest.json; fi
           if [ "${{ needs.ler-banco.outputs.grants_changed }}" = true ]; then cp /tmp/grants.new.json scripts/db-audit/grants-baseline.json; fi
 
-      # npm, como o resto da CI: o bun.lock deste repo esta defasado do package.json e `bun install
-      # --frozen-lockfile` falha ("lockfile had changes, but lockfile is frozen").
+      # npm, como o resto da CI. Os locks do bun sairam do repo na etapa 272, entao nao ha mais
+      # `bun install --frozen-lockfile` para falhar por lockfile defasado.
       - name: Setup Node
         if: needs.ler-banco.outputs.schema_changed == 'true'
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0

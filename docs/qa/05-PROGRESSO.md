@@ -44,7 +44,7 @@
 - [x] **013** — `health-check`: parar de chamar a API administrativa de usuários e exigir sessão — onda 1 — Média
 - [x] **014** — Decidir com o dono qual dos dois endpoints de saúde fica aberto e fechar o outro no `config.toml` — onda 1 — Média · **aguarda o dono** — **decidido: **`health` fica aberto** (liveness, 200 medido) e **`health-check` fica autenticado** (`requireUser` na linha 12, 401 medido) - os dois servem a coisas diferentes, entao nenhum e fechado; nesta PR o `health` deixou de devolver a mensagem crua do banco no corpo publico**
 - [x] **015** — Tirar o `.env` do controle de versão, sem reescrever histórico — onda 1 — Alta
-- [~] **016** — Corrigir o `AGENTS.md` e o comentário da CI que afirmam que o repositório é privado — onda 1 — Alta · **aguarda o dono**
+- [~] **016** — Corrigir o `AGENTS.md` e o comentário da CI que afirmam que o repositório é privado — onda 1 — Alta · **código pronto, falta só a autorização do dono (Regra 8)**: o `AGENTS.md:56` já dizia “publico”; os três comentários que repetiam “repo privado” (`ci.yml:11`, `security.yml:13`, `contexto-ia.yml:99-101`) e o `docs/agentes/github-ci.md:73` foram corrigidos na PR #519; a PR toca `.github/workflows/`, então não entrou sem o seu ok
 - [~] **017** — Levar ao dono a decisão sobre a visibilidade do repositório — onda 1 — Alta · **aguarda o dono**
 - [x] **018** — Transformar "não commite `.env`" em teste automático — onda 1 — Média · **feito — gate `scripts/ci/check-env-not-tracked.mjs` ligado em `ci.yml`; PR #438 mergeada em `7097e7ac`**
 - [x] **019** — Mapbox: confirmar a restrição do token e remover a variável que ninguém mais usa — onda 1 — Média · — **fechada em 2026-11-25**: `VITE_MAPBOX_TOKEN` removida do `.env.example` e a menção corrigida em `docs/agentes/deploy.md` e `docs/agentes/integracoes.md`; nenhum arquivo do front lê a variável (mapas usam `src/lib/mapStyles.ts`, sem token)
@@ -131,15 +131,15 @@
 - [x] **079** — Teste unitário da validação de assinatura de arquivo — onda 4 — Média
 - [x] **080** — Provar, arquivo por arquivo, quais dos oito "hooks sem importador" estão realmente mortos — onda 4 — Baixa
   <!-- Veredictos (261123):
-                          1. components/accessibility/index.ts — VIVO por caminho direto (SkipLinks, LiveRegionProvider, ReducedMotionProvider importados em MainLayout.tsx:13, LazyProviders.tsx:8-9)
-                          2. components/common/index.ts — VIVO (barril; exports EmptyState, ConfirmDialog, Pagination… em uso por caminhos diretos)
-                          3. components/pwa/index.ts — VIVO por caminho direto (OfflineBanner, InstallPrompt, UpdatePrompt em MainLayout.tsx:14,47,52)
-                          4. hooks/gamification/useGamification.ts — VIVO (importado por GamificationPanel, LevelUpModal, AppSidebar, Header, FavoriteMetricsBar via caminho sem extensão)
-                             hooks/gamification/useGamification.tsx — INDEFINIDO: 349 linhas vs .ts 259, implementações divergem; comentário P18 em authService.ts:43 indica .tsx como schema em uso; aguarda decisão do dono
-                          5. hooks/rodonaves/index.ts — VIVO por caminho direto (useSLOTargets, useSLOSnapshots, useGatewayHealth importados em RTEGateway* panels)
-                          6. hooks/ai/useNexusSimulator.ts — REMOVIDO em etapa 069 (PR #300)
-                          7. hooks/security/useSelfHealing.ts — REMOVIDO em etapa 068 (PR #300)
-                          8. utils/performance.ts — MORTO: useRenderingMonitor e measureAction sem nenhum importador (grep -rn "useRenderingMonitor\|measureAction" src/ → vazio) -->
+                                  1. components/accessibility/index.ts — VIVO por caminho direto (SkipLinks, LiveRegionProvider, ReducedMotionProvider importados em MainLayout.tsx:13, LazyProviders.tsx:8-9)
+                                  2. components/common/index.ts — VIVO (barril; exports EmptyState, ConfirmDialog, Pagination… em uso por caminhos diretos)
+                                  3. components/pwa/index.ts — VIVO por caminho direto (OfflineBanner, InstallPrompt, UpdatePrompt em MainLayout.tsx:14,47,52)
+                                  4. hooks/gamification/useGamification.ts — VIVO (importado por GamificationPanel, LevelUpModal, AppSidebar, Header, FavoriteMetricsBar via caminho sem extensão)
+                                     hooks/gamification/useGamification.tsx — INDEFINIDO: 349 linhas vs .ts 259, implementações divergem; comentário P18 em authService.ts:43 indica .tsx como schema em uso; aguarda decisão do dono
+                                  5. hooks/rodonaves/index.ts — VIVO por caminho direto (useSLOTargets, useSLOSnapshots, useGatewayHealth importados em RTEGateway* panels)
+                                  6. hooks/ai/useNexusSimulator.ts — REMOVIDO em etapa 069 (PR #300)
+                                  7. hooks/security/useSelfHealing.ts — REMOVIDO em etapa 068 (PR #300)
+                                  8. utils/performance.ts — MORTO: useRenderingMonitor e measureAction sem nenhum importador (grep -rn "useRenderingMonitor\|measureAction" src/ → vazio) -->
 - [x] **081** — Remover só o que a etapa 080 provou morto — onda 4 — Baixa
   <!-- Removido: src/utils/performance.ts (useRenderingMonitor + measureAction, zero importadores) -->
 - [x] **082** — Remover `_shared/service-wrapper.ts`, que nenhuma função usa — onda 4 — Baixa
@@ -367,7 +367,7 @@
 - [x] **271** — Remover o arquivo `x` vazio versionado na raiz — onda 8 — Baixa
 - [x] **272** — Decidir com o dono o destino de `bun.lock` e `bun.lockb` — onda 8 — Baixa · — **levantado em 2026-11-25, aguarda o dono**: `bun.lock` (423 KB) e `bun.lockb` (199 KB) versionados; nenhum workflow usa bun (CI = `npm ci`) e `types-sync.yml:366` registra que estão defasados. Recomendação = remover os dois — **2026-11-25 (fechada, decisao):** os dois locks sairam do repo (`git rm bun.lock bun.lockb`). Nenhum workflow usa bun (`npm ci` em toda a CI), o lock estava defasado do `package.json` e o build da Vercel detecta o gerenciador pelo `package-lock.json` (660 KB, versionado). `validate:root-files` tambem deixou de listar os dois na allow-list da raiz (37 arquivos).
 - [x] **273** ? Barrar arquivo acidental na raiz antes do merge ? onda 8 ? Baixa ? **feito ? `validate:root-files` com os 39 arquivos da raiz declarados um a um**
-- [~] **274** — Tirar do `AGENTS.md` e do `types-sync.yml` a menção aos locks de bun — onda 8 — Baixa · — **levantado em 2026-11-25, aguarda a 272**: só faz sentido depois de os locks saírem; toca `AGENTS.md:86-88` e o comentário de `.github/workflows/types-sync.yml:366` (Regra 8) — **2026-11-25 (metade feita):** a mencao no `AGENTS.md:131-132` saiu junto com a 272; resta o comentario de `.github/workflows/types-sync.yml:366` (arquivo de workflow = Regra 8, aguarda o dono).
+- [~] **274** — Tirar do `AGENTS.md` e do `types-sync.yml` a menção aos locks de bun — onda 8 — Baixa · **código pronto, falta só a autorização do dono (Regra 8)**: o `AGENTS.md:131-132` saiu junto com a 272; o comentário de `.github/workflows/types-sync.yml:365-366` (que dizia que o `bun.lock` estava defasado) foi reescrito na PR #519, que toca workflow e por isso aguarda o seu ok
 - [x] **275** — Criar a base de teste de hook e de tela que hoje não existe — onda 8 — Alta · **já estava na `main` (`src/test/`), smoke e testes de referência verdes**
 - [x] **276** — Teste da validação de transição de status (trava a correção de C-01) — onda 8 — Crítica
 - [x] **277** — Teste da checagem de `count` no controle de concorrência (trava a correção de C-03) — onda 8 — Alta · **`useBoxManagement.test.ts` com 3 casos verdes; sem o guard o caso de conflito falha**
