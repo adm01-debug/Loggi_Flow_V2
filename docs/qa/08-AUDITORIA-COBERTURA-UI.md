@@ -175,3 +175,17 @@ O último é o **veredicto da etapa 080**, que estava como "INDEFINIDO: aguarda 
    porque o gatilho falte; a UI de ranking usa `transportadoras.score_performance`, que tem 5 linhas
    homologadas. Sem tela nova enquanto nao houver entrega real.
 
+## Adendo 2026-11-26 (6) - censo refeito no catalogo e `xp_for_level` removida
+
+1. **Censo refeito sobre o catalogo real, nao sobre grep.** 108 funcoes em `public` (fora as de extensao) e
+   4 views. Para cada funcao foram checados quatro consumidores dentro do banco - trigger
+   (`pg_trigger.tgfoid`), policy (`pg_policy`), corpo de outra funcao (`pg_proc.prosrc`) e `cron.job.command` -
+   e a referencia no codigo (`src`, `supabase/functions`, `scripts`, `tests`). Sobraram duas funcoes sem
+   consumidor: `has_permission` (MANTER, ver Adendo (4)) e `xp_for_level`.
+2. **`xp_for_level` removida** pela migration `20261126210000`: e a formula pura `(lvl-1)^2*100`, sem
+   trigger, policy, cron ou chamador. O calculo de nivel em uso esta em
+   `src/hooks/gamification/useGamification.ts:187-189`, com a mesma formula - nao ha logica duplicada viva
+   no banco.
+3. **124 tabelas em `public`, nenhuma sem referencia no codigo; nenhuma view orfa** - as 4 views restantes ou
+   sao lidas por outra view, ou citadas em `src`/`supabase/functions`.
+4. **`carrier_rankings` segue vazia por falta de entrega, nao por falta de gatilho** - ver Adendo (5), item 5.

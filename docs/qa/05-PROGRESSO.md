@@ -5417,3 +5417,26 @@ retencao que ja esta agendada (job 103), executando 27/11 03:45 UTC.
 **Rollback:** o rollback da camada fast-metrics continua em
 `supabase/rollbacks/20261126190000_rollback_remove_camada_fast_metrics.sql` e foi testado em transacao
 revertida antes do merge.
+
+## Registro 2026-11-26 (17) - censo de funcoes e views refeito e xp_for_level removida
+
+**Dor:** o censo do doc 08 foi feito por busca de texto; nao havia prova de que nenhuma funcao ou view do
+catalogo ficou sem consumidor depois das remocoes de 26/11.
+
+**O que foi medido no banco oficial:** 108 funcoes em `public` (fora extensoes) e 4 views. Por funcao, quatro
+consumidores no banco (trigger, policy, corpo de outra funcao, `cron.job`) mais referencia no codigo em `src`,
+`supabase/functions`, `scripts` e `tests`. Resultado: nenhuma funcao morta alem de `has_permission` (MANTER,
+decidido no Adendo (4) do doc 08) e `xp_for_level`; nenhuma view orfa; 124 tabelas, nenhuma sem referencia no
+codigo.
+
+**O que foi feito:** migration `20261126210000_remove_xp_for_level_sem_chamador.sql` remove
+`public.xp_for_level(integer)` - formula pura `(lvl-1)^2*100` sem trigger, policy, cron ou chamador. O calculo
+de nivel em uso esta em `src/hooks/gamification/useGamification.ts:187-189`, com a mesma formula. Rollback em
+`supabase/rollbacks/20261126210000_rollback_remove_xp_for_level.sql` (definicao `LANGUAGE sql IMMUTABLE` +
+ACL real: PUBLIC revogado, `authenticated` e `service_role` com EXECUTE).
+
+**Verificado em transacao revertida no banco oficial:** pos-migration `funcoes=0`; pos-rollback `funcoes=1`
+com definicao e ACL identicas as reais; `ROLLBACK` devolveu o estado inicial (`funcoes=1`). O `types-sync`
+regenera `types.ts`, `schema-manifest.json` e `schema-catalog.json` depois do merge.
+
+**Contagem de migrations:** `AGENTS.md` 270 -> 271.
