@@ -5440,3 +5440,24 @@ com definicao e ACL identicas as reais; `ROLLBACK` devolveu o estado inicial (`f
 regenera `types.ts`, `schema-manifest.json` e `schema-catalog.json` depois do merge.
 
 **Contagem de migrations:** `AGENTS.md` 270 -> 271.
+
+## Registro 2026-11-26 (18)
+
+**O que foi feito:** crash de render passa a virar registro no banco. `src/components/common/ErrorBoundary.tsx`
+(faixa 29-73) agora, alem do `Sentry.captureException` condicional ao DSN, insere em `telemetry_logs` com
+`severity='error'`, `category='ui_crash'`, mensagem, `stack_trace`, `componentStack`, `url` e `device_info`.
+Falha na escrita e silenciosa (nunca esconde a tela de erro).
+
+**Por que isso fecha H-14 sem o Sentry:** `src/main.tsx:10` so inicializa o Sentry se `VITE_SENTRY_DSN` existir,
+e o secret nao existe no repositorio — sem DSN a tela de erro aparecia e ninguem era avisado. `telemetry_logs`
+ja tinha tabela, policy (`Strict insert telemetry logs`, `WITH CHECK (auth.uid() IS NOT NULL)`) e grants, entao
+nao houve DDL nem dependencia nova.
+
+**Verificado:** `npx vitest run src/components/common/ErrorBoundary.test.tsx` -> 3 testes passando (payload
+gravado com o contexto da tela; nada gravado quando nao ha erro; rejeicao do banco nao derruba a tela de erro).
+`npx tsc --noEmit` sem erro novo; `npx eslint` nos dois arquivos sem aviso.
+
+**Limitacao conhecida:** a policy exige sessao, entao crash em tela publica (usuario deslogado) e recusado pelo
+RLS e continua so no console — cobrir isso exige policy nova para `anon` (DDL) ou DSN ativo (etapa 285).
+
+**Etapa 285:** segue ABERTA apenas quanto a existir ou nao `VITE_SENTRY_DSN` no Vercel e ao custo do servico.
