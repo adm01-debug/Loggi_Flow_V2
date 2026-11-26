@@ -33,7 +33,6 @@ export const useBitrixEntregaSync = () => {
           data: {
             TITLE: `Entrega ${entrega.numero_entrega}`,
             STAGE_ID: statusMap[entrega.status] || 'NEW',
-            CATEGORY_ID: '1234', // Deliveries SPA
             OPPORTUNITY: entrega.valor_frete || 0,
             CURRENCY_ID: 'BRL',
             COMMENTS: [
