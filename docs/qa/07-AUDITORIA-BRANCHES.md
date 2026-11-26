@@ -435,3 +435,53 @@ squash-merge ou nas 21 PRs acima.
 O repositório não guarda trabalho de agente fora da `main`. As 49 PRs fechadas sem merge estão explicadas uma a
 uma, as 16 branches remotas são `main` + uma gerada + 14 do bot, e as 14 PRs abertas são bumps de dependência.
 **Nada precisa ser apagado para "não perder trabalho"** — o que existe fora da `main` é bot ou documentação viva.
+### 13.5 Análise hunk a hunk — o que "divergiu" e por quê
+
+A comparação por arquivo (13.1) responde "a `main` tem uma versão diferente?". Esta seção responde a pergunta
+seguinte: **cada linha que a PR adicionou existe hoje na `main`?** Para cada PR e cada arquivo tocado, extraí as
+linhas adicionadas (`git diff base..prN`, sem contar `+++`) e testei presença exata (após `strip()`) na versão da
+`main`. Nenhum arquivo existe só na PR — **0 caminhos ausentes** —; o que há são linhas ausentes dentro de
+arquivos reescritos:
+
+| PR | Arquivo | Linhas da PR ausentes na `main` | Por quê |
+| --- | --- | --- | --- |
+| #86 | `scripts/audit/content_hash.sql` | 20/31 | cabeçalho de comentário e a versão plpgsql foram substituídos pela implementação canônica (md5 por linha, agregado); o bug (`to_jsonb(t)`, `LATERAL ... LIMIT 0`) não existe em nenhuma versão |
+| #87 | `scripts/audit/manifest_summary.sql` | 10/21 | as mesmas consultas com alias (`AS section, AS total`) e o tratamento de pg_cron ausente; a `main` tem idempotência (`DROP TABLE IF EXISTS pg_temp`) que a PR não tinha |
+| #88 | `.gitattributes` | 7/10 | a `main` troca a lista `*.ts/*.tsx/*.json/*.yml` por `* text=auto eol=lf` + exceções — cobre mais, não menos |
+| #94 | `scripts/ops/set_missing_secrets.sh` | 71/102 | reescrita maior: `--env-file`, `eh_placeholder()` (`:87`), `--apply` (`:174`) |
+| #98 | `scripts/ops/pos_deploy_functions.sql` | 123/127 | runbook reescrito; o conteúdo da PR foi **recuperado de propósito**: `:17` diz "PASSO 0 — pré-requisitos, antes de qualquer deploy (recuperado da PR #98)" |
+| #102 | `scripts/seed-database.ts` | 182/213 | reescrito com `--dry-run`/`--confirmar-producao` (`:37`) e upsert por `onConflict` (`:310`) |
+| #106 | `TelemetryCharts.tsx` | 2/2 | só quebra de linha do prettier; o `formatter` está em `:246-253` |
+| #106 | `src/pages/Relatorios.tsx` | 2/8 | os dois casts existem em `:553-560` e `:629-630`, com o mesmo comentário sobre Recharts 3 |
+| #107 | `.warning-budget.json` | 2/2 | a `main` crava **80** avisos (a PR pedia 105) |
+| #107 | `TelemetryCharts.tsx`, `Relatorios.tsx` | 2/2 + 2/8 | os mesmos de #106 |
+| #122 | `supabase/config.toml` | 1/1 | era o comentário "teste gate"; descartável por definição |
+| #135 | `src/components/admin/DORAMetrics.tsx` | 8/34 | prettier; `DORAIndicator` existe na `main` (`:27` definição, `:243` uso) |
+| #332–#337 | `docs/qa/05-PROGRESSO.md` | 7 a 9 por PR | registros de progresso escritos de novo; o conteúdo da #337 vive em `05-PROGRESSO.md:3572` ("Registro - etapas 015 e 054") |
+| #336 | `src/components/common/BulkActions.test.tsx` | 6/60 | a `main` usa o helper `dialog` e mantém o mesmo caso: `confirmTyping: "EXCLUIR"` (`:131`) e `getByPlaceholderText(/digite "excluir"/i)` (`:162`) |
+| #437 | `docs/qa/05-PROGRESSO.md` | 19/24 | registro da etapa 284 reescrito; `vitest.config.ts` é **idêntico** e os pisos subiram para 77/73/68/74 |
+| #501 | `ci.yml`, `security.yml`, `contexto-ia.yml` | 1/1 + 1/1 + 3/3 | os mesmos comentários existem na `main` com a palavra "publico" (`ci.yml:11`, `security.yml:13`, `contexto-ia.yml:99-101`) |
+| #501 | `docs/qa/03-ACHADOS.md` | 7/7 | o estado está registrado em `03-ACHADOS.md:235`: "Estado (2026-11-26): FECHADO — 016 e 274 entraram na PR #519" |
+| #534 | `scripts/db-audit/grants-baseline.json` | 2/3 | a `main` está **abaixo** (108/55 contra 112/58): o EXECUTE fechado desde então é maior que o da PR |
+
+Provas executáveis que já existiam na `main` e cobrem o que as PRs de script pediam:
+
+- `scripts/audit/manifest-summary-content-hash.unit.mjs` roda de verdade os dois SQLs das #86/#87 em bancos de
+  fixture (com e sem `pg_cron`, linhas carregadas em ordem diferente) — é o teste que a #92 pediu como gate.
+- `scripts/historico/cleanup_triggers_source.sql` e `scripts/historico/origem_remediacao_2026-08-31.sql` existem
+  na `main` — eram os dois caminhos da seção 12 que viviam só em ref apagada.
+
+**Branch `contexto` (a única remota que não é `main` nem bot):** 584 arquivos, todos `docs/contexto/**` gerados pelo
+workflow + um `README.md` de 4 linhas que é o aviso do próprio workflow ("branch gerada, não edite"). Os dois únicos
+arquivos manuais dessa árvore — `docs/contexto/regras/manual/README.md` e `TEMPLATE-regras-de-negocio.md` — existem
+na `main`. Nada a recuperar.
+
+### 13.6 O único item que ficou de fato para trás: 9 bumps patch/minor do dependabot
+
+Conferindo as 28 PRs fechadas do bot contra o `package.json` da `main`, **9 atualizações patch/minor não estão em
+lugar nenhum** (nenhuma PR aberta as cobre): `zod` 4.5.4 → 4.6.4, `tsx` 4.23.12 → 4.23.15, `@types/node` 26.4.0 →
+26.5.1, `@testing-library/dom` 10.4.1 → 10.4.2, `@radix-ui/react-switch` 1.2.6 → 1.4.1, `@radix-ui/react-checkbox`
+1.3.2 → 1.3.11, `@radix-ui/react-toggle-group` 1.1.10 → 1.1.19, `@radix-ui/react-aspect-ratio` 1.1.8 → 1.1.15 e
+`eslint-plugin-react-refresh` 0.5.5 → 0.5.6. Não são trabalho de agente (só `package.json`/`package-lock.json`) e
+nenhuma corrige comportamento do sistema — ficam registradas como dívida de dependência, com a decisão de não mexer
+no lockfile nesta rodada.

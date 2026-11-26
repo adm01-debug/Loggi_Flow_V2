@@ -5524,3 +5524,16 @@ trabalho a recuperar. As 21 restantes: 12 tem conteudo identico ou so documentac
 **Consequencia pratica:** nada fora da `main` precisa ser apagado para "nao perder trabalho" - o que sobra e bot
 (14 PRs abertas de bump, 13 verdes e a #491 de `react-i18next` 17 -> 18 vermelha) ou branch gerada por workflow.
 Nenhuma branch remota guarda commit de agente que nao tenha entrado por squash-merge.
+**Segunda passada - hunk a hunk (secao 13.5 do doc 07):** comparar arquivo a arquivo nao basta, entao cada linha
+que as 21 PRs adicionaram foi testada contra a versao da `main`. Zero caminhos ausentes; as linhas "faltantes" sao
+reescrita, prettier ou registro de progresso reescrito, e os casos suspeitos foram abertos no codigo da `main`:
+`Relatorios.tsx:553-560` e `:629-630` (casts do Recharts 3), `TelemetryCharts.tsx:246-253` (formatter de ms),
+`DORAMetrics.tsx:27` e `:243` (`DORAIndicator`), `BulkActions.test.tsx:131` e `:162` (`confirmTyping` e o
+placeholder), `set_missing_secrets.sh:87/174/177` (`eh_placeholder`, `--apply`, `--env-file`),
+`seed-database.ts:37/310` (flags e upsert), `pos_deploy_functions.sql:17` ("PASSO 0 ... recuperado da PR #98"),
+`03-ACHADOS.md:235` (etapa 016 fechada pela #519) e `05-PROGRESSO.md:3572` (registro 015/054 da #337). O teste
+`scripts/audit/manifest-summary-content-hash.unit.mjs` ja exercita os dois SQLs das #86/#87.
+
+**Unico item realmente para tras:** 9 atualizacoes patch/minor do dependabot que nenhuma PR aberta cobre (`zod`,
+`tsx`, `@types/node`, `@testing-library/dom`, 4 pacotes `@radix-ui` e `eslint-plugin-react-refresh`) - sem impacto
+de comportamento, registradas como divida de dependencia na secao 13.6 do doc 07.
