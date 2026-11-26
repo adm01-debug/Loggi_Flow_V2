@@ -131,15 +131,15 @@
 - [x] **079** — Teste unitário da validação de assinatura de arquivo — onda 4 — Média
 - [x] **080** — Provar, arquivo por arquivo, quais dos oito "hooks sem importador" estão realmente mortos — onda 4 — Baixa
   <!-- Veredictos (261123):
-                                      1. components/accessibility/index.ts — VIVO por caminho direto (SkipLinks, LiveRegionProvider, ReducedMotionProvider importados em MainLayout.tsx:13, LazyProviders.tsx:8-9)
-                                      2. components/common/index.ts — VIVO (barril; exports EmptyState, ConfirmDialog, Pagination… em uso por caminhos diretos)
-                                      3. components/pwa/index.ts — VIVO por caminho direto (OfflineBanner, InstallPrompt, UpdatePrompt em MainLayout.tsx:14,47,52)
-                                      4. hooks/gamification/useGamification.ts — VIVO (importado por GamificationPanel, LevelUpModal, AppSidebar, Header, FavoriteMetricsBar via caminho sem extensão)
-                                         hooks/gamification/useGamification.tsx — INDEFINIDO: 349 linhas vs .ts 259, implementações divergem; comentário P18 em authService.ts:43 indica .tsx como schema em uso; aguarda decisão do dono
-                                      5. hooks/rodonaves/index.ts — VIVO por caminho direto (useSLOTargets, useSLOSnapshots, useGatewayHealth importados em RTEGateway* panels)
-                                      6. hooks/ai/useNexusSimulator.ts — REMOVIDO em etapa 069 (PR #300)
-                                      7. hooks/security/useSelfHealing.ts — REMOVIDO em etapa 068 (PR #300)
-                                      8. utils/performance.ts — MORTO: useRenderingMonitor e measureAction sem nenhum importador (grep -rn "useRenderingMonitor\|measureAction" src/ → vazio) -->
+                                          1. components/accessibility/index.ts — VIVO por caminho direto (SkipLinks, LiveRegionProvider, ReducedMotionProvider importados em MainLayout.tsx:13, LazyProviders.tsx:8-9)
+                                          2. components/common/index.ts — VIVO (barril; exports EmptyState, ConfirmDialog, Pagination… em uso por caminhos diretos)
+                                          3. components/pwa/index.ts — VIVO por caminho direto (OfflineBanner, InstallPrompt, UpdatePrompt em MainLayout.tsx:14,47,52)
+                                          4. hooks/gamification/useGamification.ts — VIVO (importado por GamificationPanel, LevelUpModal, AppSidebar, Header, FavoriteMetricsBar via caminho sem extensão)
+                                             hooks/gamification/useGamification.tsx — INDEFINIDO: 349 linhas vs .ts 259, implementações divergem; comentário P18 em authService.ts:43 indica .tsx como schema em uso; aguarda decisão do dono
+                                          5. hooks/rodonaves/index.ts — VIVO por caminho direto (useSLOTargets, useSLOSnapshots, useGatewayHealth importados em RTEGateway* panels)
+                                          6. hooks/ai/useNexusSimulator.ts — REMOVIDO em etapa 069 (PR #300)
+                                          7. hooks/security/useSelfHealing.ts — REMOVIDO em etapa 068 (PR #300)
+                                          8. utils/performance.ts — MORTO: useRenderingMonitor e measureAction sem nenhum importador (grep -rn "useRenderingMonitor\|measureAction" src/ → vazio) -->
 - [x] **081** — Remover só o que a etapa 080 provou morto — onda 4 — Baixa
   <!-- Removido: src/utils/performance.ts (useRenderingMonitor + measureAction, zero importadores) -->
 - [x] **082** — Remover `_shared/service-wrapper.ts`, que nenhuma função usa — onda 4 — Baixa
@@ -5057,7 +5057,6 @@ Contadores apos estas etapas (grep em `docs/qa/05-PROGRESSO.md`): **295 `[x]` / 
 
 Contadores apos esta etapa (grep em `docs/qa/05-PROGRESSO.md`): **296 `[x]` / 4 `[~]`**.
 
-
 ## Registro 2026-11-26 (4) - etapas 039, 041 e 283: prova em runtime do registro da cotacao e suites E2E reais
 
 - **O que mudou (043/041 e 039):** nada de codigo de tela. O que faltava era **prova em runtime** de que a
@@ -5128,6 +5127,7 @@ tetos; `npx vitest run tests/security/` -> `19 passed`.
 
 **NAO VERIFICADO:** (1) o efeito do job de E2E depois de mergeado, que so se confirma em push futuro da
 `main`; (2) os valores de painel (S-05, S-08) e o DSN do Sentry, que nao sao legiveis do repositorio.
+
 ## Registro 2026-11-26 (6) - auditoria de cobertura UI: todos os objetos de banco tem consumidor
 
 **Fonte:** `docs/qa/08-AUDITORIA-COBERTURA-UI.md`. Censo ao vivo de producao (137 relacoes, 116 funcoes, 28 cron jobs)
@@ -5244,17 +5244,17 @@ mostrava erro interno - o operador nao tinha como saber qual credencial faltava.
 segredo, e `sha256("PLACEHOLDER_NEEDS_SETUP") = 5c6bf8d4020333ea13342e62560fc92f2ab73899901c49cecd60ad72dd979a39`.
 Treze segredos de producao tem exatamente esse digest:
 
-| Segredo | Integracao que para |
-| --- | --- |
-| `BITRIX24_WEBHOOK_URL` | CRM Bitrix24 (sync de negocios, SPAs, ocorrencias) |
-| `MELHOR_ENVIO_TOKEN` | cotacao e etiqueta (etapa 008) |
-| `LALAMOVE_API_KEY`, `LALAMOVE_API_SECRET` | cotacao/rastreio Lalamove |
-| `RODONAVES_USERNAME`, `RODONAVES_PASSWORD`, `RODONAVES_CNPJ_REMETENTE` | cotacao Rodonaves |
-| `OPENAI_API_KEY` | analise de frete (`normalize-freight-response`) e Nexus |
-| `OPENWEATHER_API_KEY` | clima (`get-weather-data`) |
-| `ATICKET_API_KEY` | atendimento |
-| `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | cache/idempotencia (`_shared/redis`) |
-| `SECURITY_SLACK_WEBHOOK_URL` | alerta de seguranca (`log-security-event`) |
+| Segredo                                                                | Integracao que para                                     |
+| ---------------------------------------------------------------------- | ------------------------------------------------------- |
+| `BITRIX24_WEBHOOK_URL`                                                 | CRM Bitrix24 (sync de negocios, SPAs, ocorrencias)      |
+| `MELHOR_ENVIO_TOKEN`                                                   | cotacao e etiqueta (etapa 008)                          |
+| `LALAMOVE_API_KEY`, `LALAMOVE_API_SECRET`                              | cotacao/rastreio Lalamove                               |
+| `RODONAVES_USERNAME`, `RODONAVES_PASSWORD`, `RODONAVES_CNPJ_REMETENTE` | cotacao Rodonaves                                       |
+| `OPENAI_API_KEY`                                                       | analise de frete (`normalize-freight-response`) e Nexus |
+| `OPENWEATHER_API_KEY`                                                  | clima (`get-weather-data`)                              |
+| `ATICKET_API_KEY`                                                      | atendimento                                             |
+| `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`                   | cache/idempotencia (`_shared/redis`)                    |
+| `SECURITY_SLACK_WEBHOOK_URL`                                           | alerta de seguranca (`log-security-event`)              |
 
 **Causa raiz:** o guard dos nove pontos era `if (!valor)`. O placeholder e uma string nao vazia, entao passava, o
 parceiro respondia erro e o `catch` generico devolvia `INTERNAL_ERROR`. No Bitrix havia um segundo efeito: como a env
@@ -5269,6 +5269,7 @@ tela de integracao mostra a mensagem que a funcao devolveu (antes o supabase-js 
 **Nao e codigo, e credencial:** ate o dono colar o valor real em `supabase secrets set`, essas integracoes continuam
 sem funcionar; o que muda e que agora o sistema diz qual delas falta. O `set_missing_secrets.sh` ja recusava esses
 literais, entao o guard fecha o ciclo.
+
 ## Registro 2026-11-26 (11) - Bitrix: erro do webhook deixa de ser opaco
 
 **Dor:** com uma URL de webhook salva em `bitrix_sync_config`, o `test-connection` devolvia `500 INTERNAL_ERROR` sem
@@ -5283,6 +5284,7 @@ com causa especifica: webhook inalcancavel, resposta HTML/texto (com o HTTP e a 
 HTTP sem detalhe. Nenhuma mensagem inclui a URL. `tests/contracts/bitrix-webhook-erro-visivel.spec.ts` cobre as tres.
 
 **Prova em runtime (producao, depois do deploy `45843416591`):**
+
 - linha temporaria em `bitrix_sync_config` com `https://example.com` -> `502 webhook do Bitrix respondeu HTML/texto (HTTP 405): confira se a URL salva termina com /rest/1/<token>/`
 - linha removida (tabela de volta a 0 linhas) -> `500 BITRIX24_WEBHOOK_URL not configured`
 
@@ -5314,3 +5316,36 @@ tem FK entrante (`profiles`, `fretes_internos`) e 3 policies ativas; apagar isso
 **Conferido no catalogo de producao antes do `DROP`:** 0 FK entrante, 0 view dependente, 0 funcao citando o nome no
 corpo, 0 policy de outra tabela citando o nome e nenhuma mencao em `src/`, `supabase/functions/` ou `scripts/`.
 Linhas: 0 em todas, menos `system_contract_schemas` (3 fixtures, preservadas no rollback).
+
+## Registro 2026-11-26 (13) - `ai_chat_messages` ligada ao chat de IA
+
+**Gatilho:** ultimo veredicto `DECIDIR` de tabela do doc 08 - "nao existe chat de IA na UI". Errado: existe tela, o
+que faltava era persistencia.
+
+**Antes:** `src/components/ai/AIAssistant.tsx` ja fazia streaming real pela edge function `ai-logistics-assistant`
+(`transportadoras`, `entregas`, `ocorrencias`), mas o historico vivia so em memoria
+(`conversationHistory.slice(-10)`) e o `Trash2` fazia apenas `setMessages([])`. Nenhum uso da tabela em `src/`.
+
+**Agora:** `src/hooks/ai/useHistoricoChat.ts` grava um turno por mensagem (`user_id`, `role`, `content`), recarrega os
+ultimos 50 turnos (`created_at desc` + `reverse()`) ao abrir o painel e apaga so as linhas do usuario no `Trash2`.
+A RLS da tabela (SELECT/INSERT/DELETE com `auth.uid() = user_id`, TO authenticated) define o escopo.
+
+**Testes:** `tests/contracts/ia-historico-persistente.spec.tsx` (5 casos, duplo do cliente em
+`tests/contracts/ia-historico-fixtures.ts`): teto de 50 no select, `user_id`/`role`/`content` dos dois turnos,
+exclusao escopada, conversa seguindo quando a gravacao falha e nenhuma consulta sem sessao.
+
+**Sem regressao:** falha de leitura ou gravacao nao interrompe o streaming; o usuario recebe um `toast` unico por
+sessao.
+
+## Registro 2026-11-26 (14) - as 7 tabelas mortas sairam do banco oficial
+
+**Aplicado:** `Aplicar Migration` (run `45884665628`) rodou
+`20261126170000_remove_tabelas_mortas_sem_consumidor.sql` em transacao com `ON_ERROR_STOP=1`; a versao esta
+registrada em `supabase_migrations.schema_migrations`.
+
+**Provas no banco oficial:** `pg_class` - 0 das 7 tabelas (`account_lockouts`, `allowed_ips`, `driver_badges`,
+`email_verification_tokens`, `notification_templates`, `system_adr`, `system_contract_schemas`).
+
+**Rollback testado de verdade:** `supabase/rollbacks/20261126170000_rollback_remove_tabelas_mortas.sql` rodado com
+`commit;` trocado por `rollback;` - recriou as 7 tabelas (sonda `RECRIADAS=7`), indices, 14 policies, grants, RLS e as
+3 linhas de fixture; o `ROLLBACK` devolveu o banco ao estado pos-migration.
