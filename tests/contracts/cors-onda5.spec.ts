@@ -17,7 +17,9 @@ const FUNCOES: Record<string, number> = {
   "log-login-attempt": 4,
   "log-security-event": 6,
   "check-password-breach": 5,
-  "bitrix24-integration": 18,
+  // test-connection passou a explicar a falha do webhook (inalcancavel, corpo nao-JSON
+  // e HTTP sem detalhe): 3 respostas novas, todas com os headers resolvidos.
+  "bitrix24-integration": 21,
   "execute-protocol": 5,
   "ingest-biosync": 5, // guard de papel (etapa 073) acrescentou 1 resposta
   "ocr-receipt-processor": 4,
