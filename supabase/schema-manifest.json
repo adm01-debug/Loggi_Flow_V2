@@ -3110,6 +3110,7 @@
         "f:auto_revert_ineffective_indexes(p_min_hours integer, p_min_improvement numeric)": "fe85021d635a32490d66e0592f077f43",
         "f:get_maintenance_windows(p_days integer, p_window_hours integer, p_limit integer)": "9603b899ec1081a1de0b6ac5bb13d93b",
         "f:drop_old_partitions(p_parent_table text, p_prefix text, p_months_to_keep integer)": "cc71d3cf4176f2d1a5064d5f6f2a07d3",
+        "f:registrar_crash_ui(p_message text, p_stack_trace text, p_url text, p_metadata jsonb)": "d2e5ddda9f7fee23fc406396aabf60d5",
         "f:get_monthly_analytics(start_date timestamp with time zone, end_date timestamp with time zone)": "771211b443d9cf19e79066dacb421a22"
     },
     "constraints": {
@@ -3418,7 +3419,7 @@
         "e:public.frete_interno_status|PUBLIC|USAGE|grantor=postgres": "68934a3e9455fa72420237eb05902327",
         "e:public.frete_interno_status|postgres|USAGE|grantor=postgres": "68934a3e9455fa72420237eb05902327"
     },
-    "generated_at": "2026-11-26T21:09:13Z",
+    "generated_at": "2026-11-26T22:12:15Z",
     "column_grants": {
     },
     "schema_grants": {
@@ -3785,13 +3786,17 @@
         "f:get_cache_hit_ratios(p_min_reads bigint, p_max_ratio numeric, p_limit integer)|postgres|EXECUTE|grantor=postgres": "68934a3e9455fa72420237eb05902327",
         "f:auto_revert_ineffective_indexes(p_min_hours integer, p_min_improvement numeric)|postgres|EXECUTE|grantor=postgres": "68934a3e9455fa72420237eb05902327",
         "f:get_maintenance_windows(p_days integer, p_window_hours integer, p_limit integer)|postgres|EXECUTE|grantor=postgres": "68934a3e9455fa72420237eb05902327",
+        "f:registrar_crash_ui(p_message text, p_stack_trace text, p_url text, p_metadata jsonb)|anon|EXECUTE|grantor=postgres": "68934a3e9455fa72420237eb05902327",
         "f:drop_old_partitions(p_parent_table text, p_prefix text, p_months_to_keep integer)|postgres|EXECUTE|grantor=postgres": "68934a3e9455fa72420237eb05902327",
         "f:get_cache_hit_ratios(p_min_reads bigint, p_max_ratio numeric, p_limit integer)|service_role|EXECUTE|grantor=postgres": "68934a3e9455fa72420237eb05902327",
         "f:auto_revert_ineffective_indexes(p_min_hours integer, p_min_improvement numeric)|service_role|EXECUTE|grantor=postgres": "68934a3e9455fa72420237eb05902327",
         "f:get_cache_hit_ratios(p_min_reads bigint, p_max_ratio numeric, p_limit integer)|authenticated|EXECUTE|grantor=postgres": "68934a3e9455fa72420237eb05902327",
         "f:get_maintenance_windows(p_days integer, p_window_hours integer, p_limit integer)|service_role|EXECUTE|grantor=postgres": "68934a3e9455fa72420237eb05902327",
+        "f:registrar_crash_ui(p_message text, p_stack_trace text, p_url text, p_metadata jsonb)|postgres|EXECUTE|grantor=postgres": "68934a3e9455fa72420237eb05902327",
         "f:drop_old_partitions(p_parent_table text, p_prefix text, p_months_to_keep integer)|service_role|EXECUTE|grantor=postgres": "68934a3e9455fa72420237eb05902327",
         "f:get_maintenance_windows(p_days integer, p_window_hours integer, p_limit integer)|authenticated|EXECUTE|grantor=postgres": "68934a3e9455fa72420237eb05902327",
+        "f:registrar_crash_ui(p_message text, p_stack_trace text, p_url text, p_metadata jsonb)|service_role|EXECUTE|grantor=postgres": "68934a3e9455fa72420237eb05902327",
+        "f:registrar_crash_ui(p_message text, p_stack_trace text, p_url text, p_metadata jsonb)|authenticated|EXECUTE|grantor=postgres": "68934a3e9455fa72420237eb05902327",
         "f:get_monthly_analytics(start_date timestamp with time zone, end_date timestamp with time zone)|postgres|EXECUTE|grantor=postgres": "68934a3e9455fa72420237eb05902327",
         "f:get_monthly_analytics(start_date timestamp with time zone, end_date timestamp with time zone)|service_role|EXECUTE|grantor=postgres": "68934a3e9455fa72420237eb05902327",
         "f:get_monthly_analytics(start_date timestamp with time zone, end_date timestamp with time zone)|authenticated|EXECUTE|grantor=postgres": "68934a3e9455fa72420237eb05902327"
