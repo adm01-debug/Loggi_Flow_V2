@@ -5287,3 +5287,30 @@ HTTP sem detalhe. Nenhuma mensagem inclui a URL. `tests/contracts/bitrix-webhook
 - linha removida (tabela de volta a 0 linhas) -> `500 BITRIX24_WEBHOOK_URL not configured`
 
 **Placar do plano:** 299/300 `[x]`; a unica pendente e a 286 (Sentry), que depende da DSN em maos do dono.
+
+## Registro 2026-11-26 (12) - 7 tabelas mortas saem do banco (fecha a lista DECIDIR do doc 08)
+
+**Dor:** o censo de cobertura (`docs/qa/08-AUDITORIA-COBERTURA-UI.md`) deixou 9 tabelas em DECIDIR: sem leitor, sem
+tela e sem escritor. Enquanto elas existem, quem le o schema real acha que o sistema tem multi-tenant, lockout de
+login, template de notificacao e allowlist de IP quando nada disso funciona - e as 7 tinham `GRANT SELECT` para
+`anon`.
+
+**Causa raiz:** tabelas criadas nas migrations historicas (2025-12 a 2026-05) para desenhos abandonados no meio e
+nunca removidos. Tres sao duplicatas exatas de uma capacidade que ja tem tela (`allowed_ips` vs `ip_access_rules`,
+`driver_badges` vs `achievements`, `system_adr` vs `architecture_decisions`), uma duplica `notifications`
+(`notification_templates`), uma e tratada fora do app pelo Supabase Auth (`email_verification_tokens`), uma e um
+desenho que nao existe no codigo (`account_lockouts`) e uma e sobra de uma funcao removida na #529
+(`system_contract_schemas`, cujo unico leitor era `validate_payload_schema`).
+
+**Aplicado (migration `20261126170000_remove_tabelas_mortas_sem_consumidor.sql`):** `drop table if exists` para as 7,
+sem `CASCADE` - se aparecer dependencia nova, falha em vez de levar objeto junto. Rollback completo em
+`supabase/rollbacks/20261126170000_rollback_remove_tabelas_mortas.sql` (pg_dump do banco real: colunas, defaults, 14
+policies, indices, grants e RLS habilitada, mais as 3 linhas de `system_contract_schemas`).
+
+**Ficam de fora, por decisao registrada:** `organizations` + `get_current_organization_id()` + `has_permission()` -
+tem FK entrante (`profiles`, `fretes_internos`) e 3 policies ativas; apagar isso e mudanca de arquitetura
+(multi-tenant), nao limpeza de morto.
+
+**Conferido no catalogo de producao antes do `DROP`:** 0 FK entrante, 0 view dependente, 0 funcao citando o nome no
+corpo, 0 policy de outra tabela citando o nome e nenhuma mencao em `src/`, `supabase/functions/` ou `scripts/`.
+Linhas: 0 em todas, menos `system_contract_schemas` (3 fixtures, preservadas no rollback).
