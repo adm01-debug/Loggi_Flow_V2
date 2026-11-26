@@ -38,30 +38,28 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   /**
-   * Etapa 285 do censo: crash de render passa a existir no banco, não só no
-   * console de quem caiu. Best-effort: a policy de INSERT de `telemetry_logs`
-   * exige sessão (`auth.uid() IS NOT NULL`), então erro em tela pública é
-   * recusado pelo RLS e sobra o Sentry/console — nunca quebra a tela de erro.
+   * Etapa 285 do censo (H-14): crash de render passa a existir no banco, não só no
+   * console de quem caiu. Vai pela RPC `registrar_crash_ui`, que é SECURITY DEFINER
+   * e por isso grava também para quem está sem sessão (tela de login) — o INSERT
+   * direto é recusado pelo RLS nesse caso. Best-effort: falha na chamada só gera
+   * console.warn e nunca esconde a tela de erro.
    */
   private registrarCrashEmTelemetria(error: Error, errorInfo: ErrorInfo) {
     void supabase
-      .from("telemetry_logs")
-      .insert({
-        severity: "error",
-        category: "ui_crash",
-        message: error.message || error.name,
-        stack_trace: error.stack ?? null,
-        metadata: { componentStack: errorInfo.componentStack },
-        url: window.location.href,
-        device_info: {
+      .rpc("registrar_crash_ui", {
+        p_message: error.message || error.name,
+        p_stack_trace: error.stack ?? undefined,
+        p_url: window.location.href,
+        p_metadata: {
+          componentStack: errorInfo.componentStack,
           userAgent: navigator.userAgent,
           language: navigator.language,
         },
       })
       .then(
-        ({ error: insertError }) => {
-          if (insertError) {
-            console.warn("Falha ao registrar crash em telemetry_logs:", insertError.message);
+        ({ error: rpcError }) => {
+          if (rpcError) {
+            console.warn("Falha ao registrar crash em telemetry_logs:", rpcError.message);
           }
         },
         (falha: unknown) => {

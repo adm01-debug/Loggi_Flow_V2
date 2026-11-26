@@ -2,16 +2,16 @@ import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 
 // Etapa 285 — o crash de render do ErrorBoundary passa a ser gravado em
-// `telemetry_logs` (ErrorBoundary.tsx:27). Antes só existia no console de quem
+// `telemetry_logs` pela RPC `registrar_crash_ui`. Antes só existia no console de quem
 // caiu, porque sem `VITE_SENTRY_DSN` a chamada ao Sentry é no-op (src/main.tsx:10).
+// A RPC é o caminho que também atende usuário sem sessão (tela de login).
 
-const { insertMock, fromMock } = vi.hoisted(() => ({
-  insertMock: vi.fn(),
-  fromMock: vi.fn(),
+const { rpcMock } = vi.hoisted(() => ({
+  rpcMock: vi.fn(),
 }));
 
 vi.mock("@/integrations/supabase/client", () => ({
-  supabase: { from: fromMock },
+  supabase: { rpc: rpcMock },
 }));
 
 vi.mock("@sentry/react", () => ({
@@ -33,10 +33,8 @@ describe("ErrorBoundary — registro de crash", () => {
   const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
 
   beforeEach(() => {
-    fromMock.mockReset();
-    insertMock.mockReset();
-    fromMock.mockImplementation(() => ({ insert: insertMock }));
-    insertMock.mockResolvedValue({ error: null });
+    rpcMock.mockReset();
+    rpcMock.mockResolvedValue({ error: null });
   });
 
   afterEach(() => {
@@ -50,18 +48,16 @@ describe("ErrorBoundary — registro de crash", () => {
       </ErrorBoundary>,
     );
 
-    expect(fromMock).toHaveBeenCalledWith("telemetry_logs");
-    expect(insertMock).toHaveBeenCalledTimes(1);
-    const payload = insertMock.mock.calls[0][0];
+    expect(rpcMock).toHaveBeenCalledTimes(1);
+    expect(rpcMock.mock.calls[0][0]).toBe("registrar_crash_ui");
+    const payload = rpcMock.mock.calls[0][1];
     expect(payload).toMatchObject({
-      severity: "error",
-      category: "ui_crash",
-      message: "render explodiu",
-      url: window.location.href,
+      p_message: "render explodiu",
+      p_url: window.location.href,
     });
-    expect(payload.stack_trace).toContain("render explodiu");
-    expect(payload.metadata.componentStack).toContain("Explode");
-    expect(payload.device_info.userAgent).toBe(navigator.userAgent);
+    expect(payload.p_stack_trace).toContain("render explodiu");
+    expect(payload.p_metadata.componentStack).toContain("Explode");
+    expect(payload.p_metadata.userAgent).toBe(navigator.userAgent);
     // A tela de erro continua aparecendo para o usuário final.
     expect(screen.getByText("Recuperação de Falha Crítica")).toBeInTheDocument();
   });
@@ -73,12 +69,12 @@ describe("ErrorBoundary — registro de crash", () => {
       </ErrorBoundary>,
     );
 
-    expect(fromMock).not.toHaveBeenCalled();
+    expect(rpcMock).not.toHaveBeenCalled();
     expect(screen.getByText("tela viva")).toBeInTheDocument();
   });
 
   it("não deixa o crash do banco esconder a tela de erro", async () => {
-    insertMock.mockRejectedValue(new Error("RLS recusou (sessão anônima)"));
+    rpcMock.mockRejectedValue(new Error("rede caiu no meio do crash"));
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
 
     render(

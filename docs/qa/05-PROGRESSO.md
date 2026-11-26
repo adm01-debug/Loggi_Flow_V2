@@ -5476,8 +5476,10 @@ mensagem em 500, stack em 4000 e url em 500 caracteres, e descarta metadata acim
 limitado a linhas `ui_crash` bem formadas. Rollback em
 `supabase/rollbacks/20261126220000_rollback_registrar_crash_ui.sql` (nao apaga linha nenhuma, so a funcao).
 
-**Estado:** apply pendente pelo `Aplicar Migration`; o `ErrorBoundary` so passa a chamar a RPC depois que os tipos
-gerados (`src/integrations/supabase/types.ts`) trouxerem a assinatura, via `types-sync`.
+**Estado:** aplicada no banco oficial pelo `Aplicar Migration` (run 45901906823, `success`) e provada em runtime com
+`set local role anon` dentro de transacao com `ROLLBACK`: a chamada grava `severity='error'`, `category='ui_crash'`,
+`user_id` nulo; metadata de 3 KB e descartada (`{}`); mensagem em branco nao gera linha. O `ErrorBoundary` passou a
+chamar a RPC (INSERT direto saiu do codigo) e os tipos gerados foram atualizados pelo `types-sync`.
 
 ## Registro 2026-11-26 (19)
 
