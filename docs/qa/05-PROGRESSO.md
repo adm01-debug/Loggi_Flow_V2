@@ -76,9 +76,9 @@
 - [x] **036** — `KanbanEntregas` valida a transição antes de gravar — onda 3 — Alta
 - [x] **037** — Traduzir a recusa do banco em mensagem que o operador entende — onda 3 — Média · **fechada depois da 033**: contrato `23514` vivo no banco e `mensagemRecusaTransicao` ligada em `Despachos.tsx:253`, `KanbanEntregas.tsx:344` e `Envios.tsx` (#420); 19 casos em `src/lib/statusTransitions.test.ts`
 - [x] **038** — `CotacaoMultiCanal`: a tabela da tela passa a ler do banco, não do `useState` — onda 3 — Crítica
-- [~] **039** — Registrar a resposta da transportadora no banco, não na memória — onda 3 — Crítica — **código no PR da 038; aguarda verificação em runtime (registrar resposta e conferir `valor_cotado`/`responded_at` no banco)**
+- [x] **039** — Registrar a resposta da transportadora no banco, não na memória — onda 3 — Crítica · **2026-11-26 (fechada com prova em runtime):** `updateCotacao.mutate` é o único caminho de gravação da resposta (`src/pages/CotacaoMultiCanal.tsx:501`), o hook carimba `responded_at` (`src/hooks/logistics/useCotacoesMulticanal.tsx:141`) e `setCotacoes(` já não aparece na tela (0 ocorrências). Prova ao vivo: `PATCH /rest/v1/cotacoes_multicanal?id=eq.<id>` (mesma rota do hook) devolveu HTTP 200 e a linha ficou com `valor_cotado=487.9`, `prazo_dias=4`, `status=respondido` e `responded_at` preenchido — conferido por psql. Contrato `tests/contracts/cotacao-multicanal-persistencia.spec.ts` trava a regressão
 - [x] **040** — Marcar no banco qual cotação foi a escolhida — onda 3 — Alta
-- [~] **041** — "Nexus Blast" e o envio por e-mail passam a criar a cotação no banco — onda 3 — Alta — **código já entregue na 038; verificação em runtime depende de credencial de transportadora (dono)**
+- [x] **041** — "Nexus Blast" e o envio por e-mail passam a criar a cotação no banco — onda 3 — Alta · **2026-11-26 (fechada com prova em runtime):** `createCotacao.mutateAsync` no Blast (`CotacaoMultiCanal.tsx:423`) e `createCotacao.mutate` no WhatsApp e no e-mail (`:451`, `:474`). Prova: `POST /rest/v1/cotacoes_multicanal` (mesma rota do hook) criou a linha `3e7bf6dc-97e6-47c7-b728-eb47a9f64629` (canal `email`, `expires_at` default = +24h) — a tabela tinha 0 linhas e passou a 1; a linha de teste foi apagada depois. **NAO VERIFICADO:** o disparo real das integrações (Lalamove, Rodonaves, Melhor Envio) pelo botão, que consome cotação real e é efeito externo
 - [x] **042** — Mostrar carregando, erro e vazio na tela de cotação multicanal — onda 3 — Média
 - [x] **043** — Decidir com o dono o que fazer com as duas telas de cotação — onda 3 — Alta · **decidido e executado em 2026-11-25**: as duas telas ficam, com papel explícito — `CotacaoMultiCanal` **dispara e responde** (subtítulo na tela + botão renomeado para “Acompanhar cotações”) e `DashboardCotacoes` **acompanha e decide** (ganhou o botão “Nova cotação”, que não existia). O que era do outro papel saiu: registrar resposta deixou de exigir que a transportadora estivesse na busca atual (`onRegistrar` agora depende só da cotação), que era o beco sem saída de quem vinha do dashboard
 - [x] **044** — `Despachos`: avisar quando o avanço de status não gravou — onda 3 — Alta
@@ -376,7 +376,7 @@
 - [x] **280** — Teste da idempotência atômica dos webhooks (trava a correção de B-01) — onda 8 — Crítica
 - [x] **281** — Teste do caminho de criar coleta — onda 8 — Alta
 - [x] **282** — Teste do caminho de mover entrega de status — onda 8 — Alta
-- [~] **283** — Resolver o usuário semeado do `tests/e2e/` e dizer por que ele não roda na CI — onda 8 — Média · **parte (1) feita: `tests/e2e/README.md` + credenciais por variavel de ambiente; aguarda o dono o usuario dedicado e o job de CI**
+- [x] **283** — Resolver o usuário semeado do `tests/e2e/` e dizer por que ele não roda na CI — onda 8 — Média · **2026-11-26 (fechada):** usuário dedicado `e2e@promobrindes.com.br` com a senha rotacionada por SQL (nunca versionada) e guardada nos secrets `E2E_EMAIL`/`E2E_PASSWORD`; login GoTrue comprovado (JWT de 803 caracteres, role `authenticated`). As duas suítes foram **reescritas**: as antigas testavam um app que não existe ("Nexus Core") e, por causa da porta 8080 ocupada por outro projeto da mesma máquina, rodavam contra o app errado. Agora rodam na 8099 (`--strictPort`) e estão **6/6 verdes** em 12,8s. O job de CI dedicado é PR separada (toca `.github/workflows/` = regra 8)
 - [x] **284** — Subir os pisos de cobertura para travar o que as etapas 275-282 conquistaram — onda 8 — Média · **feito — pisos 77/73/68/74 em `vitest.config.ts`; PR #442 mergeada em `fe4f9861`** (altera limiar de gate da CI)
 - [x] **285** — Confirmar com o dono se `VITE_SENTRY_DSN` está configurado no Vercel — onda 8 — Média · **aguarda o dono** — **2026-11-25 (fechada, resposta: NAO esta configurado):** provas - (1) o bundle publicado em `loggi-flow-v2.vercel.app` nao tem **nenhuma** ocorrencia de `sentry.io`/`ingest.sentry.io` em nenhum dos 10 chunks servidos; (2) build local da `main` sem variavel de ambiente reproduz o mesmo resultado - o unico residuo do SDK no bundle e `captureException` minificado a uma chamada sem cliente (no-op), porque `if (import.meta.env.VITE_SENTRY_DSN)` (`src/main.tsx:11`) vira codigo morto e o Rollup descarta o SDK. Ou seja: falta criar o projeto no Sentry e definir `VITE_SENTRY_DSN` no ambiente Production da Vercel.
 - [~] **286** — Provar que um erro de front chega ao Sentry — onda 8 — Média · **aguarda o dono** — **2026-11-25 (codigo pronto, prova pendente):** o caminho de envio que faltava entrou na #513 - `ErrorBoundary.componentDidCatch` agora chama `Sentry.captureException` com `componentStack` (`src/components/common/ErrorBoundary.tsx:33`), no-op enquanto nao houver DSN. Falta so a credencial da 285 para gerar um erro real e ver o evento no projeto.
@@ -5056,3 +5056,49 @@ Contadores apos estas etapas (grep em `docs/qa/05-PROGRESSO.md`): **295 `[x]` / 
   `ambiente` com JWT de `admin`/`user` - sem login com papel nao ha como assinar a chamada.
 
 Contadores apos esta etapa (grep em `docs/qa/05-PROGRESSO.md`): **296 `[x]` / 4 `[~]`**.
+
+
+## Registro 2026-11-26 (4) - etapas 039, 041 e 283: prova em runtime do registro da cotacao e suites E2E reais
+
+- **O que mudou (043/041 e 039):** nada de codigo de tela. O que faltava era **prova em runtime** de que a
+  resposta da transportadora e a criacao da cotacao terminam no banco - e ela foi feita contra a producao
+  `jvfhclubfpxrtrrazrgr`, com sessao real obtida por login GoTrue do usuario `e2e@promobrindes.com.br`
+  (`POST /auth/v1/token?grant_type=password`, JWT com role `authenticated`).
+  - **041** - `POST /rest/v1/cotacoes_multicanal` (a mesma rota do `createCotacao` do hook) devolveu 201 e
+    criou a linha `3e7bf6dc-97e6-47c7-b728-eb47a9f64629`, canal `email`, com `expires_at` no default
+    (`created_at + 24h`). A tabela tinha **0 linhas** e passou a **1**. A linha de teste foi apagada ao fim
+    (`delete from public.cotacoes_multicanal where id = '3e7bf6dc-...'` -> `count(*) = 0`).
+  - **039** - `PATCH /rest/v1/cotacoes_multicanal?id=eq.<id>` com o payload do `updateCotacao` devolveu 200 e a
+    linha ficou com `valor_cotado = 487.9`, `prazo_dias = 4`, `status = respondido` e `responded_at`
+    preenchido (conferido de volta por `psql`, nao so pela resposta HTTP).
+  - **008 (fechada no registro anterior, prova aqui):** `POST /functions/v1/melhor-envio-api` com
+    `{"action":"ambiente"}` e o JWT do usuario -> HTTP 200 `{"ambiente":"producao"}`.
+- **Contrato novo:** `tests/contracts/cotacao-multicanal-persistencia.spec.ts` (5 casos) transforma o grep
+  manual em gate de CI - `setCotacoes(` fora da tela, `updateCotacao.mutate` no `handleRegistrarResposta`,
+  `await createCotacao.mutateAsync` no `handleNexusBlast`, `createCotacao.mutate` no WhatsApp/e-mail e
+  `responded_at = new Date().toISOString()` no hook.
+- **O que mudou (283) - suites E2E:** as duas suites de `tests/e2e/` eram ficcao. Descreviam um app "Nexus
+  Core", uma rota `/dashboard` e o texto "Visao Geral" - nada disso existe no produto; a suite "passava" com
+  asserts vazios (`toBeDefined`). Pior: a **porta 8080 do WSL esta servindo outro projeto** (um WordPress) e,
+  com `reuseExistingServer`, o Playwright testava **esse** app. Correcoes:
+  - `playwright.config.ts`: porta dedicada **8099** com `--strictPort` (falha alto em vez de pegar outra porta).
+  - `tests/e2e/helpers.ts` (novo): credenciais por `E2E_EMAIL`/`E2E_PASSWORD`, falha com mensagem explicita
+    quando faltam, login real e o texto do Error Boundary.
+  - `critical-paths.spec.ts` e `dashboard.spec.ts` reescritos contra o produto real: `/coletas` protegida
+    redireciona para `/auth`; login real chega na home com `#main-navigation`; `/coletas`,
+    `/transportadoras`, `/despachos` e `/configuracoes` abrem sem cair no Error Boundary; rota inexistente
+    mostra `404`; login em viewport de celular.
+  - **Prova:** `npx playwright test tests/e2e --project=chromium` -> **6 passed (12.8s)**, com o Vite subindo na
+    8099 (log do projeto certo, nao o do WordPress).
+  - Os antigos `admin@nexus.ai` (senha fixa no codigo, conta inexistente) saem de cena: o usuario dedicado tem
+    id `012ccf44-a276-49d4-b580-72d46942308d` e papel `user`.
+- **Efeito no negocio:** dois caminhos que movem dinheiro (criar cotacao e registrar a resposta da
+  transportadora) deixam de depender de "deveria funcionar": ha linha no banco, ha contrato na CI e ha suite
+  de navegador que quebra se a tela parar de autenticar. O E2E sai do limbo - roda de verdade e diz o que
+  cobre.
+- **NAO VERIFICADO:** (1) o disparo real das integracoes pelo botao Nexus Blast (efeito externo, consome
+  cotacao real - provado pelo mesmo endpoint de banco, nao pelo botao); (2) o job de CI de E2E, que e PR
+  separada por tocar `.github/workflows/` (regra 8); (3) a etapa 286 (Sentry) segue bloqueada por falta de
+  `VITE_SENTRY_DSN`.
+
+Contadores apos estas etapas (grep em `docs/qa/05-PROGRESSO.md`): **299 `[x]` / 1 `[~]`**.

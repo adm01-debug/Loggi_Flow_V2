@@ -1,64 +1,75 @@
 # Testes de ponta a ponta (E2E)
 
-Duas suítes versionadas que exercitam o produto como o usuário o usa. **Nenhuma das duas roda na
-CI** — e isso é deliberado, não esquecimento. Este arquivo registra o estado real para que elas
-saiam do limbo (etapa 283 do plano de QA).
+Suites que exercitam o produto real (`LogiFlow`) no navegador. Foram reescritas em 26/11/2026
+(etapa 283 do plano de QA): ate entao as duas suites testavam um app que **nao existe**.
 
 ## Como rodar
-
-```bash
-npm run test:e2e -- --project=chromium
-```
-
-`playwright.config.ts` sobe `npm run dev` em `http://localhost:8080` (`baseURL` das duas suítes), roda
-também em `firefox`, `webkit` e `mobile-chrome`, e gera relatório HTML.
-
-## O que cada suíte exige
-
-| Suíte | O que procura em tela | Precisa de login? |
-| --- | --- | --- |
-| `critical-paths.spec.ts` | login → `/dashboard` → texto "Visão Geral" → navega por Coletas, Fretes, Analytics e Configurações sem cair no Error Boundary; depois viewport 375×667 em `/dashboard` exigindo `nav` visível | **Sim** |
-| `dashboard.spec.ts` | `<h1>` ou `.logo-text` na home, clica nos itens de menu que estiverem visíveis e valida que `/invalid-route-nexus` mostra "não encontrada", "erro" ou "404" | Não |
-
-## Credenciais
-
-O cenário de login usa um **usuário semeado**. As credenciais vêm de variável de ambiente;
-sem elas o cenário falha de imediato com mensagem explícita — ele não tenta mais autenticar
-com uma conta inventada:
 
 ```bash
 E2E_EMAIL=... E2E_PASSWORD=... npm run test:e2e -- --project=chromium
 ```
 
-Antes, o arquivo trazia `admin@nexus.ai` e a senha fixos no código. Essa conta **não existe** no
-banco de produção `jvfhclubfpxrtrrazrgr` (consulta a `auth.users` em 25/11/2026: 7 contas, nenhuma
-com esse e-mail), então o cenário falhava sempre que a tela de login aparecia.
+- `playwright.config.ts` sobe `npm run dev -- --port 8099 --strictPort` e usa
+  `baseURL=http://127.0.0.1:8099`. **Nao** rode com a porta 8080: ela e a porta padrao do
+  `vite.config.ts` e, se estiver ocupada por outro projeto da mesma maquina, o
+  `reuseExistingServer` faz o Playwright testar o app errado. Foi exatamente o que aconteceu antes
+  (havia um WordPress de outro produto servindo a 8080 e as suites "passavam" contra ele).
+  `--strictPort` faz o Vite falhar alto em vez de escolher outra porta.
+- Projetos: `chromium`, `firefox`, `webkit`, `mobile-chrome`. Sem CI, so o que for pedido em
+  `--project` roda.
+- Relatorio HTML em `playwright-report/` (nao versionado).
 
-As contas de teste que existem hoje em produção foram criadas em 18/11/2026 por
-`scripts/seed-database.ts`: `admin@loggiflow.com.br` (papéis `admin,user`, último login 19/11/2026)
-e `user1@loggiflow.com.br` a `user3@loggiflow.com.br` (papel `user`). A senha **não** está no
-repositório: o script usa `SEED_PASSWORD` quando definida, e é ela que vale — a senha padrão
-do script foi conferida contra o hash bcrypt guardado em `auth.users` e **não** confere. Quem precisa
-rodar a suíte pede a senha a quem executou o seed.
+## O que cada suite exige
 
-## Por que não rodam na CI
+| Suite                    | O que faz                                                                                                                                                                                                                                         | Precisa de login? |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
+| `critical-paths.spec.ts` | `/coletas` sem sessao redireciona para `/auth` com `#login-email` visivel; login real chega na home com `#main-navigation` e sem Error Boundary; `/coletas`, `/transportadoras`, `/despachos` e `/configuracoes` abrem sem cair no Error Boundary | 2 de 3 testes     |
+| `dashboard.spec.ts`      | home autenticada com titulo contendo `LogiFlow` e `#main-navigation`; rota inexistente mostra `404`; formulario de login em viewport 375x667                                                                                                      | 1 de 3 testes     |
 
-- `vitest.config.ts` exclui `tests/e2e` de propósito — o Playwright tem runner próprio.
-- Nenhum workflow chama `npm run test:e2e` e os 10 required checks não incluem estas suítes. Um
-  workflow `e2e.yml` existiu e foi removido de propósito (PR #223) por não haver usuário semeado
-  nem ambiente de teste.
-- Não existe staging: rodar contra produção autentica em produção. A suíte é
-  somente leitura (navegação e asserts), mas o login cria sessão e atualiza `last_sign_in_at`.
-- `AGENTS.md` já documenta `npm run test:e2e` como execução manual.
+`tests/e2e/helpers.ts` centraliza tudo: le `E2E_EMAIL`/`E2E_PASSWORD`, falha com mensagem explicita
+quando faltam (`exigirCredenciais()`), faz o login de verdade (`autenticar()`) e exporta o texto do
+Error Boundary (`FALHA_CRITICA`) usado no assert de "a tela nao quebrou".
 
-## Semear dados de teste
+Seletores usados (todos do produto, nenhum inventado): `#login-email` e `#login-password`
+(`src/pages/auth/AuthFormPanel.tsx`), `#main-navigation` (`src/layouts/MainLayout.tsx` - ha dois
+`<aside>` na pagina, por isso o id e obrigatorio). Titulo da home: `LogiFlow | Inteligencia
+Logistica de Elite`.
 
-`scripts/seed-database.ts` é idempotente, só acrescenta o que falta, aceita `--dry-run` (imprime o
-plano sem fazer nenhuma requisição) e exige `--confirmar-producao` quando a URL é a de
-produção. Usa service role key e escreve empresas, transportadoras, cotações, usuários
-e veículos fictícios; nada é apagado.
+## Credenciais
 
-Proposta de usuário dedicado de E2E — depende de aprovação do dono, porque é escrita em
-produção: criar `e2e@loggiflow.com.br` com papel `user`, registros prefixados `E2E-` e remoção
-lógica por `deleted_at` ao final, conforme `docs/SOFT_DELETE_POLICY.md`. Só depois disso faz sentido um
-job de CI — e criar workflow é decisão do dono (Regra 8).
+Usuario dedicado: **`e2e@promobrindes.com.br`** (id `012ccf44-a276-49d4-b580-72d46942308d`,
+papel `user` em `public.user_roles`). As credenciais vivem **somente** nos secrets do repositorio
+(`E2E_EMAIL`, `E2E_PASSWORD`) e em variavel de ambiente local. Nunca no codigo.
+
+Rotacao de senha (a senha nunca aparece em log; o comando abaixo grava em `/tmp/e2e_pw`):
+
+```bash
+PGPASSWORD="$SUPABASE_DB_PASSWORD" psql "host=aws-0-us-east-2.pooler.supabase.com port=5432 user=postgres.jvfhclubfpxrtrrazrgr dbname=postgres sslmode=require" -c "update auth.users set encrypted_password = extensions.crypt('$PG_NOVA', extensions.gen_salt('bf')) where email = 'e2e@promobrindes.com.br';"
+```
+
+O conninfo **precisa** estar entre aspas, senao o psql ignora `user=`/`dbname=`.
+
+Historico: a suite antiga tinha `admin@nexus.ai` com senha fixa no codigo. Essa conta nunca existiu
+no banco de producao `jvfhclubfpxrtrrazrgr` - por isso o cenario de login falhava em toda execucao.
+
+## Limpeza
+
+A suite e somente leitura em relacao aos dados do produto (navega e verifica tela), com uma excecao
+a evitar: nao exercite o botao **Nexus Blast** em producao. Ele dispara integracoes reais
+(Lalamove, Rodonaves, Melhor Envio) e cria linhas em `cotacoes_multicanal`.
+
+`cotacoes_multicanal` nao tem coluna `deleted_at`: linha de teste criada a mao sai com `delete`.
+
+```sql
+delete from public.cotacoes_multicanal where id = '<id-criado-no-teste>';
+```
+
+## Por que nao rodam na CI
+
+`vitest.config.ts` exclui `tests/e2e` (o Playwright tem runner proprio). Um workflow dedicado
+(`.github/workflows/e2e.yml`) e a etapa 283 propriamente dita: ele precisa de `E2E_EMAIL`,
+`E2E_PASSWORD` e das chaves publicas do Supabase no ambiente. Como mexe em
+`.github/workflows/`, entra pela regra 8 do fluxo do projeto (PR aberta aguardando autorizacao).
+
+Nao existe staging: a suite roda contra producao. O login cria sessao e atualiza
+`last_sign_in_at` do usuario `e2e@promobrindes.com.br`; nada mais e escrito.

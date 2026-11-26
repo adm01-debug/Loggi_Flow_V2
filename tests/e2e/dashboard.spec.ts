@@ -1,29 +1,28 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test";
+import { autenticar, exigirCredenciais } from "./helpers";
 
-test.describe('Dashboard E2E Flow', () => {
-  test('should navigate through main modules', async ({ page }) => {
-    await page.goto('/');
-    
-    // Verifica se o título principal ou logo está visível
-    const title = page.locator('h1, .logo-text');
-    await expect(title).toBeDefined();
+test.describe("LogiFlow E2E - shell e dashboard", () => {
+  test("a home autentica e carrega o shell do produto", async ({ page }) => {
+    exigirCredenciais();
+    await autenticar(page);
 
-    // Simula cliques em módulos principais se existirem na barra lateral
-    const menuItems = ['Dashboard', 'Coletas', 'Fretes', 'Configurações'];
-    
-    for (const item of menuItems) {
-      const link = page.getByText(item, { exact: false });
-      if (await link.isVisible()) {
-        await link.click();
-        await page.waitForLoadState('networkidle');
-      }
-    }
+    await expect(page).toHaveTitle(/LogiFlow/i, { timeout: 20_000 });
+    await expect(page.locator("#main-navigation")).toBeVisible();
   });
 
-  test('should handle error states gracefully', async ({ page }) => {
-    // Tenta acessar uma rota inexistente para validar 404/Error Boundary
-    await page.goto('/invalid-route-nexus');
-    const errorText = page.getByText(/não encontrada|erro|404/i);
-    await expect(errorText).toBeDefined();
+  test("rota inexistente mostra a tela de 404", async ({ page }) => {
+    await page.goto("/rota-que-nao-existe");
+
+    await expect(page.getByText("404").first()).toBeVisible({
+      timeout: 20_000,
+    });
+  });
+
+  test("a tela de login funciona em viewport de celular", async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto("/auth");
+
+    await expect(page.locator("#login-email")).toBeVisible();
+    await expect(page.locator("#login-password")).toBeVisible();
   });
 });
