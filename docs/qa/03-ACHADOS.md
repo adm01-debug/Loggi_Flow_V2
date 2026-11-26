@@ -228,7 +228,7 @@ As chaves são `anon`; o ganho não paga o risco. O que resolve é: corrigir o `
 
 **Estado (2026-11-24):** PARCIAL (feito 015; falta 016, 017, 018 — aguarda o dono).
 
-**Estado em 2026-11-25 (etapa 016).** O `AGENTS.md:56` diz **“publico”**, com a medição da API anotada na
+**Estado (2026-11-26):** FECHADO — 016 e 274 entraram na PR #519 (`25b8259fa`): os três comentários de workflow e o `docs/agentes/github-ci.md` não citam mais repositório privado. **017 decidida pelo dono:** o repositório fica **publico até todas as correções terminarem** e a visibilidade é reavaliada no fim do plano; o `.env` continua fora do rastreamento (gate `check-env-not-tracked`).
 própria linha, e os três comentários de workflow que repetiam a suposição (`ci.yml:11`, `security.yml:13`,
 `contexto-ia.yml:99-101`) foram reescritos — nenhum deles cita mais repositório privado. O `.env` deixou de ser
 rastreado e o gate `scripts/ci/check-env-not-tracked.mjs` (etapa 018) reprova se voltar. O que segue aberto é a
