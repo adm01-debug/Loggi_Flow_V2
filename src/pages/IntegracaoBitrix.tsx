@@ -35,9 +35,28 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
+const SPA_KEYS = [
+  {
+    key: "bitrix_spa_coletas_id",
+    label: "Coletas",
+    description: "ID SPA de Compras no Bitrix24",
+  },
+  {
+    key: "bitrix_spa_entregas_id",
+    label: "Entregas",
+    description: "ID SPA de Entregas no Bitrix24",
+  },
+  {
+    key: "bitrix_spa_ocorrencias_id",
+    label: "Ocorrencias",
+    description: "ID SPA de Ocorrencias no Bitrix24",
+  },
+] as const;
+
 export default function IntegracaoBitrix() {
   const qc = useQueryClient();
   const [webhookUrl, setWebhookUrl] = useState("");
+  const [spaIds, setSpaIds] = useState<Record<string, string>>({});
 
   const { data: config } = useQuery({
     queryKey: ["bitrix-config"],
@@ -101,6 +120,54 @@ export default function IntegracaoBitrix() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["bitrix-config"] });
       toast.success("Configuração salva com sucesso!");
+    },
+  });
+
+  const { data: spaConfig = [] } = useQuery({
+    queryKey: ["bitrix-spa-ids"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("business_rules_config")
+        .select("key, value")
+        .in(
+          "key",
+          SPA_KEYS.map((spa) => spa.key),
+        )
+        .limit(10);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const spaConfigMap = new Map(
+    spaConfig.map((row) => [row.key, String(row.value ?? "")]),
+  );
+
+  const saveSpaIdsMutation = useMutation({
+    mutationFn: async () => {
+      const rows = SPA_KEYS.map((spa) => {
+        const raw = (spaIds[spa.key] ?? spaConfigMap.get(spa.key) ?? "").trim();
+        const id = Number(raw);
+        if (!Number.isInteger(id) || id <= 0) {
+          throw new Error(`Informe um ID numerico para ${spa.label}.`);
+        }
+        return {
+          key: spa.key,
+          value: String(id),
+          description: spa.description,
+        };
+      });
+      const { error } = await supabase
+        .from("business_rules_config")
+        .upsert(rows, { onConflict: "key" });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["bitrix-spa-ids"] });
+      toast.success("IDs das SPAs salvos.");
+    },
+    onError: (err) => {
+      toast.error(`Nao foi possivel salvar os IDs: ${err.message}`);
     },
   });
 
@@ -456,6 +523,43 @@ export default function IntegracaoBitrix() {
                     Clientes e Negócios. Certifique-se de que o webhook no
                     Bitrix24 tenha permissões de leitura/escrita para 'CRM'.
                   </p>
+                </div>
+                <div className="pt-6 border-t space-y-4">
+                  <div className="flex items-center gap-2">
+                    <Database className="w-5 h-5 text-primary" />
+                    <p className="font-bold">IDs das SPAs no CRM</p>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Cada funil do Bitrix24 tem um numero de SPA. A sincronizacao
+                    usa estes numeros para buscar coletas, entregas e
+                    ocorrencias.
+                  </p>
+                  <div className="grid gap-4 sm:grid-cols-3">
+                    {SPA_KEYS.map((spa) => (
+                      <div key={spa.key} className="space-y-2">
+                        <Label htmlFor={spa.key}>{spa.label}</Label>
+                        <Input
+                          id={spa.key}
+                          type="number"
+                          min={1}
+                          value={
+                            spaIds[spa.key] ?? spaConfigMap.get(spa.key) ?? ""
+                          }
+                          onChange={(e) =>
+                            setSpaIds({ ...spaIds, [spa.key]: e.target.value })
+                          }
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  <Button
+                    onClick={() => saveSpaIdsMutation.mutate()}
+                    disabled={saveSpaIdsMutation.isPending}
+                  >
+                    {saveSpaIdsMutation.isPending
+                      ? "Salvando..."
+                      : "Salvar IDs"}
+                  </Button>
                 </div>
               </CardContent>
             </Card>
