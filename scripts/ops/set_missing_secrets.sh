@@ -31,6 +31,7 @@ RODONAVES_PASSWORD|senha do portal Rodonaves
 RODONAVES_CNPJ_REMETENTE|CNPJ sem mascara
 RODONAVES_WEBHOOK_SECRET|HMAC do rodonaves-webhook (sem ele o webhook recusa tudo)
 MELHOR_ENVIO_TOKEN|token Melhor Envio
+MELHOR_ENVIO_SANDBOX|opcional; true liga o sandbox fora do projeto de producao
 LALAMOVE_API_KEY|
 LALAMOVE_API_SECRET|tambem e' o HMAC do lalamove-webhook
 LALAMOVE_BASE_URL|opcional; padrao https://rest.lalamove.com
@@ -39,7 +40,6 @@ CARRIER_WEBHOOK_SECRET|HMAC do carrier-webhook-receiver (sem ele o webhook recus
 GOOGLE_API_KEY|predict-delays e ai-logistics-assistant
 OPENAI_API_KEY|normalize-freight-response (sk-...)
 # ── Mapas e clima ──
-MAPBOX_PUBLIC_TOKEN|pk.eyJ1Ijo... (publico por design)
 OPENWEATHER_API_KEY|
 # ── Comunicacao ──
 RESEND_API_KEY|re_...
