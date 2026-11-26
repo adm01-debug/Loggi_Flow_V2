@@ -1,0 +1,15 @@
+-- Remove public.xp_for_level(integer): funcao pura que ninguem chama.
+--
+-- Evidencia medida no banco oficial em 26/11/2026:
+--   0 triggers (pg_trigger.tgfoid), 0 policies (pg_policy), 0 corpos de funcao (pg_proc.prosrc) e
+--   0 cron jobs (cron.job.command) citam xp_for_level;
+--   nenhum arquivo em src/, supabase/functions/, scripts/ ou tests/ chama a RPC - so os artefatos
+--   gerados (src/integrations/supabase/types.ts, supabase/schema-manifest.json,
+--   supabase/schema-catalog.json) a listam, e o types-sync regenera os tres depois deste DROP.
+--
+-- O calculo de nivel em uso continua em TypeScript, com a mesma formula:
+--   src/hooks/gamification/useGamification.ts:187-189
+--     nivel = floor(sqrt(xp / 100)) + 1   e   xp inicial do nivel = (nivel - 1)^2 * 100
+--
+-- Rollback: supabase/rollbacks/20261126210000_rollback_remove_xp_for_level.sql
+DROP FUNCTION IF EXISTS public.xp_for_level(integer);
