@@ -1,0 +1,61 @@
+name: E2E
+
+# Etapa 283: as duas suites de tests/e2e/ passam a rodar na CI. Antes disso elas nao
+# rodavam em lugar nenhum - e quando rodavam a mao testavam outro app (ver tests/e2e/README.md).
+#
+# Precisa de: secrets E2E_EMAIL/E2E_PASSWORD (usuario dedicado) e das variables
+# VITE_SUPABASE_URL/VITE_SUPABASE_PUBLISHABLE_KEY (chave publica, a mesma que vai no bundle).
+# Sem isso a suite de login nao tem como autenticar e o job falha de proposito.
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    name: E2E (chromium)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - run: npm ci
+      - name: Conferir as credenciais do usuario de teste
+        env:
+          E2E_EMAIL: ${{ secrets.E2E_EMAIL }}
+          E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
+        run: |
+          faltando=""
+          [ -z "$E2E_EMAIL" ] && faltando="$faltando E2E_EMAIL"
+          [ -z "$E2E_PASSWORD" ] && faltando="$faltando E2E_PASSWORD"
+          if [ -n "$faltando" ]; then
+            echo "::error::Faltam secrets para a suite E2E:$faltando"
+            exit 1
+          fi
+      - name: Instalar o navegador do Playwright
+        run: npx playwright install --with-deps chromium
+      - name: Rodar as suites de ponta a ponta
+        env:
+          E2E_EMAIL: ${{ secrets.E2E_EMAIL }}
+          E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
+        run: npx playwright test tests/e2e --project=chromium
+      - name: Guardar o relatorio quando falhar
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
