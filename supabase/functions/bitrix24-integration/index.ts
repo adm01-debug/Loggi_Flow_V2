@@ -56,6 +56,33 @@ serve(async (req) => {
       );
     }
 
+    // IDs das SPAs vem da tela de regras do negocio (business_rules_config); o
+    // literal e o ultimo recurso, para a integracao nao parar se a tabela falhar.
+    const SPA_IDS_PADRAO = { coletas: 1186, entregas: 1234, ocorrencias: 1050 };
+    const spaIds = { ...SPA_IDS_PADRAO };
+    try {
+      const { data: regras } = await supabase
+        .from("business_rules_config")
+        .select("key, value")
+        .in("key", [
+          "bitrix_spa_coletas_id",
+          "bitrix_spa_entregas_id",
+          "bitrix_spa_ocorrencias_id",
+        ]);
+      for (const r of regras ?? []) {
+        const id = Number(r.value);
+        if (!Number.isInteger(id) || id <= 0) continue;
+        if (r.key === "bitrix_spa_coletas_id") spaIds.coletas = id;
+        else if (r.key === "bitrix_spa_entregas_id") spaIds.entregas = id;
+        else if (r.key === "bitrix_spa_ocorrencias_id") spaIds.ocorrencias = id;
+      }
+    } catch (e) {
+      log.warn("bitrix24-integration: business_rules_config indisponivel", {
+        error: String(e),
+        padrao: SPA_IDS_PADRAO,
+      });
+    }
+
     const body: BitrixRequest = await req.json();
 
     switch (body.action) {
@@ -65,7 +92,7 @@ serve(async (req) => {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            entityTypeId: body.spa_id || 1186,
+            entityTypeId: body.spa_id || spaIds.coletas,
             filter: { ">=updatedTime": getLastSyncTime() },
             select: ["id"],
             start: -1, // Bitrix returns only count, no items, for limit -1
@@ -93,7 +120,7 @@ serve(async (req) => {
       }
 
       case "get_deals": {
-        const spaId = body.spa_id || 1186; // Default: Gestão Compras
+        const spaId = body.spa_id || spaIds.coletas; // Default: Gestão Compras
         const response = await safeFetch(`${bitrixWebhookUrl}/crm.item.list`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -150,7 +177,7 @@ serve(async (req) => {
           );
         }
 
-        const spaId = body.spa_id || 1186;
+        const spaId = body.spa_id || spaIds.coletas;
         const response = await safeFetch(
           `${bitrixWebhookUrl}/crm.item.update`,
           {
@@ -194,7 +221,7 @@ serve(async (req) => {
           );
         }
 
-        const spaId = body.spa_id || 1234; // Default: Entregas Log
+        const spaId = body.spa_id || spaIds.entregas; // Default: Entregas Log
         const response = await safeFetch(`${bitrixWebhookUrl}/crm.item.add`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -225,14 +252,14 @@ serve(async (req) => {
       }
 
       case "sync_deals": {
-        // Sync coletas from SPA 1186 (Gestão Compras)
+        // Sync coletas (SPA de Compras de business_rules_config)
         const coletasResponse = await safeFetch(
           `${bitrixWebhookUrl}/crm.item.list`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              entityTypeId: 1186,
+              entityTypeId: spaIds.coletas,
               filter: { ">=updatedTime": getLastSyncTime() },
               select: [
                 "id",
@@ -248,14 +275,14 @@ serve(async (req) => {
         );
         const coletasData = await coletasResponse.json();
 
-        // Sync entregas from SPA 1234 (Entregas Log)
+        // Sync entregas (SPA de Entregas de business_rules_config)
         const entregasResponse = await safeFetch(
           `${bitrixWebhookUrl}/crm.item.list`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              entityTypeId: 1234,
+              entityTypeId: spaIds.entregas,
               filter: { ">=updatedTime": getLastSyncTime() },
               select: [
                 "id",
@@ -271,14 +298,14 @@ serve(async (req) => {
         );
         const entregasData = await entregasResponse.json();
 
-        // Sync Ocorrências from SPA 1050 (New: Ocorrências Log)
+        // Sync ocorrencias (SPA de Ocorrencias de business_rules_config)
         const ocorrenciasResponse = await safeFetch(
           `${bitrixWebhookUrl}/crm.item.list`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              entityTypeId: 1050,
+              entityTypeId: spaIds.ocorrencias,
               filter: { ">=updatedTime": getLastSyncTime() },
               select: [
                 "id",
