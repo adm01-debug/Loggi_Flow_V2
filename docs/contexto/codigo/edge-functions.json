@@ -1,0 +1,1832 @@
+{
+ "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
+ "format_version": 2,
+ "pasta": "supabase/functions",
+ "total": 43,
+ "verify_jwt_false": [
+  "carrier-webhook-receiver",
+  "evolution-whatsapp",
+  "health",
+  "health-check",
+  "lalamove-webhook",
+  "log-security-event",
+  "melhor-envio-api",
+  "nexus-webhook-receiver",
+  "predict-delays-scheduled",
+  "resend-email",
+  "rodonaves-webhook",
+  "webhook-status"
+ ],
+ "shared": [
+  "supabase/functions/_shared/auth.ts",
+  "supabase/functions/_shared/circuitBreaker.test.ts",
+  "supabase/functions/_shared/circuitBreaker.ts",
+  "supabase/functions/_shared/contract-validator.ts",
+  "supabase/functions/_shared/cors.ts",
+  "supabase/functions/_shared/crypto.ts",
+  "supabase/functions/_shared/crypto_test.ts",
+  "supabase/functions/_shared/eventKey.ts",
+  "supabase/functions/_shared/fetch-with-timeout.ts",
+  "supabase/functions/_shared/httpError.ts",
+  "supabase/functions/_shared/idempotency.test.ts",
+  "supabase/functions/_shared/idempotency.ts",
+  "supabase/functions/_shared/invokeFunction.ts",
+  "supabase/functions/_shared/logger.ts",
+  "supabase/functions/_shared/number.ts",
+  "supabase/functions/_shared/rateLimiter.ts",
+  "supabase/functions/_shared/redis.ts",
+  "supabase/functions/_shared/safeFetch.ts",
+  "supabase/functions/_shared/schemas/common.ts",
+  "supabase/functions/_shared/secretConfig.ts",
+  "supabase/functions/_shared/security.ts",
+  "supabase/functions/_shared/testMode.test.ts",
+  "supabase/functions/_shared/testMode.ts",
+  "supabase/functions/_shared/validate.ts",
+  "supabase/functions/_shared/weather.ts",
+  "supabase/functions/_shared/webhookSignature.test.ts",
+  "supabase/functions/_shared/webhookSignature.ts"
+ ],
+ "edges": [
+  {
+   "nome": "accuracy-meta-monitor",
+   "entrada": "supabase/functions/accuracy-meta-monitor/index.ts",
+   "arquivos": 4,
+   "linhas": 713,
+   "verify_jwt": true,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [
+    "notifications",
+    "prediction_accuracy_settings"
+   ],
+   "rpcs": [
+    "count_prediction_breach_days"
+   ],
+   "env": [
+    "APP_URL",
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS"
+   ],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [],
+   "usa_shared": [
+    "cors.ts",
+    "invokeFunction.ts",
+    "logger.ts"
+   ],
+   "chamada_pelo_front": [],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": true,
+   "orfa": false,
+   "testes": 4
+  },
+  {
+   "nome": "accuracy-weekly-digest",
+   "entrada": "supabase/functions/accuracy-weekly-digest/index.ts",
+   "arquivos": 2,
+   "linhas": 439,
+   "verify_jwt": true,
+   "metodos": [
+    "OPTIONS",
+    "POST"
+   ],
+   "tabelas": [
+    "notifications",
+    "prediction_accuracy_settings"
+   ],
+   "rpcs": [],
+   "env": [
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS"
+   ],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [],
+   "usa_shared": [
+    "cors.ts",
+    "invokeFunction.ts",
+    "logger.ts"
+   ],
+   "chamada_pelo_front": [
+    "src/components/predictions/DigestPreviewPanel.tsx"
+   ],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": true,
+   "orfa": false,
+   "testes": 1
+  },
+  {
+   "nome": "ai-logistics-assistant",
+   "entrada": "supabase/functions/ai-logistics-assistant/index.ts",
+   "arquivos": 2,
+   "linhas": 372,
+   "verify_jwt": true,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [
+    "entregas",
+    "ocorrencias",
+    "transportadoras"
+   ],
+   "rpcs": [
+    "get_carrier_performance_stats"
+   ],
+   "env": [
+    "GOOGLE_API_KEY",
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS",
+    "INTERNAL_FN_SECRET",
+    "OPENWEATHER_API_KEY",
+    "SUPABASE_ANON_KEY"
+   ],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [
+    "generativelanguage.googleapis.com"
+   ],
+   "usa_shared": [
+    "auth.ts",
+    "cors.ts",
+    "logger.ts",
+    "rateLimiter.ts",
+    "safeFetch.ts",
+    "validate.ts",
+    "weather.ts"
+   ],
+   "chamada_pelo_front": [
+    "src/components/ai/AIAssistant.tsx",
+    "src/pages/APIDocumentation.tsx"
+   ],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": false,
+   "orfa": false,
+   "testes": 1
+  },
+  {
+   "nome": "bitrix24-integration",
+   "entrada": "supabase/functions/bitrix24-integration/index.ts",
+   "arquivos": 1,
+   "linhas": 492,
+   "verify_jwt": true,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [
+    "audit_logs",
+    "bitrix_sync_config",
+    "business_rules_config"
+   ],
+   "rpcs": [],
+   "env": [
+    "BITRIX24_WEBHOOK_URL",
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS"
+   ],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [],
+   "usa_shared": [
+    "cors.ts",
+    "logger.ts",
+    "safeFetch.ts",
+    "secretConfig.ts"
+   ],
+   "chamada_pelo_front": [
+    "src/hooks/integrations/useBitrixEntregaSync.tsx",
+    "src/hooks/security/useIntegrationValidation.tsx",
+    "src/pages/IntegracaoBitrix.tsx"
+   ],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": false,
+   "orfa": false,
+   "testes": 1
+  },
+  {
+   "nome": "carrier-webhook-receiver",
+   "entrada": "supabase/functions/carrier-webhook-receiver/index.ts",
+   "arquivos": 1,
+   "linhas": 271,
+   "verify_jwt": false,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [
+    "automation_audit_logs",
+    "entregas",
+    "ocorrencias",
+    "webhook_inbound_failures"
+   ],
+   "rpcs": [],
+   "env": [
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS"
+   ],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [],
+   "usa_shared": [
+    "contract-validator.ts",
+    "cors.ts",
+    "idempotency.ts",
+    "logger.ts",
+    "rateLimiter.ts",
+    "validate.ts",
+    "webhookSignature.ts"
+   ],
+   "chamada_pelo_front": [
+    "src/pages/APIDocumentation.tsx"
+   ],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": false,
+   "orfa": false,
+   "testes": 1
+  },
+  {
+   "nome": "check-password-breach",
+   "entrada": "supabase/functions/check-password-breach/index.ts",
+   "arquivos": 1,
+   "linhas": 68,
+   "verify_jwt": true,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [],
+   "rpcs": [],
+   "env": [],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS"
+   ],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [
+    "api.pwnedpasswords.com"
+   ],
+   "usa_shared": [
+    "cors.ts",
+    "logger.ts",
+    "safeFetch.ts"
+   ],
+   "chamada_pelo_front": [
+    "src/components/auth/PasswordStrengthIndicator.tsx",
+    "src/pages/APIDocumentation.tsx"
+   ],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": false,
+   "orfa": false,
+   "testes": 1
+  },
+  {
+   "nome": "check-rate-limit",
+   "entrada": "supabase/functions/check-rate-limit/index.ts",
+   "arquivos": 1,
+   "linhas": 149,
+   "verify_jwt": true,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [
+    "rate_limit_logs",
+    "security_events"
+   ],
+   "rpcs": [],
+   "env": [
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS"
+   ],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [],
+   "usa_shared": [
+    "cors.ts",
+    "logger.ts"
+   ],
+   "chamada_pelo_front": [
+    "src/hooks/security/useSecurityEvents.ts"
+   ],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": false,
+   "orfa": false,
+   "testes": 1
+  },
+  {
+   "nome": "db-health-snapshot",
+   "entrada": "supabase/functions/db-health-snapshot/index.ts",
+   "arquivos": 1,
+   "linhas": 55,
+   "verify_jwt": true,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [
+    "db_health_snapshots"
+   ],
+   "rpcs": [
+    "persist_db_health_snapshot"
+   ],
+   "env": [
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [],
+   "usa_shared": [],
+   "chamada_pelo_front": [],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": true,
+   "orfa": false,
+   "testes": 0
+  },
+  {
+   "nome": "db-health-weekly-report",
+   "entrada": "supabase/functions/db-health-weekly-report/index.ts",
+   "arquivos": 1,
+   "linhas": 244,
+   "verify_jwt": true,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [
+    "db_slo_daily",
+    "profiles",
+    "user_roles"
+   ],
+   "rpcs": [
+    "get_capacity_forecast_fast",
+    "get_health_anomalies_fast",
+    "get_remediation_suggestions_fast"
+   ],
+   "env": [
+    "RESEND_API_KEY",
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [
+    "api.resend.com"
+   ],
+   "usa_shared": [
+    "httpError.ts",
+    "logger.ts",
+    "safeFetch.ts"
+   ],
+   "chamada_pelo_front": [],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": true,
+   "orfa": false,
+   "testes": 1
+  },
+  {
+   "nome": "db-regression-monitor",
+   "entrada": "supabase/functions/db-regression-monitor/index.ts",
+   "arquivos": 1,
+   "linhas": 91,
+   "verify_jwt": true,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [
+    "feature_flags",
+    "nexus_tactical_logs",
+    "notifications",
+    "user_roles"
+   ],
+   "rpcs": [
+    "get_query_regressions_fast"
+   ],
+   "env": [
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [],
+   "usa_shared": [],
+   "chamada_pelo_front": [],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": true,
+   "orfa": false,
+   "testes": 0
+  },
+  {
+   "nome": "evolution-whatsapp",
+   "entrada": "supabase/functions/evolution-whatsapp/index.ts",
+   "arquivos": 2,
+   "linhas": 385,
+   "verify_jwt": false,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [
+    "audit_logs"
+   ],
+   "rpcs": [],
+   "env": [
+    "EVOLUTION_ALLOWED_INSTANCES",
+    "EVOLUTION_API_KEY",
+    "EVOLUTION_API_URL",
+    "EVOLUTION_INSTANCE_NAME",
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS",
+    "INTERNAL_FN_SECRET",
+    "SUPABASE_ANON_KEY"
+   ],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [],
+   "usa_shared": [
+    "auth.ts",
+    "circuitBreaker.ts",
+    "cors.ts",
+    "logger.ts",
+    "rateLimiter.ts",
+    "safeFetch.ts",
+    "validate.ts"
+   ],
+   "chamada_pelo_front": [
+    "src/hooks/integrations/useEvolutionWhatsApp.tsx"
+   ],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": false,
+   "orfa": false,
+   "testes": 1
+  },
+  {
+   "nome": "execute-protocol",
+   "entrada": "supabase/functions/execute-protocol/index.ts",
+   "arquivos": 1,
+   "linhas": 75,
+   "verify_jwt": true,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [],
+   "rpcs": [
+    "execute_nexus_protocol"
+   ],
+   "env": [
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS"
+   ],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [],
+   "usa_shared": [
+    "cors.ts",
+    "httpError.ts",
+    "logger.ts"
+   ],
+   "chamada_pelo_front": [
+    "src/components/dashboard/LogisticsMapWidget.tsx"
+   ],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": false,
+   "orfa": false,
+   "testes": 1
+  },
+  {
+   "nome": "external-db-bridge",
+   "entrada": "supabase/functions/external-db-bridge/index.ts",
+   "arquivos": 1,
+   "linhas": 378,
+   "verify_jwt": true,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [
+    "query_telemetry"
+   ],
+   "rpcs": [],
+   "env": [
+    "EXTERNAL_DB_ALLOWED_RPCS",
+    "EXTERNAL_DB_ALLOWED_TABLES",
+    "EXTERNAL_SUPABASE_SERVICE_KEY",
+    "EXTERNAL_SUPABASE_URL",
+    "SUPABASE_ANON_KEY",
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS"
+   ],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [],
+   "usa_shared": [
+    "cors.ts",
+    "logger.ts",
+    "validate.ts"
+   ],
+   "chamada_pelo_front": [
+    "src/hooks/integrations/useExternalDbBridge.tsx"
+   ],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": false,
+   "orfa": false,
+   "testes": 1
+  },
+  {
+   "nome": "geocode-address",
+   "entrada": "supabase/functions/geocode-address/index.ts",
+   "arquivos": 1,
+   "linhas": 178,
+   "verify_jwt": true,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [],
+   "rpcs": [],
+   "env": [],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS"
+   ],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [
+    "nominatim.openstreetmap.org",
+    "photon.komoot.io",
+    "viacep.com.br"
+   ],
+   "usa_shared": [
+    "cors.ts",
+    "logger.ts",
+    "safeFetch.ts"
+   ],
+   "chamada_pelo_front": [
+    "src/hooks/integrations/useGeocoding.tsx",
+    "src/hooks/logistics/useDeliveryRoutes.tsx",
+    "src/hooks/security/useIntegrationValidation.tsx",
+    "src/pages/APIDocumentation.tsx"
+   ],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": false,
+   "orfa": false,
+   "testes": 1
+  },
+  {
+   "nome": "get-weather-data",
+   "entrada": "supabase/functions/get-weather-data/index.ts",
+   "arquivos": 1,
+   "linhas": 50,
+   "verify_jwt": true,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [],
+   "rpcs": [],
+   "env": [
+    "OPENWEATHER_API_KEY",
+    "SUPABASE_ANON_KEY",
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS"
+   ],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [
+    "api.openweathermap.org"
+   ],
+   "usa_shared": [
+    "cors.ts",
+    "logger.ts",
+    "safeFetch.ts",
+    "secretConfig.ts"
+   ],
+   "chamada_pelo_front": [
+    "src/pages/APIDocumentation.tsx"
+   ],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": false,
+   "orfa": false,
+   "testes": 1
+  },
+  {
+   "nome": "health",
+   "entrada": "supabase/functions/health/index.ts",
+   "arquivos": 1,
+   "linhas": 79,
+   "verify_jwt": false,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [
+    "profiles"
+   ],
+   "rpcs": [],
+   "env": [
+    "SUPABASE_ANON_KEY",
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS"
+   ],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [],
+   "usa_shared": [
+    "cors.ts"
+   ],
+   "chamada_pelo_front": [],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": false,
+   "orfa": false,
+   "testes": 1
+  },
+  {
+   "nome": "health-check",
+   "entrada": "supabase/functions/health-check/index.ts",
+   "arquivos": 1,
+   "linhas": 75,
+   "verify_jwt": false,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [
+    "profiles"
+   ],
+   "rpcs": [],
+   "env": [
+    "SUPABASE_ANON_KEY",
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS",
+    "INTERNAL_FN_SECRET"
+   ],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [],
+   "usa_shared": [
+    "auth.ts",
+    "circuitBreaker.ts",
+    "cors.ts",
+    "logger.ts"
+   ],
+   "chamada_pelo_front": [
+    "src/utils/systemTester.ts"
+   ],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": false,
+   "orfa": false,
+   "testes": 1
+  },
+  {
+   "nome": "ingest-biosync",
+   "entrada": "supabase/functions/ingest-biosync/index.ts",
+   "arquivos": 2,
+   "linhas": 194,
+   "verify_jwt": true,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [
+    "bio_sync_alert_rules",
+    "bio_sync_telemetry",
+    "nexus_tactical_logs"
+   ],
+   "rpcs": [],
+   "env": [
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS",
+    "INTERNAL_FN_SECRET",
+    "SUPABASE_ANON_KEY"
+   ],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [],
+   "usa_shared": [
+    "auth.ts",
+    "cors.ts",
+    "httpError.ts",
+    "idempotency.ts",
+    "invokeFunction.ts",
+    "logger.ts",
+    "validate.ts"
+   ],
+   "chamada_pelo_front": [],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": false,
+   "orfa": true,
+   "testes": 1
+  },
+  {
+   "nome": "lalamove-api",
+   "entrada": "supabase/functions/lalamove-api/index.ts",
+   "arquivos": 2,
+   "linhas": 302,
+   "verify_jwt": true,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [],
+   "rpcs": [],
+   "env": [
+    "LALAMOVE_API_KEY",
+    "LALAMOVE_API_SECRET",
+    "LALAMOVE_BASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS",
+    "UPSTASH_REDIS_REST_TOKEN",
+    "UPSTASH_REDIS_REST_URL"
+   ],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [
+    "rest.lalamove.com"
+   ],
+   "usa_shared": [
+    "circuitBreaker.ts",
+    "cors.ts",
+    "logger.ts",
+    "redis.ts",
+    "safeFetch.ts",
+    "validate.ts"
+   ],
+   "chamada_pelo_front": [
+    "src/hooks/logistics/useLalamoveOrders.tsx",
+    "src/pages/APIDocumentation.tsx"
+   ],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": false,
+   "orfa": false,
+   "testes": 1
+  },
+  {
+   "nome": "lalamove-tracking",
+   "entrada": "supabase/functions/lalamove-tracking/index.ts",
+   "arquivos": 2,
+   "linhas": 220,
+   "verify_jwt": true,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [],
+   "rpcs": [],
+   "env": [
+    "LALAMOVE_API_KEY",
+    "LALAMOVE_API_SECRET"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS"
+   ],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [
+    "rest.lalamove.com",
+    "rest.sandbox.lalamove.com"
+   ],
+   "usa_shared": [
+    "circuitBreaker.ts",
+    "cors.ts",
+    "logger.ts",
+    "safeFetch.ts",
+    "secretConfig.ts",
+    "validate.ts"
+   ],
+   "chamada_pelo_front": [
+    "src/hooks/logistics/useLalamoveTracking.tsx",
+    "src/hooks/security/useIntegrationValidation.tsx"
+   ],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": false,
+   "orfa": false,
+   "testes": 1
+  },
+  {
+   "nome": "lalamove-webhook",
+   "entrada": "supabase/functions/lalamove-webhook/index.ts",
+   "arquivos": 1,
+   "linhas": 237,
+   "verify_jwt": false,
+   "metodos": [
+    "OPTIONS",
+    "POST"
+   ],
+   "tabelas": [
+    "coletas",
+    "rastreamento_alertas",
+    "rastreamento_historico",
+    "webhook_events_processed"
+   ],
+   "rpcs": [],
+   "env": [
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS",
+    "ALLOW_TEST_MODE"
+   ],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [],
+   "usa_shared": [
+    "contract-validator.ts",
+    "cors.ts",
+    "httpError.ts",
+    "idempotency.ts",
+    "logger.ts",
+    "rateLimiter.ts",
+    "testMode.ts",
+    "validate.ts",
+    "webhookSignature.ts"
+   ],
+   "chamada_pelo_front": [],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": false,
+   "orfa": false,
+   "testes": 1
+  },
+  {
+   "nome": "lgpd-erase-user",
+   "entrada": "supabase/functions/lgpd-erase-user/index.ts",
+   "arquivos": 1,
+   "linhas": 136,
+   "verify_jwt": true,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [
+    "audit_logs",
+    "profiles",
+    "user_roles"
+   ],
+   "rpcs": [],
+   "env": [
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS"
+   ],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [],
+   "usa_shared": [
+    "cors.ts",
+    "httpError.ts",
+    "logger.ts"
+   ],
+   "chamada_pelo_front": [
+    "src/pages/APIDocumentation.tsx"
+   ],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": false,
+   "orfa": false,
+   "testes": 1
+  },
+  {
+   "nome": "log-login-attempt",
+   "entrada": "supabase/functions/log-login-attempt/index.ts",
+   "arquivos": 1,
+   "linhas": 77,
+   "verify_jwt": true,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [
+    "login_attempts"
+   ],
+   "rpcs": [],
+   "env": [
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS"
+   ],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [],
+   "usa_shared": [
+    "cors.ts",
+    "logger.ts"
+   ],
+   "chamada_pelo_front": [
+    "src/pages/auth/authUtils.ts"
+   ],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": false,
+   "orfa": false,
+   "testes": 1
+  },
+  {
+   "nome": "log-security-event",
+   "entrada": "supabase/functions/log-security-event/index.ts",
+   "arquivos": 1,
+   "linhas": 174,
+   "verify_jwt": false,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [
+    "security_events"
+   ],
+   "rpcs": [],
+   "env": [
+    "RESEND_API_KEY",
+    "SECURITY_ALERT_EMAIL",
+    "SECURITY_SLACK_WEBHOOK_URL",
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS",
+    "INTERNAL_FN_SECRET",
+    "SUPABASE_ANON_KEY"
+   ],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [
+    "api.resend.com"
+   ],
+   "usa_shared": [
+    "auth.ts",
+    "cors.ts",
+    "logger.ts",
+    "rateLimiter.ts",
+    "safeFetch.ts",
+    "secretConfig.ts"
+   ],
+   "chamada_pelo_front": [
+    "src/hooks/security/useSecurityEvents.ts"
+   ],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": false,
+   "orfa": false,
+   "testes": 1
+  },
+  {
+   "nome": "melhor-envio-api",
+   "entrada": "supabase/functions/melhor-envio-api/index.ts",
+   "arquivos": 3,
+   "linhas": 528,
+   "verify_jwt": false,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [],
+   "rpcs": [],
+   "env": [
+    "MELHOR_ENVIO_SANDBOX",
+    "MELHOR_ENVIO_TOKEN",
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS",
+    "INTERNAL_FN_SECRET",
+    "SUPABASE_ANON_KEY",
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "UPSTASH_REDIS_REST_TOKEN",
+    "UPSTASH_REDIS_REST_URL"
+   ],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [
+    "melhorenvio.com.br",
+    "sandbox.melhorenvio.com.br"
+   ],
+   "usa_shared": [
+    "auth.ts",
+    "circuitBreaker.ts",
+    "cors.ts",
+    "logger.ts",
+    "rateLimiter.ts",
+    "redis.ts",
+    "safeFetch.ts",
+    "secretConfig.ts",
+    "validate.ts"
+   ],
+   "chamada_pelo_front": [
+    "src/hooks/logistics/useMelhorEnvio.tsx",
+    "src/hooks/security/useIntegrationValidation.tsx",
+    "src/pages/APIDocumentation.tsx"
+   ],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": false,
+   "orfa": false,
+   "testes": 1
+  },
+  {
+   "nome": "new-device-alert",
+   "entrada": "supabase/functions/new-device-alert/index.ts",
+   "arquivos": 1,
+   "linhas": 206,
+   "verify_jwt": true,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [
+    "security_events"
+   ],
+   "rpcs": [],
+   "env": [
+    "RESEND_API_KEY",
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS",
+    "INTERNAL_FN_SECRET",
+    "SUPABASE_ANON_KEY"
+   ],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [
+    "api.resend.com"
+   ],
+   "usa_shared": [
+    "auth.ts",
+    "cors.ts",
+    "logger.ts",
+    "safeFetch.ts"
+   ],
+   "chamada_pelo_front": [
+    "src/hooks/auth/useNewDeviceDetection.tsx"
+   ],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": false,
+   "orfa": false,
+   "testes": 1
+  },
+  {
+   "nome": "nexus-auto-healing",
+   "entrada": "supabase/functions/nexus-auto-healing/index.ts",
+   "arquivos": 1,
+   "linhas": 115,
+   "verify_jwt": true,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [
+    "coletas",
+    "entregas",
+    "system_heartbeat",
+    "system_integrity_logs"
+   ],
+   "rpcs": [],
+   "env": [
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS"
+   ],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [],
+   "usa_shared": [
+    "cors.ts",
+    "logger.ts"
+   ],
+   "chamada_pelo_front": [
+    "src/components/common/RealtimeStatus.tsx"
+   ],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": false,
+   "orfa": false,
+   "testes": 1
+  },
+  {
+   "nome": "nexus-webhook-receiver",
+   "entrada": "supabase/functions/nexus-webhook-receiver/index.ts",
+   "arquivos": 1,
+   "linhas": 204,
+   "verify_jwt": false,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [
+    "cotacoes_multicanal",
+    "transportadoras"
+   ],
+   "rpcs": [],
+   "env": [
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS"
+   ],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [],
+   "usa_shared": [
+    "contract-validator.ts",
+    "cors.ts",
+    "httpError.ts",
+    "idempotency.ts",
+    "invokeFunction.ts",
+    "logger.ts",
+    "rateLimiter.ts",
+    "validate.ts",
+    "webhookSignature.ts"
+   ],
+   "chamada_pelo_front": [
+    "src/pages/ConfiguracoesFrete.tsx"
+   ],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": false,
+   "orfa": false,
+   "testes": 1
+  },
+  {
+   "nome": "normalize-freight-response",
+   "entrada": "supabase/functions/normalize-freight-response/index.ts",
+   "arquivos": 1,
+   "linhas": 230,
+   "verify_jwt": true,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [
+    "cotacoes_multicanal",
+    "prediction_accuracy_settings",
+    "transportadoras",
+    "user_notification_preferences"
+   ],
+   "rpcs": [],
+   "env": [
+    "OPENAI_API_KEY",
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS"
+   ],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [
+    "api.openai.com"
+   ],
+   "usa_shared": [
+    "contract-validator.ts",
+    "cors.ts",
+    "invokeFunction.ts",
+    "logger.ts",
+    "number.ts",
+    "safeFetch.ts",
+    "secretConfig.ts",
+    "validate.ts"
+   ],
+   "chamada_pelo_front": [
+    "src/components/freight/ResponseConsole.tsx",
+    "src/components/transportadoras/NormalizationMapping.tsx",
+    "src/pages/APIDocumentation.tsx"
+   ],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": false,
+   "orfa": false,
+   "testes": 1
+  },
+  {
+   "nome": "ocr-receipt-processor",
+   "entrada": "supabase/functions/ocr-receipt-processor/index.ts",
+   "arquivos": 2,
+   "linhas": 144,
+   "verify_jwt": true,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [
+    "delivery_receipt_audit"
+   ],
+   "rpcs": [],
+   "env": [
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS"
+   ],
+   "buckets": [
+    "documents"
+   ],
+   "chama_edges": [],
+   "hosts_externos": [],
+   "usa_shared": [
+    "contract-validator.ts",
+    "cors.ts",
+    "logger.ts",
+    "validate.ts"
+   ],
+   "chamada_pelo_front": [
+    "src/components/shipping/DeliveryReceiptUpload.tsx"
+   ],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": false,
+   "orfa": false,
+   "testes": 1
+  },
+  {
+   "nome": "predict-delays",
+   "entrada": "supabase/functions/predict-delays/index.ts",
+   "arquivos": 1,
+   "linhas": 406,
+   "verify_jwt": true,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [
+    "ai_delay_predictions",
+    "coletas",
+    "delay_predictions_history",
+    "entregas",
+    "ocorrencias",
+    "prediction_accuracy_settings",
+    "user_notification_preferences"
+   ],
+   "rpcs": [],
+   "env": [
+    "GOOGLE_API_KEY",
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS",
+    "OPENWEATHER_API_KEY"
+   ],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [
+    "generativelanguage.googleapis.com"
+   ],
+   "usa_shared": [
+    "circuitBreaker.ts",
+    "cors.ts",
+    "invokeFunction.ts",
+    "logger.ts",
+    "rateLimiter.ts",
+    "safeFetch.ts",
+    "weather.ts"
+   ],
+   "chamada_pelo_front": [
+    "src/hooks/logistics/useDelayPrediction.tsx",
+    "src/pages/APIDocumentation.tsx"
+   ],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": true,
+   "orfa": false,
+   "testes": 1
+  },
+  {
+   "nome": "predict-delays-scheduled",
+   "entrada": "supabase/functions/predict-delays-scheduled/index.ts",
+   "arquivos": 1,
+   "linhas": 172,
+   "verify_jwt": false,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [
+    "delay_predictions_history",
+    "notifications",
+    "user_roles"
+   ],
+   "rpcs": [],
+   "env": [
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS",
+    "INTERNAL_FN_SECRET",
+    "SUPABASE_ANON_KEY"
+   ],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [],
+   "usa_shared": [
+    "auth.ts",
+    "cors.ts",
+    "invokeFunction.ts",
+    "logger.ts"
+   ],
+   "chamada_pelo_front": [],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": true,
+   "orfa": false,
+   "testes": 1
+  },
+  {
+   "nome": "push-send",
+   "entrada": "supabase/functions/push-send/index.ts",
+   "arquivos": 1,
+   "linhas": 228,
+   "verify_jwt": true,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [
+    "push_subscriptions"
+   ],
+   "rpcs": [],
+   "env": [
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL",
+    "VAPID_PRIVATE_KEY",
+    "VAPID_PUBLIC_KEY",
+    "VAPID_SUBJECT"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS"
+   ],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [],
+   "usa_shared": [
+    "cors.ts",
+    "logger.ts",
+    "rateLimiter.ts"
+   ],
+   "chamada_pelo_front": [
+    "src/hooks/notifications/usePushNotifications.tsx"
+   ],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": false,
+   "orfa": false,
+   "testes": 0
+  },
+  {
+   "nome": "resend-email",
+   "entrada": "supabase/functions/resend-email/index.ts",
+   "arquivos": 2,
+   "linhas": 145,
+   "verify_jwt": false,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [],
+   "rpcs": [],
+   "env": [
+    "RESEND_API_KEY"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS",
+    "INTERNAL_FN_SECRET",
+    "SUPABASE_ANON_KEY",
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL"
+   ],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [
+    "api.resend.com"
+   ],
+   "usa_shared": [
+    "auth.ts",
+    "cors.ts",
+    "httpError.ts",
+    "logger.ts",
+    "safeFetch.ts",
+    "validate.ts"
+   ],
+   "chamada_pelo_front": [
+    "src/pages/APIDocumentation.tsx"
+   ],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": false,
+   "orfa": false,
+   "testes": 1
+  },
+  {
+   "nome": "rodonaves-api",
+   "entrada": "supabase/functions/rodonaves-api/index.ts",
+   "arquivos": 2,
+   "linhas": 2147,
+   "verify_jwt": true,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [
+    "entregas",
+    "ocorrencias",
+    "rte_gateway_health"
+   ],
+   "rpcs": [],
+   "env": [
+    "RODONAVES_CNPJ_REMETENTE",
+    "RODONAVES_PASSWORD",
+    "RODONAVES_USERNAME",
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS",
+    "UPSTASH_REDIS_REST_TOKEN",
+    "UPSTASH_REDIS_REST_URL"
+   ],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [
+    "01wapi.rte.com.br",
+    "brasilapi.com.br",
+    "customer-apigateway.rte.com.br",
+    "dne-apigateway.rte.com.br",
+    "payments-apigateway.rte.com.br",
+    "pickup-apigateway.rte.com.br",
+    "quotation-apigateway.rte.com.br",
+    "selfattendance-apigateway.rte.com.br",
+    "tracking-apigateway.rte.com.br",
+    "unittocity-apigateway.rte.com.br",
+    "viacep.com.br"
+   ],
+   "usa_shared": [
+    "circuitBreaker.ts",
+    "cors.ts",
+    "httpError.ts",
+    "logger.ts",
+    "rateLimiter.ts",
+    "redis.ts",
+    "safeFetch.ts",
+    "secretConfig.ts",
+    "validate.ts"
+   ],
+   "chamada_pelo_front": [
+    "src/components/rodonaves/RTECustomerManager.tsx",
+    "src/hooks/logistics/useRodonavesTracking.tsx",
+    "src/hooks/rodonaves/useGatewayHealth.ts",
+    "src/hooks/security/useIntegrationValidation.tsx",
+    "src/pages/APIDocumentation.tsx"
+   ],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": true,
+   "orfa": false,
+   "testes": 1
+  },
+  {
+   "nome": "rodonaves-webhook",
+   "entrada": "supabase/functions/rodonaves-webhook/index.ts",
+   "arquivos": 1,
+   "linhas": 248,
+   "verify_jwt": false,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [
+    "entregas",
+    "ocorrencias",
+    "webhook_events_processed"
+   ],
+   "rpcs": [],
+   "env": [
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS",
+    "ALLOW_TEST_MODE"
+   ],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [],
+   "usa_shared": [
+    "contract-validator.ts",
+    "cors.ts",
+    "httpError.ts",
+    "logger.ts",
+    "rateLimiter.ts",
+    "testMode.ts",
+    "validate.ts",
+    "webhookSignature.ts"
+   ],
+   "chamada_pelo_front": [
+    "src/hooks/logistics/useRodonavesWebhook.tsx"
+   ],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": false,
+   "orfa": false,
+   "testes": 1
+  },
+  {
+   "nome": "scheduled-reports",
+   "entrada": "supabase/functions/scheduled-reports/index.ts",
+   "arquivos": 2,
+   "linhas": 485,
+   "verify_jwt": true,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [
+    "coletas",
+    "entregas",
+    "scheduled_reports"
+   ],
+   "rpcs": [],
+   "env": [
+    "RESEND_API_KEY",
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS",
+    "INTERNAL_FN_SECRET",
+    "SUPABASE_ANON_KEY"
+   ],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [
+    "api.resend.com"
+   ],
+   "usa_shared": [
+    "auth.ts",
+    "circuitBreaker.ts",
+    "cors.ts",
+    "httpError.ts",
+    "logger.ts",
+    "safeFetch.ts",
+    "validate.ts"
+   ],
+   "chamada_pelo_front": [
+    "src/hooks/analytics/useScheduledReports.tsx"
+   ],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": false,
+   "orfa": false,
+   "testes": 1
+  },
+  {
+   "nome": "secure-store",
+   "entrada": "supabase/functions/secure-store/index.ts",
+   "arquivos": 1,
+   "linhas": 93,
+   "verify_jwt": true,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [],
+   "rpcs": [],
+   "env": [
+    "SUPABASE_ANON_KEY",
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS",
+    "FIELD_ENCRYPTION_KEY",
+    "SUPABASE_SERVICE_ROLE_KEY"
+   ],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [],
+   "usa_shared": [
+    "cors.ts",
+    "crypto.ts",
+    "logger.ts",
+    "rateLimiter.ts"
+   ],
+   "chamada_pelo_front": [
+    "src/pages/APIDocumentation.tsx"
+   ],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": false,
+   "orfa": false,
+   "testes": 1
+  },
+  {
+   "nome": "send-password-reset",
+   "entrada": "supabase/functions/send-password-reset/index.ts",
+   "arquivos": 1,
+   "linhas": 204,
+   "verify_jwt": true,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [
+    "password_reset_requests",
+    "user_roles"
+   ],
+   "rpcs": [],
+   "env": [
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS"
+   ],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [
+    "loggi-flow-v2.vercel.app"
+   ],
+   "usa_shared": [
+    "cors.ts",
+    "invokeFunction.ts",
+    "logger.ts"
+   ],
+   "chamada_pelo_front": [
+    "src/pages/APIDocumentation.tsx",
+    "src/pages/AprovacaoResetSenha.tsx"
+   ],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": false,
+   "orfa": false,
+   "testes": 1
+  },
+  {
+   "nome": "smart-carrier-selection",
+   "entrada": "supabase/functions/smart-carrier-selection/index.ts",
+   "arquivos": 2,
+   "linhas": 299,
+   "verify_jwt": true,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [
+    "entregas",
+    "freight_decisions",
+    "freight_selection_rules",
+    "tabelas_frete"
+   ],
+   "rpcs": [],
+   "env": [
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS"
+   ],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [],
+   "usa_shared": [
+    "cors.ts",
+    "httpError.ts",
+    "logger.ts",
+    "validate.ts"
+   ],
+   "chamada_pelo_front": [
+    "src/hooks/logistics/useSmartCarrierSelection.tsx",
+    "src/pages/APIDocumentation.tsx"
+   ],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": false,
+   "orfa": false,
+   "testes": 1
+  },
+  {
+   "nome": "validate-login",
+   "entrada": "supabase/functions/validate-login/index.ts",
+   "arquivos": 1,
+   "linhas": 346,
+   "verify_jwt": true,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [
+    "geo_access_rules",
+    "geo_blocked_attempts",
+    "ip_access_rules",
+    "login_attempts"
+   ],
+   "rpcs": [],
+   "env": [
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS"
+   ],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [
+    "ip-api.com"
+   ],
+   "usa_shared": [
+    "cors.ts",
+    "logger.ts",
+    "safeFetch.ts"
+   ],
+   "chamada_pelo_front": [
+    "src/pages/auth/authUtils.ts"
+   ],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": false,
+   "orfa": false,
+   "testes": 1
+  },
+  {
+   "nome": "webhook-status",
+   "entrada": "supabase/functions/webhook-status/index.ts",
+   "arquivos": 2,
+   "linhas": 277,
+   "verify_jwt": false,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [
+    "audit_logs",
+    "client_webhooks",
+    "webhook_deliveries"
+   ],
+   "rpcs": [],
+   "env": [
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS",
+    "INTERNAL_FN_SECRET",
+    "SUPABASE_ANON_KEY"
+   ],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [],
+   "usa_shared": [
+    "auth.ts",
+    "cors.ts",
+    "logger.ts",
+    "safeFetch.ts",
+    "validate.ts"
+   ],
+   "chamada_pelo_front": [
+    "src/hooks/integrations/useClientWebhooks.tsx",
+    "src/pages/APIDocumentation.tsx"
+   ],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": false,
+   "orfa": false,
+   "testes": 1
+  },
+  {
+   "nome": "whatsapp-notification",
+   "entrada": "supabase/functions/whatsapp-notification/index.ts",
+   "arquivos": 1,
+   "linhas": 344,
+   "verify_jwt": true,
+   "metodos": [
+    "OPTIONS"
+   ],
+   "tabelas": [
+    "audit_logs",
+    "coletas",
+    "entregas"
+   ],
+   "rpcs": [],
+   "env": [
+    "EVOLUTION_API_KEY",
+    "EVOLUTION_API_URL",
+    "EVOLUTION_INSTANCE_NAME",
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL"
+   ],
+   "env_via_shared": [
+    "ALLOWED_ORIGINS"
+   ],
+   "buckets": [],
+   "chama_edges": [],
+   "hosts_externos": [
+    "loggi-flow-v2.vercel.app"
+   ],
+   "usa_shared": [
+    "cors.ts",
+    "logger.ts",
+    "safeFetch.ts"
+   ],
+   "chamada_pelo_front": [
+    "src/hooks/notifications/useWhatsAppNotification.tsx"
+   ],
+   "chamada_por_edges": [],
+   "chamada_por_sql_ou_cron": false,
+   "orfa": false,
+   "testes": 1
+  }
+ ],
+ "chamadas_sem_pasta": []
+}

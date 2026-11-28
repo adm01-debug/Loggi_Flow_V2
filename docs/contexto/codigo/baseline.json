@@ -1,0 +1,725 @@
+{
+ "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
+ "format_version": 2,
+ "git": {
+  "commit": "285036298fe3554601579f25007f01bc6b452634",
+  "branch": "main",
+  "data_commit": "2026-11-26T20:33:50-03:00",
+  "remote": "https://github.com/adm01-debug/Loggi_Flow_V2",
+  "ultimos_commits": [
+   {
+    "sha": "2850362",
+    "data": "2026-11-26",
+    "assunto": "docs: reaudita as 49 PRs fechadas e as 16 branches arquivo a arquivo (#555)"
+   },
+   {
+    "sha": "169ad92",
+    "data": "2026-11-26",
+    "assunto": "fix: crash de tela usa a RPC que grava tambem sem sessao (#554)"
+   },
+   {
+    "sha": "e07c1b5",
+    "data": "2026-11-26",
+    "assunto": "chore(db): sincronizar artefatos com o banco [auto] (#553)"
+   },
+   {
+    "sha": "23cd682",
+    "data": "2026-11-26",
+    "assunto": "feat: crash de tela publica passa a ser gravado por RPC liberada para anonimo (#552)"
+   },
+   {
+    "sha": "18c288a",
+    "data": "2026-11-26",
+    "assunto": "chore: fecha a decisao 5 do censo mantendo o multi-tenant dormente (#551)"
+   },
+   {
+    "sha": "db8018b",
+    "data": "2026-11-26",
+    "assunto": "chore(db): sincronizar artefatos com o banco [auto] (#545)"
+   },
+   {
+    "sha": "a2c24e8",
+    "data": "2026-11-26",
+    "assunto": "feat: crash de render vira registro em telemetry_logs sem depender de DSN (#550)"
+   },
+   {
+    "sha": "93aaf77",
+    "data": "2026-11-26",
+    "assunto": "chore: remove xp_for_level sem chamador e fecha o censo de funcoes (#549)"
+   },
+   {
+    "sha": "1bbacc0",
+    "data": "2026-11-26",
+    "assunto": "chore: fecha o censo do doc 08 com retencao de logs medida e cron conferido (#548)"
+   },
+   {
+    "sha": "ccea0b6",
+    "data": "2026-11-26",
+    "assunto": "chore: remove camada fast-metrics sem leitor e system_health_check (#547)"
+   },
+   {
+    "sha": "aaeb84c",
+    "data": "2026-11-26",
+    "assunto": "feat: chat de IA passa a persistir o historico em ai_chat_messages (#546)"
+   },
+   {
+    "sha": "b0323be",
+    "data": "2026-11-26",
+    "assunto": "chore: remove 7 tabelas mortas sem consumidor (fecha a lista DECIDIR do doc 08) (#544)"
+   },
+   {
+    "sha": "3876814",
+    "data": "2026-11-26",
+    "assunto": "docs: etapa 283 fecha com o job de E2E verde na main (#543)"
+   },
+   {
+    "sha": "ab6c510",
+    "data": "2026-11-26",
+    "assunto": "infra: roda as suites de tests/e2e na CI (etapa 283) (#524)"
+   },
+   {
+    "sha": "b8c7f39",
+    "data": "2026-11-26",
+    "assunto": "docs: corrige o censo de cobertura - business_rules_config voltou a ter efeito (#542)"
+   },
+   {
+    "sha": "263c2e2",
+    "data": "2026-11-26",
+    "assunto": "chore(docs): registra o fechamento da PR #540 e a prova em runtime (#541)"
+   },
+   {
+    "sha": "7ef98ef",
+    "data": "2026-11-26",
+    "assunto": "fix: test-connection do Bitrix explica a causa quando o webhook falha (#540)"
+   },
+   {
+    "sha": "1ca9d74",
+    "data": "2026-11-26",
+    "assunto": "fix: segredo com placeholder deixa de passar por configurado e o painel mostra a causa real (#539)"
+   },
+   {
+    "sha": "863c616",
+    "data": "2026-11-26",
+    "assunto": "feat: tela para os IDs de SPA do Bitrix na pagina de integracao (#538)"
+   },
+   {
+    "sha": "1549d6f",
+    "data": "2026-11-26",
+    "assunto": "feat: tira os IDs de SPA do Bitrix de dentro do codigo (#537)"
+   },
+   {
+    "sha": "55afe40",
+    "data": "2026-11-26",
+    "assunto": "docs: registra as quatro migrations aplicadas e o EXECUTE publico de fabrica (#536)"
+   },
+   {
+    "sha": "dc5c286",
+    "data": "2026-11-26",
+    "assunto": "chore(db): sincronizar artefatos com o banco [auto] (#531)"
+   },
+   {
+    "sha": "09ae937",
+    "data": "2026-11-26",
+    "assunto": "fix: alinha o catalogo de secrets ao que as functions leem (#535)"
+   },
+   {
+    "sha": "b89c849",
+    "data": "2026-11-26",
+    "assunto": "fix: tira anon da funcao de retencao e dos default privileges de funcoes (#533)"
+   },
+   {
+    "sha": "97f2fd1",
+    "data": "2026-11-26",
+    "assunto": "chore: fecha o EXECUTE publico das funcoes SECURITY DEFINER internas (#532)"
+   }
+  ],
+  "arquivos_mudados_7d": 1825,
+  "pastas_mais_mudadas_30d": [
+   {
+    "pasta": "docs/qa/05-PROGRESSO.md",
+    "mudancas": 154
+   },
+   {
+    "pasta": "src/features/db-observability",
+    "mudancas": 83
+   },
+   {
+    "pasta": "src/hooks/logistics",
+    "mudancas": 77
+   },
+   {
+    "pasta": "src/components/common",
+    "mudancas": 56
+   },
+   {
+    "pasta": "src/components/ui",
+    "mudancas": 55
+   },
+   {
+    "pasta": "supabase/functions/_shared",
+    "mudancas": 37
+   },
+   {
+    "pasta": "src/lib/rodonaves",
+    "mudancas": 32
+   },
+   {
+    "pasta": "coverage/supabase/functions",
+    "mudancas": 30
+   },
+   {
+    "pasta": "coverage/src/lib",
+    "mudancas": 27
+   },
+   {
+    "pasta": "src/components/security",
+    "mudancas": 25
+   },
+   {
+    "pasta": "src/hooks/common",
+    "mudancas": 25
+   },
+   {
+    "pasta": "src/components/freight",
+    "mudancas": 23
+   },
+   {
+    "pasta": "src/components/dashboard",
+    "mudancas": 22
+   },
+   {
+    "pasta": "src/components/rodonaves",
+    "mudancas": 21
+   },
+   {
+    "pasta": "src/hooks/analytics",
+    "mudancas": 19
+   }
+  ],
+  "arquivos_mais_mudados_90d": [
+   {
+    "arquivo": "docs/qa/05-PROGRESSO.md",
+    "mudancas": 154
+   },
+   {
+    "arquivo": "AGENTS.md",
+    "mudancas": 17
+   },
+   {
+    "arquivo": "docs/audit/2026-11-20_funcionalidades_nao_implementadas.md",
+    "mudancas": 13
+   },
+   {
+    "arquivo": "docs/pendencias/_ordem.md",
+    "mudancas": 13
+   },
+   {
+    "arquivo": "docs/qa/03-ACHADOS.md",
+    "mudancas": 13
+   },
+   {
+    "arquivo": "supabase/schema-manifest.json",
+    "mudancas": 12
+   },
+   {
+    "arquivo": "src/integrations/supabase/types.ts",
+    "mudancas": 11
+   },
+   {
+    "arquivo": "docs/qa/07-AUDITORIA-BRANCHES.md",
+    "mudancas": 10
+   },
+   {
+    "arquivo": "supabase/schema-catalog.json",
+    "mudancas": 10
+   },
+   {
+    "arquivo": "docs/qa/08-AUDITORIA-COBERTURA-UI.md",
+    "mudancas": 9
+   },
+   {
+    "arquivo": "scripts/db-audit/grants-baseline.json",
+    "mudancas": 8
+   },
+   {
+    "arquivo": "supabase/functions/nexus-webhook-receiver/index.ts",
+    "mudancas": 8
+   },
+   {
+    "arquivo": "supabase/functions/rodonaves-api/index.ts",
+    "mudancas": 8
+   },
+   {
+    "arquivo": "scripts/automation.config.json",
+    "mudancas": 7
+   },
+   {
+    "arquivo": "src/pages/Coletas.tsx",
+    "mudancas": 7
+   },
+   {
+    "arquivo": "src/pages/CotacaoMultiCanal.tsx",
+    "mudancas": 7
+   },
+   {
+    "arquivo": "src/pages/Despachos.tsx",
+    "mudancas": 7
+   },
+   {
+    "arquivo": "src/pages/KanbanEntregas.tsx",
+    "mudancas": 7
+   },
+   {
+    "arquivo": "supabase/functions/bitrix24-integration/index.ts",
+    "mudancas": 7
+   },
+   {
+    "arquivo": "supabase/functions/ingest-biosync/index.ts",
+    "mudancas": 7
+   },
+   {
+    "arquivo": "supabase/functions/rodonaves-webhook/index.ts",
+    "mudancas": 7
+   },
+   {
+    "arquivo": "docs/agentes/banco.md",
+    "mudancas": 6
+   },
+   {
+    "arquivo": "docs/agentes/integracoes.md",
+    "mudancas": 6
+   },
+   {
+    "arquivo": "package.json",
+    "mudancas": 6
+   },
+   {
+    "arquivo": "src/pages/Envios.tsx",
+    "mudancas": 6
+   }
+  ],
+  "autores_30d": [
+   {
+    "autor": "adm01-debug",
+    "commits": 288
+   },
+   {
+    "autor": "github-actions[bot]",
+    "commits": 12
+   }
+  ]
+ },
+ "contagens": {
+  "arquivos_total": 1653,
+  "arquivos_codigo": 1005,
+  "linhas_codigo": 191118,
+  "rotas": 61,
+  "rotas_http_backend": 0,
+  "vistas_por_id": 0,
+  "itens_menu": 87,
+  "modulos": 74,
+  "componentes": 383,
+  "hooks": 179,
+  "edge_functions": 43,
+  "tabelas": 137,
+  "migrations": 272,
+  "cron_jobs": 30,
+  "testes": 224,
+  "workflows": 18,
+  "scripts": 69,
+  "docs_md": 268
+ },
+ "por_pasta": {
+  "eslint.config.js": {
+   "arquivos": 1,
+   "linhas": 135
+  },
+  "playwright.config.ts": {
+   "arquivos": 1,
+   "linhas": 41
+  },
+  "postcss.config.js": {
+   "arquivos": 1,
+   "linhas": 7
+  },
+  "public/sw.js": {
+   "arquivos": 1,
+   "linhas": 32
+  },
+  "scripts/ai-context": {
+   "arquivos": 3,
+   "linhas": 1931
+  },
+  "scripts/audit": {
+   "arquivos": 2,
+   "linhas": 887
+  },
+  "scripts/audit-gate.mjs": {
+   "arquivos": 1,
+   "linhas": 126
+  },
+  "scripts/automation.mjs": {
+   "arquivos": 1,
+   "linhas": 1170
+  },
+  "scripts/automation.unit.mjs": {
+   "arquivos": 1,
+   "linhas": 689
+  },
+  "scripts/check-warning-budget.mjs": {
+   "arquivos": 1,
+   "linhas": 154
+  },
+  "scripts/ci": {
+   "arquivos": 31,
+   "linhas": 8719
+  },
+  "scripts/db-audit": {
+   "arquivos": 19,
+   "linhas": 3755
+  },
+  "scripts/gates": {
+   "arquivos": 7,
+   "linhas": 828
+  },
+  "scripts/generate-quality-report.mjs": {
+   "arquivos": 1,
+   "linhas": 143
+  },
+  "scripts/graphify": {
+   "arquivos": 1,
+   "linhas": 234
+  },
+  "scripts/graphify-local.mjs": {
+   "arquivos": 1,
+   "linhas": 1247
+  },
+  "scripts/graphify-local.unit.mjs": {
+   "arquivos": 1,
+   "linhas": 577
+  },
+  "scripts/inventario": {
+   "arquivos": 8,
+   "linhas": 2970
+  },
+  "scripts/lib": {
+   "arquivos": 2,
+   "linhas": 411
+  },
+  "scripts/maintenance": {
+   "arquivos": 4,
+   "linhas": 3044
+  },
+  "scripts/ops": {
+   "arquivos": 3,
+   "linhas": 749
+  },
+  "scripts/ratchet-warning-budget.mjs": {
+   "arquivos": 1,
+   "linhas": 110
+  },
+  "scripts/regras_negocio": {
+   "arquivos": 5,
+   "linhas": 3702
+  },
+  "scripts/seed": {
+   "arquivos": 1,
+   "linhas": 650
+  },
+  "scripts/seed-database.ts": {
+   "arquivos": 1,
+   "linhas": 982
+  },
+  "scripts/supabase_snapshot": {
+   "arquivos": 3,
+   "linhas": 3525
+  },
+  "scripts/validate-csp.mjs": {
+   "arquivos": 1,
+   "linhas": 96
+  },
+  "scripts/validate-no-console.mjs": {
+   "arquivos": 1,
+   "linhas": 72
+  },
+  "src/App.tsx": {
+   "arquivos": 1,
+   "linhas": 211
+  },
+  "src/components": {
+   "arquivos": 301,
+   "linhas": 52100
+  },
+  "src/features": {
+   "arquivos": 91,
+   "linhas": 6705
+  },
+  "src/hooks": {
+   "arquivos": 131,
+   "linhas": 20509
+  },
+  "src/i18n.ts": {
+   "arquivos": 1,
+   "linhas": 38
+  },
+  "src/integrations": {
+   "arquivos": 3,
+   "linhas": 6533
+  },
+  "src/lib": {
+   "arquivos": 66,
+   "linhas": 8118
+  },
+  "src/main.tsx": {
+   "arquivos": 1,
+   "linhas": 64
+  },
+  "src/pages": {
+   "arquivos": 82,
+   "linhas": 34921
+  },
+  "src/services": {
+   "arquivos": 5,
+   "linhas": 282
+  },
+  "src/test": {
+   "arquivos": 4,
+   "linhas": 198
+  },
+  "src/utils": {
+   "arquivos": 5,
+   "linhas": 618
+  },
+  "supabase/functions": {
+   "arquivos": 130,
+   "linhas": 16175
+  },
+  "tailwind.config.ts": {
+   "arquivos": 1,
+   "linhas": 296
+  },
+  "tests/contracts": {
+   "arquivos": 66,
+   "linhas": 6575
+  },
+  "tests/e2e": {
+   "arquivos": 3,
+   "linhas": 99
+  },
+  "tests/fuzzing": {
+   "arquivos": 1,
+   "linhas": 31
+  },
+  "tests/integration": {
+   "arquivos": 3,
+   "linhas": 219
+  },
+  "tests/load": {
+   "arquivos": 1,
+   "linhas": 20
+  },
+  "tests/security": {
+   "arquivos": 2,
+   "linhas": 229
+  },
+  "tests/unit": {
+   "arquivos": 1,
+   "linhas": 29
+  },
+  "vite.config.ts": {
+   "arquivos": 1,
+   "linhas": 112
+  },
+  "vitest.config.ts": {
+   "arquivos": 1,
+   "linhas": 50
+  }
+ },
+ "maiores_arquivos": [
+  {
+   "arquivo": "src/integrations/supabase/types.ts",
+   "linhas": 6476
+  },
+  {
+   "arquivo": "scripts/regras_negocio/generate.py",
+   "linhas": 2253
+  },
+  {
+   "arquivo": "supabase/functions/rodonaves-api/index.ts",
+   "linhas": 2064
+  },
+  {
+   "arquivo": "scripts/supabase_snapshot/snapshot.py",
+   "linhas": 1909
+  },
+  {
+   "arquivo": "src/pages/ConfiguracoesFrete.tsx",
+   "linhas": 1376
+  },
+  {
+   "arquivo": "src/pages/Envios.tsx",
+   "linhas": 1258
+  },
+  {
+   "arquivo": "scripts/graphify-local.mjs",
+   "linhas": 1247
+  },
+  {
+   "arquivo": "src/pages/Transportadoras.tsx",
+   "linhas": 1245
+  },
+  {
+   "arquivo": "scripts/automation.mjs",
+   "linhas": 1170
+  },
+  {
+   "arquivo": "src/pages/CotacaoMultiCanal.tsx",
+   "linhas": 1144
+  },
+  {
+   "arquivo": "src/components/dashboard/LogisticsMapWidget.tsx",
+   "linhas": 1137
+  },
+  {
+   "arquivo": "src/pages/Clientes.tsx",
+   "linhas": 1103
+  },
+  {
+   "arquivo": "src/pages/DashboardExecutivo.tsx",
+   "linhas": 1087
+  },
+  {
+   "arquivo": "src/pages/Ocorrencias.tsx",
+   "linhas": 1056
+  },
+  {
+   "arquivo": "scripts/ai-context/gerar.mjs",
+   "linhas": 1024
+  },
+  {
+   "arquivo": "scripts/seed-database.ts",
+   "linhas": 982
+  },
+  {
+   "arquivo": "src/pages/Coletas.tsx",
+   "linhas": 960
+  },
+  {
+   "arquivo": "scripts/maintenance/lib.mjs",
+   "linhas": 937
+  },
+  {
+   "arquivo": "scripts/maintenance/run.mjs",
+   "linhas": 899
+  },
+  {
+   "arquivo": "src/pages/Fornecedores.tsx",
+   "linhas": 885
+  },
+  {
+   "arquivo": "src/pages/Relatorios.tsx",
+   "linhas": 885
+  },
+  {
+   "arquivo": "src/components/melhorenvio/MECarrinhoPanel.tsx",
+   "linhas": 840
+  },
+  {
+   "arquivo": "src/pages/FretesInternos.tsx",
+   "linhas": 831
+  },
+  {
+   "arquivo": "scripts/ci/github-settings-guard.mjs",
+   "linhas": 829
+  },
+  {
+   "arquivo": "src/pages/RastreamentoRealTime.tsx",
+   "linhas": 810
+  }
+ ],
+ "qualidade": {
+  "any": 69,
+  "console_log": 164,
+  "ts_ignore": 0,
+  "eslint_disable": 3,
+  "todos": 2,
+  "arquivos_acima_500_linhas": 51
+ },
+ "todos": [
+  {
+   "arquivo": "scripts/ai-context/cenarios.mjs",
+   "linha": 154,
+   "tipo": "FIXME",
+   "texto": "rever\\nexport const A = () => <div role=\\\"alert\\\">{supabase.rpc('get_seq_scan_x')}</div>;\"); }, (J)"
+  },
+  {
+   "arquivo": "scripts/ai-context/gerar.unit.mjs",
+   "linha": 617,
+   "tipo": "TODO",
+   "texto": "trocar a API\\nconst re = /\\\\b(TODO|FIXME)\\\\b/;\\nconst s = 'TODO';\\nexport const A = () => <p>\\n  {/*"
+  }
+ ],
+ "alertas": {
+  "rotas_sem_arquivo": [],
+  "componentes_ambiguos": [],
+  "menu_sem_destino": [
+   "Atrasados -> atrasado",
+   "Com exceção -> excecao",
+   "Entregues -> entregue",
+   "Parados -> parado",
+   "Só com anomalia -> risco",
+   "Todos -> todos"
+  ],
+  "edges_orfas": [
+   "ingest-biosync"
+  ],
+  "edges_chamadas_sem_pasta": [],
+  "tabelas_sem_rls": [],
+  "tabelas_rls_indeterminado": [
+   "audit_logs_y2026m01",
+   "audit_logs_y2026m02",
+   "audit_logs_y2026m03",
+   "audit_logs_y2026m04",
+   "audit_logs_y2026m05",
+   "audit_logs_y2026m06",
+   "audit_logs_y2026m07",
+   "audit_logs_y2026m08",
+   "audit_logs_y2026m09",
+   "audit_logs_y2026m10",
+   "audit_logs_y2026m11",
+   "audit_logs_y2026m12"
+  ],
+  "tabelas_usadas_sem_definicao": [],
+  "tabelas_com_drift_migration_vs_types": [
+   "business_rules_config",
+   "feature_flags",
+   "freight_integration_mappings"
+  ],
+  "rpcs_sem_definicao": [],
+  "componentes_orfaos": [
+   "src/components/gamification/BadgeCard.tsx",
+   "src/components/gamification/GiftCard.tsx"
+  ],
+  "componentes_com_nome_duplicado": [
+   "ConfirmProvider",
+   "DeleteButton",
+   "InlineConfirm",
+   "Pagination",
+   "PerformanceChart",
+   "SearchInput",
+   "Skeleton",
+   "Toaster"
+  ],
+  "scripts_orfaos": [],
+  "env_usadas_nao_declaradas": [
+   "MODE",
+   "NODE_ENV"
+  ],
+  "ciclos_de_import": 3,
+  "possiveis_segredos_no_codigo": [
+   "tests/security/integrations-access.spec.ts:12",
+   "tests/security/rls-access.spec.ts:13"
+  ]
+ },
+ "erros_do_gerador": []
+}

@@ -1,0 +1,1447 @@
+{
+ "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
+ "format_version": 2,
+ "stack": {
+  "linguagens": [
+   "TypeScript (904)",
+   "SQL (298)",
+   "Markdown (268)",
+   "JavaScript (94)",
+   "JSON (35)",
+   "YAML (22)",
+   "Shell (9)",
+   "Python (8)"
+  ],
+  "linguagem_principal": "TypeScript",
+  "framework": "React",
+  "backend_http": [],
+  "bundler": "Vite",
+  "roteador": "react-router",
+  "banco": "Supabase",
+  "testes": [
+   "vitest",
+   "playwright"
+  ],
+  "ui": [
+   "tailwind",
+   "radix/shadcn"
+  ],
+  "estado": [
+   "react-query"
+  ],
+  "gerenciador_pacotes": "npm",
+  "node": null,
+  "python": null,
+  "deploy": [
+   "vercel"
+  ],
+  "monorepo": null,
+  "pastas_fonte": [
+   "src"
+  ]
+ },
+ "workspaces": [],
+ "package": {
+  "nome": "vite_react_shadcn_ts",
+  "versao": "0.0.0",
+  "scripts": {
+   "automation:check": "node scripts/automation.mjs check --ref HEAD",
+   "automation:doctor": "node scripts/automation.mjs doctor",
+   "automation:graph": "node scripts/automation.mjs graph",
+   "automation:heal": "node scripts/automation.mjs heal --ref origin/main",
+   "automation:install-hooks": "node scripts/automation.mjs install-hooks",
+   "automation:nightly": "node scripts/automation.mjs nightly --ref origin/main",
+   "automation:status": "node scripts/automation.mjs graph status",
+   "automation:test": "node scripts/automation.mjs test",
+   "automation:uninstall-hooks": "node scripts/automation.mjs uninstall-hooks",
+   "build": "vite build",
+   "build:dev": "vite build --mode development",
+   "check-circular": "madge --circular src",
+   "dev": "vite",
+   "graph:setup": "bash scripts/graphify/setup.sh",
+   "graph:update": "graphify update .",
+   "lint": "eslint .",
+   "lint:budget": "node scripts/check-warning-budget.mjs",
+   "lint:budget:ratchet": "node scripts/ratchet-warning-budget.mjs",
+   "maintenance:check": "sh scripts/maintenance/run.sh check --root . --ref origin/main",
+   "maintenance:doctor": "sh scripts/maintenance/run.sh doctor --root .",
+   "maintenance:heal": "sh scripts/maintenance/run.sh heal --root . --ref origin/main",
+   "prebuild": "node scripts/validate-csp.mjs",
+   "prepare": "husky",
+   "preview": "vite preview",
+   "quality:report": "node scripts/generate-quality-report.mjs",
+   "security-scan": "node scripts/audit-gate.mjs",
+   "seed": "tsx scripts/seed-database.ts",
+   "test": "vitest",
+   "test:coverage": "vitest --coverage",
+   "test:e2e": "playwright test",
+   "test:fuzz": "vitest tests/integration/fuzzing.spec.ts",
+   "test:maintenance": "node --test scripts/maintenance/maintenance.unit.mjs",
+   "test:rls": "vitest run tests/security/rls-access.spec.ts tests/security/integrations-access.spec.ts",
+   "test:security": "vitest run tests/security/",
+   "test:ui": "vitest --ui",
+   "test:watch": "vitest --watch",
+   "typecheck": "tsc --noEmit",
+   "validate:agents-facts": "node scripts/ci/check-agents-facts.mjs",
+   "validate:csp": "node scripts/validate-csp.mjs",
+   "validate:dedupe-keys": "node scripts/ci/check-dedupe-keys.mjs",
+   "validate:doc-paths": "node scripts/ci/check-doc-paths.mjs",
+   "validate:no-console": "node scripts/validate-no-console.mjs",
+   "validate:query-limits": "node scripts/ci/validate-query-limits.mjs",
+   "validate:root-files": "node scripts/ci/check-root-files.mjs",
+   "validate:soft-delete": "node scripts/ci/check-soft-delete.mjs"
+  },
+  "dependencias": 76,
+  "dev_dependencias": 39,
+  "principais": {
+   "@supabase/supabase-js": "^2.119.0",
+   "@tanstack/react-query": "^5.102.8",
+   "@tanstack/react-virtual": "^3.14.12",
+   "date-fns": "^4.4.0",
+   "date-fns-tz": "^3.2.0",
+   "framer-motion": "^13.1.0",
+   "i18next": "^26.2.0",
+   "i18next-browser-languagedetector": "^8.2.1",
+   "next-themes": "^0.4.6",
+   "react": "^18.3.1",
+   "react-confetti": "^6.4.0",
+   "react-day-picker": "^10.0.1",
+   "react-dom": "^18.3.1",
+   "react-hook-form": "^7.61.1",
+   "react-i18next": "^17.0.13",
+   "react-map-gl": "^8.1.3",
+   "react-markdown": "^10.1.0",
+   "react-resizable-panels": "^4.12.3",
+   "react-router-dom": "^7.18.6",
+   "react-use": "^17.6.0",
+   "recharts": "^3.10.1",
+   "tailwindcss-animate": "^1.0.7",
+   "zod": "^4.5.4"
+  },
+  "engines": null,
+  "packageManager": null
+ },
+ "python": {
+  "dependencias": [
+   "psycopg"
+  ]
+ },
+ "configs": [
+  ".github/dependabot.yml",
+  ".husky/pre-commit",
+  "ai-context.config.json",
+  "components.json",
+  "eslint.config.js",
+  "package.json",
+  "playwright.config.ts",
+  "postcss.config.js",
+  "supabase/config.toml",
+  "tailwind.config.ts",
+  "tsconfig.app.json",
+  "tsconfig.json",
+  "tsconfig.node.json",
+  "vercel.json",
+  "vite.config.ts",
+  "vitest.config.ts"
+ ],
+ "workflows": [
+  {
+   "arquivo": ".github/workflows/aplicar-migration.yml",
+   "nome": "Aplicar Migration",
+   "gatilhos": [
+    "workflow_dispatch"
+   ],
+   "crons": [],
+   "branches": [],
+   "jobs": [
+    "aplicar"
+   ],
+   "permissoes": [
+    "contents: read"
+   ],
+   "scripts_usados": [],
+   "npm_scripts": [],
+   "secrets": [
+    "DESTINO_URL"
+   ],
+   "actions": [
+    "actions/checkout"
+   ]
+  },
+  {
+   "arquivo": ".github/workflows/auto-update-pr-branch.yml",
+   "nome": "Auto Update PR Branches",
+   "gatilhos": [
+    "push",
+    "schedule",
+    "workflow_dispatch",
+    "workflow_run"
+   ],
+   "crons": [
+    "7,37 * * * *"
+   ],
+   "branches": [
+    "main"
+   ],
+   "jobs": [
+    "update-behind-branches"
+   ],
+   "permissoes": [],
+   "scripts_usados": [
+    "scripts/ci/fila-merge.mjs"
+   ],
+   "npm_scripts": [],
+   "secrets": [
+    "GITHUB_TOKEN"
+   ],
+   "actions": [
+    "actions/checkout",
+    "actions/setup-node"
+   ]
+  },
+  {
+   "arquivo": ".github/workflows/automation-local.yml",
+   "nome": "Automação local",
+   "gatilhos": [
+    "pull_request",
+    "push",
+    "workflow_dispatch"
+   ],
+   "crons": [],
+   "branches": [
+    "main"
+   ],
+   "jobs": [
+    "contracts"
+   ],
+   "permissoes": [
+    "contents: read"
+   ],
+   "scripts_usados": [
+    "scripts/automation.mjs"
+   ],
+   "npm_scripts": [],
+   "secrets": [],
+   "actions": [
+    "actions/checkout",
+    "actions/setup-node"
+   ]
+  },
+  {
+   "arquivo": ".github/workflows/branch-hygiene-audit.yml",
+   "nome": "Branch Hygiene Audit",
+   "gatilhos": [
+    "schedule",
+    "workflow_dispatch"
+   ],
+   "crons": [
+    "56 7 * * 1"
+   ],
+   "branches": [],
+   "jobs": [
+    "audit"
+   ],
+   "permissoes": [
+    "contents: read",
+    "pull-requests: read"
+   ],
+   "scripts_usados": [
+    "scripts/ci/actions-kpi.mjs",
+    "scripts/ci/branch-podaveis.mjs",
+    "scripts/ci/bump-toolchain.mjs",
+    "scripts/ci/sla-code-scanning.mjs"
+   ],
+   "npm_scripts": [],
+   "secrets": [],
+   "actions": [
+    "actions/checkout"
+   ]
+  },
+  {
+   "arquivo": ".github/workflows/ci-nexus.yml",
+   "nome": "CI Quality Gate Nexus",
+   "gatilhos": [
+    "pull_request",
+    "push"
+   ],
+   "crons": [],
+   "branches": [
+    "develop",
+    "main",
+    "master"
+   ],
+   "jobs": [
+    "quality-gate"
+   ],
+   "permissoes": [
+    "contents: read"
+   ],
+   "scripts_usados": [],
+   "npm_scripts": [
+    "lint",
+    "security-scan",
+    "test",
+    "test:coverage",
+    "test:fuzz",
+    "test:rls",
+    "typecheck",
+    "validate:agents-facts",
+    "validate:csp",
+    "validate:doc-paths",
+    "validate:no-console",
+    "validate:query-limits",
+    "validate:root-files",
+    "validate:soft-delete"
+   ],
+   "secrets": [],
+   "actions": [
+    "actions/checkout",
+    "actions/setup-node",
+    "denoland/setup-deno"
+   ]
+  },
+  {
+   "arquivo": ".github/workflows/ci.yml",
+   "nome": "CI/CD Pipeline",
+   "gatilhos": [
+    "pull_request",
+    "push"
+   ],
+   "crons": [],
+   "branches": [
+    "develop",
+    "main"
+   ],
+   "jobs": [
+    "security",
+    "lint",
+    "typecheck",
+    "warning-budget",
+    "test",
+    "agents-docs",
+    "build"
+   ],
+   "permissoes": [
+    "contents: read",
+    "pull-requests: read"
+   ],
+   "scripts_usados": [
+    "scripts/audit-gate.mjs",
+    "scripts/ci/check-claude-md-integrity.mjs",
+    "scripts/ci/check-env-not-tracked.mjs"
+   ],
+   "npm_scripts": [
+    "build",
+    "lint",
+    "lint:budget",
+    "test:coverage",
+    "typecheck"
+   ],
+   "secrets": [
+    "GITHUB_TOKEN"
+   ],
+   "actions": [
+    "actions/checkout",
+    "actions/setup-node",
+    "actions/upload-artifact",
+    "gitleaks/gitleaks-action"
+   ]
+  },
+  {
+   "arquivo": ".github/workflows/codeql.yml",
+   "nome": "CodeQL",
+   "gatilhos": [
+    "schedule",
+    "workflow_dispatch"
+   ],
+   "crons": [
+    "30 9 * * *"
+   ],
+   "branches": [],
+   "jobs": [
+    "analyze",
+    "analyze-actions"
+   ],
+   "permissoes": [
+    "contents: read"
+   ],
+   "scripts_usados": [],
+   "npm_scripts": [],
+   "secrets": [],
+   "actions": [
+    "actions/checkout",
+    "github/codeql-action/analyze",
+    "github/codeql-action/init"
+   ]
+  },
+  {
+   "arquivo": ".github/workflows/contexto-ia.yml",
+   "nome": "Contexto para agentes de IA (10 min)",
+   "gatilhos": [
+    "push",
+    "schedule",
+    "workflow_dispatch"
+   ],
+   "crons": [
+    "7 * * * *"
+   ],
+   "branches": [
+    "main"
+   ],
+   "jobs": [
+    "gate",
+    "codigo",
+    "banco",
+    "regras",
+    "publicar"
+   ],
+   "permissoes": [
+    "contents: read"
+   ],
+   "scripts_usados": [
+    "scripts/ai-context/gerar.mjs",
+    "scripts/ai-context/gerar.unit.mjs",
+    "scripts/regras_negocio/generate.py",
+    "scripts/regras_negocio/indice.py",
+    "scripts/supabase_snapshot/README.md",
+    "scripts/supabase_snapshot/requirements.txt",
+    "scripts/supabase_snapshot/snapshot.py"
+   ],
+   "npm_scripts": [],
+   "secrets": [
+    "DESTINO_URL",
+    "SUPABASE_DB_URL"
+   ],
+   "actions": [
+    "actions/cache",
+    "actions/checkout",
+    "actions/download-artifact",
+    "actions/setup-node",
+    "actions/upload-artifact"
+   ]
+  },
+  {
+   "arquivo": ".github/workflows/dependency-review.yml",
+   "nome": "Dependency Review",
+   "gatilhos": [
+    "pull_request"
+   ],
+   "crons": [],
+   "branches": [
+    "main"
+   ],
+   "jobs": [
+    "dependency-review"
+   ],
+   "permissoes": [
+    "contents: read"
+   ],
+   "scripts_usados": [],
+   "npm_scripts": [],
+   "secrets": [],
+   "actions": [
+    "actions/checkout",
+    "actions/dependency-review-action"
+   ]
+  },
+  {
+   "arquivo": ".github/workflows/deploy-functions.yml",
+   "nome": "Deploy Edge Functions",
+   "gatilhos": [
+    "push",
+    "workflow_dispatch"
+   ],
+   "crons": [],
+   "branches": [
+    "main"
+   ],
+   "jobs": [
+    "deploy"
+   ],
+   "permissoes": [
+    "contents: read"
+   ],
+   "scripts_usados": [],
+   "npm_scripts": [],
+   "secrets": [
+    "SUPABASE_ACCESS_TOKEN"
+   ],
+   "actions": [
+    "actions/checkout",
+    "supabase/setup-cli"
+   ]
+  },
+  {
+   "arquivo": ".github/workflows/e2e.yml",
+   "nome": "E2E",
+   "gatilhos": [
+    "pull_request",
+    "workflow_dispatch"
+   ],
+   "crons": [],
+   "branches": [
+    "main"
+   ],
+   "jobs": [
+    "e2e"
+   ],
+   "permissoes": [
+    "contents: read"
+   ],
+   "scripts_usados": [],
+   "npm_scripts": [],
+   "secrets": [
+    "E2E_EMAIL",
+    "E2E_PASSWORD"
+   ],
+   "actions": [
+    "actions/checkout",
+    "actions/setup-node",
+    "actions/upload-artifact"
+   ]
+  },
+  {
+   "arquivo": ".github/workflows/inventario-estado-semanal.yml",
+   "nome": "Inventário do estado real (semanal)",
+   "gatilhos": [
+    "schedule",
+    "workflow_dispatch"
+   ],
+   "crons": [
+    "23 10 * * 1"
+   ],
+   "branches": [],
+   "jobs": [
+    "gerar"
+   ],
+   "permissoes": [
+    "contents: read"
+   ],
+   "scripts_usados": [
+    "scripts/inventario/gerar-banco.mjs",
+    "scripts/inventario/gerar-repo.mjs",
+    "scripts/inventario/gerar-rotas.mjs",
+    "scripts/inventario/mudou-conteudo.mjs"
+   ],
+   "npm_scripts": [],
+   "secrets": [
+    "SUPABASE_ACCESS_TOKEN"
+   ],
+   "actions": [
+    "actions/checkout",
+    "actions/github-script",
+    "actions/setup-node",
+    "actions/upload-artifact",
+    "peter-evans/create-pull-request"
+   ]
+  },
+  {
+   "arquivo": ".github/workflows/notifica-falha-main.yml",
+   "nome": "Notifica falha na main",
+   "gatilhos": [
+    "workflow_run"
+   ],
+   "crons": [],
+   "branches": [
+    "main"
+   ],
+   "jobs": [
+    "notificar"
+   ],
+   "permissoes": [],
+   "scripts_usados": [],
+   "npm_scripts": [],
+   "secrets": [],
+   "actions": [
+    "actions/github-script"
+   ]
+  },
+  {
+   "arquivo": ".github/workflows/scripts-tests.yml",
+   "nome": "Scripts Tests",
+   "gatilhos": [
+    "pull_request",
+    "push",
+    "workflow_dispatch"
+   ],
+   "crons": [],
+   "branches": [
+    "main"
+   ],
+   "jobs": [
+    "testes"
+   ],
+   "permissoes": [
+    "contents: read"
+   ],
+   "scripts_usados": [
+    "scripts/regras_negocio/test_generate.py",
+    "scripts/regras_negocio/test_indice.py",
+    "scripts/regras_negocio/test_publish.py",
+    "scripts/supabase_snapshot/requirements.txt",
+    "scripts/supabase_snapshot/test_snapshot.py",
+    "scripts/supabase_snapshot/test_snapshot_postgres.py"
+   ],
+   "npm_scripts": [],
+   "secrets": [],
+   "actions": [
+    "actions/checkout",
+    "actions/setup-node"
+   ]
+  },
+  {
+   "arquivo": ".github/workflows/security.yml",
+   "nome": "Security Scan",
+   "gatilhos": [
+    "pull_request",
+    "push",
+    "schedule"
+   ],
+   "crons": [
+    "0 0 * * 0"
+   ],
+   "branches": [
+    "main",
+    "master"
+   ],
+   "jobs": [
+    "security"
+   ],
+   "permissoes": [
+    "contents: read",
+    "pull-requests: read"
+   ],
+   "scripts_usados": [
+    "scripts/audit-gate.mjs"
+   ],
+   "npm_scripts": [],
+   "secrets": [
+    "GITHUB_TOKEN"
+   ],
+   "actions": [
+    "actions/checkout",
+    "gitleaks/gitleaks-action"
+   ]
+  },
+  {
+   "arquivo": ".github/workflows/settings-guard.yml",
+   "nome": "Settings Guard",
+   "gatilhos": [
+    "schedule",
+    "workflow_dispatch"
+   ],
+   "crons": [
+    "15 7 * * *"
+   ],
+   "branches": [],
+   "jobs": [
+    "guard"
+   ],
+   "permissoes": [
+    "contents: read"
+   ],
+   "scripts_usados": [
+    "scripts/ci/github-settings-guard.mjs"
+   ],
+   "npm_scripts": [],
+   "secrets": [
+    "GITHUB_TOKEN",
+    "SETTINGS_GUARD_TOKEN"
+   ],
+   "actions": [
+    "actions/checkout",
+    "actions/setup-node",
+    "actions/upload-artifact"
+   ]
+  },
+  {
+   "arquivo": ".github/workflows/sync-internal-secret.yml",
+   "nome": "Sync Internal Secret",
+   "gatilhos": [
+    "workflow_dispatch"
+   ],
+   "crons": [],
+   "branches": [],
+   "jobs": [
+    "resync-secret"
+   ],
+   "permissoes": [
+    "contents: read"
+   ],
+   "scripts_usados": [
+    "scripts/ops/set_missing_secrets.sh"
+   ],
+   "npm_scripts": [],
+   "secrets": [
+    "DESTINO_URL",
+    "SUPABASE_ACCESS_TOKEN",
+    "sh"
+   ],
+   "actions": [
+    "actions/checkout",
+    "supabase/setup-cli"
+   ]
+  },
+  {
+   "arquivo": ".github/workflows/types-sync.yml",
+   "nome": "types-sync",
+   "gatilhos": [
+    "push",
+    "schedule",
+    "workflow_dispatch"
+   ],
+   "crons": [
+    "49 5 * * 1"
+   ],
+   "branches": [
+    "main"
+   ],
+   "jobs": [
+    "preflight",
+    "ler-banco",
+    "gates-e-pr"
+   ],
+   "permissoes": [
+    "contents: read"
+   ],
+   "scripts_usados": [
+    "scripts/ci/install-pgbouncer.sh",
+    "scripts/ci/install-postgresql-client.sh",
+    "scripts/ci/typecheck-ratchet.mjs",
+    "scripts/db-audit/catalog.sql",
+    "scripts/db-audit/check-catalog-fresh.mjs",
+    "scripts/db-audit/check-grants-fresh.mjs",
+    "scripts/db-audit/check-manifest-fresh.mjs",
+    "scripts/db-audit/check-remocoes-destrutivas.mjs",
+    "scripts/db-audit/database-identity.json",
+    "scripts/db-audit/database-identity.mjs",
+    "scripts/db-audit/gen-types.sh",
+    "scripts/db-audit/grants-baseline.json",
+    "scripts/db-audit/grants-baseline.sql",
+    "scripts/db-audit/known-violations.json",
+    "scripts/db-audit/lote-pendente.mjs",
+    "scripts/db-audit/manifest.sql",
+    "scripts/db-audit/psql-environment.mjs",
+    "scripts/db-audit/supabase-usage-guard.mjs"
+   ],
+   "npm_scripts": [],
+   "secrets": [
+    "DESTINO_URL",
+    "GITHUB_TOKEN",
+    "TYPES_SYNC_PR_TOKEN"
+   ],
+   "actions": [
+    "actions/checkout",
+    "actions/download-artifact",
+    "actions/github-script",
+    "actions/setup-node",
+    "actions/upload-artifact",
+    "peter-evans/create-pull-request",
+    "supabase/setup-cli"
+   ]
+  }
+ ],
+ "hooks_git": [
+  {
+   "arquivo": ".husky/pre-commit",
+   "comandos": [
+    "npx lint-staged"
+   ]
+  }
+ ],
+ "docs_raiz": [
+  {
+   "arquivo": ".github/pull_request_template.md",
+   "titulo": "Resumo",
+   "linhas": 10
+  },
+  {
+   "arquivo": "AGENTS.md",
+   "titulo": "AGENTS.md — Loggi Flow V2",
+   "linhas": 149
+  },
+  {
+   "arquivo": "CHANGELOG.md",
+   "titulo": "Changelog",
+   "linhas": 118
+  },
+  {
+   "arquivo": "CLAUDE.md",
+   "titulo": null,
+   "linhas": 2
+  },
+  {
+   "arquivo": "CONTRIBUTING.md",
+   "titulo": "Contribuindo para o Loggi-Flow",
+   "linhas": 42
+  },
+  {
+   "arquivo": "DOCUMENTATION.md",
+   "titulo": "📋 Documentação Técnica - Loggi-Flow",
+   "linhas": 775
+  },
+  {
+   "arquivo": "ESTADO_ATUAL.md",
+   "titulo": "ESTADO ATUAL DO SISTEMA — LogiFlow / loggi-flow-v2",
+   "linhas": 539
+  },
+  {
+   "arquivo": "ESTADO_ATUAL_EVIDENCIAS.md",
+   "titulo": "EVIDÊNCIAS — Auditoria de Estado do LogiFlow",
+   "linhas": 604
+  },
+  {
+   "arquivo": "README.md",
+   "titulo": "🚚 Loggi-Flow",
+   "linhas": 120
+  },
+  {
+   "arquivo": "TEMPLATE_STRUCTURE.md",
+   "titulo": "🚀 Template de Estrutura - Guia de Setup",
+   "linhas": 1466
+  },
+  {
+   "arquivo": "docs/ANALISE_API_RODONAVES.md",
+   "titulo": "ANÁLISE TÉCNICA DEFINITIVA — API RODONAVES TRANSPORTES",
+   "linhas": 229
+  },
+  {
+   "arquivo": "docs/ARCHITECTURE.md",
+   "titulo": "🏗️ Arquitetura do Loggi-Flow",
+   "linhas": 181
+  },
+  {
+   "arquivo": "docs/ARCHITECTURE_C4.md",
+   "titulo": "C4 Architecture Model - LogiFlow",
+   "linhas": 63
+  },
+  {
+   "arquivo": "docs/AUDITORIA_BACKEND_SENIOR_2026.md",
+   "titulo": "🔍 Auditoria Sênior de Back-End — Loggi-Flow",
+   "linhas": 245
+  },
+  {
+   "arquivo": "docs/AUTOMACAO_LOCAL.md",
+   "titulo": "Automação local — Loggi_Flow_V2",
+   "linhas": 158
+  },
+  {
+   "arquivo": "docs/DISASTER_RECOVERY.md",
+   "titulo": "Disaster Recovery Runbook",
+   "linhas": 15
+  },
+  {
+   "arquivo": "docs/ER_DIAGRAM.md",
+   "titulo": "Entity Relationship Diagram - LogiFlow",
+   "linhas": 61
+  },
+  {
+   "arquivo": "docs/HOOKS_COMPONENTS_API.md",
+   "titulo": "Documentação de Hooks e Componentes Reutilizáveis",
+   "linhas": 640
+  },
+  {
+   "arquivo": "docs/INCIDENT_PLAYBOOK.md",
+   "titulo": "🛠️ LogiFlow Incident Playbook",
+   "linhas": 33
+  },
+  {
+   "arquivo": "docs/INCIDENT_RESPONSE.md",
+   "titulo": "🚑 Plano de Resposta a Incidentes (IRP)",
+   "linhas": 25
+  },
+  {
+   "arquivo": "docs/INTEGRACAO_CONFIG.md",
+   "titulo": "Configuração de Integrações - Loggi Flow",
+   "linhas": 193
+  },
+  {
+   "arquivo": "docs/INVENTARIO_FUNCIONALIDADES.md",
+   "titulo": "🛡️ INVENTÁRIO DE FUNCIONALIDADES LOGIFLOW — 10/10",
+   "linhas": 132
+  },
+  {
+   "arquivo": "docs/LGPD_COMPLIANCE.md",
+   "titulo": "🛡️ LGPD COMPLIANCE & PRIVACY POLICY",
+   "linhas": 18
+  },
+  {
+   "arquivo": "docs/MELHORIAS.md",
+   "titulo": "✅ MELHORIAS IMPLEMENTADAS - LOGGI-FLOW v4.0",
+   "linhas": 180
+  },
+  {
+   "arquivo": "docs/MIGRATION-GUIDE.md",
+   "titulo": "🚀 Guia de Migração Mock → Produção",
+   "linhas": 139
+  },
+  {
+   "arquivo": "docs/ONBOARDING.md",
+   "titulo": "Onboarding do Desenvolvedor (LogiFlow 10/10)",
+   "linhas": 15
+  },
+  {
+   "arquivo": "docs/PERFEICAO_10_10.md",
+   "titulo": "CERTIFICADO DE PERFEIÇÃO 10/10 — LOGIFLOW",
+   "linhas": 54
+  },
+  {
+   "arquivo": "docs/PLANO_BRASPRESS_MULTITRANSPORTADORAS_200_ETAPAS.md",
+   "titulo": "Plano Braspress + Multitransportadora — 200 etapas",
+   "linhas": 425
+  },
+  {
+   "arquivo": "docs/PLANO_FRONTEND_CONTRATOS_190_ETAPAS.md",
+   "titulo": "Plano Front‑End Sênior + Contratos de API — 190 etapas",
+   "linhas": 474
+  },
+  {
+   "arquivo": "docs/PLANO_GOOGLE_MAPS_150_ETAPAS.md",
+   "titulo": "Plano Google Maps Platform — 150 etapas",
+   "linhas": 1380
+  },
+  {
+   "arquivo": "docs/PLANO_MELHORIAS_2026.md",
+   "titulo": "📋 PLANO EXAUSTIVO DE MELHORIAS — LogiFlow 2026",
+   "linhas": 120
+  },
+  {
+   "arquivo": "docs/PLANO_TRANSPORTADORAS_200_ETAPAS.md",
+   "titulo": "Plano Transportadoras — 200 etapas (Rodonaves a fundo + multitransportadora)",
+   "linhas": 1785
+  },
+  {
+   "arquivo": "docs/PLANO_UX_NAVEGACAO_200_ETAPAS.md",
+   "titulo": "Plano de UX de navegação — 200 etapas",
+   "linhas": 508
+  },
+  {
+   "arquivo": "docs/POSTMORTEM_TEMPLATE.md",
+   "titulo": "📓 Post-Mortem de Incidentes",
+   "linhas": 31
+  },
+  {
+   "arquivo": "docs/README-CRUD.md",
+   "titulo": "📚 Documentação CRUD - Loggi-Flow",
+   "linhas": 120
+  },
+  {
+   "arquivo": "docs/RELATORIO_PERFEICAO_FINAL.md",
+   "titulo": "🏆 RELATÓRIO DE PERFEIÇÃO 10/10 — LogiFlow",
+   "linhas": 49
+  },
+  {
+   "arquivo": "docs/RUNBOOK_BACKUP.md",
+   "titulo": "📑 Runbook: Backup & Disaster Recovery - LogiFlow",
+   "linhas": 46
+  },
+  {
+   "arquivo": "docs/RUNBOOK_DB_PERFORMANCE.md",
+   "titulo": "Runbook — Investigação de Performance de Banco",
+   "linhas": 55
+  },
+  {
+   "arquivo": "docs/SECURITY_AUDIT_REPORT.md",
+   "titulo": "🕵️ SECURITY PEN-TEST REPORT (SELF-AUDIT)",
+   "linhas": 15
+  },
+  {
+   "arquivo": "docs/SLO.md",
+   "titulo": "📈 Service Level Objectives (SLOs) — LogiFlow",
+   "linhas": 40
+  },
+  {
+   "arquivo": "docs/SOFT_DELETE_POLICY.md",
+   "titulo": "Política de Soft Delete — LogiFlow",
+   "linhas": 36
+  },
+  {
+   "arquivo": "docs/SRE_HANDBOOK.md",
+   "titulo": "🚒 LOGIFLOW SRE & ON-CALL HANDBOOK",
+   "linhas": 24
+  },
+  {
+   "arquivo": "docs/auditoria-recuperacao-branches.md",
+   "titulo": null,
+   "linhas": 336
+  },
+  {
+   "arquivo": "docs/prod-readiness.md",
+   "titulo": "Prod Readiness — Loggi_Flow_V2",
+   "linhas": 89
+  }
+ ],
+ "docs_em_subpastas": [
+  {
+   "pasta": "docs/pendencias",
+   "arquivos_md": 165
+  },
+  {
+   "pasta": "docs/adr",
+   "arquivos_md": 20
+  },
+  {
+   "pasta": "docs/qa",
+   "arquivos_md": 9
+  },
+  {
+   "pasta": "docs/agentes",
+   "arquivos_md": 8
+  },
+  {
+   "pasta": "docs/audit",
+   "arquivos_md": 3
+  },
+  {
+   "pasta": "docs/contexto",
+   "arquivos_md": 2
+  },
+  {
+   "pasta": "docs/data",
+   "arquivos_md": 1
+  },
+  {
+   "pasta": "docs/seguranca",
+   "arquivos_md": 1
+  }
+ ],
+ "changelog_topo": "[1.1.0] - 2026-09-02",
+ "env": {
+  "declaradas_no_env_example": [
+   "LALAMOVE_API_KEY",
+   "LALAMOVE_API_SECRET",
+   "LALAMOVE_BASE_URL",
+   "SUPABASE_SERVICE_ROLE_KEY",
+   "VITE_APP_ENV",
+   "VITE_APP_NAME",
+   "VITE_CD_ORIGEM_LAT",
+   "VITE_CD_ORIGEM_LNG",
+   "VITE_ENABLE_BITRIX24_SYNC",
+   "VITE_ENABLE_GAMIFICATION",
+   "VITE_ENABLE_LALAMOVE",
+   "VITE_GOOGLE_MAPS_API_KEY",
+   "VITE_N8N_WEBHOOK_URL",
+   "VITE_SENTRY_DSN",
+   "VITE_SUPABASE_PUBLISHABLE_KEY",
+   "VITE_SUPABASE_URL"
+  ],
+  "usadas_no_front": [
+   "MODE",
+   "NODE_ENV",
+   "VITE_CD_ORIGEM_LAT",
+   "VITE_CD_ORIGEM_LNG",
+   "VITE_SENTRY_DSN",
+   "VITE_SUPABASE_PUBLISHABLE_KEY",
+   "VITE_SUPABASE_URL"
+  ],
+  "usadas_nas_edges": [
+   "ALLOWED_ORIGINS",
+   "ALLOW_TEST_MODE",
+   "APP_URL",
+   "BITRIX24_WEBHOOK_URL",
+   "EVOLUTION_ALLOWED_INSTANCES",
+   "EVOLUTION_API_KEY",
+   "EVOLUTION_API_URL",
+   "EVOLUTION_INSTANCE_NAME",
+   "EXTERNAL_DB_ALLOWED_RPCS",
+   "EXTERNAL_DB_ALLOWED_TABLES",
+   "EXTERNAL_SUPABASE_SERVICE_KEY",
+   "EXTERNAL_SUPABASE_URL",
+   "FIELD_ENCRYPTION_KEY",
+   "GOOGLE_API_KEY",
+   "INTERNAL_FN_SECRET",
+   "LALAMOVE_API_KEY",
+   "LALAMOVE_API_SECRET",
+   "LALAMOVE_BASE_URL",
+   "MELHOR_ENVIO_SANDBOX",
+   "MELHOR_ENVIO_TOKEN",
+   "OPENAI_API_KEY",
+   "OPENWEATHER_API_KEY",
+   "RESEND_API_KEY",
+   "RODONAVES_CNPJ_REMETENTE",
+   "RODONAVES_PASSWORD",
+   "RODONAVES_USERNAME",
+   "SECURITY_ALERT_EMAIL",
+   "SECURITY_SLACK_WEBHOOK_URL",
+   "SUPABASE_ANON_KEY",
+   "SUPABASE_SERVICE_ROLE_KEY",
+   "SUPABASE_URL",
+   "UPSTASH_REDIS_REST_TOKEN",
+   "UPSTASH_REDIS_REST_URL",
+   "VAPID_PRIVATE_KEY",
+   "VAPID_PUBLIC_KEY",
+   "VAPID_SUBJECT"
+  ],
+  "usadas_no_python": [
+   "AI_CONTEXT_INDEX",
+   "AI_CONTEXT_MODEL",
+   "AI_CONTEXT_PROFILE",
+   "AI_CONTEXT_SCHEMA_SNAPSHOT",
+   "ANTHROPIC_API_KEY",
+   "CODE_SCAN_DIRS",
+   "GEN_TYPES",
+   "PATH",
+   "PGDUMP",
+   "PGDUMP_SCHEMAS",
+   "REPO_ROOT",
+   "SNAPSHOT_DIR",
+   "SNAPSHOT_EXCLUDE_SCHEMAS",
+   "SNAPSHOT_INCLUDE_SCHEMAS",
+   "SNAPSHOT_TEST_PG_URL",
+   "SUPABASE_ACCESS_TOKEN",
+   "SUPABASE_DB_URL",
+   "SUPABASE_PROJECT_REF",
+   "SUPABASE_SNAPSHOT_PUBLICACAO"
+  ],
+  "usadas_mas_nao_declaradas": [
+   "MODE",
+   "NODE_ENV"
+  ],
+  "secrets_em_workflows": [
+   "DESTINO_URL",
+   "E2E_EMAIL",
+   "E2E_PASSWORD",
+   "GITHUB_TOKEN",
+   "SETTINGS_GUARD_TOKEN",
+   "SUPABASE_ACCESS_TOKEN",
+   "SUPABASE_DB_URL",
+   "TYPES_SYNC_PR_TOKEN",
+   "sh"
+  ]
+ },
+ "deploy": {
+  "alvos": [
+   "vercel"
+  ],
+  "dockerfiles": [],
+  "compose": [],
+  "vercel": {
+   "framework": null,
+   "build": null,
+   "rewrites": 1,
+   "redirects": 0,
+   "headers": 0,
+   "ignore_command": null,
+   "crons": []
+  }
+ },
+ "integracoes": {
+  "sdks": [
+   {
+    "pacote": "i18next",
+    "servico": "i18next",
+    "versao": "^26.2.0"
+   },
+   {
+    "pacote": "react-i18next",
+    "servico": "i18next",
+    "versao": "^17.0.13"
+   },
+   {
+    "pacote": "@tanstack/react-query",
+    "servico": "react-query",
+    "versao": "^5.102.8"
+   },
+   {
+    "pacote": "@sentry/react",
+    "servico": "Sentry",
+    "versao": "^10.70.0"
+   },
+   {
+    "pacote": "@supabase/supabase-js",
+    "servico": "Supabase",
+    "versao": "^2.119.0"
+   },
+   {
+    "pacote": "@upstash/redis",
+    "servico": "Upstash",
+    "versao": "^1.38.0"
+   },
+   {
+    "pacote": "zod",
+    "servico": "zod",
+    "versao": "^4.5.4"
+   }
+  ],
+  "hosts_externos": [
+   {
+    "host": "api.resend.com",
+    "arquivos": 5
+   },
+   {
+    "host": "viacep.com.br",
+    "arquivos": 4
+   },
+   {
+    "host": "wa.me",
+    "arquivos": 4
+   },
+   {
+    "host": "api.ipify.org",
+    "arquivos": 3
+   },
+   {
+    "host": "generativelanguage.googleapis.com",
+    "arquivos": 2
+   },
+   {
+    "host": "loggi-flow-v2.vercel.app",
+    "arquivos": 2
+   },
+   {
+    "host": "rest.lalamove.com",
+    "arquivos": 2
+   },
+   {
+    "host": "s3.amazonaws.com",
+    "arquivos": 2
+   },
+   {
+    "host": "01wapi.rte.com.br",
+    "arquivos": 1
+   },
+   {
+    "host": "api.openai.com",
+    "arquivos": 1
+   },
+   {
+    "host": "api.openweathermap.org",
+    "arquivos": 1
+   },
+   {
+    "host": "api.pwnedpasswords.com",
+    "arquivos": 1
+   },
+   {
+    "host": "api.transportadora.com",
+    "arquivos": 1
+   },
+   {
+    "host": "basemaps.cartocdn.com",
+    "arquivos": 1
+   },
+   {
+    "host": "bitrix24.com",
+    "arquivos": 1
+   },
+   {
+    "host": "brasilapi.com.br",
+    "arquivos": 1
+   },
+   {
+    "host": "customer-apigateway.rte.com.br",
+    "arquivos": 1
+   },
+   {
+    "host": "dne-apigateway.rte.com.br",
+    "arquivos": 1
+   },
+   {
+    "host": "ip-api.com",
+    "arquivos": 1
+   },
+   {
+    "host": "ipapi.co",
+    "arquivos": 1
+   },
+   {
+    "host": "melhorenvio.com.br",
+    "arquivos": 1
+   },
+   {
+    "host": "nominatim.openstreetmap.org",
+    "arquivos": 1
+   },
+   {
+    "host": "payments-apigateway.rte.com.br",
+    "arquivos": 1
+   },
+   {
+    "host": "photon.komoot.io",
+    "arquivos": 1
+   },
+   {
+    "host": "pickup-apigateway.rte.com.br",
+    "arquivos": 1
+   },
+   {
+    "host": "quotation-apigateway.rte.com.br",
+    "arquivos": 1
+   },
+   {
+    "host": "rest.sandbox.lalamove.com",
+    "arquivos": 1
+   },
+   {
+    "host": "sandbox.melhorenvio.com.br",
+    "arquivos": 1
+   },
+   {
+    "host": "selfattendance-apigateway.rte.com.br",
+    "arquivos": 1
+   },
+   {
+    "host": "server.arcgisonline.com",
+    "arquivos": 1
+   },
+   {
+    "host": "seu-dominio.bitrix24.com.br",
+    "arquivos": 1
+   },
+   {
+    "host": "seu-servidor.com",
+    "arquivos": 1
+   },
+   {
+    "host": "tracking-apigateway.rte.com.br",
+    "arquivos": 1
+   },
+   {
+    "host": "unittocity-apigateway.rte.com.br",
+    "arquivos": 1
+   },
+   {
+    "host": "www.openstreetmap.org",
+    "arquivos": 1
+   }
+  ],
+  "env_de_integracao": [
+   "BITRIX24_WEBHOOK_URL",
+   "EVOLUTION_ALLOWED_INSTANCES",
+   "EVOLUTION_API_KEY",
+   "EVOLUTION_API_URL",
+   "EVOLUTION_INSTANCE_NAME",
+   "GOOGLE_API_KEY",
+   "INTERNAL_FN_SECRET",
+   "LALAMOVE_API_KEY",
+   "LALAMOVE_API_SECRET",
+   "MELHOR_ENVIO_TOKEN",
+   "OPENAI_API_KEY",
+   "OPENWEATHER_API_KEY",
+   "RESEND_API_KEY",
+   "SECURITY_SLACK_WEBHOOK_URL",
+   "UPSTASH_REDIS_REST_TOKEN",
+   "UPSTASH_REDIS_REST_URL",
+   "VITE_GOOGLE_MAPS_API_KEY",
+   "VITE_N8N_WEBHOOK_URL",
+   "VITE_SENTRY_DSN"
+  ],
+  "webhooks_recebidos": [
+   "carrier-webhook-receiver",
+   "evolution-whatsapp",
+   "health",
+   "health-check",
+   "lalamove-webhook",
+   "log-security-event",
+   "melhor-envio-api",
+   "nexus-webhook-receiver",
+   "predict-delays-scheduled",
+   "resend-email",
+   "rodonaves-webhook",
+   "webhook-status"
+  ],
+  "realtime": [
+   "db-regression-alerts-${user.id}",
+   "health-ping",
+   "presence-health",
+   "raw_responses",
+   "realtime:${config.table}:${multiTopicId}",
+   "system-health-check",
+   "tactical-logs"
+  ]
+ },
+ "permissoes": {
+  "papeis_no_codigo": [
+   {
+    "papel": "user",
+    "ocorrencias": 6
+   },
+   {
+    "papel": "admin",
+    "ocorrencias": 5
+   },
+   {
+    "papel": "service_role",
+    "ocorrencias": 3
+   },
+   {
+    "papel": "system",
+    "ocorrencias": 3
+   },
+   {
+    "papel": "assistant",
+    "ocorrencias": 2
+   },
+   {
+    "papel": "authenticated",
+    "ocorrencias": 2
+   }
+  ],
+  "enums_de_papel": [
+   {
+    "enum": "app_role",
+    "valores": [
+     "admin",
+     "user"
+    ]
+   }
+  ],
+  "rpcs_de_autorizacao": [
+   "get_user_permissions",
+   "has_role"
+  ],
+  "guards": [
+   "src/components/auth/ProtectedRoute.tsx"
+  ],
+  "rotas_protegidas": 57,
+  "rotas_publicas": [
+   "/*",
+   "/auth",
+   "/rastrear",
+   "/reset-password"
+  ],
+  "menu_com_papeis": [],
+  "tabelas_sem_rls": [],
+  "tabelas_rls_indeterminado": [
+   "audit_logs_y2026m01",
+   "audit_logs_y2026m02",
+   "audit_logs_y2026m03",
+   "audit_logs_y2026m04",
+   "audit_logs_y2026m05",
+   "audit_logs_y2026m06",
+   "audit_logs_y2026m07",
+   "audit_logs_y2026m08",
+   "audit_logs_y2026m09",
+   "audit_logs_y2026m10",
+   "audit_logs_y2026m11",
+   "audit_logs_y2026m12"
+  ],
+  "tabelas_rls_indeterminado_como_decidir": "SELECT c.relname FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = 'public' AND c.relkind = 'r' AND NOT c.relrowsecurity ORDER BY 1;"
+ },
+ "feature_flags": {
+  "total": 0,
+  "flags": [],
+  "tabelas_de_flag": [
+   "feature_flags",
+   "geo_blocking_settings",
+   "prediction_accuracy_settings"
+  ]
+ },
+ "providers": {
+  "entrada": "src/main.tsx",
+  "providers": [
+   "AuthProvider",
+   "BrowserRouter",
+   "ErrorBoundary",
+   "QueryClientProvider",
+   "TooltipProvider"
+  ]
+ },
+ "i18n": {
+  "arquivos": 0,
+  "idiomas": [],
+  "lib": [
+   "i18next"
+  ]
+ }
+}

@@ -1,0 +1,6483 @@
+{
+ "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
+ "format_version": 2,
+ "descricao": "menu → módulo (pasta de domínio) → telas/rotas → hooks → edge functions → tabelas → dependências entre módulos. edges/tabelas/rpcs são TRANSITIVOS (tudo que os arquivos do módulo puxam); `diretos` tem só o que está escrito nos arquivos do próprio módulo.",
+ "modulos": [
+  {
+   "modulo": "components",
+   "arquivos": 1,
+   "testes": 0,
+   "linhas": 34,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 1,
+   "hooks_locais": [
+    "useAchievementNotifications",
+    "useAuth",
+    "useDateFormatter",
+    "useLiveRegion",
+    "useNewDeviceDetection",
+    "useReducedMotion",
+    "useRouteAnnouncer",
+    "useSecurityPushNotifications",
+    "useSessionTimeout",
+    "useTimezone"
+   ],
+   "hooks_definidos": [],
+   "edges": [
+    "new-device-alert"
+   ],
+   "tabelas": [
+    "known_devices",
+    "profiles",
+    "security_events",
+    "user_levels",
+    "user_roles"
+   ],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [],
+   "depende_de_modulos": [
+    "components/accessibility",
+    "components/achievements",
+    "components/security",
+    "hooks/common",
+    "hooks/gamification"
+   ],
+   "pacotes_externos": []
+  },
+  {
+   "modulo": "components/accessibility",
+   "arquivos": 4,
+   "testes": 0,
+   "linhas": 240,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 3,
+   "hooks_locais": [
+    "useLiveRegion",
+    "useReducedMotion",
+    "useRouteAnnouncer"
+   ],
+   "hooks_definidos": [
+    "useLiveRegion",
+    "useMotionVariants",
+    "useReducedMotion",
+    "useRouteAnnouncer",
+    "useLiveRegion",
+    "useRouteAnnouncer",
+    "useMotionVariants",
+    "useReducedMotion"
+   ],
+   "edges": [],
+   "tabelas": [],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [],
+   "flags": [],
+   "papeis": [],
+   "diretos": {
+    "edges": [],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "components",
+    "components/layout"
+   ],
+   "depende_de_modulos": [
+    "components/ui"
+   ],
+   "pacotes_externos": []
+  },
+  {
+   "modulo": "components/achievements",
+   "arquivos": 4,
+   "testes": 0,
+   "linhas": 437,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 3,
+   "hooks_locais": [
+    "useAchievementNotifications"
+   ],
+   "hooks_definidos": [],
+   "edges": [],
+   "tabelas": [],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [],
+   "flags": [],
+   "papeis": [],
+   "diretos": {
+    "edges": [],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "components",
+    "components/layout"
+   ],
+   "depende_de_modulos": [
+    "components/ui",
+    "hooks/gamification",
+    "lib"
+   ],
+   "pacotes_externos": [
+    "framer-motion",
+    "lucide-react",
+    "react-confetti",
+    "react-use"
+   ]
+  },
+  {
+   "modulo": "components/admin",
+   "arquivos": 4,
+   "testes": 0,
+   "linhas": 1176,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 4,
+   "hooks_locais": [
+    "useGlobalHealthScore",
+    "useRemediationMttr",
+    "useRemediationSuggestions"
+   ],
+   "hooks_definidos": [],
+   "edges": [],
+   "tabelas": [
+    "bio_sync_alert_rules",
+    "telemetry_logs"
+   ],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [],
+   "diretos": {
+    "edges": [],
+    "tabelas": [
+     "bio_sync_alert_rules",
+     "telemetry_logs"
+    ],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "components/ui",
+    "features/db-observability",
+    "integrations/supabase"
+   ],
+   "pacotes_externos": [
+    "@tanstack/react-query",
+    "date-fns",
+    "framer-motion",
+    "lucide-react",
+    "recharts",
+    "sonner"
+   ]
+  },
+  {
+   "modulo": "components/ai",
+   "arquivos": 2,
+   "testes": 0,
+   "linhas": 401,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 1,
+   "hooks_locais": [
+    "useAuth",
+    "useHistoricoChat"
+   ],
+   "hooks_definidos": [],
+   "edges": [
+    "ai-logistics-assistant"
+   ],
+   "tabelas": [
+    "ai_chat_messages",
+    "profiles",
+    "user_levels",
+    "user_roles"
+   ],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin",
+    "assistant",
+    "user"
+   ],
+   "diretos": {
+    "edges": [
+     "ai-logistics-assistant"
+    ],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "components/layout",
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "components/ui",
+    "hooks/ai",
+    "hooks/auth",
+    "lib"
+   ],
+   "pacotes_externos": [
+    "lucide-react",
+    "react-markdown",
+    "sonner"
+   ]
+  },
+  {
+   "modulo": "components/analytics",
+   "arquivos": 4,
+   "testes": 0,
+   "linhas": 562,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 3,
+   "hooks_locais": [
+    "useAnalytics",
+    "useAuth",
+    "useIsDesktop",
+    "useIsMobile",
+    "useIsTablet",
+    "useMediaQuery",
+    "usePrefersDarkMode",
+    "usePrefersReducedMotion"
+   ],
+   "hooks_definidos": [],
+   "edges": [],
+   "tabelas": [
+    "entregas",
+    "ocorrencias",
+    "profiles",
+    "user_levels",
+    "user_roles"
+   ],
+   "rpcs": [
+    "get_monthly_analytics"
+   ],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [],
+    "tabelas": [
+     "entregas",
+     "ocorrencias"
+    ],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "components/ui",
+    "hooks/analytics",
+    "hooks/common",
+    "integrations/supabase",
+    "lib"
+   ],
+   "pacotes_externos": [
+    "@tanstack/react-query",
+    "date-fns",
+    "lucide-react",
+    "recharts"
+   ]
+  },
+  {
+   "modulo": "components/audit",
+   "arquivos": 2,
+   "testes": 0,
+   "linhas": 487,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 1,
+   "hooks_locais": [
+    "useAuditLogs",
+    "useAuth",
+    "useConfirm",
+    "useExport",
+    "useFilters",
+    "usePagination",
+    "useRealtime",
+    "useRecordHistory",
+    "useSelection",
+    "useSorting",
+    "useVirtualTable"
+   ],
+   "hooks_definidos": [],
+   "edges": [],
+   "tabelas": [
+    "audit_logs",
+    "profiles",
+    "user_levels",
+    "user_roles"
+   ],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [
+    "realtime:${config.table}:${multiTopicId}"
+   ],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "components/common",
+    "components/ui",
+    "hooks/common",
+    "hooks/data",
+    "hooks/security",
+    "hooks/ui",
+    "integrations/supabase",
+    "lib"
+   ],
+   "pacotes_externos": [
+    "date-fns",
+    "lucide-react",
+    "sonner"
+   ]
+  },
+  {
+   "modulo": "components/auth",
+   "arquivos": 3,
+   "testes": 0,
+   "linhas": 296,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 2,
+   "hooks_locais": [
+    "useAuth",
+    "useDebounce"
+   ],
+   "hooks_definidos": [],
+   "edges": [
+    "check-password-breach"
+   ],
+   "tabelas": [
+    "profiles",
+    "user_levels",
+    "user_roles"
+   ],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [
+     "check-password-breach"
+    ],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "pages/auth"
+   ],
+   "depende_de_modulos": [
+    "hooks/auth",
+    "hooks/common",
+    "integrations/supabase",
+    "lib"
+   ],
+   "pacotes_externos": [
+    "lucide-react",
+    "react-router-dom"
+   ]
+  },
+  {
+   "modulo": "components/automation",
+   "arquivos": 3,
+   "testes": 0,
+   "linhas": 371,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 2,
+   "hooks_locais": [
+    "useAuth",
+    "useBusinessRules"
+   ],
+   "hooks_definidos": [],
+   "edges": [],
+   "tabelas": [
+    "business_rules",
+    "profiles",
+    "user_levels",
+    "user_roles"
+   ],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "components/ui",
+    "hooks/logistics",
+    "lib"
+   ],
+   "pacotes_externos": [
+    "framer-motion",
+    "lucide-react"
+   ]
+  },
+  {
+   "modulo": "components/box",
+   "arquivos": 3,
+   "testes": 0,
+   "linhas": 364,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 2,
+   "hooks_locais": [
+    "useAudioFeedback",
+    "useAuditLogs",
+    "useAuth",
+    "useBoxManagement",
+    "useRecordHistory"
+   ],
+   "hooks_definidos": [],
+   "edges": [],
+   "tabelas": [
+    "audit_logs",
+    "entregas",
+    "kanban_history",
+    "profiles",
+    "user_levels",
+    "user_roles"
+   ],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "components/common",
+    "components/ui",
+    "hooks/logistics",
+    "hooks/notifications",
+    "lib"
+   ],
+   "pacotes_externos": [
+    "date-fns",
+    "framer-motion",
+    "lucide-react"
+   ]
+  },
+  {
+   "modulo": "components/coletas",
+   "arquivos": 4,
+   "testes": 1,
+   "linhas": 1534,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 3,
+   "hooks_locais": [
+    "useAudioFeedback",
+    "useAuth",
+    "useBusinessRuleEngine",
+    "useBusinessRules",
+    "useRuleTriggers",
+    "useTelemetry",
+    "useToast"
+   ],
+   "hooks_definidos": [],
+   "edges": [],
+   "tabelas": [
+    "audit_logs",
+    "business_rules",
+    "coletas",
+    "entregas",
+    "error_events",
+    "fornecedores",
+    "notifications",
+    "ocorrencias",
+    "profiles",
+    "rule_execution_logs",
+    "telemetry_logs",
+    "transportadoras",
+    "user_levels",
+    "user_roles"
+   ],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [],
+    "tabelas": [
+     "audit_logs",
+     "coletas",
+     "fornecedores",
+     "transportadoras"
+    ],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "components/ui",
+    "hooks/logistics",
+    "hooks/notifications",
+    "hooks/ui",
+    "integrations/supabase",
+    "lib"
+   ],
+   "pacotes_externos": [
+    "date-fns",
+    "framer-motion",
+    "jspdf",
+    "jspdf-autotable",
+    "lucide-react",
+    "react-hook-form",
+    "sonner"
+   ]
+  },
+  {
+   "modulo": "components/common",
+   "arquivos": 45,
+   "testes": 2,
+   "linhas": 5216,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 41,
+   "hooks_locais": [
+    "useAuditLogs",
+    "useAuth",
+    "useConfirm",
+    "useDocumentUpload",
+    "useErrorHandler",
+    "useExport",
+    "useGlobalSearch",
+    "useImageUpload",
+    "useIsDesktop",
+    "useIsMobile",
+    "useIsTablet",
+    "useMediaQuery",
+    "useNavigationHistory",
+    "usePrefersDarkMode",
+    "usePrefersReducedMotion",
+    "useRecordHistory"
+   ],
+   "hooks_definidos": [
+    "useConfirm",
+    "useConfirm",
+    "useErrorHandler",
+    "useConfirm"
+   ],
+   "edges": [
+    "health-check",
+    "nexus-auto-healing"
+   ],
+   "tabelas": [
+    "audit_logs",
+    "clientes",
+    "coletas",
+    "entregas",
+    "error_events",
+    "fornecedores",
+    "profiles",
+    "security_events",
+    "transportadoras",
+    "user_levels",
+    "user_roles"
+   ],
+   "rpcs": [
+    "registrar_crash_ui"
+   ],
+   "buckets": [],
+   "canais_realtime": [
+    "health-ping",
+    "presence-health",
+    "system-health-check"
+   ],
+   "env": [
+    "NODE_ENV",
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [
+     "nexus-auto-healing"
+    ],
+    "tabelas": [
+     "error_events"
+    ],
+    "rpcs": [
+     "registrar_crash_ui"
+    ]
+   },
+   "importado_por_outros_modulos": [
+    "components/audit",
+    "components/box",
+    "components/freight",
+    "components/labels",
+    "components/layout",
+    "components/melhorenvio",
+    "components/predictions",
+    "pages",
+    "pages/cotacao-multicanal"
+   ],
+   "depende_de_modulos": [
+    "components/ui",
+    "hooks/auth",
+    "hooks/common",
+    "hooks/data",
+    "hooks/security",
+    "integrations/supabase",
+    "lib",
+    "utils"
+   ],
+   "pacotes_externos": [
+    "@sentry/react",
+    "@tanstack/react-virtual",
+    "date-fns",
+    "framer-motion",
+    "lucide-react",
+    "nprogress",
+    "react-day-picker",
+    "react-router-dom",
+    "sonner",
+    "xlsx",
+    "zod"
+   ]
+  },
+  {
+   "modulo": "components/dashboard",
+   "arquivos": 17,
+   "testes": 1,
+   "linhas": 5501,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 15,
+   "hooks_locais": [
+    "useApiStatus",
+    "useAuth",
+    "useBiometricAnomalies",
+    "useDashboardMetrics",
+    "useDashboardWidgets",
+    "useDelayPrediction",
+    "useExecutiveMetrics",
+    "useFavoriteMetrics",
+    "useGamification",
+    "useIsDesktop",
+    "useIsMobile",
+    "useIsTablet",
+    "useLocalStorage",
+    "useLogisticsCosts",
+    "useLogisticsIntelligence",
+    "useMapIntelligence",
+    "useMapWeatherSync",
+    "useMediaQuery",
+    "useNexusHealth",
+    "useOfflineSync",
+    "useOnlineStatus",
+    "usePrefersDarkMode",
+    "usePrefersReducedMotion",
+    "useRealtime",
+    "useRecentAlerts",
+    "useSLAMetrics",
+    "useTelemetry",
+    "useTransportadoraPerformance",
+    "useUnifiedTracking",
+    "useWebAuthn"
+   ],
+   "hooks_definidos": [],
+   "edges": [
+    "execute-protocol",
+    "predict-delays"
+   ],
+   "tabelas": [
+    "achievements",
+    "ai_delay_predictions",
+    "bio_sync_telemetry",
+    "coletas",
+    "cotacoes_multicanal",
+    "entregas",
+    "error_events",
+    "nexus_tactical_logs",
+    "ocorrencias",
+    "performance_metrics",
+    "profiles",
+    "reward_items",
+    "risk_zones",
+    "security_events",
+    "sla_alerts",
+    "system_heartbeat",
+    "telemetry_logs",
+    "transportadoras",
+    "user_achievements",
+    "user_levels",
+    "user_roles",
+    "webauthn_challenges",
+    "webauthn_credentials"
+   ],
+   "rpcs": [
+    "add_user_xp",
+    "get_dashboard_metrics"
+   ],
+   "buckets": [],
+   "canais_realtime": [
+    "realtime:${config.table}:${multiTopicId}",
+    "tactical-logs"
+   ],
+   "env": [
+    "VITE_CD_ORIGEM_LAT",
+    "VITE_CD_ORIGEM_LNG",
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [
+     "execute-protocol"
+    ],
+    "tabelas": [
+     "system_heartbeat"
+    ],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "components/map",
+    "components/ui",
+    "hooks/analytics",
+    "hooks/auth",
+    "hooks/common",
+    "hooks/gamification",
+    "hooks/logistics",
+    "hooks/system",
+    "integrations/supabase",
+    "lib"
+   ],
+   "pacotes_externos": [
+    "@dnd-kit/core",
+    "@dnd-kit/sortable",
+    "@dnd-kit/utilities",
+    "@tanstack/react-query",
+    "date-fns",
+    "framer-motion",
+    "lucide-react",
+    "maplibre-gl",
+    "react-map-gl",
+    "react-router-dom",
+    "recharts",
+    "sonner"
+   ]
+  },
+  {
+   "modulo": "components/freight",
+   "arquivos": 18,
+   "testes": 0,
+   "linhas": 3444,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 17,
+   "hooks_locais": [
+    "useAchievementNotifications",
+    "useAnalytics",
+    "useApiStatus",
+    "useAudioFeedback",
+    "useAuditLogs",
+    "useAuth",
+    "useBiometricAnomalies",
+    "useBoxManagement",
+    "useBusinessRuleEngine",
+    "useBusinessRules",
+    "useClientWebhooks",
+    "useComments",
+    "useConciliacao",
+    "useConfirm",
+    "useConfirmExit",
+    "useCotacoesFrete",
+    "useDashboardData",
+    "useDashboardMetrics",
+    "useDashboardWidgets",
+    "useDateFormatter",
+    "useDelayPrediction",
+    "useDensity",
+    "useDeviceSessions",
+    "useDocumentUpload",
+    "useDrillDown",
+    "useEntityHistory",
+    "useExecutiveMetrics",
+    "useExport",
+    "useExternalDbBridge",
+    "useFavoriteMetrics",
+    "useFeatureFlag",
+    "useFeatureFlags",
+    "useFilters",
+    "useFreightIntelligence",
+    "useFreightQuotation",
+    "useGamification",
+    "useGlobalSearch",
+    "useGlobalShortcuts",
+    "useImageUpload",
+    "useIntegrationValidation",
+    "useIsDesktop",
+    "useIsMobile",
+    "useIsTablet",
+    "useKeyboardShortcut",
+    "useKeyboardShortcuts",
+    "useLalamoveOrders",
+    "useLogisticsIntelligence",
+    "useMFA",
+    "useMapWeatherSync",
+    "useMediaQuery",
+    "useMelhorEnvio",
+    "useNavigationHistory",
+    "useNewDeviceDetection",
+    "useNotificationBadge",
+    "useNotificationPreferences",
+    "useNotifications",
+    "useOfflineSync",
+    "useOnboarding",
+    "useOnlineStatus",
+    "usePagination",
+    "usePerformanceMonitor",
+    "usePermissions",
+    "usePrefersDarkMode",
+    "usePrefersReducedMotion",
+    "usePrefetch",
+    "useQRScanner",
+    "useQuotationFlow",
+    "useRateLimitLogs",
+    "useRealtime",
+    "useRecentAlerts",
+    "useRecordHistory",
+    "useRewardPurchases",
+    "useRodonavesTracking",
+    "useRodonavesWebhook",
+    "useRole",
+    "useRuleTriggers",
+    "useSLAMetrics",
+    "useSLANotifications",
+    "useSecurityEvents",
+    "useSecurityPushNotifications",
+    "useSelection",
+    "useSessionTimeout",
+    "useShortcutsDialog",
+    "useSmartAlerts",
+    "useSmartCarrierSelection",
+    "useSoftDelete",
+    "useSorting",
+    "useTelemetry",
+    "useTimezone",
+    "useToast",
+    "useTouchGestures",
+    "useTransportadoraPerformance",
+    "useUnifiedTracking",
+    "useVirtualTable",
+    "useWebAuthn",
+    "useWhatsAppNotification"
+   ],
+   "hooks_definidos": [],
+   "edges": [
+    "bitrix24-integration",
+    "check-rate-limit",
+    "evolution-whatsapp",
+    "external-db-bridge",
+    "geocode-address",
+    "lalamove-api",
+    "lalamove-tracking",
+    "log-security-event",
+    "melhor-envio-api",
+    "new-device-alert",
+    "normalize-freight-response",
+    "predict-delays",
+    "push-send",
+    "rodonaves-api",
+    "rodonaves-webhook",
+    "scheduled-reports",
+    "smart-carrier-selection",
+    "webhook-status",
+    "whatsapp-notification"
+   ],
+   "tabelas": [
+    "achievements",
+    "ai_delay_predictions",
+    "alertas_custo",
+    "audit_logs",
+    "bio_sync_telemetry",
+    "business_rules",
+    "client_webhooks",
+    "clientes",
+    "coletas",
+    "comments",
+    "conciliacao_itens_importados",
+    "conciliacoes",
+    "cotacoes_frete",
+    "cotacoes_multicanal",
+    "entregas",
+    "error_events",
+    "feature_flags",
+    "fornecedores",
+    "freight_decisions",
+    "freight_selection_rules",
+    "fretes_internos",
+    "ip_access_rules",
+    "kanban_history",
+    "known_devices",
+    "logistica_reversa",
+    "notificacoes_custo",
+    "notifications",
+    "ocorrencias",
+    "performance_metrics",
+    "profiles",
+    "push_subscriptions",
+    "rastreamento_alertas",
+    "rastreamento_historico",
+    "rate_limit_logs",
+    "reward_items",
+    "reward_purchases",
+    "risk_zones",
+    "rule_execution_logs",
+    "security_events",
+    "sla_alerts",
+    "tabelas_frete",
+    "telemetry_logs",
+    "transportadora_rotas",
+    "transportadoras",
+    "user_achievements",
+    "user_levels",
+    "user_notification_preferences",
+    "user_onboarding",
+    "user_roles",
+    "user_sessions",
+    "webauthn_challenges",
+    "webauthn_credentials",
+    "webhook_deliveries",
+    "webhook_inbound_failures"
+   ],
+   "rpcs": [
+    "add_user_xp",
+    "get_dashboard_metrics",
+    "get_monthly_analytics",
+    "get_user_permissions"
+   ],
+   "buckets": [],
+   "canais_realtime": [
+    "raw_responses",
+    "realtime:${config.table}:${multiTopicId}"
+   ],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [
+     "normalize-freight-response"
+    ],
+    "tabelas": [
+     "audit_logs",
+     "cotacoes_multicanal",
+     "freight_decisions",
+     "transportadora_rotas"
+    ],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "components/common",
+    "components/ui",
+    "hooks",
+    "hooks/common",
+    "hooks/logistics",
+    "integrations/supabase",
+    "lib",
+    "lib/rodonaves"
+   ],
+   "pacotes_externos": [
+    "@tanstack/react-query",
+    "date-fns",
+    "decimal.js",
+    "framer-motion",
+    "lucide-react",
+    "recharts",
+    "sonner"
+   ]
+  },
+  {
+   "modulo": "components/gamification",
+   "arquivos": 3,
+   "testes": 0,
+   "linhas": 259,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 3,
+   "hooks_locais": [
+    "useAuth",
+    "useGamification"
+   ],
+   "hooks_definidos": [],
+   "edges": [],
+   "tabelas": [
+    "achievements",
+    "profiles",
+    "reward_items",
+    "user_achievements",
+    "user_levels",
+    "user_roles"
+   ],
+   "rpcs": [
+    "add_user_xp"
+   ],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "components/layout"
+   ],
+   "depende_de_modulos": [
+    "components/ui",
+    "hooks/gamification",
+    "lib"
+   ],
+   "pacotes_externos": [
+    "framer-motion",
+    "lucide-react",
+    "react-confetti",
+    "react-use"
+   ]
+  },
+  {
+   "modulo": "components/integrations",
+   "arquivos": 1,
+   "testes": 0,
+   "linhas": 255,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 1,
+   "hooks_locais": [
+    "useAuth",
+    "useClientWebhooks"
+   ],
+   "hooks_definidos": [],
+   "edges": [
+    "webhook-status"
+   ],
+   "tabelas": [
+    "client_webhooks",
+    "profiles",
+    "user_levels",
+    "user_roles",
+    "webhook_deliveries",
+    "webhook_inbound_failures"
+   ],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "components/ui",
+    "hooks/integrations"
+   ],
+   "pacotes_externos": [
+    "date-fns",
+    "lucide-react",
+    "sonner"
+   ]
+  },
+  {
+   "modulo": "components/labels",
+   "arquivos": 3,
+   "testes": 0,
+   "linhas": 573,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 2,
+   "hooks_locais": [],
+   "hooks_definidos": [],
+   "edges": [],
+   "tabelas": [
+    "entregas"
+   ],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [],
+   "diretos": {
+    "edges": [],
+    "tabelas": [
+     "entregas"
+    ],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "components/common",
+    "components/ui",
+    "integrations/supabase"
+   ],
+   "pacotes_externos": [
+    "@tanstack/react-query",
+    "date-fns",
+    "jspdf",
+    "lucide-react",
+    "qrcode.react",
+    "sonner"
+   ]
+  },
+  {
+   "modulo": "components/layout",
+   "arquivos": 7,
+   "testes": 0,
+   "linhas": 1579,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 6,
+   "hooks_locais": [
+    "useAchievementNotifications",
+    "useApiStatus",
+    "useAuth",
+    "useGamification",
+    "useGlobalSearch",
+    "useHistoricoChat",
+    "useNavigationHistory",
+    "useNexusHealth",
+    "useNotificationBadge",
+    "useNotifications",
+    "useOfflineSync",
+    "useOnboarding",
+    "useOnlineStatus",
+    "usePWAInstall",
+    "usePerformanceMonitor",
+    "usePrefetch",
+    "useQRScanner",
+    "useSLANotifications",
+    "useSmartAlerts",
+    "useTelemetry",
+    "useToast",
+    "useTouchGestures",
+    "useUserPreferences"
+   ],
+   "hooks_definidos": [],
+   "edges": [
+    "ai-logistics-assistant",
+    "health-check",
+    "nexus-auto-healing"
+   ],
+   "tabelas": [
+    "achievements",
+    "ai_chat_messages",
+    "audit_logs",
+    "clientes",
+    "coletas",
+    "entregas",
+    "error_events",
+    "fornecedores",
+    "notifications",
+    "profiles",
+    "reward_items",
+    "security_events",
+    "telemetry_logs",
+    "transportadoras",
+    "user_achievements",
+    "user_levels",
+    "user_onboarding",
+    "user_roles"
+   ],
+   "rpcs": [
+    "add_user_xp"
+   ],
+   "buckets": [],
+   "canais_realtime": [
+    "health-ping",
+    "system-health-check"
+   ],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin",
+    "assistant",
+    "user"
+   ],
+   "diretos": {
+    "edges": [],
+    "tabelas": [
+     "security_events"
+    ],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "pages",
+    "pages/admin"
+   ],
+   "depende_de_modulos": [
+    "components/accessibility",
+    "components/achievements",
+    "components/ai",
+    "components/common",
+    "components/gamification",
+    "components/notifications",
+    "components/onboarding",
+    "components/pwa",
+    "components/scanner",
+    "components/search",
+    "components/ui",
+    "features/preferences",
+    "hooks/analytics",
+    "hooks/auth",
+    "hooks/common",
+    "hooks/data",
+    "hooks/gamification",
+    "hooks/system",
+    "hooks/ui",
+    "integrations/supabase",
+    "lib",
+    "utils"
+   ],
+   "pacotes_externos": [
+    "framer-motion",
+    "lucide-react",
+    "react-router-dom",
+    "sonner"
+   ]
+  },
+  {
+   "modulo": "components/logistics",
+   "arquivos": 1,
+   "testes": 0,
+   "linhas": 132,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 1,
+   "hooks_locais": [
+    "useAuth",
+    "useDelayPrediction",
+    "useTelemetry"
+   ],
+   "hooks_definidos": [],
+   "edges": [
+    "predict-delays"
+   ],
+   "tabelas": [
+    "error_events",
+    "profiles",
+    "telemetry_logs",
+    "user_levels",
+    "user_roles"
+   ],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "components/ui",
+    "hooks/logistics",
+    "lib"
+   ],
+   "pacotes_externos": [
+    "framer-motion",
+    "lucide-react"
+   ]
+  },
+  {
+   "modulo": "components/map",
+   "arquivos": 6,
+   "testes": 0,
+   "linhas": 1419,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 5,
+   "hooks_locais": [
+    "useIsDesktop",
+    "useIsMobile",
+    "useIsTablet",
+    "useMapIntelligence",
+    "useMediaQuery",
+    "usePrefersDarkMode",
+    "usePrefersReducedMotion"
+   ],
+   "hooks_definidos": [],
+   "edges": [],
+   "tabelas": [
+    "entregas",
+    "nexus_tactical_logs"
+   ],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [
+    "tactical-logs"
+   ],
+   "env": [
+    "VITE_CD_ORIGEM_LAT",
+    "VITE_CD_ORIGEM_LNG",
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [],
+   "diretos": {
+    "edges": [],
+    "tabelas": [
+     "nexus_tactical_logs"
+    ],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "components/dashboard",
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "components/ui",
+    "hooks/common",
+    "hooks/logistics",
+    "integrations/supabase",
+    "lib"
+   ],
+   "pacotes_externos": [
+    "framer-motion",
+    "lucide-react",
+    "maplibre-gl",
+    "recharts"
+   ]
+  },
+  {
+   "modulo": "components/melhorenvio",
+   "arquivos": 18,
+   "testes": 0,
+   "linhas": 3323,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 15,
+   "hooks_locais": [
+    "useAuth",
+    "useConfirm",
+    "useExport",
+    "useLocalStorage",
+    "useMelhorEnvio",
+    "usePagination"
+   ],
+   "hooks_definidos": [],
+   "edges": [
+    "melhor-envio-api"
+   ],
+   "tabelas": [
+    "profiles",
+    "user_levels",
+    "user_roles"
+   ],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "components/common",
+    "components/ui",
+    "hooks/common",
+    "hooks/logistics",
+    "lib"
+   ],
+   "pacotes_externos": [
+    "lucide-react",
+    "sonner"
+   ]
+  },
+  {
+   "modulo": "components/notifications",
+   "arquivos": 6,
+   "testes": 0,
+   "linhas": 1165,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 5,
+   "hooks_locais": [
+    "useAuth",
+    "useNotificationBadge",
+    "useNotifications",
+    "usePushNotifications",
+    "useSLANotifications",
+    "useSmartAlerts",
+    "useToast"
+   ],
+   "hooks_definidos": [],
+   "edges": [
+    "push-send"
+   ],
+   "tabelas": [
+    "coletas",
+    "entregas",
+    "notifications",
+    "profiles",
+    "push_subscriptions",
+    "user_levels",
+    "user_roles"
+   ],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "components/layout",
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "components/ui",
+    "hooks/logistics",
+    "hooks/notifications",
+    "lib"
+   ],
+   "pacotes_externos": [
+    "date-fns",
+    "framer-motion",
+    "lucide-react",
+    "react-router-dom"
+   ]
+  },
+  {
+   "modulo": "components/onboarding",
+   "arquivos": 6,
+   "testes": 0,
+   "linhas": 1320,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 5,
+   "hooks_locais": [
+    "useAchievementNotifications",
+    "useAuth",
+    "useGamification",
+    "useOnboarding"
+   ],
+   "hooks_definidos": [],
+   "edges": [],
+   "tabelas": [
+    "achievements",
+    "profiles",
+    "reward_items",
+    "user_achievements",
+    "user_levels",
+    "user_onboarding",
+    "user_roles"
+   ],
+   "rpcs": [
+    "add_user_xp"
+   ],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "components/layout",
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "components/ui",
+    "hooks/ui",
+    "lib"
+   ],
+   "pacotes_externos": [
+    "framer-motion",
+    "lucide-react",
+    "react-router-dom"
+   ]
+  },
+  {
+   "modulo": "components/predictions",
+   "arquivos": 13,
+   "testes": 0,
+   "linhas": 2628,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 12,
+   "hooks_locais": [
+    "useAccuracyMetaAudit",
+    "useAccuracyMetaCycle",
+    "useAuth",
+    "useBreachDays",
+    "useCarrierAccuracy",
+    "useChannelHealth",
+    "useDebouncedEffect",
+    "useDelayPrediction",
+    "useMitigationActions",
+    "usePredictionAccuracy",
+    "usePredictionAccuracyDaily",
+    "usePredictionAccuracySettings",
+    "useRootCauseAnalysis",
+    "useTelemetry"
+   ],
+   "hooks_definidos": [],
+   "edges": [
+    "accuracy-weekly-digest",
+    "predict-delays"
+   ],
+   "tabelas": [
+    "delay_predictions_history",
+    "error_events",
+    "mitigation_actions",
+    "notifications",
+    "prediction_accuracy_settings",
+    "profiles",
+    "telemetry_logs",
+    "user_levels",
+    "user_roles",
+    "v_prediction_accuracy",
+    "v_prediction_accuracy_by_carrier",
+    "v_prediction_accuracy_daily",
+    "v_prediction_accuracy_daily_carrier"
+   ],
+   "rpcs": [
+    "count_prediction_breach_days",
+    "count_prediction_breach_days_bulk"
+   ],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [
+     "accuracy-weekly-digest"
+    ],
+    "tabelas": [
+     "v_prediction_accuracy_daily_carrier"
+    ],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "components/common",
+    "components/ui",
+    "hooks/logistics",
+    "hooks/predictions",
+    "integrations/supabase",
+    "lib",
+    "lib/predictions"
+   ],
+   "pacotes_externos": [
+    "@tanstack/react-query",
+    "date-fns",
+    "lucide-react",
+    "recharts",
+    "sonner"
+   ]
+  },
+  {
+   "modulo": "components/pwa",
+   "arquivos": 4,
+   "testes": 0,
+   "linhas": 351,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 3,
+   "hooks_locais": [
+    "useApiStatus",
+    "useOfflineSync",
+    "useOnlineStatus",
+    "usePWAInstall"
+   ],
+   "hooks_definidos": [
+    "usePWAInstall",
+    "usePWAInstall"
+   ],
+   "edges": [],
+   "tabelas": [],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [],
+   "flags": [],
+   "papeis": [],
+   "diretos": {
+    "edges": [],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "components/layout"
+   ],
+   "depende_de_modulos": [
+    "components/ui",
+    "hooks/common"
+   ],
+   "pacotes_externos": [
+    "framer-motion",
+    "lucide-react"
+   ]
+  },
+  {
+   "modulo": "components/reports",
+   "arquivos": 2,
+   "testes": 0,
+   "linhas": 359,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 1,
+   "hooks_locais": [
+    "useAuth",
+    "useScheduledReports"
+   ],
+   "hooks_definidos": [],
+   "edges": [
+    "scheduled-reports"
+   ],
+   "tabelas": [
+    "profiles",
+    "user_levels",
+    "user_roles"
+   ],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "components/ui",
+    "hooks/analytics"
+   ],
+   "pacotes_externos": [
+    "lucide-react",
+    "sonner"
+   ]
+  },
+  {
+   "modulo": "components/rewards",
+   "arquivos": 1,
+   "testes": 0,
+   "linhas": 119,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 1,
+   "hooks_locais": [
+    "useAuth",
+    "useRewardPurchases"
+   ],
+   "hooks_definidos": [],
+   "edges": [],
+   "tabelas": [
+    "profiles",
+    "reward_purchases",
+    "user_levels",
+    "user_roles"
+   ],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "components/ui",
+    "hooks/gamification"
+   ],
+   "pacotes_externos": [
+    "date-fns",
+    "lucide-react"
+   ]
+  },
+  {
+   "modulo": "components/rodonaves",
+   "arquivos": 18,
+   "testes": 0,
+   "linhas": 4154,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 17,
+   "hooks_locais": [
+    "useAuth",
+    "useGatewayHealth",
+    "useRodonavesTracking",
+    "useRole",
+    "useSLOSnapshots",
+    "useSLOTargets"
+   ],
+   "hooks_definidos": [],
+   "edges": [
+    "rodonaves-api"
+   ],
+   "tabelas": [
+    "profiles",
+    "rte_gateway_health",
+    "rte_slo_daily_snapshots",
+    "rte_slo_targets",
+    "user_levels",
+    "user_roles"
+   ],
+   "rpcs": [
+    "rte_gateway_sustained_downtime",
+    "rte_rollup_slo_daily"
+   ],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [
+     "rodonaves-api"
+    ],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "components/ui",
+    "hooks/logistics",
+    "hooks/rodonaves",
+    "integrations/supabase",
+    "lib",
+    "lib/rodonaves"
+   ],
+   "pacotes_externos": [
+    "lucide-react",
+    "recharts",
+    "sonner"
+   ]
+  },
+  {
+   "modulo": "components/scanner",
+   "arquivos": 3,
+   "testes": 0,
+   "linhas": 354,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 2,
+   "hooks_locais": [
+    "useQRScanner"
+   ],
+   "hooks_definidos": [],
+   "edges": [],
+   "tabelas": [],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [],
+   "flags": [],
+   "papeis": [],
+   "diretos": {
+    "edges": [],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "components/layout",
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "components/ui",
+    "hooks/ui"
+   ],
+   "pacotes_externos": [
+    "framer-motion",
+    "lucide-react",
+    "sonner"
+   ]
+  },
+  {
+   "modulo": "components/search",
+   "arquivos": 2,
+   "testes": 0,
+   "linhas": 195,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 1,
+   "hooks_locais": [
+    "useAuth",
+    "useGlobalSearch",
+    "useToast"
+   ],
+   "hooks_definidos": [],
+   "edges": [],
+   "tabelas": [
+    "clientes",
+    "coletas",
+    "entregas",
+    "fornecedores",
+    "profiles",
+    "transportadoras",
+    "user_levels",
+    "user_roles"
+   ],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "components/layout"
+   ],
+   "depende_de_modulos": [
+    "components/ui",
+    "hooks/auth",
+    "hooks/common",
+    "hooks/ui"
+   ],
+   "pacotes_externos": [
+    "lucide-react",
+    "next-themes",
+    "react-router-dom"
+   ]
+  },
+  {
+   "modulo": "components/security",
+   "arquivos": 24,
+   "testes": 1,
+   "linhas": 3790,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 21,
+   "hooks_locais": [
+    "useAuth",
+    "useCanAccess",
+    "useDeviceSessions",
+    "useMFA",
+    "useNewDeviceDetection",
+    "usePermissions",
+    "useRateLimitLogs",
+    "useSecurityEvents",
+    "useSecurityPushNotifications",
+    "useSessionTimeout",
+    "useToast",
+    "useWebAuthn"
+   ],
+   "hooks_definidos": [
+    "useCanAccess"
+   ],
+   "edges": [
+    "check-rate-limit",
+    "log-security-event",
+    "new-device-alert"
+   ],
+   "tabelas": [
+    "geo_access_rules",
+    "geo_blocked_attempts",
+    "geo_blocking_rules",
+    "geo_blocking_settings",
+    "ip_access_rules",
+    "known_devices",
+    "login_attempts",
+    "permissions",
+    "profiles",
+    "rate_limit_logs",
+    "role_permissions",
+    "security_events",
+    "user_levels",
+    "user_roles",
+    "user_sessions",
+    "webauthn_challenges",
+    "webauthn_credentials"
+   ],
+   "rpcs": [
+    "get_user_permissions"
+   ],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [],
+    "tabelas": [
+     "geo_access_rules",
+     "geo_blocked_attempts",
+     "geo_blocking_rules",
+     "geo_blocking_settings",
+     "ip_access_rules",
+     "known_devices",
+     "login_attempts",
+     "permissions",
+     "rate_limit_logs",
+     "role_permissions",
+     "security_events",
+     "user_sessions"
+    ],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "components",
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "components/ui",
+    "hooks/auth",
+    "hooks/notifications",
+    "hooks/security",
+    "hooks/ui",
+    "integrations/supabase"
+   ],
+   "pacotes_externos": [
+    "@tanstack/react-query",
+    "date-fns",
+    "lucide-react",
+    "sonner",
+    "zod"
+   ]
+  },
+  {
+   "modulo": "components/shipping",
+   "arquivos": 3,
+   "testes": 0,
+   "linhas": 739,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 2,
+   "hooks_locais": [
+    "useAudioFeedback",
+    "useAuth"
+   ],
+   "hooks_definidos": [],
+   "edges": [
+    "ocr-receipt-processor"
+   ],
+   "tabelas": [
+    "delivery_receipt_audit",
+    "entregas",
+    "kanban_history",
+    "profiles",
+    "user_levels",
+    "user_roles"
+   ],
+   "rpcs": [],
+   "buckets": [
+    "avatars",
+    "documents"
+   ],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [
+     "ocr-receipt-processor"
+    ],
+    "tabelas": [
+     "delivery_receipt_audit",
+     "entregas",
+     "kanban_history",
+     "profiles"
+    ],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "components/ui",
+    "hooks/auth",
+    "hooks/notifications",
+    "integrations/supabase",
+    "lib",
+    "services/api"
+   ],
+   "pacotes_externos": [
+    "date-fns",
+    "lucide-react",
+    "sonner"
+   ]
+  },
+  {
+   "modulo": "components/transportadoras",
+   "arquivos": 6,
+   "testes": 0,
+   "linhas": 1395,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 5,
+   "hooks_locais": [
+    "useAuth"
+   ],
+   "hooks_definidos": [],
+   "edges": [
+    "normalize-freight-response"
+   ],
+   "tabelas": [
+    "profiles",
+    "transportadora_rotas",
+    "user_levels",
+    "user_roles"
+   ],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [
+     "normalize-freight-response"
+    ],
+    "tabelas": [
+     "transportadora_rotas"
+    ],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "components/ui",
+    "hooks/logistics",
+    "integrations/supabase",
+    "lib"
+   ],
+   "pacotes_externos": [
+    "@tanstack/react-query",
+    "lucide-react",
+    "sonner"
+   ]
+  },
+  {
+   "modulo": "components/ui",
+   "arquivos": 55,
+   "testes": 0,
+   "linhas": 7257,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 51,
+   "hooks_locais": [
+    "useFormField",
+    "useIsMobile",
+    "useSidebar",
+    "useToast"
+   ],
+   "hooks_definidos": [
+    "useFormField",
+    "useFormField",
+    "useSidebar",
+    "useToast",
+    "useSidebar",
+    "useToast"
+   ],
+   "edges": [],
+   "tabelas": [],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [],
+   "flags": [],
+   "papeis": [],
+   "diretos": {
+    "edges": [],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "components/accessibility",
+    "components/achievements",
+    "components/admin",
+    "components/ai",
+    "components/analytics",
+    "components/audit",
+    "components/automation",
+    "components/box",
+    "components/coletas",
+    "components/common",
+    "components/dashboard",
+    "components/freight",
+    "components/gamification",
+    "components/integrations",
+    "components/labels",
+    "components/layout",
+    "components/logistics",
+    "components/map",
+    "components/melhorenvio",
+    "components/notifications",
+    "components/onboarding",
+    "components/predictions",
+    "components/pwa",
+    "components/reports",
+    "components/rewards",
+    "components/rodonaves",
+    "components/scanner",
+    "components/search",
+    "components/security",
+    "components/shipping",
+    "components/transportadoras",
+    "features/db-observability",
+    "features/incidents",
+    "features/preferences",
+    "hooks/ui",
+    "pages",
+    "pages/admin",
+    "pages/admin-telemetria",
+    "pages/aprovacao-reset",
+    "pages/auth",
+    "pages/conciliacao",
+    "pages/cotacao-multicanal",
+    "pages/dashboard-cotacoes",
+    "pages/ranking"
+   ],
+   "depende_de_modulos": [
+    "hooks/ui",
+    "lib"
+   ],
+   "pacotes_externos": [
+    "@radix-ui/react-accordion",
+    "@radix-ui/react-alert-dialog",
+    "@radix-ui/react-aspect-ratio",
+    "@radix-ui/react-avatar",
+    "@radix-ui/react-checkbox",
+    "@radix-ui/react-collapsible",
+    "@radix-ui/react-context-menu",
+    "@radix-ui/react-dialog",
+    "@radix-ui/react-dropdown-menu",
+    "@radix-ui/react-hover-card",
+    "@radix-ui/react-label",
+    "@radix-ui/react-menubar",
+    "@radix-ui/react-navigation-menu",
+    "@radix-ui/react-popover",
+    "@radix-ui/react-progress",
+    "@radix-ui/react-radio-group",
+    "@radix-ui/react-scroll-area",
+    "@radix-ui/react-select",
+    "@radix-ui/react-separator",
+    "@radix-ui/react-slider",
+    "@radix-ui/react-slot",
+    "@radix-ui/react-switch",
+    "@radix-ui/react-tabs",
+    "@radix-ui/react-toast",
+    "@radix-ui/react-toggle",
+    "@radix-ui/react-toggle-group",
+    "@radix-ui/react-tooltip",
+    "class-variance-authority",
+    "cmdk",
+    "embla-carousel-react",
+    "framer-motion",
+    "input-otp",
+    "lucide-react",
+    "next-themes",
+    "react-day-picker",
+    "react-hook-form",
+    "react-resizable-panels",
+    "recharts",
+    "sonner",
+    "vaul"
+   ]
+  },
+  {
+   "modulo": "features/analytics",
+   "arquivos": 3,
+   "testes": 0,
+   "linhas": 59,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 0,
+   "hooks_locais": [
+    "useAnalyticsFeature"
+   ],
+   "hooks_definidos": [
+    "useAnalyticsFeature"
+   ],
+   "edges": [],
+   "tabelas": [],
+   "rpcs": [
+    "get_monthly_analytics"
+   ],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [],
+   "diretos": {
+    "edges": [],
+    "tabelas": [],
+    "rpcs": [
+     "get_monthly_analytics"
+    ]
+   },
+   "importado_por_outros_modulos": [],
+   "depende_de_modulos": [
+    "integrations/supabase"
+   ],
+   "pacotes_externos": [
+    "@tanstack/react-query"
+   ]
+  },
+  {
+   "modulo": "features/db-observability",
+   "arquivos": 81,
+   "testes": 1,
+   "linhas": 5770,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 39,
+   "hooks_locais": [
+    "useActiveSessions",
+    "useApplyIndexProposal",
+    "useApplyRemediation",
+    "useAuth",
+    "useAutovacuumHealth",
+    "useBloatHotspots",
+    "useCacheHitRatios",
+    "useCancelQuery",
+    "useCapacityForecast",
+    "useCronJobs",
+    "useDbRegressionAlerts",
+    "useDbRegressions",
+    "useDuplicateIndexes",
+    "useExtensionsAudit",
+    "useGlobalHealthScore",
+    "useHealthAnomalies",
+    "useHealthScoreHistory",
+    "useHealthScoreRegression",
+    "useHealthSnapshots",
+    "useIndexProposals",
+    "useIndexRoi",
+    "useLoadHeatmap",
+    "useLockConflicts",
+    "useLongRunningQueries",
+    "useMaintenanceWindows",
+    "useMeasureIndexImpact",
+    "useProposeIndex",
+    "useQueryDetail",
+    "useQueryIndexSuggestion",
+    "useRejectIndexProposal",
+    "useRemediationActions",
+    "useRemediationMttr",
+    "useRemediationSuggestions",
+    "useReplicationStatus",
+    "useRlsAudit",
+    "useSeqScanHotspots",
+    "useSloDaily",
+    "useTableCoaccess",
+    "useTempFileStats",
+    "useTopQueries",
+    "useTopTablesBySize",
+    "useTransactionHealth",
+    "useUnindexedForeignKeys",
+    "useUnusedIndexes",
+    "useUpdateRemediationStatus",
+    "useWalHealth",
+    "useWraparoundStatus"
+   ],
+   "hooks_definidos": [
+    "useActiveSessions",
+    "useAutovacuumHealth",
+    "useBloatHotspots",
+    "useCacheHitRatios",
+    "useCapacityForecast",
+    "useCronJobs",
+    "useDbRegressionAlerts",
+    "useDbRegressions",
+    "useDuplicateIndexes",
+    "useExtensionsAudit",
+    "useGlobalHealthScore",
+    "useHealthAnomalies",
+    "useHealthScoreHistory",
+    "useHealthScoreRegression",
+    "useHealthSnapshots",
+    "useApplyIndexProposal",
+    "useIndexProposals",
+    "useMeasureIndexImpact",
+    "useProposeIndex",
+    "useRejectIndexProposal",
+    "useIndexRoi",
+    "useLoadHeatmap",
+    "useLockConflicts",
+    "useCancelQuery",
+    "useLongRunningQueries",
+    "useMaintenanceWindows",
+    "useQueryDetail",
+    "useQueryIndexSuggestion",
+    "useApplyRemediation",
+    "useRemediationActions",
+    "useUpdateRemediationStatus",
+    "useRemediationMttr",
+    "useRemediationSuggestions",
+    "useReplicationStatus",
+    "useRlsAudit",
+    "useSeqScanHotspots",
+    "useSloDaily",
+    "useTableCoaccess",
+    "useTempFileStats",
+    "useTopQueries",
+    "useTopTablesBySize",
+    "useTransactionHealth",
+    "useUnindexedForeignKeys",
+    "useUnusedIndexes",
+    "useWalHealth",
+    "useWraparoundStatus",
+    "useActiveSessions",
+    "useApplyIndexProposal",
+    "useApplyRemediation",
+    "useAutovacuumHealth",
+    "useBloatHotspots",
+    "useCacheHitRatios",
+    "useCancelQuery",
+    "useCapacityForecast",
+    "useCronJobs",
+    "useDbRegressionAlerts",
+    "useDbRegressions",
+    "useDuplicateIndexes",
+    "useExtensionsAudit",
+    "useGlobalHealthScore",
+    "useHealthAnomalies",
+    "useHealthScoreHistory",
+    "useHealthScoreRegression",
+    "useHealthSnapshots",
+    "useIndexProposals",
+    "useIndexRoi",
+    "useLoadHeatmap",
+    "useLockConflicts",
+    "useLongRunningQueries",
+    "useMaintenanceWindows",
+    "useMeasureIndexImpact",
+    "useProposeIndex",
+    "useQueryDetail",
+    "useQueryIndexSuggestion",
+    "useRejectIndexProposal",
+    "useRemediationActions",
+    "useRemediationMttr",
+    "useRemediationSuggestions",
+    "useReplicationStatus",
+    "useRlsAudit",
+    "useSeqScanHotspots",
+    "useSloDaily",
+    "useTableCoaccess",
+    "useTempFileStats",
+    "useTopQueries",
+    "useTopTablesBySize",
+    "useTransactionHealth",
+    "useUnindexedForeignKeys",
+    "useUnusedIndexes",
+    "useUpdateRemediationStatus",
+    "useWalHealth",
+    "useWraparoundStatus"
+   ],
+   "edges": [],
+   "tabelas": [
+    "db_health_snapshots",
+    "db_slo_daily",
+    "profiles",
+    "remediation_actions",
+    "user_levels",
+    "user_roles"
+   ],
+   "rpcs": [
+    "cancel_long_running_query",
+    "get_bloat_hotspots",
+    "get_cache_hit_ratios",
+    "get_duplicate_indexes",
+    "get_health_anomalies_fast",
+    "get_lock_conflicts",
+    "get_long_running_queries",
+    "get_query_regressions_fast",
+    "get_replication_status",
+    "get_seq_scan_hotspots",
+    "get_table_coaccess_graph",
+    "get_temp_file_stats",
+    "get_transaction_health",
+    "get_unindexed_foreign_keys",
+    "get_unused_indexes",
+    "get_wal_health"
+   ],
+   "buckets": [],
+   "canais_realtime": [
+    "db-regression-alerts-${user.id}"
+   ],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [],
+    "tabelas": [
+     "db_health_snapshots",
+     "db_slo_daily",
+     "remediation_actions"
+    ],
+    "rpcs": [
+     "cancel_long_running_query",
+     "get_bloat_hotspots",
+     "get_cache_hit_ratios",
+     "get_duplicate_indexes",
+     "get_health_anomalies_fast",
+     "get_lock_conflicts",
+     "get_long_running_queries",
+     "get_query_regressions_fast",
+     "get_replication_status",
+     "get_seq_scan_hotspots",
+     "get_table_coaccess_graph",
+     "get_temp_file_stats",
+     "get_transaction_health",
+     "get_unindexed_foreign_keys",
+     "get_unused_indexes",
+     "get_wal_health"
+    ]
+   },
+   "importado_por_outros_modulos": [
+    "components/admin",
+    "features/incidents",
+    "pages/admin"
+   ],
+   "depende_de_modulos": [
+    "components/ui",
+    "hooks/auth",
+    "integrations/supabase"
+   ],
+   "pacotes_externos": [
+    "@tanstack/react-query",
+    "date-fns",
+    "lucide-react",
+    "recharts",
+    "sonner"
+   ]
+  },
+  {
+   "modulo": "features/incidents",
+   "arquivos": 2,
+   "testes": 0,
+   "linhas": 199,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 1,
+   "hooks_locais": [
+    "useApplyRemediation",
+    "useRemediationActions",
+    "useUpdateRemediationStatus"
+   ],
+   "hooks_definidos": [],
+   "edges": [],
+   "tabelas": [
+    "remediation_actions"
+   ],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [],
+   "diretos": {
+    "edges": [],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "pages",
+    "services/resilience"
+   ],
+   "depende_de_modulos": [
+    "components/ui",
+    "features/db-observability"
+   ],
+   "pacotes_externos": [
+    "date-fns",
+    "framer-motion",
+    "lucide-react",
+    "sonner"
+   ]
+  },
+  {
+   "modulo": "features/preferences",
+   "arquivos": 4,
+   "testes": 0,
+   "linhas": 539,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 1,
+   "hooks_locais": [
+    "useUserPreferences"
+   ],
+   "hooks_definidos": [
+    "useUserPreferences"
+   ],
+   "edges": [],
+   "tabelas": [],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [],
+   "flags": [],
+   "papeis": [],
+   "diretos": {
+    "edges": [],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "components/layout",
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "components/ui",
+    "hooks/common",
+    "lib",
+    "utils"
+   ],
+   "pacotes_externos": [
+    "lucide-react"
+   ]
+  },
+  {
+   "modulo": "hooks",
+   "arquivos": 1,
+   "testes": 0,
+   "linhas": 151,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 0,
+   "hooks_locais": [
+    "useAchievementNotifications",
+    "useAnalytics",
+    "useApiStatus",
+    "useAudioFeedback",
+    "useAuditLogs",
+    "useAuth",
+    "useBiometricAnomalies",
+    "useBoxManagement",
+    "useBusinessRuleEngine",
+    "useBusinessRules",
+    "useClientWebhooks",
+    "useComments",
+    "useConciliacao",
+    "useConfirmExit",
+    "useCotacoesFrete",
+    "useDashboardData",
+    "useDashboardMetrics",
+    "useDashboardWidgets",
+    "useDateFormatter",
+    "useDelayPrediction",
+    "useDensity",
+    "useDeviceSessions",
+    "useDocumentUpload",
+    "useDrillDown",
+    "useEntityHistory",
+    "useExecutiveMetrics",
+    "useExport",
+    "useExternalDbBridge",
+    "useFavoriteMetrics",
+    "useFeatureFlag",
+    "useFeatureFlags",
+    "useFreightIntelligence",
+    "useFreightQuotation",
+    "useGamification",
+    "useGlobalSearch",
+    "useGlobalShortcuts",
+    "useImageUpload",
+    "useIntegrationValidation",
+    "useIsDesktop",
+    "useIsMobile",
+    "useIsTablet",
+    "useKeyboardShortcut",
+    "useKeyboardShortcuts",
+    "useLalamoveOrders",
+    "useLogisticsIntelligence",
+    "useMFA",
+    "useMapWeatherSync",
+    "useMediaQuery",
+    "useMelhorEnvio",
+    "useNavigationHistory",
+    "useNewDeviceDetection",
+    "useNotificationBadge",
+    "useNotificationPreferences",
+    "useNotifications",
+    "useOfflineSync",
+    "useOnboarding",
+    "useOnlineStatus",
+    "usePerformanceMonitor",
+    "usePermissions",
+    "usePrefersDarkMode",
+    "usePrefersReducedMotion",
+    "usePrefetch",
+    "useQRScanner",
+    "useQuotationFlow",
+    "useRateLimitLogs",
+    "useRealtime",
+    "useRecentAlerts",
+    "useRecordHistory",
+    "useRewardPurchases",
+    "useRodonavesTracking",
+    "useRodonavesWebhook",
+    "useRole",
+    "useRuleTriggers",
+    "useSLAMetrics",
+    "useSLANotifications",
+    "useSecurityEvents",
+    "useSecurityPushNotifications",
+    "useSessionTimeout",
+    "useShortcutsDialog",
+    "useSmartAlerts",
+    "useSmartCarrierSelection",
+    "useSoftDelete",
+    "useTelemetry",
+    "useTimezone",
+    "useToast",
+    "useTouchGestures",
+    "useTransportadoraPerformance",
+    "useUnifiedTracking",
+    "useVirtualTable",
+    "useWebAuthn",
+    "useWhatsAppNotification"
+   ],
+   "hooks_definidos": [
+    "useAchievementNotifications",
+    "useIntegrationValidation",
+    "useIsMobile",
+    "useToast"
+   ],
+   "edges": [
+    "bitrix24-integration",
+    "check-rate-limit",
+    "evolution-whatsapp",
+    "external-db-bridge",
+    "geocode-address",
+    "lalamove-api",
+    "lalamove-tracking",
+    "log-security-event",
+    "melhor-envio-api",
+    "new-device-alert",
+    "predict-delays",
+    "push-send",
+    "rodonaves-api",
+    "rodonaves-webhook",
+    "scheduled-reports",
+    "smart-carrier-selection",
+    "webhook-status",
+    "whatsapp-notification"
+   ],
+   "tabelas": [
+    "achievements",
+    "ai_delay_predictions",
+    "alertas_custo",
+    "audit_logs",
+    "bio_sync_telemetry",
+    "business_rules",
+    "client_webhooks",
+    "clientes",
+    "coletas",
+    "comments",
+    "conciliacao_itens_importados",
+    "conciliacoes",
+    "cotacoes_frete",
+    "cotacoes_multicanal",
+    "entregas",
+    "error_events",
+    "feature_flags",
+    "fornecedores",
+    "freight_selection_rules",
+    "fretes_internos",
+    "ip_access_rules",
+    "kanban_history",
+    "known_devices",
+    "logistica_reversa",
+    "notificacoes_custo",
+    "notifications",
+    "ocorrencias",
+    "performance_metrics",
+    "profiles",
+    "push_subscriptions",
+    "rastreamento_alertas",
+    "rastreamento_historico",
+    "rate_limit_logs",
+    "reward_items",
+    "reward_purchases",
+    "risk_zones",
+    "rule_execution_logs",
+    "security_events",
+    "sla_alerts",
+    "tabelas_frete",
+    "telemetry_logs",
+    "transportadora_rotas",
+    "transportadoras",
+    "user_achievements",
+    "user_levels",
+    "user_notification_preferences",
+    "user_onboarding",
+    "user_roles",
+    "user_sessions",
+    "webauthn_challenges",
+    "webauthn_credentials",
+    "webhook_deliveries",
+    "webhook_inbound_failures"
+   ],
+   "rpcs": [
+    "add_user_xp",
+    "get_dashboard_metrics",
+    "get_monthly_analytics",
+    "get_user_permissions"
+   ],
+   "buckets": [],
+   "canais_realtime": [
+    "realtime:${config.table}:${multiTopicId}"
+   ],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "components/freight",
+    "pages",
+    "pages/conciliacao",
+    "pages/cotacao-multicanal",
+    "pages/dashboard-cotacoes"
+   ],
+   "depende_de_modulos": [
+    "hooks/analytics",
+    "hooks/auth",
+    "hooks/common",
+    "hooks/data",
+    "hooks/gamification",
+    "hooks/integrations",
+    "hooks/logistics",
+    "hooks/notifications",
+    "hooks/security",
+    "hooks/ui"
+   ],
+   "pacotes_externos": []
+  },
+  {
+   "modulo": "hooks/ai",
+   "arquivos": 1,
+   "testes": 0,
+   "linhas": 77,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 0,
+   "hooks_locais": [
+    "useHistoricoChat"
+   ],
+   "hooks_definidos": [
+    "useHistoricoChat"
+   ],
+   "edges": [],
+   "tabelas": [
+    "ai_chat_messages"
+   ],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "assistant",
+    "user"
+   ],
+   "diretos": {
+    "edges": [],
+    "tabelas": [
+     "ai_chat_messages"
+    ],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "components/ai"
+   ],
+   "depende_de_modulos": [
+    "integrations/supabase"
+   ],
+   "pacotes_externos": [
+    "sonner"
+   ]
+  },
+  {
+   "modulo": "hooks/analytics",
+   "arquivos": 11,
+   "testes": 0,
+   "linhas": 1994,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 2,
+   "hooks_locais": [
+    "useAnalytics",
+    "useAuth",
+    "useDashboardData",
+    "useDashboardMetrics",
+    "useDashboardWidgets",
+    "useDrillDown",
+    "useExecutiveMetrics",
+    "useFavoriteMetrics",
+    "usePerformanceMonitor",
+    "useRecentAlerts",
+    "useTelemetry",
+    "useTransportadoraPerformance"
+   ],
+   "hooks_definidos": [
+    "useAnalytics",
+    "useDashboardData",
+    "useDashboardMetrics",
+    "useRecentAlerts",
+    "useTransportadoraPerformance",
+    "useDashboardWidgets",
+    "useDrillDown",
+    "useExecutiveMetrics",
+    "useFavoriteMetrics",
+    "useKPIBenchmark",
+    "usePerformanceMonitor",
+    "useScheduledReports",
+    "useTelemetry"
+   ],
+   "edges": [
+    "scheduled-reports"
+   ],
+   "tabelas": [
+    "ai_delay_predictions",
+    "coletas",
+    "cotacoes_multicanal",
+    "entregas",
+    "error_events",
+    "fretes_internos",
+    "ocorrencias",
+    "profiles",
+    "sla_alerts",
+    "telemetry_logs",
+    "transportadoras",
+    "user_levels",
+    "user_roles"
+   ],
+   "rpcs": [
+    "get_dashboard_metrics",
+    "get_monthly_analytics"
+   ],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [
+     "scheduled-reports"
+    ],
+    "tabelas": [
+     "ai_delay_predictions",
+     "coletas",
+     "cotacoes_multicanal",
+     "entregas",
+     "error_events",
+     "fretes_internos",
+     "ocorrencias",
+     "sla_alerts",
+     "telemetry_logs",
+     "transportadoras"
+    ],
+    "rpcs": [
+     "get_dashboard_metrics",
+     "get_monthly_analytics"
+    ]
+   },
+   "importado_por_outros_modulos": [
+    "components/analytics",
+    "components/dashboard",
+    "components/layout",
+    "components/reports",
+    "hooks",
+    "hooks/data",
+    "hooks/logistics",
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "hooks/auth",
+    "hooks/common",
+    "integrations/supabase",
+    "lib"
+   ],
+   "pacotes_externos": [
+    "@tanstack/react-query",
+    "date-fns",
+    "react-day-picker",
+    "sonner"
+   ]
+  },
+  {
+   "modulo": "hooks/auth",
+   "arquivos": 8,
+   "testes": 0,
+   "linhas": 1525,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 1,
+   "hooks_locais": [
+    "useAuth",
+    "useDeviceSessions",
+    "useMFA",
+    "useNewDeviceDetection",
+    "usePermissions",
+    "useRole",
+    "useSessionTimeout",
+    "useWebAuthn"
+   ],
+   "hooks_definidos": [
+    "useAuth",
+    "useDeviceSessions",
+    "useMFA",
+    "useNewDeviceDetection",
+    "usePermissions",
+    "useRole",
+    "useSessionTimeout",
+    "useWebAuthn"
+   ],
+   "edges": [
+    "new-device-alert"
+   ],
+   "tabelas": [
+    "known_devices",
+    "profiles",
+    "security_events",
+    "user_levels",
+    "user_roles",
+    "user_sessions",
+    "webauthn_challenges",
+    "webauthn_credentials"
+   ],
+   "rpcs": [
+    "get_user_permissions"
+   ],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [
+     "new-device-alert"
+    ],
+    "tabelas": [
+     "known_devices",
+     "profiles",
+     "security_events",
+     "user_roles",
+     "user_sessions",
+     "webauthn_challenges",
+     "webauthn_credentials"
+    ],
+    "rpcs": [
+     "get_user_permissions"
+    ]
+   },
+   "importado_por_outros_modulos": [
+    "components/ai",
+    "components/auth",
+    "components/common",
+    "components/dashboard",
+    "components/layout",
+    "components/search",
+    "components/security",
+    "components/shipping",
+    "features/db-observability",
+    "hooks",
+    "hooks/analytics",
+    "hooks/common",
+    "hooks/gamification",
+    "hooks/integrations",
+    "hooks/logistics",
+    "hooks/notifications",
+    "hooks/predictions",
+    "hooks/rodonaves",
+    "hooks/security",
+    "hooks/sla",
+    "hooks/ui",
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "integrations/supabase",
+    "lib",
+    "services/api"
+   ],
+   "pacotes_externos": [
+    "@supabase/supabase-js",
+    "@tanstack/react-query",
+    "sonner"
+   ]
+  },
+  {
+   "modulo": "hooks/common",
+   "arquivos": 20,
+   "testes": 2,
+   "linhas": 2624,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 2,
+   "hooks_locais": [
+    "useApiStatus",
+    "useAuth",
+    "useComments",
+    "useConfirmExit",
+    "useDateFormatter",
+    "useDensity",
+    "useExport",
+    "useGlobalSearch",
+    "useGlobalShortcuts",
+    "useIsDesktop",
+    "useIsMobile",
+    "useIsTablet",
+    "useKeyboardShortcut",
+    "useKeyboardShortcuts",
+    "useMediaQuery",
+    "useNavigationHistory",
+    "useOfflineSync",
+    "useOnlineStatus",
+    "usePrefersDarkMode",
+    "usePrefersReducedMotion",
+    "useShortcutsDialog",
+    "useTimezone"
+   ],
+   "hooks_definidos": [
+    "useBulkActions",
+    "useComments",
+    "useConfirmExit",
+    "useDebounce",
+    "useDebouncedCallback",
+    "useDensity",
+    "useExport",
+    "useFilters",
+    "useGlobalSearch",
+    "useImportData",
+    "useGlobalShortcuts",
+    "useKeyboardShortcut",
+    "useKeyboardShortcuts",
+    "useShortcutsDialog",
+    "useLocalStorage",
+    "useIsDesktop",
+    "useIsMobile",
+    "useIsTablet",
+    "useMediaQuery",
+    "usePrefersDarkMode",
+    "usePrefersReducedMotion",
+    "useNavigationHistory",
+    "useApiStatus",
+    "useOfflineSync",
+    "useOnlineStatus",
+    "usePagination",
+    "useLocalSearch",
+    "useSearch",
+    "useSelection",
+    "useServerPagination",
+    "useSorting",
+    "useDateFormatter",
+    "useTimezone"
+   ],
+   "edges": [],
+   "tabelas": [
+    "clientes",
+    "coletas",
+    "comments",
+    "entregas",
+    "fornecedores",
+    "profiles",
+    "security_events",
+    "transportadoras",
+    "user_levels",
+    "user_roles"
+   ],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [],
+    "tabelas": [
+     "clientes",
+     "coletas",
+     "comments",
+     "entregas",
+     "fornecedores",
+     "profiles",
+     "security_events",
+     "transportadoras"
+    ],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "components",
+    "components/analytics",
+    "components/audit",
+    "components/auth",
+    "components/common",
+    "components/dashboard",
+    "components/freight",
+    "components/layout",
+    "components/map",
+    "components/melhorenvio",
+    "components/pwa",
+    "components/search",
+    "features/preferences",
+    "hooks",
+    "hooks/analytics",
+    "hooks/data",
+    "hooks/logistics",
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "hooks/auth",
+    "integrations/supabase",
+    "lib",
+    "utils"
+   ],
+   "pacotes_externos": [
+    "@tanstack/react-query",
+    "date-fns",
+    "date-fns-tz",
+    "jspdf",
+    "jspdf-autotable",
+    "lucide-react",
+    "papaparse",
+    "react-day-picker",
+    "react-router-dom",
+    "sonner",
+    "xlsx",
+    "zod"
+   ]
+  },
+  {
+   "modulo": "hooks/data",
+   "arquivos": 9,
+   "testes": 0,
+   "linhas": 1049,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 0,
+   "hooks_locais": [
+    "useAuth",
+    "useDocumentUpload",
+    "useImageUpload",
+    "useNotificacoesPage",
+    "useNotificacoesRealtime",
+    "usePrefetch",
+    "useSoftDelete",
+    "useTelemetry"
+   ],
+   "hooks_definidos": [
+    "useDocumentUpload",
+    "useImageUpload",
+    "useMemoizedQuery",
+    "useNotificacoesPage",
+    "useNotificacoesRealtime",
+    "usePrefetch",
+    "useMultiTableRealtime",
+    "useRealtime",
+    "useResilientMutation",
+    "useSoftDelete"
+   ],
+   "edges": [],
+   "tabelas": [
+    "audit_logs",
+    "clientes",
+    "coletas",
+    "entregas",
+    "error_events",
+    "notifications",
+    "profiles",
+    "security_events",
+    "telemetry_logs",
+    "transportadoras",
+    "user_levels",
+    "user_roles"
+   ],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [
+    "realtime:${config.table}:${multiTopicId}"
+   ],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [],
+    "tabelas": [
+     "audit_logs",
+     "clientes",
+     "coletas",
+     "entregas",
+     "notifications",
+     "transportadoras"
+    ],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "components/audit",
+    "components/common",
+    "components/layout",
+    "hooks",
+    "hooks/logistics",
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "hooks/analytics",
+    "hooks/common",
+    "integrations/supabase",
+    "lib",
+    "services/resilience"
+   ],
+   "pacotes_externos": [
+    "@supabase/supabase-js",
+    "@tanstack/react-query",
+    "sonner"
+   ]
+  },
+  {
+   "modulo": "hooks/gamification",
+   "arquivos": 3,
+   "testes": 0,
+   "linhas": 383,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 1,
+   "hooks_locais": [
+    "useAchievementNotifications",
+    "useAuth",
+    "useRewardPurchases"
+   ],
+   "hooks_definidos": [
+    "useAchievementNotifications",
+    "useGamification",
+    "useRewardPurchases"
+   ],
+   "edges": [],
+   "tabelas": [
+    "achievements",
+    "profiles",
+    "reward_items",
+    "reward_purchases",
+    "user_achievements",
+    "user_levels",
+    "user_roles"
+   ],
+   "rpcs": [
+    "add_user_xp"
+   ],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [],
+    "tabelas": [
+     "achievements",
+     "reward_items",
+     "reward_purchases",
+     "user_achievements",
+     "user_levels"
+    ],
+    "rpcs": [
+     "add_user_xp"
+    ]
+   },
+   "importado_por_outros_modulos": [
+    "components",
+    "components/achievements",
+    "components/dashboard",
+    "components/gamification",
+    "components/layout",
+    "components/rewards",
+    "hooks",
+    "hooks/ui",
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "hooks/auth",
+    "integrations/supabase",
+    "utils"
+   ],
+   "pacotes_externos": [
+    "@tanstack/react-query"
+   ]
+  },
+  {
+   "modulo": "hooks/integrations",
+   "arquivos": 5,
+   "testes": 0,
+   "linhas": 473,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 0,
+   "hooks_locais": [
+    "useAuth",
+    "useClientWebhooks",
+    "useExternalDbBridge"
+   ],
+   "hooks_definidos": [
+    "useBitrixEntregaSync",
+    "useClientWebhooks",
+    "useEvolutionWhatsApp",
+    "useExternalDbBridge",
+    "useGeocoding"
+   ],
+   "edges": [
+    "bitrix24-integration",
+    "evolution-whatsapp",
+    "external-db-bridge",
+    "geocode-address",
+    "webhook-status"
+   ],
+   "tabelas": [
+    "client_webhooks",
+    "profiles",
+    "user_levels",
+    "user_roles",
+    "webhook_deliveries",
+    "webhook_inbound_failures"
+   ],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [
+     "bitrix24-integration",
+     "evolution-whatsapp",
+     "external-db-bridge",
+     "geocode-address",
+     "webhook-status"
+    ],
+    "tabelas": [
+     "client_webhooks",
+     "webhook_deliveries",
+     "webhook_inbound_failures"
+    ],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "components/integrations",
+    "hooks",
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "hooks/auth",
+    "integrations/supabase"
+   ],
+   "pacotes_externos": [
+    "@tanstack/react-query",
+    "sonner"
+   ]
+  },
+  {
+   "modulo": "hooks/logistics",
+   "arquivos": 41,
+   "testes": 3,
+   "linhas": 8040,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 0,
+   "hooks_locais": [
+    "useAccuracyMetaAudit",
+    "useAccuracyMetaCycle",
+    "useAuth",
+    "useBiometricAnomalies",
+    "useBoxManagement",
+    "useBreachDays",
+    "useBusinessRuleEngine",
+    "useBusinessRules",
+    "useCarrierAccuracy",
+    "useChannelHealth",
+    "useConciliacao",
+    "useCotacoesFrete",
+    "useDashboardMetrics",
+    "useDebouncedEffect",
+    "useDelayPrediction",
+    "useExecutiveMetrics",
+    "useFreightIntelligence",
+    "useFreightQuotation",
+    "useLalamoveOrders",
+    "useLogisticsIntelligence",
+    "useMapIntelligence",
+    "useMapWeatherSync",
+    "useMelhorEnvio",
+    "usePredictionAccuracy",
+    "usePredictionAccuracyDaily",
+    "usePredictionAccuracySettings",
+    "useQuotationFlow",
+    "useRealtime",
+    "useRecentAlerts",
+    "useRodonavesTracking",
+    "useRodonavesWebhook",
+    "useRootCauseAnalysis",
+    "useRuleTriggers",
+    "useSLAMetrics",
+    "useSLANotifications",
+    "useSmartAlerts",
+    "useSmartCarrierSelection",
+    "useTelemetry",
+    "useToast",
+    "useTransportadoraPerformance",
+    "useUnifiedTracking"
+   ],
+   "hooks_definidos": [
+    "useAccuracyMetaAudit",
+    "useAccuracyMetaCycle",
+    "useBiometricAnomalies",
+    "useBoxManagement",
+    "useBusinessRuleEngine",
+    "useBusinessRules",
+    "useCarrierAccuracy",
+    "useChannelHealth",
+    "useConciliacao",
+    "useCostAlerts",
+    "useCotacoesFrete",
+    "useCotacoesMulticanal",
+    "useDelayPrediction",
+    "useDeliveryRoutes",
+    "useFreightIntelligence",
+    "useFreightQuotation",
+    "useLalamoveOrders",
+    "useLalamoveTracking",
+    "useLogisticaReversaReal",
+    "useLogisticsCalendar",
+    "useTransportadoras",
+    "useLogisticsCosts",
+    "useLogisticsIntelligence",
+    "useMapIntelligence",
+    "useMapWeatherSync",
+    "useMelhorEnvio",
+    "usePredictionAccuracy",
+    "usePredictionAccuracyDaily",
+    "useBreachDays",
+    "useDebouncedEffect",
+    "usePredictionAccuracySettings",
+    "useQuotationFlow",
+    "useRodonavesTracking",
+    "useRodonavesWebhook",
+    "useRootCauseAnalysis",
+    "useRuleTriggers",
+    "useSLAAlerts",
+    "useSLAMetrics",
+    "useSLANotifications",
+    "useSmartAlerts",
+    "useSmartCarrierSelection",
+    "useTrackingAnalytics",
+    "useTransportadoraRotas",
+    "useUnifiedTracking"
+   ],
+   "edges": [
+    "geocode-address",
+    "lalamove-api",
+    "lalamove-tracking",
+    "melhor-envio-api",
+    "predict-delays",
+    "rodonaves-api",
+    "rodonaves-webhook",
+    "smart-carrier-selection"
+   ],
+   "tabelas": [
+    "ai_delay_predictions",
+    "alertas_custo",
+    "bio_sync_telemetry",
+    "business_rules",
+    "coletas",
+    "conciliacao_itens_importados",
+    "conciliacoes",
+    "cotacoes_frete",
+    "cotacoes_multicanal",
+    "delay_predictions_history",
+    "entregas",
+    "error_events",
+    "freight_selection_rules",
+    "kanban_history",
+    "logistica_reversa",
+    "notificacoes_custo",
+    "notifications",
+    "ocorrencias",
+    "performance_metrics",
+    "prediction_accuracy_settings",
+    "profiles",
+    "rastreamento_alertas",
+    "rastreamento_historico",
+    "risk_zones",
+    "rule_execution_logs",
+    "sla_alerts",
+    "tabelas_frete",
+    "telemetry_logs",
+    "transportadora_rotas",
+    "transportadoras",
+    "user_levels",
+    "user_roles",
+    "v_prediction_accuracy",
+    "v_prediction_accuracy_by_carrier",
+    "v_prediction_accuracy_daily"
+   ],
+   "rpcs": [
+    "count_prediction_breach_days",
+    "count_prediction_breach_days_bulk",
+    "get_dashboard_metrics"
+   ],
+   "buckets": [],
+   "canais_realtime": [
+    "realtime:${config.table}:${multiTopicId}"
+   ],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [
+     "geocode-address",
+     "lalamove-api",
+     "lalamove-tracking",
+     "melhor-envio-api",
+     "predict-delays",
+     "rodonaves-api",
+     "rodonaves-webhook",
+     "smart-carrier-selection"
+    ],
+    "tabelas": [
+     "alertas_custo",
+     "bio_sync_telemetry",
+     "business_rules",
+     "coletas",
+     "conciliacao_itens_importados",
+     "conciliacoes",
+     "cotacoes_multicanal",
+     "delay_predictions_history",
+     "entregas",
+     "freight_selection_rules",
+     "kanban_history",
+     "logistica_reversa",
+     "notificacoes_custo",
+     "notifications",
+     "ocorrencias",
+     "performance_metrics",
+     "prediction_accuracy_settings",
+     "rastreamento_alertas",
+     "rastreamento_historico",
+     "risk_zones",
+     "rule_execution_logs",
+     "sla_alerts",
+     "tabelas_frete",
+     "transportadora_rotas",
+     "transportadoras",
+     "v_prediction_accuracy",
+     "v_prediction_accuracy_by_carrier",
+     "v_prediction_accuracy_daily"
+    ],
+    "rpcs": [
+     "count_prediction_breach_days",
+     "count_prediction_breach_days_bulk"
+    ]
+   },
+   "importado_por_outros_modulos": [
+    "components/automation",
+    "components/box",
+    "components/coletas",
+    "components/dashboard",
+    "components/freight",
+    "components/logistics",
+    "components/map",
+    "components/melhorenvio",
+    "components/notifications",
+    "components/predictions",
+    "components/rodonaves",
+    "components/transportadoras",
+    "hooks",
+    "pages",
+    "pages/cotacao-multicanal"
+   ],
+   "depende_de_modulos": [
+    "hooks/analytics",
+    "hooks/auth",
+    "hooks/common",
+    "hooks/data",
+    "hooks/ui",
+    "integrations/supabase",
+    "lib",
+    "lib/predictions",
+    "lib/rodonaves",
+    "services/api"
+   ],
+   "pacotes_externos": [
+    "@tanstack/react-query",
+    "date-fns",
+    "decimal.js",
+    "sonner"
+   ]
+  },
+  {
+   "modulo": "hooks/notifications",
+   "arquivos": 6,
+   "testes": 0,
+   "linhas": 935,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 1,
+   "hooks_locais": [
+    "useAudioFeedback",
+    "useAuth",
+    "useNotificationBadge",
+    "useNotificationPreferences",
+    "useNotifications",
+    "useSecurityPushNotifications",
+    "useWhatsAppNotification"
+   ],
+   "hooks_definidos": [
+    "useAudioFeedback",
+    "useNotificationPreferences",
+    "useNotificationBadge",
+    "useNotifications",
+    "usePushNotifications",
+    "useSecurityPushNotifications",
+    "useWhatsAppNotification"
+   ],
+   "edges": [
+    "push-send",
+    "whatsapp-notification"
+   ],
+   "tabelas": [
+    "notifications",
+    "profiles",
+    "push_subscriptions",
+    "security_events",
+    "user_levels",
+    "user_notification_preferences",
+    "user_roles"
+   ],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [
+     "push-send",
+     "whatsapp-notification"
+    ],
+    "tabelas": [
+     "notifications",
+     "push_subscriptions",
+     "security_events",
+     "user_notification_preferences"
+    ],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "components/box",
+    "components/coletas",
+    "components/notifications",
+    "components/security",
+    "components/shipping",
+    "hooks",
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "hooks/auth",
+    "integrations/supabase",
+    "lib",
+    "utils"
+   ],
+   "pacotes_externos": [
+    "@tanstack/react-query",
+    "sonner"
+   ]
+  },
+  {
+   "modulo": "hooks/predictions",
+   "arquivos": 1,
+   "testes": 0,
+   "linhas": 141,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 0,
+   "hooks_locais": [
+    "useAuth",
+    "useMitigationActions"
+   ],
+   "hooks_definidos": [
+    "useMitigationActions"
+   ],
+   "edges": [],
+   "tabelas": [
+    "mitigation_actions",
+    "profiles",
+    "user_levels",
+    "user_roles"
+   ],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [],
+    "tabelas": [
+     "mitigation_actions"
+    ],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "components/predictions"
+   ],
+   "depende_de_modulos": [
+    "hooks/auth",
+    "integrations/supabase",
+    "lib/predictions"
+   ],
+   "pacotes_externos": [
+    "@tanstack/react-query",
+    "sonner"
+   ]
+  },
+  {
+   "modulo": "hooks/rodonaves",
+   "arquivos": 4,
+   "testes": 2,
+   "linhas": 432,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 0,
+   "hooks_locais": [
+    "useAuth",
+    "useGatewayHealth",
+    "useRole",
+    "useSLOSnapshots",
+    "useSLOTargets"
+   ],
+   "hooks_definidos": [
+    "useGatewayHealth",
+    "useSLOSnapshots",
+    "useSLOTargets",
+    "useGatewayHealth",
+    "useSLOSnapshots",
+    "useSLOTargets"
+   ],
+   "edges": [
+    "rodonaves-api"
+   ],
+   "tabelas": [
+    "profiles",
+    "rte_gateway_health",
+    "rte_slo_daily_snapshots",
+    "rte_slo_targets",
+    "user_levels",
+    "user_roles"
+   ],
+   "rpcs": [
+    "rte_gateway_sustained_downtime",
+    "rte_rollup_slo_daily"
+   ],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [
+     "rodonaves-api"
+    ],
+    "tabelas": [
+     "rte_gateway_health",
+     "rte_slo_daily_snapshots",
+     "rte_slo_targets"
+    ],
+    "rpcs": [
+     "rte_gateway_sustained_downtime",
+     "rte_rollup_slo_daily"
+    ]
+   },
+   "importado_por_outros_modulos": [
+    "components/rodonaves"
+   ],
+   "depende_de_modulos": [
+    "hooks/auth",
+    "integrations/supabase",
+    "lib/rodonaves"
+   ],
+   "pacotes_externos": [
+    "@tanstack/react-query"
+   ]
+  },
+  {
+   "modulo": "hooks/security",
+   "arquivos": 6,
+   "testes": 0,
+   "linhas": 792,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 0,
+   "hooks_locais": [
+    "useAuditLogs",
+    "useAuth",
+    "useEntityHistory",
+    "useFeatureFlag",
+    "useFeatureFlags",
+    "useIntegrationValidation",
+    "useRateLimitLogs",
+    "useRecordHistory",
+    "useSecurityEvents"
+   ],
+   "hooks_definidos": [
+    "useAuditLogs",
+    "useRecordHistory",
+    "useEntityHistory",
+    "useFeatureFlag",
+    "useFeatureFlags",
+    "useIntegrationValidation",
+    "useRateLimitLogs",
+    "useSecurityEvents"
+   ],
+   "edges": [
+    "bitrix24-integration",
+    "check-rate-limit",
+    "geocode-address",
+    "lalamove-tracking",
+    "log-security-event",
+    "melhor-envio-api",
+    "rodonaves-api"
+   ],
+   "tabelas": [
+    "audit_logs",
+    "feature_flags",
+    "ip_access_rules",
+    "profiles",
+    "rate_limit_logs",
+    "security_events",
+    "user_levels",
+    "user_roles"
+   ],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [
+     "bitrix24-integration",
+     "check-rate-limit",
+     "geocode-address",
+     "lalamove-tracking",
+     "log-security-event",
+     "melhor-envio-api",
+     "rodonaves-api"
+    ],
+    "tabelas": [
+     "audit_logs",
+     "feature_flags",
+     "ip_access_rules",
+     "rate_limit_logs",
+     "security_events"
+    ],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "components/audit",
+    "components/common",
+    "components/security",
+    "hooks",
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "hooks/auth",
+    "integrations/supabase",
+    "lib"
+   ],
+   "pacotes_externos": [
+    "@tanstack/react-query",
+    "sonner"
+   ]
+  },
+  {
+   "modulo": "hooks/sla",
+   "arquivos": 1,
+   "testes": 0,
+   "linhas": 122,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 0,
+   "hooks_locais": [
+    "useAuth",
+    "useSLAMetas"
+   ],
+   "hooks_definidos": [
+    "useSLAMetas"
+   ],
+   "edges": [],
+   "tabelas": [
+    "profiles",
+    "user_levels",
+    "user_panel_preferences",
+    "user_roles"
+   ],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [],
+    "tabelas": [
+     "user_panel_preferences"
+    ],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "hooks/auth",
+    "integrations/supabase",
+    "lib"
+   ],
+   "pacotes_externos": [
+    "@tanstack/react-query"
+   ]
+  },
+  {
+   "modulo": "hooks/system",
+   "arquivos": 1,
+   "testes": 0,
+   "linhas": 105,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 0,
+   "hooks_locais": [
+    "useNexusHealth"
+   ],
+   "hooks_definidos": [
+    "useNexusHealth"
+   ],
+   "edges": [],
+   "tabelas": [],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [],
+   "diretos": {
+    "edges": [],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "components/dashboard",
+    "components/layout"
+   ],
+   "depende_de_modulos": [
+    "integrations/supabase",
+    "lib"
+   ],
+   "pacotes_externos": []
+  },
+  {
+   "modulo": "hooks/ui",
+   "arquivos": 6,
+   "testes": 0,
+   "linhas": 814,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 0,
+   "hooks_locais": [
+    "useAchievementNotifications",
+    "useAuth",
+    "useGamification",
+    "useIsMobile",
+    "useOnboarding",
+    "useQRScanner",
+    "useToast",
+    "useTouchGestures",
+    "useVirtualTable"
+   ],
+   "hooks_definidos": [
+    "useIsMobile",
+    "useToast",
+    "useOnboarding",
+    "useQRScanner",
+    "useTouchGestures",
+    "useVirtualTable"
+   ],
+   "edges": [],
+   "tabelas": [
+    "achievements",
+    "profiles",
+    "reward_items",
+    "user_achievements",
+    "user_levels",
+    "user_onboarding",
+    "user_roles"
+   ],
+   "rpcs": [
+    "add_user_xp"
+   ],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [],
+    "tabelas": [
+     "user_onboarding"
+    ],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "components/audit",
+    "components/coletas",
+    "components/layout",
+    "components/onboarding",
+    "components/scanner",
+    "components/search",
+    "components/security",
+    "components/ui",
+    "hooks",
+    "hooks/logistics",
+    "pages",
+    "pages/auth"
+   ],
+   "depende_de_modulos": [
+    "components/ui",
+    "hooks/auth",
+    "hooks/gamification",
+    "integrations/supabase"
+   ],
+   "pacotes_externos": [
+    "@tanstack/react-query",
+    "@tanstack/react-virtual",
+    "react-router-dom",
+    "sonner"
+   ]
+  },
+  {
+   "modulo": "integrations/lovable",
+   "arquivos": 1,
+   "testes": 0,
+   "linhas": 33,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 0,
+   "hooks_locais": [],
+   "hooks_definidos": [],
+   "edges": [],
+   "tabelas": [],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [],
+   "diretos": {
+    "edges": [],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "pages/auth"
+   ],
+   "depende_de_modulos": [
+    "integrations/supabase"
+   ],
+   "pacotes_externos": []
+  },
+  {
+   "modulo": "integrations/supabase",
+   "arquivos": 2,
+   "testes": 0,
+   "linhas": 6500,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 0,
+   "hooks_locais": [],
+   "hooks_definidos": [],
+   "edges": [],
+   "tabelas": [],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [],
+   "diretos": {
+    "edges": [],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "components/admin",
+    "components/analytics",
+    "components/audit",
+    "components/auth",
+    "components/coletas",
+    "components/common",
+    "components/dashboard",
+    "components/freight",
+    "components/labels",
+    "components/layout",
+    "components/map",
+    "components/predictions",
+    "components/rodonaves",
+    "components/security",
+    "components/shipping",
+    "components/transportadoras",
+    "features/analytics",
+    "features/db-observability",
+    "hooks/ai",
+    "hooks/analytics",
+    "hooks/auth",
+    "hooks/common",
+    "hooks/data",
+    "hooks/gamification",
+    "hooks/integrations",
+    "hooks/logistics",
+    "hooks/notifications",
+    "hooks/predictions",
+    "hooks/rodonaves",
+    "hooks/security",
+    "hooks/sla",
+    "hooks/system",
+    "hooks/ui",
+    "integrations/lovable",
+    "lib",
+    "pages",
+    "pages/auth",
+    "services/api",
+    "services/resilience",
+    "utils"
+   ],
+   "depende_de_modulos": [
+    "lib"
+   ],
+   "pacotes_externos": [
+    "@supabase/supabase-js"
+   ]
+  },
+  {
+   "modulo": "lib",
+   "arquivos": 20,
+   "testes": 10,
+   "linhas": 1745,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 0,
+   "hooks_locais": [],
+   "hooks_definidos": [],
+   "edges": [],
+   "tabelas": [],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_CD_ORIGEM_LAT",
+    "VITE_CD_ORIGEM_LNG"
+   ],
+   "flags": [],
+   "papeis": [],
+   "diretos": {
+    "edges": [],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "components/achievements",
+    "components/ai",
+    "components/analytics",
+    "components/audit",
+    "components/auth",
+    "components/automation",
+    "components/box",
+    "components/coletas",
+    "components/common",
+    "components/dashboard",
+    "components/freight",
+    "components/gamification",
+    "components/layout",
+    "components/logistics",
+    "components/map",
+    "components/melhorenvio",
+    "components/notifications",
+    "components/onboarding",
+    "components/predictions",
+    "components/rodonaves",
+    "components/shipping",
+    "components/transportadoras",
+    "components/ui",
+    "features/preferences",
+    "hooks/analytics",
+    "hooks/auth",
+    "hooks/common",
+    "hooks/data",
+    "hooks/logistics",
+    "hooks/notifications",
+    "hooks/security",
+    "hooks/sla",
+    "hooks/system",
+    "integrations/supabase",
+    "pages",
+    "pages/conciliacao",
+    "pages/ranking"
+   ],
+   "depende_de_modulos": [
+    "integrations/supabase"
+   ],
+   "pacotes_externos": [
+    "clsx",
+    "date-fns",
+    "jspdf",
+    "jspdf-autotable",
+    "maplibre-gl",
+    "papaparse",
+    "tailwind-merge",
+    "xlsx",
+    "zod"
+   ]
+  },
+  {
+   "modulo": "lib/predictions",
+   "arquivos": 6,
+   "testes": 7,
+   "linhas": 755,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 0,
+   "hooks_locais": [],
+   "hooks_definidos": [],
+   "edges": [],
+   "tabelas": [],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [],
+   "flags": [],
+   "papeis": [],
+   "diretos": {
+    "edges": [],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "components/predictions",
+    "hooks/logistics",
+    "hooks/predictions"
+   ],
+   "depende_de_modulos": [],
+   "pacotes_externos": []
+  },
+  {
+   "modulo": "lib/rodonaves",
+   "arquivos": 11,
+   "testes": 11,
+   "linhas": 2080,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 0,
+   "hooks_locais": [],
+   "hooks_definidos": [],
+   "edges": [],
+   "tabelas": [],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [],
+   "flags": [],
+   "papeis": [],
+   "diretos": {
+    "edges": [],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "components/freight",
+    "components/rodonaves",
+    "hooks/logistics",
+    "hooks/rodonaves"
+   ],
+   "depende_de_modulos": [],
+   "pacotes_externos": []
+  },
+  {
+   "modulo": "lib/schemas",
+   "arquivos": 1,
+   "testes": 0,
+   "linhas": 25,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 0,
+   "hooks_locais": [],
+   "hooks_definidos": [],
+   "edges": [],
+   "tabelas": [],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [],
+   "flags": [],
+   "papeis": [],
+   "diretos": {
+    "edges": [],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [],
+   "depende_de_modulos": [],
+   "pacotes_externos": [
+    "zod"
+   ]
+  },
+  {
+   "modulo": "pages",
+   "arquivos": 59,
+   "testes": 1,
+   "linhas": 31505,
+   "itens_menu": [
+    "Administração",
+    "Administração",
+    "Administração",
+    "Administração",
+    "ADR",
+    "Alertas Custo",
+    "Audit Trail",
+    "Auditoria Nexus",
+    "Automação Regras",
+    "Bitrix24 CRM",
+    "Cadastros",
+    "Cadastros",
+    "Cadastros",
+    "Calendário",
+    "Central Rastreamento",
+    "Coletas",
+    "Coletas Compras",
+    "Conciliação Auto",
+    "Config Nexus",
+    "Conquistas",
+    "Cotação e Despacho",
+    "Cotação Frete",
+    "Cotação Multi-Canal",
+    "Custos Logísticos",
+    "Dashboard",
+    "Dashboard Cotações",
+    "Dashboard SLA",
+    "Documentação API",
+    "Envios",
+    "Envios Clientes",
+    "Executivo",
+    "Exportação",
+    "Financeiro",
+    "Fretes Internos",
+    "Gamificação",
+    "Gestão de BOX",
+    "Importação Massa",
+    "Início",
+    "Integrações",
+    "Integrações",
+    "Inteligência Frete",
+    "Kanban Entregas",
+    "Logística Reversa",
+    "Loja",
+    "Mapa de Rotas",
+    "Melhor Envio",
+    "Operações",
+    "Painel OTIF",
+    "Painel SLA",
+    "Ranking",
+    "Rastreamento Motorista",
+    "Rate Limit",
+    "Rede Logística",
+    "Relatório PDF",
+    "Relatórios",
+    "Reset Senha",
+    "Rodonaves RTE",
+    "Rotas",
+    "Telemetria",
+    "Usuários",
+    "Visão Geral",
+    "Webhooks Nexus",
+    "Clientes",
+    "Fornecedores",
+    "Conciliação",
+    "Custos",
+    "BOX",
+    "Despachos",
+    "Ocorrências",
+    "Rastreamento",
+    "Cotação",
+    "Mapa",
+    "Transportadoras",
+    "Configurações",
+    "Notificações",
+    "Segurança",
+    "Analytics",
+    "OTIF",
+    "SLA"
+   ],
+   "telas": [
+    "/",
+    "/*",
+    "/admin/adr",
+    "/admin/telemetria",
+    "/alertas-custo",
+    "/analytics",
+    "/api-docs",
+    "/aprovacao-reset-senha",
+    "/audit-trail",
+    "/auth",
+    "/automacao-regras",
+    "/bitrix24",
+    "/calendario",
+    "/central-rastreamento",
+    "/clientes",
+    "/coletas",
+    "/conciliacao",
+    "/conciliacao-automatica",
+    "/config-frete",
+    "/configuracoes",
+    "/conquistas",
+    "/cotacao-frete",
+    "/cotacao-multicanal",
+    "/custos",
+    "/dashboard-cotacoes",
+    "/dashboard-executivo",
+    "/despachos",
+    "/envios",
+    "/exportacao",
+    "/fornecedores",
+    "/fretes-internos",
+    "/gerenciamento-usuarios",
+    "/gestao-box",
+    "/gestao-rodonaves",
+    "/importacao-massa",
+    "/inteligencia-frete",
+    "/kanban-entregas",
+    "/logistica-reversa",
+    "/loja",
+    "/mapa-rotas",
+    "/melhor-envio",
+    "/notificacoes",
+    "/ocorrencias",
+    "/painel-otif",
+    "/painel-sla",
+    "/perfil",
+    "/ranking",
+    "/rastreamento-motorista",
+    "/rastreamento/:id",
+    "/rastrear",
+    "/rate-limit",
+    "/relatorio-pdf",
+    "/relatorios",
+    "/reset-password",
+    "/rotas-transportadoras",
+    "/seguranca",
+    "/sla-dashboard",
+    "/transportadoras",
+    "/webhooks"
+   ],
+   "rotas_http": [],
+   "componentes": 59,
+   "hooks_locais": [
+    "useAccuracyMetaAudit",
+    "useAccuracyMetaCycle",
+    "useAchievementNotifications",
+    "useAnalytics",
+    "useApiStatus",
+    "useApplyRemediation",
+    "useAudioFeedback",
+    "useAuditLogs",
+    "useAuth",
+    "useBiometricAnomalies",
+    "useBoxManagement",
+    "useBreachDays",
+    "useBusinessRuleEngine",
+    "useBusinessRules",
+    "useCarrierAccuracy",
+    "useChannelHealth",
+    "useClientWebhooks",
+    "useComments",
+    "useConciliacao",
+    "useConfirm",
+    "useConfirmExit",
+    "useCostAlerts",
+    "useCotacoesFrete",
+    "useCotacoesMulticanal",
+    "useDashboardData",
+    "useDashboardMetrics",
+    "useDashboardWidgets",
+    "useDateFormatter",
+    "useDebounce",
+    "useDebouncedEffect",
+    "useDelayPrediction",
+    "useDeliveryRoutes",
+    "useDensity",
+    "useDeviceSessions",
+    "useDocumentUpload",
+    "useDrillDown",
+    "useEntityHistory",
+    "useExecutiveMetrics",
+    "useExport",
+    "useExternalDbBridge",
+    "useFavoriteMetrics",
+    "useFeatureFlag",
+    "useFeatureFlags",
+    "useFilters",
+    "useFreightIntelligence",
+    "useFreightQuotation",
+    "useGamification",
+    "useGatewayHealth",
+    "useGeocoding",
+    "useGlobalHealthScore",
+    "useGlobalSearch",
+    "useGlobalShortcuts",
+    "useHistoricoChat",
+    "useImageUpload",
+    "useIntegrationValidation",
+    "useIsDesktop",
+    "useIsMobile",
+    "useIsTablet",
+    "useKPIBenchmark",
+    "useKeyboardShortcut",
+    "useKeyboardShortcuts",
+    "useLalamoveOrders",
+    "useLalamoveTracking",
+    "useLocalStorage",
+    "useLogisticaReversaReal",
+    "useLogisticsCalendar",
+    "useLogisticsCosts",
+    "useLogisticsIntelligence",
+    "useMFA",
+    "useMapIntelligence",
+    "useMapWeatherSync",
+    "useMediaQuery",
+    "useMelhorEnvio",
+    "useMitigationActions",
+    "useNavigationHistory",
+    "useNewDeviceDetection",
+    "useNexusHealth",
+    "useNotificacoesPage",
+    "useNotificacoesRealtime",
+    "useNotificationBadge",
+    "useNotificationPreferences",
+    "useNotifications",
+    "useOfflineSync",
+    "useOnboarding",
+    "useOnlineStatus",
+    "usePWAInstall",
+    "usePagination",
+    "usePerformanceMonitor",
+    "usePermissions",
+    "usePredictionAccuracy",
+    "usePredictionAccuracyDaily",
+    "usePredictionAccuracySettings",
+    "usePrefersDarkMode",
+    "usePrefersReducedMotion",
+    "usePrefetch",
+    "usePushNotifications",
+    "useQRScanner",
+    "useQuotationFlow",
+    "useRateLimitLogs",
+    "useRealtime",
+    "useRecentAlerts",
+    "useRecordHistory",
+    "useRemediationActions",
+    "useRemediationMttr",
+    "useRemediationSuggestions",
+    "useRewardPurchases",
+    "useRodonavesTracking",
+    "useRodonavesWebhook",
+    "useRole",
+    "useRootCauseAnalysis",
+    "useRuleTriggers",
+    "useSLAMetas",
+    "useSLAMetrics",
+    "useSLANotifications",
+    "useSLOSnapshots",
+    "useSLOTargets",
+    "useScheduledReports",
+    "useSecurityEvents",
+    "useSecurityPushNotifications",
+    "useSelection",
+    "useSessionTimeout",
+    "useShortcutsDialog",
+    "useSmartAlerts",
+    "useSmartCarrierSelection",
+    "useSoftDelete",
+    "useSorting",
+    "useTelemetry",
+    "useTimezone",
+    "useToast",
+    "useTouchGestures",
+    "useTrackingAnalytics",
+    "useTransportadoraPerformance",
+    "useTransportadoraRotas",
+    "useUnifiedTracking",
+    "useUpdateRemediationStatus",
+    "useUserPreferences",
+    "useVirtualTable",
+    "useWebAuthn",
+    "useWhatsAppNotification"
+   ],
+   "hooks_definidos": [],
+   "edges": [
+    "accuracy-weekly-digest",
+    "ai-logistics-assistant",
+    "bitrix24-integration",
+    "carrier-webhook-receiver",
+    "check-password-breach",
+    "check-rate-limit",
+    "evolution-whatsapp",
+    "execute-protocol",
+    "external-db-bridge",
+    "geocode-address",
+    "get-weather-data",
+    "health-check",
+    "lalamove-api",
+    "lalamove-tracking",
+    "lgpd-erase-user",
+    "log-login-attempt",
+    "log-security-event",
+    "melhor-envio-api",
+    "new-device-alert",
+    "nexus-auto-healing",
+    "nexus-webhook-receiver",
+    "normalize-freight-response",
+    "ocr-receipt-processor",
+    "predict-delays",
+    "push-send",
+    "resend-email",
+    "rodonaves-api",
+    "rodonaves-webhook",
+    "scheduled-reports",
+    "secure-store",
+    "send-password-reset",
+    "smart-carrier-selection",
+    "validate-login",
+    "webhook-status",
+    "whatsapp-notification"
+   ],
+   "tabelas": [
+    "achievements",
+    "ai_chat_messages",
+    "ai_delay_predictions",
+    "alertas_custo",
+    "architecture_decisions",
+    "audit_logs",
+    "bio_sync_alert_rules",
+    "bio_sync_telemetry",
+    "bitrix_sync_config",
+    "bitrix_sync_logs",
+    "business_rules",
+    "business_rules_config",
+    "client_webhooks",
+    "clientes",
+    "coletas",
+    "comments",
+    "conciliacao_itens_importados",
+    "conciliacoes",
+    "cotacoes_frete",
+    "cotacoes_multicanal",
+    "delay_predictions_history",
+    "delivery_receipt_audit",
+    "entregas",
+    "error_events",
+    "feature_flags",
+    "fornecedores",
+    "freight_decisions",
+    "freight_integration_mappings",
+    "freight_selection_rules",
+    "fretes_internos",
+    "geo_access_rules",
+    "geo_blocked_attempts",
+    "geo_blocking_rules",
+    "geo_blocking_settings",
+    "ip_access_rules",
+    "kanban_history",
+    "known_devices",
+    "login_attempts",
+    "logistica_reversa",
+    "mitigation_actions",
+    "nexus_tactical_logs",
+    "notificacoes_custo",
+    "notifications",
+    "ocorrencias",
+    "password_reset_requests",
+    "performance_metrics",
+    "permissions",
+    "prediction_accuracy_settings",
+    "profiles",
+    "push_subscriptions",
+    "query_telemetry",
+    "rastreamento_alertas",
+    "rastreamento_historico",
+    "rate_limit_logs",
+    "remediation_actions",
+    "reward_items",
+    "reward_purchases",
+    "risk_zones",
+    "role_permissions",
+    "rte_gateway_health",
+    "rte_slo_daily_snapshots",
+    "rte_slo_targets",
+    "rule_execution_logs",
+    "security_events",
+    "sla_alerts",
+    "system_heartbeat",
+    "tabelas_frete",
+    "telemetry_logs",
+    "transportadora_rotas",
+    "transportadoras",
+    "user_achievements",
+    "user_levels",
+    "user_notification_preferences",
+    "user_onboarding",
+    "user_panel_preferences",
+    "user_roles",
+    "user_sessions",
+    "v_prediction_accuracy",
+    "v_prediction_accuracy_by_carrier",
+    "v_prediction_accuracy_daily",
+    "v_prediction_accuracy_daily_carrier",
+    "webauthn_challenges",
+    "webauthn_credentials",
+    "webhook_deliveries",
+    "webhook_inbound_failures"
+   ],
+   "rpcs": [
+    "add_user_xp",
+    "count_prediction_breach_days",
+    "count_prediction_breach_days_bulk",
+    "get_carrier_performance_stats",
+    "get_dashboard_metrics",
+    "get_leaderboard",
+    "get_monthly_analytics",
+    "get_public_tracking",
+    "get_user_permissions",
+    "purchase_reward",
+    "rte_gateway_sustained_downtime",
+    "rte_rollup_slo_daily"
+   ],
+   "buckets": [
+    "avatars",
+    "documents"
+   ],
+   "canais_realtime": [
+    "health-ping",
+    "presence-health",
+    "raw_responses",
+    "realtime:${config.table}:${multiTopicId}",
+    "system-health-check",
+    "tactical-logs"
+   ],
+   "env": [
+    "VITE_CD_ORIGEM_LAT",
+    "VITE_CD_ORIGEM_LNG",
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin",
+    "assistant",
+    "user"
+   ],
+   "diretos": {
+    "edges": [
+     "ai-logistics-assistant",
+     "bitrix24-integration",
+     "carrier-webhook-receiver",
+     "check-password-breach",
+     "geocode-address",
+     "get-weather-data",
+     "lalamove-api",
+     "lgpd-erase-user",
+     "melhor-envio-api",
+     "nexus-webhook-receiver",
+     "normalize-freight-response",
+     "predict-delays",
+     "resend-email",
+     "rodonaves-api",
+     "secure-store",
+     "send-password-reset",
+     "smart-carrier-selection",
+     "webhook-status"
+    ],
+    "tabelas": [
+     "architecture_decisions",
+     "audit_logs",
+     "bio_sync_alert_rules",
+     "bio_sync_telemetry",
+     "bitrix_sync_config",
+     "bitrix_sync_logs",
+     "business_rules_config",
+     "clientes",
+     "coletas",
+     "conciliacao_itens_importados",
+     "cotacoes_frete",
+     "entregas",
+     "fornecedores",
+     "freight_integration_mappings",
+     "freight_selection_rules",
+     "fretes_internos",
+     "kanban_history",
+     "nexus_tactical_logs",
+     "notifications",
+     "ocorrencias",
+     "password_reset_requests",
+     "performance_metrics",
+     "profiles",
+     "query_telemetry",
+     "reward_items",
+     "transportadoras",
+     "user_levels",
+     "user_roles"
+    ],
+    "rpcs": [
+     "get_carrier_performance_stats",
+     "get_leaderboard",
+     "get_public_tracking",
+     "purchase_reward"
+    ]
+   },
+   "importado_por_outros_modulos": [],
+   "depende_de_modulos": [
+    "components/admin",
+    "components/ai",
+    "components/analytics",
+    "components/audit",
+    "components/automation",
+    "components/box",
+    "components/coletas",
+    "components/common",
+    "components/dashboard",
+    "components/freight",
+    "components/integrations",
+    "components/labels",
+    "components/layout",
+    "components/logistics",
+    "components/map",
+    "components/melhorenvio",
+    "components/notifications",
+    "components/onboarding",
+    "components/predictions",
+    "components/reports",
+    "components/rewards",
+    "components/rodonaves",
+    "components/scanner",
+    "components/security",
+    "components/shipping",
+    "components/transportadoras",
+    "components/ui",
+    "features/incidents",
+    "features/preferences",
+    "hooks",
+    "hooks/analytics",
+    "hooks/auth",
+    "hooks/common",
+    "hooks/data",
+    "hooks/gamification",
+    "hooks/integrations",
+    "hooks/logistics",
+    "hooks/notifications",
+    "hooks/security",
+    "hooks/sla",
+    "hooks/ui",
+    "integrations/supabase",
+    "lib",
+    "pages/admin-telemetria",
+    "pages/aprovacao-reset",
+    "pages/auth",
+    "pages/conciliacao",
+    "pages/cotacao-multicanal",
+    "pages/dashboard-cotacoes",
+    "pages/ranking"
+   ],
+   "pacotes_externos": [
+    "@hello-pangea/dnd",
+    "@tanstack/react-query",
+    "date-fns",
+    "framer-motion",
+    "jspdf",
+    "jspdf-autotable",
+    "lucide-react",
+    "maplibre-gl",
+    "qrcode.react",
+    "react-confetti",
+    "react-day-picker",
+    "react-map-gl",
+    "react-router-dom",
+    "react-use",
+    "recharts",
+    "sonner",
+    "zod"
+   ]
+  },
+  {
+   "modulo": "pages/admin",
+   "arquivos": 2,
+   "testes": 0,
+   "linhas": 337,
+   "itens_menu": [
+    "Quality Gate",
+    "Saúde do Banco"
+   ],
+   "telas": [
+    "/admin/db-health",
+    "/admin/quality-gate"
+   ],
+   "rotas_http": [],
+   "componentes": 2,
+   "hooks_locais": [
+    "useAchievementNotifications",
+    "useActiveSessions",
+    "useApiStatus",
+    "useApplyIndexProposal",
+    "useApplyRemediation",
+    "useAuth",
+    "useAutovacuumHealth",
+    "useBloatHotspots",
+    "useCacheHitRatios",
+    "useCancelQuery",
+    "useCapacityForecast",
+    "useCronJobs",
+    "useDbRegressionAlerts",
+    "useDbRegressions",
+    "useDuplicateIndexes",
+    "useExtensionsAudit",
+    "useGamification",
+    "useGlobalHealthScore",
+    "useGlobalSearch",
+    "useHealthAnomalies",
+    "useHealthScoreHistory",
+    "useHealthScoreRegression",
+    "useHealthSnapshots",
+    "useHistoricoChat",
+    "useIndexProposals",
+    "useIndexRoi",
+    "useLoadHeatmap",
+    "useLockConflicts",
+    "useLongRunningQueries",
+    "useMaintenanceWindows",
+    "useMeasureIndexImpact",
+    "useNavigationHistory",
+    "useNexusHealth",
+    "useNotificationBadge",
+    "useNotifications",
+    "useOfflineSync",
+    "useOnboarding",
+    "useOnlineStatus",
+    "usePWAInstall",
+    "usePerformanceMonitor",
+    "usePrefetch",
+    "useProposeIndex",
+    "useQRScanner",
+    "useQueryDetail",
+    "useQueryIndexSuggestion",
+    "useRejectIndexProposal",
+    "useRemediationActions",
+    "useRemediationMttr",
+    "useRemediationSuggestions",
+    "useReplicationStatus",
+    "useRlsAudit",
+    "useSLANotifications",
+    "useSeqScanHotspots",
+    "useSloDaily",
+    "useSmartAlerts",
+    "useTableCoaccess",
+    "useTelemetry",
+    "useTempFileStats",
+    "useToast",
+    "useTopQueries",
+    "useTopTablesBySize",
+    "useTouchGestures",
+    "useTransactionHealth",
+    "useUnindexedForeignKeys",
+    "useUnusedIndexes",
+    "useUpdateRemediationStatus",
+    "useUserPreferences",
+    "useWalHealth",
+    "useWraparoundStatus"
+   ],
+   "hooks_definidos": [],
+   "edges": [
+    "ai-logistics-assistant",
+    "health-check",
+    "nexus-auto-healing"
+   ],
+   "tabelas": [
+    "achievements",
+    "ai_chat_messages",
+    "audit_logs",
+    "clientes",
+    "coletas",
+    "db_health_snapshots",
+    "db_slo_daily",
+    "entregas",
+    "error_events",
+    "fornecedores",
+    "notifications",
+    "profiles",
+    "remediation_actions",
+    "reward_items",
+    "security_events",
+    "telemetry_logs",
+    "transportadoras",
+    "user_achievements",
+    "user_levels",
+    "user_onboarding",
+    "user_roles"
+   ],
+   "rpcs": [
+    "add_user_xp",
+    "cancel_long_running_query",
+    "get_bloat_hotspots",
+    "get_cache_hit_ratios",
+    "get_duplicate_indexes",
+    "get_health_anomalies_fast",
+    "get_lock_conflicts",
+    "get_long_running_queries",
+    "get_query_regressions_fast",
+    "get_replication_status",
+    "get_seq_scan_hotspots",
+    "get_table_coaccess_graph",
+    "get_temp_file_stats",
+    "get_transaction_health",
+    "get_unindexed_foreign_keys",
+    "get_unused_indexes",
+    "get_wal_health"
+   ],
+   "buckets": [],
+   "canais_realtime": [
+    "db-regression-alerts-${user.id}",
+    "health-ping",
+    "system-health-check"
+   ],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin",
+    "assistant",
+    "user"
+   ],
+   "diretos": {
+    "edges": [],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [],
+   "depende_de_modulos": [
+    "components/layout",
+    "components/ui",
+    "features/db-observability"
+   ],
+   "pacotes_externos": [
+    "lucide-react"
+   ]
+  },
+  {
+   "modulo": "pages/admin-telemetria",
+   "arquivos": 3,
+   "testes": 0,
+   "linhas": 267,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 3,
+   "hooks_locais": [],
+   "hooks_definidos": [],
+   "edges": [],
+   "tabelas": [],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [],
+   "flags": [],
+   "papeis": [],
+   "diretos": {
+    "edges": [],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "components/ui"
+   ],
+   "pacotes_externos": [
+    "lucide-react"
+   ]
+  },
+  {
+   "modulo": "pages/aprovacao-reset",
+   "arquivos": 1,
+   "testes": 0,
+   "linhas": 122,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 1,
+   "hooks_locais": [],
+   "hooks_definidos": [],
+   "edges": [],
+   "tabelas": [],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [],
+   "flags": [],
+   "papeis": [],
+   "diretos": {
+    "edges": [],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "components/ui"
+   ],
+   "pacotes_externos": [
+    "date-fns",
+    "lucide-react"
+   ]
+  },
+  {
+   "modulo": "pages/auth",
+   "arquivos": 5,
+   "testes": 0,
+   "linhas": 1104,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 4,
+   "hooks_locais": [
+    "useDebounce",
+    "useToast"
+   ],
+   "hooks_definidos": [],
+   "edges": [
+    "check-password-breach",
+    "log-login-attempt",
+    "validate-login"
+   ],
+   "tabelas": [
+    "password_reset_requests"
+   ],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [],
+   "diretos": {
+    "edges": [
+     "log-login-attempt",
+     "validate-login"
+    ],
+    "tabelas": [
+     "password_reset_requests"
+    ],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "components/auth",
+    "components/ui",
+    "hooks/ui",
+    "integrations/lovable",
+    "integrations/supabase"
+   ],
+   "pacotes_externos": [
+    "framer-motion",
+    "lucide-react",
+    "zod"
+   ]
+  },
+  {
+   "modulo": "pages/conciliacao",
+   "arquivos": 4,
+   "testes": 0,
+   "linhas": 585,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 3,
+   "hooks_locais": [
+    "useAchievementNotifications",
+    "useAnalytics",
+    "useApiStatus",
+    "useAudioFeedback",
+    "useAuditLogs",
+    "useAuth",
+    "useBiometricAnomalies",
+    "useBoxManagement",
+    "useBusinessRuleEngine",
+    "useBusinessRules",
+    "useClientWebhooks",
+    "useComments",
+    "useConciliacao",
+    "useConfirmExit",
+    "useCotacoesFrete",
+    "useDashboardData",
+    "useDashboardMetrics",
+    "useDashboardWidgets",
+    "useDateFormatter",
+    "useDelayPrediction",
+    "useDensity",
+    "useDeviceSessions",
+    "useDocumentUpload",
+    "useDrillDown",
+    "useEntityHistory",
+    "useExecutiveMetrics",
+    "useExport",
+    "useExternalDbBridge",
+    "useFavoriteMetrics",
+    "useFeatureFlag",
+    "useFeatureFlags",
+    "useFreightIntelligence",
+    "useFreightQuotation",
+    "useGamification",
+    "useGlobalSearch",
+    "useGlobalShortcuts",
+    "useImageUpload",
+    "useIntegrationValidation",
+    "useIsDesktop",
+    "useIsMobile",
+    "useIsTablet",
+    "useKeyboardShortcut",
+    "useKeyboardShortcuts",
+    "useLalamoveOrders",
+    "useLogisticsIntelligence",
+    "useMFA",
+    "useMapWeatherSync",
+    "useMediaQuery",
+    "useMelhorEnvio",
+    "useNavigationHistory",
+    "useNewDeviceDetection",
+    "useNotificationBadge",
+    "useNotificationPreferences",
+    "useNotifications",
+    "useOfflineSync",
+    "useOnboarding",
+    "useOnlineStatus",
+    "usePerformanceMonitor",
+    "usePermissions",
+    "usePrefersDarkMode",
+    "usePrefersReducedMotion",
+    "usePrefetch",
+    "useQRScanner",
+    "useQuotationFlow",
+    "useRateLimitLogs",
+    "useRealtime",
+    "useRecentAlerts",
+    "useRecordHistory",
+    "useRewardPurchases",
+    "useRodonavesTracking",
+    "useRodonavesWebhook",
+    "useRole",
+    "useRuleTriggers",
+    "useSLAMetrics",
+    "useSLANotifications",
+    "useSecurityEvents",
+    "useSecurityPushNotifications",
+    "useSessionTimeout",
+    "useShortcutsDialog",
+    "useSmartAlerts",
+    "useSmartCarrierSelection",
+    "useSoftDelete",
+    "useTelemetry",
+    "useTimezone",
+    "useToast",
+    "useTouchGestures",
+    "useTransportadoraPerformance",
+    "useUnifiedTracking",
+    "useVirtualTable",
+    "useWebAuthn",
+    "useWhatsAppNotification"
+   ],
+   "hooks_definidos": [],
+   "edges": [
+    "bitrix24-integration",
+    "check-rate-limit",
+    "evolution-whatsapp",
+    "external-db-bridge",
+    "geocode-address",
+    "lalamove-api",
+    "lalamove-tracking",
+    "log-security-event",
+    "melhor-envio-api",
+    "new-device-alert",
+    "predict-delays",
+    "push-send",
+    "rodonaves-api",
+    "rodonaves-webhook",
+    "scheduled-reports",
+    "smart-carrier-selection",
+    "webhook-status",
+    "whatsapp-notification"
+   ],
+   "tabelas": [
+    "achievements",
+    "ai_delay_predictions",
+    "alertas_custo",
+    "audit_logs",
+    "bio_sync_telemetry",
+    "business_rules",
+    "client_webhooks",
+    "clientes",
+    "coletas",
+    "comments",
+    "conciliacao_itens_importados",
+    "conciliacoes",
+    "cotacoes_frete",
+    "cotacoes_multicanal",
+    "entregas",
+    "error_events",
+    "feature_flags",
+    "fornecedores",
+    "freight_selection_rules",
+    "fretes_internos",
+    "ip_access_rules",
+    "kanban_history",
+    "known_devices",
+    "logistica_reversa",
+    "notificacoes_custo",
+    "notifications",
+    "ocorrencias",
+    "performance_metrics",
+    "profiles",
+    "push_subscriptions",
+    "rastreamento_alertas",
+    "rastreamento_historico",
+    "rate_limit_logs",
+    "reward_items",
+    "reward_purchases",
+    "risk_zones",
+    "rule_execution_logs",
+    "security_events",
+    "sla_alerts",
+    "tabelas_frete",
+    "telemetry_logs",
+    "transportadora_rotas",
+    "transportadoras",
+    "user_achievements",
+    "user_levels",
+    "user_notification_preferences",
+    "user_onboarding",
+    "user_roles",
+    "user_sessions",
+    "webauthn_challenges",
+    "webauthn_credentials",
+    "webhook_deliveries",
+    "webhook_inbound_failures"
+   ],
+   "rpcs": [
+    "add_user_xp",
+    "get_dashboard_metrics",
+    "get_monthly_analytics",
+    "get_user_permissions"
+   ],
+   "buckets": [],
+   "canais_realtime": [
+    "realtime:${config.table}:${multiTopicId}"
+   ],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "components/ui",
+    "hooks",
+    "lib"
+   ],
+   "pacotes_externos": [
+    "date-fns",
+    "jspdf",
+    "jspdf-autotable",
+    "lucide-react",
+    "sonner",
+    "xlsx"
+   ]
+  },
+  {
+   "modulo": "pages/cotacao-multicanal",
+   "arquivos": 4,
+   "testes": 1,
+   "linhas": 352,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 3,
+   "hooks_locais": [
+    "useAchievementNotifications",
+    "useAnalytics",
+    "useApiStatus",
+    "useAudioFeedback",
+    "useAuditLogs",
+    "useAuth",
+    "useBiometricAnomalies",
+    "useBoxManagement",
+    "useBusinessRuleEngine",
+    "useBusinessRules",
+    "useClientWebhooks",
+    "useComments",
+    "useConciliacao",
+    "useConfirmExit",
+    "useCotacoesFrete",
+    "useDashboardData",
+    "useDashboardMetrics",
+    "useDashboardWidgets",
+    "useDateFormatter",
+    "useDelayPrediction",
+    "useDensity",
+    "useDeviceSessions",
+    "useDocumentUpload",
+    "useDrillDown",
+    "useEntityHistory",
+    "useExecutiveMetrics",
+    "useExport",
+    "useExternalDbBridge",
+    "useFavoriteMetrics",
+    "useFeatureFlag",
+    "useFeatureFlags",
+    "useFreightIntelligence",
+    "useFreightQuotation",
+    "useGamification",
+    "useGlobalSearch",
+    "useGlobalShortcuts",
+    "useImageUpload",
+    "useIntegrationValidation",
+    "useIsDesktop",
+    "useIsMobile",
+    "useIsTablet",
+    "useKeyboardShortcut",
+    "useKeyboardShortcuts",
+    "useLalamoveOrders",
+    "useLogisticsIntelligence",
+    "useMFA",
+    "useMapWeatherSync",
+    "useMediaQuery",
+    "useMelhorEnvio",
+    "useNavigationHistory",
+    "useNewDeviceDetection",
+    "useNotificationBadge",
+    "useNotificationPreferences",
+    "useNotifications",
+    "useOfflineSync",
+    "useOnboarding",
+    "useOnlineStatus",
+    "usePerformanceMonitor",
+    "usePermissions",
+    "usePrefersDarkMode",
+    "usePrefersReducedMotion",
+    "usePrefetch",
+    "useQRScanner",
+    "useQuotationFlow",
+    "useRateLimitLogs",
+    "useRealtime",
+    "useRecentAlerts",
+    "useRecordHistory",
+    "useRewardPurchases",
+    "useRodonavesTracking",
+    "useRodonavesWebhook",
+    "useRole",
+    "useRuleTriggers",
+    "useSLAMetrics",
+    "useSLANotifications",
+    "useSecurityEvents",
+    "useSecurityPushNotifications",
+    "useSessionTimeout",
+    "useShortcutsDialog",
+    "useSmartAlerts",
+    "useSmartCarrierSelection",
+    "useSoftDelete",
+    "useTelemetry",
+    "useTimezone",
+    "useToast",
+    "useTouchGestures",
+    "useTransportadoraPerformance",
+    "useUnifiedTracking",
+    "useVirtualTable",
+    "useWebAuthn",
+    "useWhatsAppNotification"
+   ],
+   "hooks_definidos": [],
+   "edges": [
+    "bitrix24-integration",
+    "check-rate-limit",
+    "evolution-whatsapp",
+    "external-db-bridge",
+    "geocode-address",
+    "lalamove-api",
+    "lalamove-tracking",
+    "log-security-event",
+    "melhor-envio-api",
+    "new-device-alert",
+    "predict-delays",
+    "push-send",
+    "rodonaves-api",
+    "rodonaves-webhook",
+    "scheduled-reports",
+    "smart-carrier-selection",
+    "webhook-status",
+    "whatsapp-notification"
+   ],
+   "tabelas": [
+    "achievements",
+    "ai_delay_predictions",
+    "alertas_custo",
+    "audit_logs",
+    "bio_sync_telemetry",
+    "business_rules",
+    "client_webhooks",
+    "clientes",
+    "coletas",
+    "comments",
+    "conciliacao_itens_importados",
+    "conciliacoes",
+    "cotacoes_frete",
+    "cotacoes_multicanal",
+    "entregas",
+    "error_events",
+    "feature_flags",
+    "fornecedores",
+    "freight_selection_rules",
+    "fretes_internos",
+    "ip_access_rules",
+    "kanban_history",
+    "known_devices",
+    "logistica_reversa",
+    "notificacoes_custo",
+    "notifications",
+    "ocorrencias",
+    "performance_metrics",
+    "profiles",
+    "push_subscriptions",
+    "rastreamento_alertas",
+    "rastreamento_historico",
+    "rate_limit_logs",
+    "reward_items",
+    "reward_purchases",
+    "risk_zones",
+    "rule_execution_logs",
+    "security_events",
+    "sla_alerts",
+    "tabelas_frete",
+    "telemetry_logs",
+    "transportadora_rotas",
+    "transportadoras",
+    "user_achievements",
+    "user_levels",
+    "user_notification_preferences",
+    "user_onboarding",
+    "user_roles",
+    "user_sessions",
+    "webauthn_challenges",
+    "webauthn_credentials",
+    "webhook_deliveries",
+    "webhook_inbound_failures"
+   ],
+   "rpcs": [
+    "add_user_xp",
+    "get_dashboard_metrics",
+    "get_monthly_analytics",
+    "get_user_permissions"
+   ],
+   "buckets": [],
+   "canais_realtime": [
+    "realtime:${config.table}:${multiTopicId}"
+   ],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "components/common",
+    "components/ui",
+    "hooks",
+    "hooks/logistics"
+   ],
+   "pacotes_externos": [
+    "framer-motion",
+    "lucide-react"
+   ]
+  },
+  {
+   "modulo": "pages/dashboard-cotacoes",
+   "arquivos": 1,
+   "testes": 0,
+   "linhas": 83,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 1,
+   "hooks_locais": [
+    "useAchievementNotifications",
+    "useAnalytics",
+    "useApiStatus",
+    "useAudioFeedback",
+    "useAuditLogs",
+    "useAuth",
+    "useBiometricAnomalies",
+    "useBoxManagement",
+    "useBusinessRuleEngine",
+    "useBusinessRules",
+    "useClientWebhooks",
+    "useComments",
+    "useConciliacao",
+    "useConfirmExit",
+    "useCotacoesFrete",
+    "useDashboardData",
+    "useDashboardMetrics",
+    "useDashboardWidgets",
+    "useDateFormatter",
+    "useDelayPrediction",
+    "useDensity",
+    "useDeviceSessions",
+    "useDocumentUpload",
+    "useDrillDown",
+    "useEntityHistory",
+    "useExecutiveMetrics",
+    "useExport",
+    "useExternalDbBridge",
+    "useFavoriteMetrics",
+    "useFeatureFlag",
+    "useFeatureFlags",
+    "useFreightIntelligence",
+    "useFreightQuotation",
+    "useGamification",
+    "useGlobalSearch",
+    "useGlobalShortcuts",
+    "useImageUpload",
+    "useIntegrationValidation",
+    "useIsDesktop",
+    "useIsMobile",
+    "useIsTablet",
+    "useKeyboardShortcut",
+    "useKeyboardShortcuts",
+    "useLalamoveOrders",
+    "useLogisticsIntelligence",
+    "useMFA",
+    "useMapWeatherSync",
+    "useMediaQuery",
+    "useMelhorEnvio",
+    "useNavigationHistory",
+    "useNewDeviceDetection",
+    "useNotificationBadge",
+    "useNotificationPreferences",
+    "useNotifications",
+    "useOfflineSync",
+    "useOnboarding",
+    "useOnlineStatus",
+    "usePerformanceMonitor",
+    "usePermissions",
+    "usePrefersDarkMode",
+    "usePrefersReducedMotion",
+    "usePrefetch",
+    "useQRScanner",
+    "useQuotationFlow",
+    "useRateLimitLogs",
+    "useRealtime",
+    "useRecentAlerts",
+    "useRecordHistory",
+    "useRewardPurchases",
+    "useRodonavesTracking",
+    "useRodonavesWebhook",
+    "useRole",
+    "useRuleTriggers",
+    "useSLAMetrics",
+    "useSLANotifications",
+    "useSecurityEvents",
+    "useSecurityPushNotifications",
+    "useSessionTimeout",
+    "useShortcutsDialog",
+    "useSmartAlerts",
+    "useSmartCarrierSelection",
+    "useSoftDelete",
+    "useTelemetry",
+    "useTimezone",
+    "useToast",
+    "useTouchGestures",
+    "useTransportadoraPerformance",
+    "useUnifiedTracking",
+    "useVirtualTable",
+    "useWebAuthn",
+    "useWhatsAppNotification"
+   ],
+   "hooks_definidos": [],
+   "edges": [
+    "bitrix24-integration",
+    "check-rate-limit",
+    "evolution-whatsapp",
+    "external-db-bridge",
+    "geocode-address",
+    "lalamove-api",
+    "lalamove-tracking",
+    "log-security-event",
+    "melhor-envio-api",
+    "new-device-alert",
+    "predict-delays",
+    "push-send",
+    "rodonaves-api",
+    "rodonaves-webhook",
+    "scheduled-reports",
+    "smart-carrier-selection",
+    "webhook-status",
+    "whatsapp-notification"
+   ],
+   "tabelas": [
+    "achievements",
+    "ai_delay_predictions",
+    "alertas_custo",
+    "audit_logs",
+    "bio_sync_telemetry",
+    "business_rules",
+    "client_webhooks",
+    "clientes",
+    "coletas",
+    "comments",
+    "conciliacao_itens_importados",
+    "conciliacoes",
+    "cotacoes_frete",
+    "cotacoes_multicanal",
+    "entregas",
+    "error_events",
+    "feature_flags",
+    "fornecedores",
+    "freight_selection_rules",
+    "fretes_internos",
+    "ip_access_rules",
+    "kanban_history",
+    "known_devices",
+    "logistica_reversa",
+    "notificacoes_custo",
+    "notifications",
+    "ocorrencias",
+    "performance_metrics",
+    "profiles",
+    "push_subscriptions",
+    "rastreamento_alertas",
+    "rastreamento_historico",
+    "rate_limit_logs",
+    "reward_items",
+    "reward_purchases",
+    "risk_zones",
+    "rule_execution_logs",
+    "security_events",
+    "sla_alerts",
+    "tabelas_frete",
+    "telemetry_logs",
+    "transportadora_rotas",
+    "transportadoras",
+    "user_achievements",
+    "user_levels",
+    "user_notification_preferences",
+    "user_onboarding",
+    "user_roles",
+    "user_sessions",
+    "webauthn_challenges",
+    "webauthn_credentials",
+    "webhook_deliveries",
+    "webhook_inbound_failures"
+   ],
+   "rpcs": [
+    "add_user_xp",
+    "get_dashboard_metrics",
+    "get_monthly_analytics",
+    "get_user_permissions"
+   ],
+   "buckets": [],
+   "canais_realtime": [
+    "realtime:${config.table}:${multiTopicId}"
+   ],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [
+    "admin"
+   ],
+   "diretos": {
+    "edges": [],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "components/ui",
+    "hooks"
+   ],
+   "pacotes_externos": [
+    "framer-motion",
+    "lucide-react"
+   ]
+  },
+  {
+   "modulo": "pages/ranking",
+   "arquivos": 1,
+   "testes": 0,
+   "linhas": 77,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 1,
+   "hooks_locais": [],
+   "hooks_definidos": [],
+   "edges": [],
+   "tabelas": [],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [],
+   "flags": [],
+   "papeis": [],
+   "diretos": {
+    "edges": [],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "pages"
+   ],
+   "depende_de_modulos": [
+    "components/ui",
+    "lib"
+   ],
+   "pacotes_externos": [
+    "framer-motion",
+    "lucide-react"
+   ]
+  },
+  {
+   "modulo": "services/api",
+   "arquivos": 3,
+   "testes": 0,
+   "linhas": 155,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 0,
+   "hooks_locais": [],
+   "hooks_definidos": [],
+   "edges": [],
+   "tabelas": [
+    "cotacoes_frete",
+    "profiles",
+    "user_levels",
+    "user_roles"
+   ],
+   "rpcs": [],
+   "buckets": [
+    "avatars",
+    "documents"
+   ],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [],
+   "diretos": {
+    "edges": [],
+    "tabelas": [
+     "cotacoes_frete",
+     "profiles",
+     "user_levels",
+     "user_roles"
+    ],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "components/shipping",
+    "hooks/auth",
+    "hooks/logistics"
+   ],
+   "depende_de_modulos": [
+    "integrations/supabase"
+   ],
+   "pacotes_externos": []
+  },
+  {
+   "modulo": "services/base",
+   "arquivos": 1,
+   "testes": 0,
+   "linhas": 28,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 0,
+   "hooks_locais": [],
+   "hooks_definidos": [],
+   "edges": [],
+   "tabelas": [
+    "security_events"
+   ],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [],
+   "diretos": {
+    "edges": [],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [],
+   "depende_de_modulos": [
+    "services/resilience"
+   ],
+   "pacotes_externos": []
+  },
+  {
+   "modulo": "services/resilience",
+   "arquivos": 1,
+   "testes": 0,
+   "linhas": 99,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 0,
+   "hooks_locais": [],
+   "hooks_definidos": [],
+   "edges": [],
+   "tabelas": [
+    "security_events"
+   ],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [],
+   "diretos": {
+    "edges": [],
+    "tabelas": [
+     "security_events"
+    ],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "hooks/data",
+    "services/base"
+   ],
+   "depende_de_modulos": [
+    "features/incidents",
+    "integrations/supabase"
+   ],
+   "pacotes_externos": []
+  },
+  {
+   "modulo": "test",
+   "arquivos": 0,
+   "testes": 4,
+   "linhas": 0,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 0,
+   "hooks_locais": [],
+   "hooks_definidos": [],
+   "edges": [],
+   "tabelas": [],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [],
+   "env": [],
+   "flags": [],
+   "papeis": [],
+   "diretos": {
+    "edges": [],
+    "tabelas": [],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [],
+   "depende_de_modulos": [],
+   "pacotes_externos": []
+  },
+  {
+   "modulo": "utils",
+   "arquivos": 4,
+   "testes": 1,
+   "linhas": 538,
+   "itens_menu": [],
+   "telas": [],
+   "rotas_http": [],
+   "componentes": 0,
+   "hooks_locais": [],
+   "hooks_definidos": [],
+   "edges": [
+    "health-check"
+   ],
+   "tabelas": [
+    "audit_logs",
+    "profiles"
+   ],
+   "rpcs": [],
+   "buckets": [],
+   "canais_realtime": [
+    "health-ping"
+   ],
+   "env": [
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "VITE_SUPABASE_URL"
+   ],
+   "flags": [],
+   "papeis": [],
+   "diretos": {
+    "edges": [
+     "health-check"
+    ],
+    "tabelas": [
+     "audit_logs",
+     "profiles"
+    ],
+    "rpcs": []
+   },
+   "importado_por_outros_modulos": [
+    "components/common",
+    "components/layout",
+    "features/preferences",
+    "hooks/common",
+    "hooks/gamification",
+    "hooks/notifications"
+   ],
+   "depende_de_modulos": [
+    "integrations/supabase"
+   ],
+   "pacotes_externos": [
+    "sonner"
+   ]
+  }
+ ]
+}

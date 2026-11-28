@@ -1,0 +1,84 @@
+{
+ "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
+ "format_version": 2,
+ "onde_ficam": {
+  "telas": [
+   "src/pages (61)"
+  ],
+  "componentes": [
+   "src/components (257)",
+   "src/pages (77)",
+   "src/features (41)"
+  ],
+  "hooks": [
+   "src/hooks (124)",
+   "src/features (41)",
+   "src/components (14)"
+  ],
+  "servicos_logica": [
+   "src/lib (38)",
+   "src/services (5)",
+   "src/utils (4)"
+  ],
+  "testes": [
+   "co-localizado (*.test) (93)",
+   "tests/ (77)",
+   "outro (54)"
+  ],
+  "edge_functions": "supabase/functions",
+  "migrations": "supabase/migrations",
+  "scripts": [
+   "scripts/ci (17)",
+   "scripts/db-audit (15)",
+   "scripts/audit (5)"
+  ],
+  "docs": [
+   "docs (34)",
+   "(raiz) (9)",
+   ".github (1)"
+  ]
+ },
+ "nomenclatura": {
+  "componentes": "PascalCase (85%)",
+  "hooks": "use + PascalCase",
+  "servicos": "camelCase (96%)",
+  "edge_functions": "kebab-case (98%)",
+  "tabelas": "snake_case (88%)"
+ },
+ "barrels_index": 25,
+ "extensao_componentes": [
+  ".tsx (383)"
+ ],
+ "alias_imports": {
+  "(raiz)": {
+   "@/": "src/",
+   "~/": "src/"
+  }
+ },
+ "commits": {
+  "convencao": "commitlint",
+  "exemplos": [
+   "docs: reaudita as 49 PRs fechadas e as 16 branches arquivo a arquivo (#555)",
+   "fix: crash de tela usa a RPC que grava tambem sem sessao (#554)",
+   "chore(db): sincronizar artefatos com o banco [auto] (#553)",
+   "feat: crash de tela publica passa a ser gravado por RPC liberada para anonimo (#552)",
+   "chore: fecha a decisao 5 do censo mantendo o multi-tenant dormente (#551)"
+  ]
+ },
+ "pr_template": ".github/pull_request_template.md",
+ "codeowners": null,
+ "contributing": "CONTRIBUTING.md",
+ "instrucoes_agentes": [
+  "AGENTS.md",
+  "CLAUDE.md"
+ ],
+ "typescript": {
+  "strict": true,
+  "noImplicitAny": true,
+  "tsconfigs": [
+   "tsconfig.app.json",
+   "tsconfig.json",
+   "tsconfig.node.json"
+  ]
+ }
+}

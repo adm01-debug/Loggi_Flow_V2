@@ -1,0 +1,836 @@
+{
+ "aviso": "GERADO AUTOMATICAMENTE por scripts/ai-context/gerar.mjs — não editar à mão; será sobrescrito.",
+ "format_version": 2,
+ "total": 69,
+ "scripts": [
+  {
+   "arquivo": "scripts/ai-context/cenarios.mjs",
+   "descricao": "Simulação de cenários do gerador: monta centenas de repositórios sintéticos (variantes de SQL, rotas, menus, edges, workflows, monorepo, Python, arquivos corrompidos, fuzz) e confere:",
+   "linhas": 191,
+   "env": [
+    "A",
+    "K",
+    "NODE_ENV",
+    "SCRIPT_ONLY",
+    "SO_NO_TESTE",
+    "SRK",
+    "SUPABASE_URL",
+    "VITE_A",
+    "VITE_C",
+    "VITE_FEATURE_X",
+    "X"
+   ],
+   "npm_scripts": [],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/ai-context/gerar.mjs",
+   "descricao": "Gera o contexto de projeto para agentes de IA (padrão: inventario/ia/*). Zero dependências. Node >= 18. Genérico: funciona em qualquer repositório.",
+   "linhas": 1024,
+   "env": [
+    "AI_CONTEXT_DIR",
+    "AI_CONTEXT_PUBLICACAO",
+    "AI_CONTEXT_ROOT"
+   ],
+   "npm_scripts": [],
+   "workflows": [
+    "contexto-ia.yml"
+   ],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/audit-gate.mjs",
+   "descricao": "Gate de vulnerabilidades: falha em qualquer CRITICAL/HIGH fora da allowlist. Allowlist só para pacotes SEM fix disponível no npm, com justificativa e revisão",
+   "linhas": 126,
+   "env": [
+    "AUDIT_TIMEOUT_MS"
+   ],
+   "npm_scripts": [
+    "security-scan"
+   ],
+   "workflows": [
+    "ci.yml",
+    "security.yml"
+   ],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/audit/content_hash.sql",
+   "descricao": "Hash de conteúdo por tabela — para verificar paridade de dados Executar nos dois bancos após carga; deve retornar hashes iguais",
+   "linhas": 51,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/audit/manifest_data.sql",
+   "descricao": "Manifesto de auditoria — dados (rows + hash de conteúdo) por tabela public/internal Saída única: (section, key, def) no padrão do pipeline audit_tmp.manifest",
+   "linhas": 20,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/audit/manifest_detail.sql",
+   "descricao": "Manifesto de auditoria — detalhado por objeto Sections: schema, table, column, constraint, index, policy, function, trigger, enum",
+   "linhas": 66,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/audit/manifest_full.sql",
+   "descricao": "Sobra de execução interrompida na mesma sessão: sem este DROP o CREATE falha e, com o psql no modo padrão (segue após erro), as linhas velhas saem misturadas no manifesto novo.",
+   "linhas": 113,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/audit/manifest_summary.sql",
+   "descricao": "Manifesto de auditoria — resumo por seção Executar nos dois bancos e comparar saídas",
+   "linhas": 51,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/automation.mjs",
+   "descricao": null,
+   "linhas": 1170,
+   "env": [
+    "REPO_AUTOMATION_CHAINING",
+    "REPO_AUTOMATION_GRACE_MS"
+   ],
+   "npm_scripts": [
+    "automation:doctor",
+    "automation:test",
+    "automation:check",
+    "automation:heal",
+    "automation:nightly",
+    "automation:graph",
+    "automation:status",
+    "automation:install-hooks",
+    "automation:uninstall-hooks"
+   ],
+   "workflows": [
+    "automation-local.yml"
+   ],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/check-warning-budget.mjs",
+   "descricao": "Warning budget gate. Runs ESLint (JSON) and `tsc --noEmit`, counts issues, and fails the process",
+   "linhas": 154,
+   "env": [],
+   "npm_scripts": [
+    "lint:budget"
+   ],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/ci/actions-kpi.mjs",
+   "descricao": "E79: KPI de uso do GitHub Actions, para o branch-hygiene-audit semanal. Medido antes de escrever (03/10/2026): a API devolve `run_started_at` e",
+   "linhas": 315,
+   "env": [
+    "GH_TOKEN",
+    "GITHUB_API_URL",
+    "GITHUB_REPOSITORY",
+    "GITHUB_STEP_SUMMARY",
+    "GITHUB_TOKEN",
+    "JANELA_DIAS"
+   ],
+   "npm_scripts": [],
+   "workflows": [
+    "branch-hygiene-audit.yml"
+   ],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/ci/branch-podaveis.mjs",
+   "descricao": "W98 — comando pronto de poda de branches (usado pelo branch-hygiene-audit.yml). O plano oferecia duas saídas: apagar sozinho ou só gerar o comando. Apagar é",
+   "linhas": 222,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [
+    "branch-hygiene-audit.yml"
+   ],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/ci/bump-toolchain.mjs",
+   "descricao": "W40: Verifica se há versão mais nova das ferramentas em .github/toolchain.json. Usa a API do GitHub (ou fallback público) para cada ferramenta.",
+   "linhas": 178,
+   "env": [
+    "GH_TOKEN",
+    "GITHUB_STEP_SUMMARY",
+    "GITHUB_TOKEN"
+   ],
+   "npm_scripts": [],
+   "workflows": [
+    "branch-hygiene-audit.yml"
+   ],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/ci/check-agents-facts.mjs",
+   "descricao": null,
+   "linhas": 126,
+   "env": [],
+   "npm_scripts": [
+    "validate:agents-facts"
+   ],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/ci/check-claude-md-integrity.mjs",
+   "descricao": "Garante que as instrucoes para agentes nao foram apagadas ou esvaziadas por outra sessao. Alvo: AGENTS.md (regras) + docs/agentes/*.md (referencia). CLAUDE.md e so `@AGENTS.md`.",
+   "linhas": 149,
+   "env": [
+    "CLAUDE_MD_BASE"
+   ],
+   "npm_scripts": [],
+   "workflows": [
+    "ci.yml"
+   ],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/ci/check-dedupe-keys.mjs",
+   "descricao": "Etapa 142 do plano QA (achado B-02): chave de dedupe nao pode conter valor aleatorio ou relogio. O defeito original: `crypto.randomUUID()` ou `Date.now()` dentro da chave do evento faz cada",
+   "linhas": 95,
+   "env": [],
+   "npm_scripts": [
+    "validate:dedupe-keys"
+   ],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/ci/check-doc-paths.mjs",
+   "descricao": null,
+   "linhas": 87,
+   "env": [],
+   "npm_scripts": [
+    "validate:doc-paths"
+   ],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/ci/check-env-not-tracked.mjs",
+   "descricao": "Impede que o `.env` volte para o indice do git (etapa 018 do plano QA, achado S-07). O gitleaks procura *padrao de segredo* no diff: um `.env` com a chave `anon` passa limpo — foi assim",
+   "linhas": 66,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [
+    "ci.yml"
+   ],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/ci/check-root-files.mjs",
+   "descricao": null,
+   "linhas": 109,
+   "env": [],
+   "npm_scripts": [
+    "validate:root-files"
+   ],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/ci/check-soft-delete.mjs",
+   "descricao": "Reprova `.delete()` do front em tabela que tem exclusão lógica (achado D-02, etapa 058 do plano QA). docs/SOFT_DELETE_POLICY.md é política; aqui ela vira mecanismo: toda cadeia",
+   "linhas": 163,
+   "env": [],
+   "npm_scripts": [
+    "validate:soft-delete"
+   ],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/ci/fila-merge.mjs",
+   "descricao": "Fila de merge serial (substitui a fila nativa, indisponível em conta `User`). Problema medido em 15/10/2026: com `strict=true`, cada merge na `main` deixava",
+   "linhas": 254,
+   "env": [
+    "GITHUB_OUTPUT",
+    "GITHUB_REPOSITORY",
+    "GITHUB_STEP_SUMMARY"
+   ],
+   "npm_scripts": [],
+   "workflows": [
+    "auto-update-pr-branch.yml"
+   ],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/ci/github-settings-guard.mjs",
+   "descricao": "E13/E14 + E95: confere o perimetro do GitHub contra o baseline versionado (`github-settings-baseline.json`) e restaura o que sabe restaurar.",
+   "linhas": 829,
+   "env": [
+    "ADMIN_READ_TOKEN",
+    "GITHUB_REPOSITORY",
+    "GITHUB_RUN_ID",
+    "GITHUB_TOKEN",
+    "PERIMETER_SNAPSHOT_PATH",
+    "SETTINGS_GUARD_AUTOR"
+   ],
+   "npm_scripts": [],
+   "workflows": [
+    "settings-guard.yml"
+   ],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/ci/install-pgbouncer.sh",
+   "descricao": "So pula a instalacao se o binario existe E roda: `pgbouncer` presente mas quebrado (wrapper sem o pacote real, biblioteca faltando) tem de cair no apt, nao abortar aqui.",
+   "linhas": 38,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [
+    "types-sync.yml"
+   ],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/ci/install-postgresql-client.sh",
+   "descricao": "So pula a instalacao se o binario existe E roda: `psql` presente mas quebrado (wrapper sem o pacote real, biblioteca faltando) tem de cair no apt, nao abortar aqui.",
+   "linhas": 38,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [
+    "types-sync.yml"
+   ],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/ci/sla-code-scanning.mjs",
+   "descricao": "W83 — SLA dos alertas abertos de Code Scanning (usado pelo branch-hygiene-audit.yml). high/critical → 14 dias; medium/low → 30 dias. Violação → exit 1.",
+   "linhas": 90,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [
+    "branch-hygiene-audit.yml"
+   ],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/ci/typecheck-ratchet.mjs",
+   "descricao": "Roda \"tsc -b --force\" e compara as ocorrencias com um baseline versionado: falha so se uma NOVA ocorrencia aparecer (mesmo principio do orcamento em",
+   "linhas": 415,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [
+    "types-sync.yml"
+   ],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/ci/validate-query-limits.mjs",
+   "descricao": "Reprova cadeia de listagem sem teto: `supabase.from(<tabela>).select(...)` que não termina em `.limit(`, `.range(`, `.single(` ou `.maybeSingle(` (achado P-01 do plano QA).",
+   "linhas": 216,
+   "env": [],
+   "npm_scripts": [
+    "validate:query-limits"
+   ],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/db-audit/catalog.sql",
+   "descricao": "Regenera supabase/schema-catalog.json a partir do banco de destino. Uso:",
+   "linhas": 93,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [
+    "types-sync.yml"
+   ],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/db-audit/check-catalog-fresh.mjs",
+   "descricao": "Confere se supabase/schema-catalog.json ainda reflete o banco. O guard de acoplamento roda offline contra o catalogo commitado. O preco disso",
+   "linhas": 187,
+   "env": [
+    "CATALOG_IDENTITY_PATH",
+    "CATALOG_PATH",
+    "DESTINO_URL"
+   ],
+   "npm_scripts": [],
+   "workflows": [
+    "types-sync.yml"
+   ],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/db-audit/check-grants-fresh.mjs",
+   "descricao": "Confere se scripts/db-audit/grants-baseline.json ainda reflete o banco. Compara apenas o conteudo de ACL (anon_execute, anon_table_select,",
+   "linhas": 93,
+   "env": [
+    "GRANTS_BASELINE_PATH"
+   ],
+   "npm_scripts": [],
+   "workflows": [
+    "types-sync.yml"
+   ],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/db-audit/check-manifest-fresh.mjs",
+   "descricao": "Compara supabase/schema-manifest.json com uma geracao fresca do banco oficial. Exit codes:",
+   "linhas": 109,
+   "env": [
+    "CATALOG_IDENTITY_PATH",
+    "DESTINO_URL",
+    "MANIFEST_PATH"
+   ],
+   "npm_scripts": [],
+   "workflows": [
+    "types-sync.yml"
+   ],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/db-audit/check-remocoes-destrutivas.mjs",
+   "descricao": "Gate 3 do types-sync — remocoes destrutivas. Compara os OBJETOS do catalogo antigo x novo (`supabase/schema-catalog.json`,",
+   "linhas": 137,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [
+    "types-sync.yml"
+   ],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/db-audit/database-identity.mjs",
+   "descricao": null,
+   "linhas": 202,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [
+    "types-sync.yml"
+   ],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/db-audit/gen-types.sh",
+   "descricao": "gen-types.sh [--local] [arquivo_de_saida] Gera os types TypeScript do schema public (src/integrations/supabase/types.ts).",
+   "linhas": 192,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [
+    "types-sync.yml"
+   ],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/db-audit/grants-baseline.sql",
+   "descricao": "Regenera scripts/db-audit/grants-baseline.json a partir do banco de destino. Uso:",
+   "linhas": 39,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [
+    "types-sync.yml"
+   ],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/db-audit/local-pg-proxy.mjs",
+   "descricao": "scripts/db-audit/local-pg-proxy.mjs <diretorio-temporario-0700> Escreve a config de um pgbouncer LOCAL (bind 127.0.0.1) que repassa para o",
+   "linhas": 131,
+   "env": [
+    "DESTINO_URL"
+   ],
+   "npm_scripts": [],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/db-audit/lote-pendente.mjs",
+   "descricao": "W26: fonte única da regra \"apply pendente\". Chama check-migration-drift.mjs --classificar, escreve uma secao no",
+   "linhas": 98,
+   "env": [
+    "DESTINO_URL",
+    "GITHUB_STEP_SUMMARY"
+   ],
+   "npm_scripts": [],
+   "workflows": [
+    "types-sync.yml"
+   ],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/db-audit/manifest-lib.mjs",
+   "descricao": null,
+   "linhas": 99,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/db-audit/manifest.sql",
+   "descricao": "Manifesto estrutural deterministico do schema public. Snapshot versionado:",
+   "linhas": 386,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [
+    "types-sync.yml"
+   ],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/db-audit/psql-environment.mjs",
+   "descricao": "libpq does not expand a URI supplied through the PGDATABASE default. Callers must validate project identity/TLS before calling this transport.",
+   "linhas": 126,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [
+    "types-sync.yml"
+   ],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/db-audit/sql-lexer.mjs",
+   "descricao": "Lexer SQL compartilhado entre check-migration-drift.mjs e supabase-usage-guard.mjs.",
+   "linhas": 225,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/db-audit/supabase-usage-guard.mjs",
+   "descricao": "Guard de acoplamento codigo <-> banco. Varre src/ e supabase/functions/ procurando .from('x') e .rpc('y') feitos no",
+   "linhas": 298,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [
+    "types-sync.yml"
+   ],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/gates/helpers.mjs",
+   "descricao": "Apoio dos testes dos gates da raiz de scripts/ (validate-*.mjs, audit-gate.mjs, *-warning-budget.mjs, generate-quality-report.mjs). Os gates resolvem a raiz do repo a partir do próprio caminho",
+   "linhas": 62,
+   "env": [
+    "PATH"
+   ],
+   "npm_scripts": [],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/generate-quality-report.mjs",
+   "descricao": "Generates a Quality Gate report:   - ESLint warnings/errors per file, grouped by rule category",
+   "linhas": 143,
+   "env": [],
+   "npm_scripts": [
+    "quality:report"
+   ],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/graphify-local.mjs",
+   "descricao": null,
+   "linhas": 1247,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/graphify/setup.sh",
+   "descricao": "Instala o graphify (grafo de conhecimento do código) e o configura neste clone. Uso: npm run graph:setup   (Linux, macOS ou WSL; precisa de uv ou pipx)",
+   "linhas": 54,
+   "env": [],
+   "npm_scripts": [
+    "graph:setup"
+   ],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/historico/cleanup_triggers_source.sql",
+   "descricao": "========================================================== CLEANUP DE TRIGGERS DUPLICADOS — SOURCE hgicfqjayrjurivtygqf",
+   "linhas": 116,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/historico/origem_remediacao_2026-08-31.sql",
+   "descricao": "Etapas 36 (blocos 1-2 do cleanup_triggers_source.sql + extra), 50, 22 e 34 aplicadas na ORIGEM em 2026-08-31 HISTÓRICO — NÃO REEXECUTAR: registro do que já foi aplicado. Desde o cutover a origem",
+   "linhas": 66,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/inventario/banco.sql",
+   "descricao": "Inventario do banco oficial (so leitura) para inventario/estado/banco.json. Uso (credencial viva):   node scripts/inventario/gerar-banco.mjs",
+   "linhas": 152,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/inventario/gerar-banco.mjs",
+   "descricao": "Inventario do banco oficial -> inventario/estado/banco.json (fonte de consulta dos agentes). Tudo sai de comando: o SQL de leitura `scripts/inventario/banco.sql`, a lista de edge",
+   "linhas": 448,
+   "env": [
+    "INVENTARIO_PERMITIR_OUTRO_PROJETO",
+    "SUPABASE_ACCESS_TOKEN",
+    "SUPABASE_API_URL",
+    "SUPABASE_PROJECT_REF"
+   ],
+   "npm_scripts": [],
+   "workflows": [
+    "inventario-estado-semanal.yml"
+   ],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/inventario/gerar-repo.mjs",
+   "descricao": "Inventario gerado do lado do repositorio (sem acesso ao banco):  - edge functions: linhas do index.ts, segredos lidos (Deno.env.get no index.ts e nos arquivos locais que ele",
+   "linhas": 147,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [
+    "inventario-estado-semanal.yml"
+   ],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/inventario/gerar-rotas.mjs",
+   "descricao": "Inventario das rotas do front -> inventario/estado/rotas.json (fonte de consulta dos agentes). Le o codigo, nao documentacao:",
+   "linhas": 433,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [
+    "inventario-estado-semanal.yml"
+   ],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/inventario/mudou-conteudo.mjs",
+   "descricao": "O inventario mudou de verdade? Compara cada arquivo de inventario/estado/ com a versao do HEAD depois de tirar so os carimbos de data (`medido_em`, `gerado_em`, em qualquer nivel).",
+   "linhas": 137,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [
+    "inventario-estado-semanal.yml"
+   ],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/lib/seguranca-processo.mjs",
+   "descricao": "Utilidades compartilhadas pelos scripts de auditoria/CI. Existe para nao repetir, em cada ponto de uso, dois trechos que o Sonar",
+   "linhas": 142,
+   "env": [
+    "PATH"
+   ],
+   "npm_scripts": [],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/maintenance/lib.mjs",
+   "descricao": null,
+   "linhas": 937,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/maintenance/run.mjs",
+   "descricao": null,
+   "linhas": 899,
+   "env": [
+    "XDG_STATE_HOME"
+   ],
+   "npm_scripts": [],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/maintenance/run.sh",
+   "descricao": null,
+   "linhas": 16,
+   "env": [],
+   "npm_scripts": [
+    "maintenance:doctor",
+    "maintenance:check",
+    "maintenance:heal"
+   ],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/maintenance/typecheck.mjs",
+   "descricao": null,
+   "linhas": 110,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/ops/backup_origem.sh",
+   "descricao": "Backup diario da ORIGEM (Lovable hgicfqjayrjurivtygqf) ate o descomissionamento. Roda no container claude-code da VPS. Segredo fora do repo: /workspace/.secrets/loggi-origem.pgpass (formato pgpass: ho",
+   "linhas": 75,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/ops/pos_deploy_functions.sql",
+   "descricao": "Runbook pós-deploy das edge functions (auditoria 2026-09-02) — projeto jvfhclubfpxrtrrazrgr Só comentários: colar este arquivo num SQL editor não executa nada.",
+   "linhas": 100,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/ops/set_missing_secrets.sh",
+   "descricao": "Secrets das edge functions do projeto oficial — referencia dos NOMES esperados e envio dos que ainda estao com PLACEHOLDER_NEEDS_SETUP (cutover, etapa 83).",
+   "linhas": 280,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [
+    "sync-internal-secret.yml"
+   ],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/ratchet-warning-budget.mjs",
+   "descricao": "Auto-ratchet the warning budget. Runs the same measurement as `check-warning-budget.mjs` but instead of failing",
+   "linhas": 110,
+   "env": [],
+   "npm_scripts": [
+    "lint:budget:ratchet"
+   ],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/regras_negocio/generate.py",
+   "descricao": "AI Context Sync — gera e mantém atualizada a base de contexto do repositório para agentes de IA (neste repo: docs/contexto/regras/, publicado na branch `contexto`).",
+   "linhas": 2253,
+   "env": [
+    "AI_CONTEXT_INDEX",
+    "AI_CONTEXT_MODEL",
+    "AI_CONTEXT_PROFILE",
+    "AI_CONTEXT_SCHEMA_SNAPSHOT",
+    "ANTHROPIC_API_KEY"
+   ],
+   "npm_scripts": [],
+   "workflows": [
+    "contexto-ia.yml"
+   ],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/regras_negocio/indice.py",
+   "descricao": "Índice único do contexto para agentes de IA — junta várias fontes de verdade em um 00-INDEX.md. Cada fonte é um produtor independente (script, secret e falha próprios). Este script só lê o que",
+   "linhas": 259,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [
+    "contexto-ia.yml"
+   ],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/regras_negocio/publish.sh",
+   "descricao": "Publica a saída gerada do contexto (neste repo: docs/contexto/regras) sem nunca escrever na branch padrão. Uso standalone; neste repo quem publica é o job `publicar` de .github/workflows/contexto-ia.y",
+   "linhas": 290,
+   "env": [],
+   "npm_scripts": [],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/seed-database.ts",
+   "descricao": "Seed script — popula um banco Supabase com dados fictícios realistas para desenvolvimento, demos e o usuário de teste do E2E.",
+   "linhas": 982,
+   "env": [
+    "SEED_PASSWORD",
+    "SEED_TIMEOUT_MS",
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_URL",
+    "VITE_SUPABASE_URL"
+   ],
+   "npm_scripts": [
+    "seed"
+   ],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/supabase_snapshot/snapshot.py",
+   "descricao": "Somente leitura no banco (sessão read-only, statement_timeout, lock_timeout). Nunca grava linhas de tabelas, valores de segredos, chaves, senhas ou DSN.",
+   "linhas": 1909,
+   "env": [
+    "CODE_SCAN_DIRS",
+    "GEN_TYPES",
+    "PGDUMP",
+    "PGDUMP_SCHEMAS",
+    "REPO_ROOT",
+    "SNAPSHOT_DIR",
+    "SNAPSHOT_EXCLUDE_SCHEMAS",
+    "SNAPSHOT_INCLUDE_SCHEMAS",
+    "SUPABASE_ACCESS_TOKEN",
+    "SUPABASE_DB_URL",
+    "SUPABASE_PROJECT_REF",
+    "SUPABASE_SNAPSHOT_PUBLICACAO"
+   ],
+   "npm_scripts": [],
+   "workflows": [
+    "contexto-ia.yml"
+   ],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/validate-csp.mjs",
+   "descricao": "Valida a meta CSP em index.html contra domínios de fontes/estilos necessários. Falha o build se style-src não permitir fonts.googleapis.com ou font-src não permitir fonts.gstatic.com.",
+   "linhas": 96,
+   "env": [],
+   "npm_scripts": [
+    "prebuild",
+    "validate:csp"
+   ],
+   "workflows": [],
+   "orfao": false
+  },
+  {
+   "arquivo": "scripts/validate-no-console.mjs",
+   "descricao": "Fails CI when supabase/functions contains raw console.* calls. Prevents PII regressions in Edge Function logs.",
+   "linhas": 72,
+   "env": [],
+   "npm_scripts": [
+    "validate:no-console"
+   ],
+   "workflows": [],
+   "orfao": false
+  }
+ ]
+}
